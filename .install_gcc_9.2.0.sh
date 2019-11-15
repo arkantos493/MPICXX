@@ -10,7 +10,7 @@ else
     echo "  -- unpacking GCC 9.2.0"
     tar xf gcc-9.2.0.tar.xz
     rm gcc-9.2.0.tar.xz
-    cd gcc-9.2.0
+    cd gcc-9.2.0 && ls -a
     echo "  -- installing prerequisites"
    # ./contrib/download_prerequisites
     cd .. && mkdir gcc-9.2.0-objdir && cd gcc-9.2.0-objdir
