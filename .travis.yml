@@ -17,6 +17,7 @@ before_install:
 install: 
   - sudo apt-get install -qq g++-9
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
+  - sudo apt-get install openmpi-bin
 
 script: 
   - mkdir build && cd build
