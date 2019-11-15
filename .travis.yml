@@ -27,7 +27,7 @@ install:
 #  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
 #  - sudo apt-get install libopenmpi-dev openmpi-bin
     # install gcc 9.2.0
-   - ./install_gcc9.2.sh
+   - ./.install_gcc_9.2.0.sh
    - sudo update-alternatives --install /usr/bin/g++ g++ gcc-9/bin/g++ 90
    - sudo apt-get install libopenmpi-dev openmpi-bin
 
