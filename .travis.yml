@@ -29,7 +29,8 @@ before_script:
   - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -DGEN_DOCS=OFF ..
 
 script: 
-  - make
+  - make -j $(nproc)
+  - ctest --output-on-failure
 
 
 after_success:
