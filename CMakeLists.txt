@@ -1,22 +1,24 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(Project-Name)
+project(MPICXX LANGUAGES CXX)
 
 set(Project-Name_VERSION_MAJOR 0)
 set(Project-Name_VERSION_MINOR 1)
 set(Project-Name_VERSION_PATCH 0)
 set(Project-Name_VERSION "${Project-Name_VERSION_MAJOR}.${Project-Name_VERSION_MINOR}.${Project-Name_VERSION_PATCH}")
 
-set(PROJ_NAME "\"Project Name\"") # PROJECT_NAME is a predefined variable
-set(PROJECT_DESCRIPTION "\"A cross-platform C++14 project template\"")
+set(PROJ_NAME "\"MPICXX\"") # PROJECT_NAME is a predefined variable
+set(PROJECT_DESCRIPTION "\"An OpenMPI C++ wrapper library\"")
 
-configure_file(include/project-abbr/config.hpp.in
-    ${CMAKE_BINARY_DIR}/include/project-abbr/config.hpp
+configure_file(include/mpicxx/config.hpp.in
+    ${CMAKE_BINARY_DIR}/include/mpicxx/config.hpp
 )
 
-set(CMAKE_CXX_STANDARD 14)
+#add_compile_options(-Wall -Wextra -pedantic -fconcepts)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 # Options
 option(BUILD_TESTS "Build test executable" OFF)
@@ -38,7 +40,7 @@ if (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
     include(CodeCoverage)
     
     append_coverage_compiler_flags()
-    set(COVERAGE_EXCLUDES "/usr/include/\\*;${CMAKE_SOURCE_DIR}/src/main.cpp;${CMAKE_SOURCE_DIR}/test/*;${CMAKE_SOURCE_DIR}/third_party/doctest/*")
+    set(COVERAGE_EXCLUDES "/usr/include/\\*;${CMAKE_SOURCE_DIR}/test/*;${CMAKE_SOURCE_DIR}/third_party/doctest/*")
     
     setup_target_for_coverage(NAME coverage EXECUTABLE ctest DEPENDENCIES coverage)
 else (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -52,17 +54,17 @@ else (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
     endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
 
-set(LIBRARY_SOURCES
-    src/factorial.cpp
-    src/hello_world.cpp
-)
+add_library(mpicxx INTERFACE) # A library
 
-add_library(Project-Name-lib ${LIBRARY_SOURCES}) # A library
-set_target_properties(Project-Name-lib PROPERTIES PREFIX "") # Remove the lib prefix
-target_include_directories(Project-Name-lib PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
+# find MPI
+find_package(MPI REQUIRED)
+if(MPI_FOUND)
+    include_directories(mpicxx ${MPI_CXX_INCLUDE_DIRS})
+    target_link_libraries(mpicxx INTERFACE MPI::MPI_CXX)
+endif()
 
-add_executable(Project-Name src/main.cpp) # The main executable
-target_link_libraries(Project-Name Project-Name-lib) # Link our sources to the executable
+target_include_directories(mpicxx INTERFACE ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
+
 
 if (BUILD_TESTS)
     include(CTest)
@@ -75,8 +77,7 @@ if (GEN_DOCS)
 endif (GEN_DOCS)
 
 # Install the built library and executable into the appropriate directory
-install(TARGETS Project-Name DESTINATION bin)
-install(TARGETS Project-Name-lib
+install(TARGETS mpicxx
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
@@ -84,7 +85,7 @@ install(TARGETS Project-Name-lib
 
 # Install the project header files into the appropriate directory
 install(DIRECTORY include/ DESTINATION include PATTERN "config.hpp.in" EXCLUDE) # Install our main header files
-install(FILES ${CMAKE_BINARY_DIR}/include/project-abbr/config.hpp DESTINATION include/project-abbr) # Install our configuration file
+install(FILES ${CMAKE_BINARY_DIR}/include/mpicxx/config.hpp DESTINATION include/mpicxx) # Install our configuration file
 
 # Install the project's extra files
-install(FILES README.md LICENSE DESTINATION share/project-abbr)
+install(FILES README.md LICENSE DESTINATION share/mpicxx)

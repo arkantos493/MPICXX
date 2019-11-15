@@ -32,28 +32,28 @@ public:
      * Initializes class members hello_ and world_
      * with their respective values.
      */
-    HelloWorld();
+    HelloWorld() : hello_{ "Hello" }, world_{ "World" } { }
     
     /**
      * \brief Getter for member variable hello_ 
      * 
      * \return The string "Hello"
      */
-    const std::string& hello() const;
+    const std::string& hello() const { return hello_; }
     
     /**
      * \brief Getter for member variable world_ 
      * 
      * \return The string "World"
      */
-    const std::string& world() const;
+    const std::string& world() const { return world_; }
     
     /**
      * \brief A random number generator
      * 
      * \return The random number 4000
      */
-    int generateRandomNumber() const;
+    int generateRandomNumber() const { return 4'000; }
     
     
     /**

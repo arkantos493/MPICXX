@@ -11,7 +11,7 @@ env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
-   secure: "veAdPtCJipVm1byxjBdwEAmFrTkvPeQTFh2+F+HGoCpzKJloQA3r7TcUSvkw3VKCSdc7fim6YKei3w57N9lR8wjlOdM+HScWims4i9n9t7zFQCbsaOuxxK7nmoFDuRx/9HPoi4px7famfhqRbYDQKcX4wX4XWeO5Ic364oGfXSc5loKSiu40ruseEeSAAyf96QYRRYvfbg2ifQTPTc1mMrE7KXDtyRQPnIWMHE3vFGdmcekqjRuVotUHbkoTZOElnA5dfXIctfJfDIv6ZMF1fLOcqoGqQrBiGqNtZvGZf0vGjmqwURZZOCkmIeBroyQSlneB6uhkes52vjbYMs+3NF7Y7D1kyPFiMaoK4WfjlQ5Z9k6JoBupkOhMLwyklxkks/scZXuI+H0V285fl2E5tdiowCBXn68J5yn1RjiAOLOS20oExLhPwd5cNsUKOmrWbNBlvEq37MKTVyBfu0h2gCVF3xo+H3b2RLzgn39hKppSK0iReVEfOmzhk6yP5QUBZUjemruJeZFp0CG3On8EdUQgIY9gOsFBoAsYkm6ahwvNSdL3Am8zpQMBBjS/WqJ3nNaPKQWqqL4eWG2y4cItjrRiIlczNh+LsJEP5vescEdiF+fx0hpCBy0B7LrOLUn7bGcPSOPV3XmqPesK5HaDE1bwgZ1ZjebdioTHfk+YHEs="
+   secure: "APYWJ0RK63i8f11bjCt61y1nBiKClrKUSf8cjbtUZNrV8CGlhyr+bZI/rQXfwHwRiUlEPM9jyPun70xficHk1eSF5Hug8Z7fDNgqHKaKiZ+GLjpOvtNpSkfobxA+HNuJo6akQfko/Z65h4vOmfnU5GJicKpsLmtyonoEHiAdDgcaD1E0gofE9Zcsl3RNsOs6NiGX3BsgDssnHIFukiydcKNhsPsWrABJBYleSXwnI8ZfVactg9X1ANKj7lmdXM9xJ2kpiBfPCf9PaOuL3/4nsMkuPyTdYXt63CJZjLRDRd+d3ukfBC71BW9yrs1nkQIV4ZncG/6uml/eiPZgA6+RE+fmxA1Aqvzz23TtT5awjQNQyBo32FZNElbogd8x27/SPOvRT3DgEREFLMm/Wmhh+zATlBdqZna0hjnQZB9rNfEGIlLGf5zZPI9Zo1G5DrNTJIVoNC4thxPzIRwBAj3LqTWHif28vm5O0rpBkSsBRWGX1s/On+uYHrX9lGb/mdbVDvcbNIs+rXSA6RsPvzq+9T7VAxTkfLQPwd6OcSXqX6tm8UUZh8dGhpQriTrNTr7Yed31YH0dq2jzpYEQWdsfD6vP9ypWAPy3Gb0FDyDyYjQqr7sX6VJcN2JYramxeP52twbyIC1Zkg0fvx+F6XmHw9wDo5D54VCJUZTdQ5eOxxE="
 
 matrix:
   include:
@@ -31,7 +31,7 @@ matrix:
           project:
             name: "MPICXX"
             description: "An OpenMPI C++ wrapper library"
-          notification_email: marcel.tobias.breyer@gmail.com
+          notification_email: b-marci@web.de
           build_command_prepend: "cov-configure --comptype gcc --compiler g++-5 --template && cmake -DCMAKE_CXX_COMPILER=g++-5 -DGEN_DOCS=OFF ."
           build_command: "cmake --build ."
           branch_pattern: coverity_scan
