@@ -14,7 +14,7 @@ configure_file(include/mpicxx/config.hpp.in
     ${CMAKE_BINARY_DIR}/include/mpicxx/config.hpp
 )
 
-#add_compile_options(-Wall -Wextra -pedantic -fconcepts)
+add_compile_options(-Wall -Wextra -pedantic -fconcepts --coverage)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

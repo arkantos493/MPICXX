@@ -1,85 +1,20 @@
 language: cpp
+os: linux
+compiler: gcc
 
-sudo: required
+addons:
+  apt:
+    packages: lcov
 
-branches:
-  only:
-    - master
-    - coverity_scan
-
-env:
-  global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   secure: "APYWJ0RK63i8f11bjCt61y1nBiKClrKUSf8cjbtUZNrV8CGlhyr+bZI/rQXfwHwRiUlEPM9jyPun70xficHk1eSF5Hug8Z7fDNgqHKaKiZ+GLjpOvtNpSkfobxA+HNuJo6akQfko/Z65h4vOmfnU5GJicKpsLmtyonoEHiAdDgcaD1E0gofE9Zcsl3RNsOs6NiGX3BsgDssnHIFukiydcKNhsPsWrABJBYleSXwnI8ZfVactg9X1ANKj7lmdXM9xJ2kpiBfPCf9PaOuL3/4nsMkuPyTdYXt63CJZjLRDRd+d3ukfBC71BW9yrs1nkQIV4ZncG/6uml/eiPZgA6+RE+fmxA1Aqvzz23TtT5awjQNQyBo32FZNElbogd8x27/SPOvRT3DgEREFLMm/Wmhh+zATlBdqZna0hjnQZB9rNfEGIlLGf5zZPI9Zo1G5DrNTJIVoNC4thxPzIRwBAj3LqTWHif28vm5O0rpBkSsBRWGX1s/On+uYHrX9lGb/mdbVDvcbNIs+rXSA6RsPvzq+9T7VAxTkfLQPwd6OcSXqX6tm8UUZh8dGhpQriTrNTr7Yed31YH0dq2jzpYEQWdsfD6vP9ypWAPy3Gb0FDyDyYjQqr7sX6VJcN2JYramxeP52twbyIC1Zkg0fvx+F6XmHw9wDo5D54VCJUZTdQ5eOxxE="
-
-matrix:
-  include:
-    # Coverity Scan (Linux Debug)
-    - os: linux
-      compiler: gcc
-      before_install:
-        - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - cmake
-        coverity_scan:
-          project:
-            name: "MPICXX"
-            description: "An OpenMPI C++ wrapper library"
-          notification_email: b-marci@web.de
-          build_command_prepend: "cmake -DGEN_DOCS=OFF ."
-          build_command: "cmake --build ."
-          branch_pattern: coverity_scan
-      if: branch = coverity_scan
-      before_script: echo "Coverity Scan"
-      script: echo "Coverity Scan"
-    # Code coverage (Linux Debug)
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-9.2
-            - cmake
-            - lcov
-      before_script:
-        - mkdir -p build && cd build
-        - cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++-9.2 -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -DGEN_DOCS=OFF ..
-      script:
-        - cmake --build . -- -j2
-        - cmake --build . --target coverage
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
-      if: branch != coverity_scan
-    # Linux Release
-    - os: linux
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-9.2
-            - cmake
-      env:
-        - MATRIX_EVAL="COMPILER=g++-9.2 && BUILD_TYPE=Release"
-      if: branch != coverity_scan
-
-before_install:
-  - eval "${MATRIX_EVAL}"
-
-before_script:
-  - mkdir -p build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_COMPILER=$COMPILER -DBUILD_TESTS=ON -DGEN_DOCS=OFF ..
-
-script:
-  - cmake --build . -- -j2 # Build the code
-  - ctest --output-on-failure
-  - sudo cmake --build . --target install # Install the necessary files
+after_success:
+# Create lcov report
+# capture coverage info
+- lcov --directory . --capture --output-file coverage.info
+# filter out system and extra files.
+# To also not include test code in coverage add them with full path to the patterns: '*/tests/*'
+- lcov --remove coverage.info '/usr/*' "${HOME}"'/.cache/*' --output-file coverage.info
+# output coverage data for debugging (optional)
+- lcov --list coverage.info
+# Uploading to CodeCov
+# '-f' specifies file(s) to use and disables manual coverage gathering and file search which has already been done above
+- bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
