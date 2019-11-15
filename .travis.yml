@@ -1,6 +1,7 @@
 language: cpp
 compiler: gcc
 dist: bionic
+sudo: required
 
 env:
   global:

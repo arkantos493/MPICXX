@@ -12,7 +12,7 @@ else
     rm gcc-9.2.0.tar.xz
     cd gcc-9.2.0 && ls -a && ls -a contrib
     echo "  -- installing prerequisites"
-   # ./contrib/download_prerequisites
+    sudo ./contrib/download_prerequisites
     cd .. && mkdir gcc-9.2.0-objdir && cd gcc-9.2.0-objdir
     echo "  -- configure GCC 9.2.0"
     "$PWD/../gcc-9.2.0/configure" --prefix="/home/gcc-9" --exec-prefix="/home/gcc-9" --enable-languages=c,c++
