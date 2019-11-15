@@ -15,7 +15,7 @@ else
    # ./contrib/download_prerequisites
     cd .. && mkdir gcc-9.2.0-objdir && cd gcc-9.2.0-objdir
     echo "  -- configure GCC 9.2.0"
-    "$PWD/../gcc-9.2.0/configure" --prefix="$PWD/../gcc-9" --exec-prefix="$PWD/../gcc-9" --enable-languages=c,c++
+    "$PWD/../gcc-9.2.0/configure" --prefix="/home/gcc-9" --exec-prefix="/home/gcc-9" --enable-languages=c,c++
     echo " -- build and install GCC 9.2.0"
     make -j $(nproc) all
     make install
@@ -23,5 +23,5 @@ else
 fi
 
 echo "Setting environment variables"
-export PATH=$PATH:gcc-9/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:gcc-9/lib64
+export PATH=$PATH:/home/gcc-9/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/gcc-9/lib64
