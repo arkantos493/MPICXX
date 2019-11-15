@@ -1,28 +1,27 @@
+language: cpp
+compiler: gcc
+dist: bionic
+
+
 addons:
   apt:
     packages: 
      - lcov
      - cmake-data
      - cmake
+     - libopenmpi-dev
+     - openmpi-bin
+     - g++9 
 
-
-language: cpp
-compiler: gcc
-dist: bionic
-
-before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
-
-install: 
-  - sudo apt-get install -qq g++-9
+before_script:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
-  - sudo apt-get install openmpi-bin
+
 
 script: 
   - mkdir build && cd build
   - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON ..
   - make
+
 
 after_success:
 # Create lcov report
