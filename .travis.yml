@@ -11,15 +11,15 @@ addons:
      - cmake
      - libopenmpi-dev
      - openmpi-bin
-     - g++9 
+     - g++-9 
 
 before_script:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
+  - mkdir build && cd build
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON ..
 
 
 script: 
-  - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON ..
   - make
 
 
