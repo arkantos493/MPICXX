@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # enable/disable generation of documentation
-option(GEN_DOCS "Generate documentation" OFF)
+option(GEN_DOC "Generate documentation" OFF)
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -85,8 +85,8 @@ enable_testing()
 add_subdirectory(test)
 
 # generate documentation if requested
-if (GEN_DOCS)
+if (GEN_DOC)
     add_subdirectory(doc)
-endif (GEN_DOCS)
+endif (GEN_DOC)
 
 

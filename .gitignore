@@ -52,4 +52,9 @@ googletest-download/
 googletest-src/
 
 
+### Docu ###
+xml_doxygen/
+rst_doxyrest/
+html/
+
 # End of https://www.gitignore.io/api/c++,cmake
