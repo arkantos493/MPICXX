@@ -14,6 +14,10 @@ addons:
      - cmake-data
      - cmake
 
+cache:
+  directories:
+    - /home/openmpi
+
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
@@ -23,7 +27,16 @@ before_install:
 install: 
   - sudo apt-get install -qq g++-9
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 90
-  - sudo apt-get install libopenmpi-dev openmpi-bin
+#  - sudo apt-get install libopenmpi-dev openmpi-bin
+  # install openmpi 4
+  - wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.gz
+  - gunzip -c openmpi-4.0.2.tar.gz | tar xf -
+  - rm openmpi-4.0.2.tar.gz
+  - cd openmpi-4.0.2
+  - ./configure --prefix=/home/openmpi --exec-prefix=/home/openmpi
+  - make all install
+  - rm -r openmpi-4.0.2
+  - export PATH=$PATH:/home/openmpi/bin
 
 before_script:
   - echo "Versions:\n" & g++ --version && cmake --version && mpirun --version
