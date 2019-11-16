@@ -1,0 +1,8 @@
+@PACKAGE_INIT@
+
+# mpicxx header only library depends on MPI so that needs to be installed
+include(CMakeFindDependencyMacro)
+find_dependency(MPI)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+check_required_components("@PROJECT_NAME@")

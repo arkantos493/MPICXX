@@ -1,91 +1,92 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 
-project(MPICXX LANGUAGES CXX)
+project("mpicxx" 
+        VERSION "0.1.0" 
+        LANGUAGES CXX
+        DESCRIPTION "A header only C++ wrapper library for MPI"
+        HOMEPAGE_URL "https://github.com/arkantos493/MPICXX")
 
-set(Project-Name_VERSION_MAJOR 0)
-set(Project-Name_VERSION_MINOR 1)
-set(Project-Name_VERSION_PATCH 0)
-set(Project-Name_VERSION "${Project-Name_VERSION_MAJOR}.${Project-Name_VERSION_MINOR}.${Project-Name_VERSION_PATCH}")
-
-set(PROJ_NAME "\"MPICXX\"") # PROJECT_NAME is a predefined variable
-set(PROJECT_DESCRIPTION "\"An OpenMPI C++ wrapper library\"")
-
-configure_file(include/mpicxx/config.hpp.in
-    ${CMAKE_BINARY_DIR}/include/mpicxx/config.hpp
-)
-
-add_compile_options(-Wall -Wextra -pedantic -fconcepts --coverage)
+# set important compiler flags
+add_compile_options(-Wall -Wextra -pedantic -fconcepts)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# enable/disable generation of documentation
+option(GEN_DOCS "Generate documentation" OFF)
 
-# Options
-option(BUILD_TESTS "Build test executable" OFF)
-option(GEN_DOCS "Generate documentation" ON)
-option(ENABLE_COVERAGE "Enable code coverage" OFF)
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
+# set build type to Release if none was specified
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as no build type was specified")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type (Debug/Release)" FORCE)
 endif (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
-if (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
-    if (NOT BUILD_TESTS)
-        message(FATAL_ERROR "Tests must be enabled for code coverage!")
-    endif (NOT BUILD_TESTS)
-    
-    include(CodeCoverage)
-    
-    append_coverage_compiler_flags()
-    set(COVERAGE_EXCLUDES "/usr/include/\\*;${CMAKE_SOURCE_DIR}/test/*;${CMAKE_SOURCE_DIR}/third_party/doctest/*")
-    
-    setup_target_for_coverage(NAME coverage EXECUTABLE ctest DEPENDENCIES coverage)
-else (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2")
-    endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-endif (ENABLE_COVERAGE AND NOT CMAKE_CONFIGURATION_TYPES)
 
-add_library(mpicxx INTERFACE) # A library
+# create header-only (interface) library
+add_library(${PROJECT_NAME} INTERFACE)
 
-# find MPI
+# find MPI and add it to the library target
 find_package(MPI REQUIRED)
-if(MPI_FOUND)
-    include_directories(mpicxx ${MPI_CXX_INCLUDE_DIRS})
-    target_link_libraries(mpicxx INTERFACE MPI::MPI_CXX)
-endif()
-
-target_include_directories(mpicxx INTERFACE ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR}/include)
+include_directories(${PROJECT_NAME} ${MPI_CXX_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} INTERFACE MPI::MPI_CXX)
 
 
-if (BUILD_TESTS)
-    include(CTest)
-    enable_testing()
-    add_subdirectory(test)
-endif (BUILD_TESTS)
+# set include directories
+target_include_directories(
+    ${PROJECT_NAME} INTERFACE 
+        $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>    # include path if library is used directly by another cmake target
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)           # include path if project is installed
 
+# set needed compiler dependencies
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
+
+# set targets to install
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}_Targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}     # all files that are neither executables, shared libraries or header files
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}     # all shared libraries files
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})    # all executables
+                                                        # INCLUDE ommited because INSTALL_INTERFACE already specifies this
+
+# manage version comparison
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion)
+
+# generate configuration file
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+    "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+
+# create and copy install-targets file
+install(EXPORT ${PROJECT_NAME}_Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+
+# create file containing the build configuration and version information
+install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+              "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
+
+# install headers
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/mpicxx DESTINATION include)
+
+
+# test interface library
+include(${PROJECT_SOURCE_DIR}/cmake/GoogleTest.cmake)
+include(CTest)
+enable_testing()
+add_subdirectory(test)
+
+# generate documentation if requested
 if (GEN_DOCS)
     add_subdirectory(doc)
 endif (GEN_DOCS)
 
-# Install the built library and executable into the appropriate directory
-install(TARGETS mpicxx
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-)
 
-# Install the project header files into the appropriate directory
-install(DIRECTORY include/ DESTINATION include PATTERN "config.hpp.in" EXCLUDE) # Install our main header files
-install(FILES ${CMAKE_BINARY_DIR}/include/mpicxx/config.hpp DESTINATION include/mpicxx) # Install our configuration file
-
-# Install the project's extra files
-install(FILES README.md LICENSE DESTINATION share/mpicxx)
