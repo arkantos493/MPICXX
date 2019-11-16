@@ -36,6 +36,7 @@ install:
   - ./configure --prefix=/home/openmpi --exec-prefix=/home/openmpi
   - make -j $(nproc)
   - sudo make install
+  - cd ..
   - rm -r openmpi-4.0.2
   - export PATH=$PATH:/home/openmpi/bin
 
