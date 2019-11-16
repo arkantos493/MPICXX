@@ -36,5 +36,5 @@ PROJECT_NUMBER = 0.1.0
 PROJECT_BRIEF = "A header only C++ wrapper library for MPI"
 OUTPUT_DIRECTORY = doc/
 INPUT = doc/ include/
-USE_MDFILE_AS_MAINPAGE = README.md
-EXTRACT_ALL = NO
+USE_MDFILE_AS_MAINPAGE = doc/main_page.md
+EXTRACT_ALL = YES
