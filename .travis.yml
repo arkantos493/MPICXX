@@ -1,7 +1,7 @@
 language: cpp
 compiler: gcc
 dist: bionic
-sudo: required
+os: linux
 
 #env:
 #  global:
@@ -34,7 +34,8 @@ install:
   - rm openmpi-4.0.2.tar.gz
   - cd openmpi-4.0.2
   - ./configure --prefix=/home/openmpi --exec-prefix=/home/openmpi
-  - make all install
+  - make -j $(nproc)
+  - sudo make install
   - rm -r openmpi-4.0.2
   - export PATH=$PATH:/home/openmpi/bin
 
