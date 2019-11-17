@@ -36,18 +36,18 @@ Supported options are:
 ## Running the tests
 
 After a successful `make` (with a previously `cmake` call with option `-DENABLE_TESTS=ON`) simply run:
-```
+```bash
 ctest
 ```
 
 ## Deployment
 
 To install the library simple use:
-```
+```bash
 make install
 ```
 or
-```
+```bash
 sudo make install
 ```
 To use this library simple add the following lines to your `CMakeLists.txt` file:
