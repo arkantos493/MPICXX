@@ -25,7 +25,7 @@ install:
 before_script:
   - echo "Versions:\n" & g++ --version && cmake --version && mpirun --version
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DCOVERALLS=ON -DGEN_DOCS=OFF ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTS=ON -DENABLE_COVERALLS_REPORT=ON -DGENERATE_DOCUMENTATION=OFF .. 
 
 script: 
   - make -j $(nproc)
