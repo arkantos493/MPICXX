@@ -58,4 +58,8 @@ rst_doxyrest/
 html/
 doxyrest/
 
+
+### CLion ###
+.idea/
+
 # End of https://www.gitignore.io/api/c++,cmake
