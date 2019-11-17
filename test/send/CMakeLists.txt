@@ -5,4 +5,4 @@ set(TEST_SOURCES
 )
 
 # create google test with MPI support
-add_mpi_test(send "${TEST_SOURCES}" 2)
+add_mpi_test(send "${TEST_SOURCES}" 4)
