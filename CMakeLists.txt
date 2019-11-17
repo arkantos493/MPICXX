@@ -14,8 +14,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # enable/disable generation of documentation
 option(GEN_DOC "Generate documentation" OFF)
+option(COVERALLS "Generate coveralls data" OFF)
 
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 # set build type to Release if none was specified
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -83,6 +84,17 @@ include(${PROJECT_SOURCE_DIR}/cmake/GoogleTest.cmake)
 include(CTest)
 enable_testing()
 add_subdirectory(test)
+
+if (COVERALLS)
+    include(Coveralls)
+    coveralls_turn_on_coverage()
+    file(GLOB_RECURSE COVERAGE_SRCS "${PROJECT_SOURCE_DIR}/inlcude/mpicxx(*.hpp")
+    # Create the coveralls target.
+    coveralls_setup(
+        "${COVERAGE_SRCS}" # The source files.
+        ON                 # If we should upload.
+        "${PROJECT_SOURCE_DIR}/cmake/modules/") # (Optional) Alternate project cmake module path.
+endif()
 
 # generate documentation if requested
 if (GEN_DOC)

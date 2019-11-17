@@ -39,12 +39,12 @@ install:
 #  - cd ..
 #  - rm -rf openmpi-4.0.2
 #  - export PATH=$PATH:/home/openmpi/bin
-  - sh ./install_mpich_travis.sh
+  - sh ./.install_mpich_travis.sh
 
 before_script:
   - echo "Versions:\n" & g++ --version && cmake --version && mpirun --version
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -DGEN_DOCS=OFF ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DCOVERALLS=ON -DGEN_DOCS=OFF ..
 
 script: 
   - make -j $(nproc)
