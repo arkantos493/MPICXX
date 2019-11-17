@@ -19,7 +19,7 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 ### Installing
 
 This library supports the normal cmake tool chain.
-```
+```bash
 git clone git@github.com:arkantos493/MPICXX.git
 cd MPICXX
 mkdir build && cd build
@@ -51,7 +51,7 @@ or
 sudo make install
 ```
 To use this library simple add the following lines to your `CMakeLists.txt` file:
-```
+```cmake
 # find the library
 find_package(mpicxx CONFIG REQUIRED)
 
@@ -60,7 +60,7 @@ target_link_libraries(target mpicxx::mpicxx)
 ```
 
 ## Examples
-Comming later...
+Coming later...
 
 ## License
 
