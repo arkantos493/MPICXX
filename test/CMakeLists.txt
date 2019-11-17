@@ -14,5 +14,6 @@ endfunction(add_mpi_test)
 
 
 # add all test suites
+add_subdirectory(info)
 add_subdirectory(send)
 add_subdirectory(reduce)
