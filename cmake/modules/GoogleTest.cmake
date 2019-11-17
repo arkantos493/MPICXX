@@ -1,3 +1,5 @@
+### based on https://github.com/google/googletest/blob/master/googletest/README.md ###
+
 # Download and unpack googletest at configure time
 configure_file(${CMAKE_SOURCE_DIR}/third_party/CMakeLists.txt.in ${CMAKE_SOURCE_DIR}/third_party/googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .

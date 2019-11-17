@@ -1,9 +1,15 @@
+### based on https://vicrucann.github.io/tutorials/quick-cmake-doxygen/ ###
+
 # find doxygen
 find_package(Doxygen REQUIRED dot)
 
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
-# find doxyrest
-find_package(Doxyrest REQUIRED)
+# install doxyrest (so that the two config files don'T have to be changed)
+set(DOXYREST_INSTALL_IN ${PROJECT_SOURCE_DIR}/third_party/install_doxyrest.sh)
+set(DOXYREST_INSTALL_OUT ${CMAKE_CURRENT_BINARY_DIR}/install_doxyrest.sh)
+configure_file(${DOXYREST_INSTALL_IN} ${DOXYREST_INSTALL_OUT} @ONLY)
+execute_process(COMMAND sh ${DOXYREST_INSTALL_OUT})
+set(DOXYREST_EXECUTABLE ${PROJECT_SOURCE_DIR}/third_party/doxyrest/bin/doxyrest)
+
 # find Sphinx
 find_package(Sphinx REQUIRED)
 

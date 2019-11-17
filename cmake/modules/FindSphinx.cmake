@@ -1,3 +1,5 @@
+### based on https://eb2.co/blog/2012/03/sphinx-and-cmake-beautiful-documentation-for-c---projects/ ###
+
 find_program(SPHINX_EXECUTABLE NAMES sphinx-build
     HINTS
     $ENV{SPHINX_DIR}

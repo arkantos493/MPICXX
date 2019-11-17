@@ -1,3 +1,5 @@
+### based on https://scicomp.stackexchange.com/questions/8516/any-recommendations-for-unit-testing-frameworks-compatible-with-code-libraries-t ###
+
 # easily create mpi test cases
 function(add_mpi_test name test_files num_mpi_procs)
     # add new test executable with the static main and the provided source test files

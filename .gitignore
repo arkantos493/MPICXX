@@ -56,5 +56,6 @@ googletest-src/
 xml_doxygen/
 rst_doxyrest/
 html/
+doxyrest/
 
 # End of https://www.gitignore.io/api/c++,cmake

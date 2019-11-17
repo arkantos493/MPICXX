@@ -12,17 +12,17 @@
 #
 import os
 import sys
-sys.path.insert(1, os.path.abspath('/home/marcel/Programs/doxyrest/share/doxyrest/sphinx'))
+sys.path.insert(1, os.path.abspath('@PROJECT_SOURCE_DIR@/third_party/doxyrest/share/doxyrest/sphinx'))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'mpicxx'
+project = '@PROJECT_NAME@'
 copyright = '2019, Marcel Breyer'
 author = 'Marcel Breyer'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '@PROJECT_VERSION@'
 
 
 # -- General configuration ---------------------------------------------------
