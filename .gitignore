@@ -57,6 +57,7 @@ xml_doxygen/
 rst_doxyrest/
 html/
 doxyrest/
+html_doxygen/
 
 
 ### CLion ###
