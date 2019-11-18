@@ -115,7 +115,7 @@ class MPIMinimalistPrinter : public ::testing::EmptyTestEventListener
     UpdateCommState();
  }
 
- MPIMinimalistPrinter(MPI_Comm comm_) : ::testing::EmptyTestEventListener(),
+ explicit MPIMinimalistPrinter(MPI_Comm comm_) : ::testing::EmptyTestEventListener(),
     result_vector()
  {
    int is_mpi_initialized;
