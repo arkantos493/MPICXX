@@ -31,20 +31,15 @@ configure_file(${SPHINX_CONFIG_IN} ${SPHINX_CONFIG_OUT} @ONLY)
 add_custom_command(
     OUTPUT
         doxygen.stamp
-    DEPENDS
-        Doxyfile.in
     COMMAND
         ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
     COMMAND
         ${DOXYREST_EXECUTABLE} -c ${DOXYREST_OUT}
     COMMAND
-        ${SPHINX_EXECUTABLE} -b html -c ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/doc/rst_doxyrest ${PROJECT_SOURCE_DIR}/doc/html
-    COMMAND
-        cmake -E touch doxygen.stamp
+        ${SPHINX_EXECUTABLE} -q -b html -c ${CMAKE_CURRENT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/doc/rst_doxyrest ${PROJECT_SOURCE_DIR}/doc/html
     COMMENT
         "Generating API documentation with Doxygen -> Doxyrest -> Sphinx"
     VERBATIM
 )
 
 add_custom_target(doc DEPENDS doxygen.stamp)
-
