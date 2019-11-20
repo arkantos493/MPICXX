@@ -27,6 +27,38 @@ namespace mpicxx {
     class info {
         using size_type = std::size_t;
 
+        class proxy {
+        public:
+            proxy(info* ptr, std::string key) : ptr(ptr), key(key.c_str()) { } // TODO 2019-11-20 19:56 marcel: godbolt
+
+            void operator=(const std::string& value) {
+                MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                        "Info value to long!: max size: %i, provided size: %i",
+                        MPI_MAX_INFO_VAL, value.size());
+
+                MPI_Info_set(ptr->info_, key, value.c_str());
+            }
+
+            operator std::string() const {
+                // int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag)
+                // int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag)
+                int valuelen = 0, flag;
+                MPI_Info_get_valuelen(ptr->info_, key, &valuelen, &flag);
+
+                MPICXX_ASSERT(flag, "Key not found!: %s", key);
+
+                char* value = new char[valuelen + 1];
+                MPI_Info_get(ptr->info_, key, valuelen, value, &flag);
+
+                MPICXX_ASSERT(flag, "Key not found!: %s", key);
+
+                return std::string(value, value + valuelen);
+            }
+        private:
+            info* ptr;
+            const char* key;
+        };
+
     public:
         /**
          * Default constructor: create a new empty info object.
@@ -69,6 +101,15 @@ namespace mpicxx {
          * @return the number of keys (= number of values)
          */
         size_type size() const;
+
+
+        proxy operator[](const std::string& key) {
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Info key to long!: max size: %i, provided size: %i",
+                          MPI_MAX_INFO_VAL, key.size());
+
+            return proxy(this, key);
+        }
 
 
 
