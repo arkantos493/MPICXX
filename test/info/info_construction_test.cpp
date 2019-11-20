@@ -45,7 +45,7 @@ TEST(InfoTests, CopyConstruction) {
     // be sure that the copied key and value are present
     int flag_copy;
     char value_copy[6];
-    MPI_Info_get(info_copy.get(), "key", 6, value_copy, &flag_copy);
+    MPI_Info_get(info_copy.get(), "key", 5, value_copy, &flag_copy);
     // check if the key exists
     EXPECT_TRUE(static_cast<bool>(flag_copy));
     // check if the value associated with the key is correct
