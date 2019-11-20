@@ -25,6 +25,8 @@ namespace mpicxx {
      * TODO: usage example
      */
     class info {
+        using size_type = std::size_t;
+
     public:
         /**
          * Default constructor: create a new empty info object.
@@ -58,6 +60,19 @@ namespace mpicxx {
         info& operator=(info&&) = delete;
 
         /**
+         * Returns whether this info object is empty, i.e. has no [key, value]-pairs, or not.
+         * @return true iff ``this->size == 0``
+         */
+        bool empty() const;
+        /**
+         * Get the number of [key, value]-pairs in this info object
+         * @return the number of keys (= number of values)
+         */
+        size_type size() const;
+
+
+
+        /**
          * Get the underlying MPI_Info object.
          * @return a reference to the MPI_Info wrapped in this info object
          */
@@ -81,7 +96,7 @@ namespace mpicxx {
      * int MPI_Info_create(MPI_Info *info)
      * @endcode
      */
-    info::info() {
+    inline info::info() {
         MPI_Info_create(&info_);
     }
     /**
@@ -90,7 +105,7 @@ namespace mpicxx {
      * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
      * @endcode
      */
-    info::info(const info& other) {
+    inline info::info(const info& other) {
         MPI_Info_dup(other.info_, &info_);
     }
     /**
@@ -99,7 +114,7 @@ namespace mpicxx {
      * int MPI_Info_free(MPI_info *info);
      * @endcode
      */
-    info::~info() {
+    inline info::~info() {
         MPI_Info_free(&info_);
     }
 
@@ -113,7 +128,7 @@ namespace mpicxx {
      * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
      * @endcode
      */
-    info& info::operator=(const info& rhs) {
+    inline info& info::operator=(const info& rhs) {
         if (this != &rhs) {
             // delete current MPI_Info object
             MPI_Info_free(&info_);
@@ -123,10 +138,35 @@ namespace mpicxx {
         return *this;
     }
 
+    // ------------------------------------------------------------------------ //
+    //                                 capacity                                 //
+    // ------------------------------------------------------------------------ //
+    /**
+     * Calls (indirectly):
+     * @code
+     * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+     * @endcode
+     */
+    inline bool info::empty() const {
+        return this->size() == 0;
+    }
+    /**
+     * Calls:
+     * @code
+     * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+     * @endcode
+     */
+    inline info::size_type info::size() const {
+        int nkeys;
+        MPI_Info_get_nkeys(info_, &nkeys);
+        return static_cast<size_type>(nkeys);
+    }
 
-    MPI_Info& info::get() noexcept { return info_; }
-    const MPI_Info& info::get() const noexcept { return info_; }
+
+
+    inline MPI_Info& info::get() noexcept { return info_; }
+    inline const MPI_Info& info::get() const noexcept { return info_; }
 
 }
 
-#endif //MPICXX_INFO_HPP
+#endif // MPICXX_INFO_HPP
