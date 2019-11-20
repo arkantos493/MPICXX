@@ -81,7 +81,7 @@ class MPIEnvironment : public ::testing::Environment {
     if (!is_mpi_finalized) {
       int rank;
       ASSERT_EQ(MPI_Comm_rank(MPI_COMM_WORLD, &rank), MPI_SUCCESS);
-      if (rank == 0) { printf("Finalizing MPI...\n"); }
+//      if (rank == 0) { printf("Finalizing MPI...\n"); }
       ASSERT_EQ(MPI_Finalize(), MPI_SUCCESS);
     }
     ASSERT_EQ(MPI_Finalized(&is_mpi_finalized), MPI_SUCCESS);
