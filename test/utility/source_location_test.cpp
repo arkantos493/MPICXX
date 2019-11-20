@@ -20,7 +20,7 @@ TEST(UtilityTests, CurrentSourceLocation) {
     EXPECT_STREQ(loc.function_name(), "TestBody");
 
     // test line number
-    EXPECT_EQ(loc.line(), 6);
+    EXPECT_EQ(loc.line(), 14);
 
     // test column number
     EXPECT_EQ(loc.column(), 0);
