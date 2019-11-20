@@ -15,7 +15,7 @@ cmake_dependent_option(ENABLE_COVERALLS_REPORT "Generate coveralls data" OFF
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
 
-# add costum cmake modules path
+# add custom cmake modules path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 
@@ -39,7 +39,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 # find MPI and add it to the library target
 find_package(MPI REQUIRED)
-include_directories(${PROJECT_NAME} ${MPI_CXX_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} INTERFACE ${MPI_CXX_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} INTERFACE MPI::MPI_CXX)
 
 
