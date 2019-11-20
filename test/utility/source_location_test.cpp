@@ -1,3 +1,11 @@
+/**
+ * @file source_location_test.cpp
+ * @author Marcel Breyer
+ * @date 2019-11-20
+ *
+ * @brief Test cases for the (maybe custom) @ref mpicxx::source_location implementation.
+ */
+
 #include <gtest/gtest.h>
 
 #include <mpicxx/utility/source_location.hpp>
