@@ -96,9 +96,11 @@ namespace mpicxx {
         info& operator=(const info& rhs);
         /**
          * Move assignment operator: transfer the resources from the other info object to this object.
-         * Releases the currently hold [key, value]-pairs and
+         *
+         * Calling any method on ``other`` (except constructors, destructor or assignment operators)
+         * yields **undefined behaviour**.
          */
-        info& operator=(info&&) = delete; // TODO 2019-11-21 19:11 marcel: add
+        info& operator=(info&& rhs);
 
         /**
          * Returns whether this info object is empty, i.e. has no [key, value]-pairs, or not.
@@ -156,7 +158,7 @@ namespace mpicxx {
      * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
      * @endcode
      */
-    inline info::info(const info& other) {
+    inline info::info(const info& other) { // TODO 2019-11-21 21:05 marcel: what if other was moved from?
         MPI_Info_dup(other.info_, &info_);
     }
     inline info::info(info&& other) : info_(std::move(other.info_)) {
@@ -186,10 +188,31 @@ namespace mpicxx {
      */
     inline info& info::operator=(const info& rhs) {
         if (this != &rhs) {
-            // delete current MPI_Info object
-            MPI_Info_free(&info_);
+            // delete current MPI_Info object if necessary
+            if (info_ != nullptr) {
+                MPI_Info_free(&info_);
+            }
             // copy rhs info object
             MPI_Info_dup(rhs.info_, &info_);
+        }
+        return *this;
+    }
+    /**
+     * Calls:
+     * @code
+     * int MPI_Info_free(MPI_info *info);
+     * @endcode
+     */
+    inline info& info::operator=(info&& rhs) {
+        if (this != &rhs) {
+            // delete the current MPI_Info object if necessary
+            if (info_ != nullptr) {
+                MPI_Info_free(&info_);
+            }
+            // transfer ownership
+            info_ = std::move(rhs.info_);
+            // set moved from object to a valid state
+            rhs.info_ = nullptr;
         }
         return *this;
     }
