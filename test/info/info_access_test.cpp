@@ -27,4 +27,10 @@ TEST(InfoTests, ElementRead) {
     // read currently added value
     std::string value = info["key"];
     EXPECT_STREQ(value.c_str(), "value");
+
+    // add new [key, value]-pair
+    info["key2"] = "value2";
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 2);
+
 }
