@@ -64,3 +64,41 @@ TEST(InfoTests, CopyConstruction) {
     EXPECT_EQ(nkeys, 1);
 
 }
+
+TEST(InfoTests, MoveConstruction) {
+
+    // default construct a mpicxx::info object
+    mpicxx::info info;
+
+    // add an element to the info object
+    MPI_Info_set(info.get(), "key", "value");
+
+    // be sure the key was successfully added
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 1);
+
+    // create an new info object from a std::move
+    mpicxx::info info_move(std::move(info));
+
+    // be sure that the moved key and value are present
+    int flag_move;
+    char value_move[6];
+    MPI_Info_get(info_move.get(), "key", 5, value_move, &flag_move);
+    // check if the key exists
+    EXPECT_TRUE(static_cast<bool>(flag_move));
+    // check if the value associated with the key is correct
+    EXPECT_STREQ(value_move, "value");
+
+    // add an element to the info object
+    MPI_Info_set(info_move.get(), "key2", "value2");
+
+    // be sure the key was successfully added
+    int nkeys_move;
+    MPI_Info_get_nkeys(info_move.get(), &nkeys_move);
+    EXPECT_EQ(nkeys_move, 2);
+
+    // be sure the moved from object has released it's state
+    EXPECT_EQ(info.get(), nullptr);
+
+}

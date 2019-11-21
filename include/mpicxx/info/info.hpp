@@ -75,9 +75,11 @@ namespace mpicxx {
          */
         info(const info& other);
         /**
-         * Delete move construction.
+         * Move constructor: transfer the resources from the other info object to this object.
+         * Sets ``other._info = nullptr``.
+         * @param[in] other the moved from info object
          */
-        info(info&&) = delete; // TODO 2019-11-21 19:11 marcel: add
+        info(info&& other);
         /**
          * Destruct this info object.
          */
@@ -109,7 +111,7 @@ namespace mpicxx {
         /**
          * Get a proxy object to access the value associated with the given key.
          * @tparam T forwarding reference (in essence: ``std::string``, ``const char*`` or ``const char[]``)
-         * @param key the
+         * @param[in] key the accessed key
          * @return a proxy object (to distinguish between read and write accesses)
          */
         template <typename T>
@@ -154,6 +156,9 @@ namespace mpicxx {
     inline info::info(const info& other) {
         MPI_Info_dup(other.info_, &info_);
     }
+    inline info::info(info&& other) : info_(std::move(other.info_)) {
+        other.info_ = nullptr;
+    }
     /**
      * Calls:
      * @code
@@ -161,7 +166,9 @@ namespace mpicxx {
      * @endcode
      */
     inline info::~info() {
-        MPI_Info_free(&info_);
+        if (info_ != nullptr) {
+            MPI_Info_free(&info_);
+        }
     }
 
     // ------------------------------------------------------------------------ //
