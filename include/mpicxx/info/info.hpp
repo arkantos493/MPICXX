@@ -76,7 +76,9 @@ namespace mpicxx {
         info(const info& other);
         /**
          * Move constructor: transfer the resources from the other info object to this object.
-         * Sets ``other._info = nullptr``.
+         *
+         * Calling any method on ``other`` (except constructors, destructor or assignment operators)
+         * yields **undefined behaviour**.
          * @param[in] other the moved from info object
          */
         info(info&& other);
@@ -93,7 +95,8 @@ namespace mpicxx {
          */
         info& operator=(const info& rhs);
         /**
-         * Delete move assignment operator.
+         * Move assignment operator: transfer the resources from the other info object to this object.
+         * Releases the currently hold [key, value]-pairs and
          */
         info& operator=(info&&) = delete; // TODO 2019-11-21 19:11 marcel: add
 
