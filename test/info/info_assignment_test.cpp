@@ -86,6 +86,6 @@ TEST(InfoTests, MoveAssignment) {
     EXPECT_EQ(nkeys_move, 2);
 
     // be sure the moved from object has released it's state
-    EXPECT_EQ(info.get(), nullptr);
+    EXPECT_EQ(info.get(), MPI_INFO_NULL);
 
 }
