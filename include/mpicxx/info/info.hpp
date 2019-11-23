@@ -34,12 +34,21 @@ namespace mpicxx {
             template <typename T>
             proxy(info* ptr, T&& key) : ptr(ptr), key(std::forward<T>(key)) { }
 
-            void operator=(const std::string& value) {
-                MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                        "Info value to long!: max size: %i, provided size: %i",
-                        MPI_MAX_INFO_VAL, value.size());
-
-                MPI_Info_set(ptr->info_, key.c_str(), value.c_str());
+            template <typename T>
+            void operator=(T&& value) {
+                if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
+                    // a std::string has been passed
+                    MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                                  "Info value to long!: max size: %u, provided size (with null terminator): %i",
+                                  MPI_MAX_INFO_VAL, value.size() + 1);
+                    MPI_Info_set(ptr->info_, key.c_str(), value.c_str());
+                } else {
+                    // a c-style string has been passed
+                    MPICXX_ASSERT(std::strlen(value) < MPI_MAX_INFO_VAL,
+                                  "Info value to long!: max size: %u, provided size (with null terminator): %u",
+                                  MPI_MAX_INFO_KEY, std::strlen(value) + 1);
+                    MPI_Info_set(ptr->info_, key.c_str(), value);
+                }
             }
 
             operator std::string() const {
@@ -250,13 +259,13 @@ namespace mpicxx {
         if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
             // use std::string::size() if the given template type decays to a string
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key to long (std::string)!: max size: %i, provided size (with null terminator): %u",
+                          "Info key to long!: max size: %u, provided size (with null terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
         } else {
             // use the std::strlen() function otherwise (on c-style strings)
             // requires a null terminator!
             MPICXX_ASSERT(std::strlen(key) < MPI_MAX_INFO_KEY,
-                          "Info key to long (char*)!: max size: %i, provided size (with null terminator): %u",
+                          "Info key to long!: max size: %u, provided size (with null terminator): %u",
                           MPI_MAX_INFO_KEY, std::strlen(key) + 1);
         }
         // create proxy object and forward key
