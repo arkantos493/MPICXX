@@ -12,8 +12,10 @@
 #define MPICXX_INFO_HPP
 
 #include <cstring>
+#include <initializer_list>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 #include <mpi.h>
 
@@ -28,6 +30,11 @@ namespace mpicxx {
      */
     class info {
         using size_type = std::size_t;
+        using key_type = std::string; // TODO 2019-11-23 22:13 marcel: anschauen
+        using mapped_type = std::string;
+        using value_type = std::pair<const key_type, mapped_type>;
+        using iterator = void; // TODO 2019-11-23 22:06 marcel: implement iterator
+        using const_iterator = void; // TODO 2019-11-23 22:06 marcel: implement const iterator
 
         class proxy {
         public:
@@ -35,7 +42,7 @@ namespace mpicxx {
             proxy(info* ptr, T&& key) : ptr(ptr), key(std::forward<T>(key)) { }
 
             template <typename T>
-            void operator=(T&& value) {
+            void operator=(T&& value) { // TODO 2019-11-23 22:04 marcel: no forwarding reference needed
                 if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
                     // a std::string has been passed
                     MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
@@ -74,6 +81,7 @@ namespace mpicxx {
     public:
         // constructors and destructor
         info();
+        info(std::initializer_list<value_type> ilist); // TODO 2019-11-23 22:19 marcel: implement
         info(const info& other);
         info(info&& other);
         ~info();
@@ -86,15 +94,31 @@ namespace mpicxx {
         template <typename T>
         proxy operator[](T&& key);
 
+        // iterators
+
+
         // capacity
         bool empty() const;
         size_type size() const;
 
         // modifier
-
+//        void clear();
+//        std::pair<iterator, bool> insert(const key_type& key);
+//        template <typename InputIterator>
+//        void insert(InputIterator first, InputIterator last);
+//        void insert(std::initializer_list<value_type> ilist);
+//        template <typename M>
+//        std::pair<iterator, bool> insert_or_assign(const key_type& k, M&& obj); // TODO 2019-11-23 22:17 marcel: alle anschauen
 
         // lookup
-
+//        template <typename T>
+//        size_type count(const T& key) const;
+//        template <typename T>
+//        iterator find(const T& key);
+//        template <typename T>
+//        const_iterator find(const T& key) const;
+//        template <typename T>
+//        bool contains(const T& key) const;
 
         // getter
         MPI_Info get() noexcept;
