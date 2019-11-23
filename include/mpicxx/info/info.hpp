@@ -49,14 +49,12 @@ namespace mpicxx {
 
                 MPICXX_ASSERT(flag, "Key not found!: %s", key);
 
-                char* value = new char[valuelen + 1];
-                MPI_Info_get(ptr->info_, key.c_str(), valuelen, value, &flag);
+                std::string value(valuelen, ' ');
+                MPI_Info_get(ptr->info_, key.c_str(), valuelen, value.data(), &flag);
 
                 MPICXX_ASSERT(flag, "Key not found!: %s", key);
 
-                std::string value_str(value, valuelen);
-                delete[] value;
-                return value_str;
+                return value;
             }
         private:
             info* ptr;
@@ -242,7 +240,7 @@ namespace mpicxx {
     }
 
     // ------------------------------------------------------------------------ //
-    //                                 capacity                                 //
+    //                                  access                                  //
     // ------------------------------------------------------------------------ //
     /**
      * Write a value:
@@ -283,6 +281,14 @@ namespace mpicxx {
         // create proxy object and forward key
         return proxy(this, std::forward<T>(key));
     }
+
+    // ------------------------------------------------------------------------ //
+    //                                modifiers                                 //
+    // ------------------------------------------------------------------------ //
+
+    // ------------------------------------------------------------------------ //
+    //                                 lookup                                   //
+    // ------------------------------------------------------------------------ //
 
 
     inline MPI_Info info::get() noexcept { return info_; }
