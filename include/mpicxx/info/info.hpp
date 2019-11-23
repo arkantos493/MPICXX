@@ -62,28 +62,10 @@ namespace mpicxx {
         };
 
     public:
-        /**
-         * Default constructor: create a new empty info object.
-         */
+
         info();
-        /**
-         * Copy constructor: construct this info object with a copy of the given info object.
-         * Retains the [key, value]-pair ordering.
-         * @param[in] other the copied info object
-         */
         info(const info& other);
-        /**
-         * Move constructor: transfer the resources from the other info object to this object.
-         * Retains the [key, value]-pair ordering.
-         *
-         * Calling any method on ``other`` (**except** constructors, destructor, assignment operators or ``get()``)
-         * yields **undefined behaviour**.
-         * @param[in] other the moved from info object
-         */
         info(info&& other);
-        /**
-         * Destruct this info object.
-         */
         ~info();
 
         /**
@@ -140,25 +122,30 @@ namespace mpicxx {
     };
 
 
-    // ------------------------------------------------------------------------ //
-    //                        constructor and destructor                        //
-    // ------------------------------------------------------------------------ //
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                         constructor and destructor                                         //
+    // ---------------------------------------------------------------------------------------------------------- //
     /**
-     * Calls:
-     * @code
-     * int MPI_Info_create(MPI_Info *info)
-     * @endcode
+     * @brief Default constructor: create a new empty info object.
+     *
+     * @post the newly constructed object is in a valid state
+     *
+     * @calls{ int MPI_Info_create(MPI_Info *info); }
      */
     inline info::info() {
         MPI_Info_create(&info_);
     }
     /**
-     * Calls:
-     * @code
-     * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
-     * @endcode
-     * @warning
-     * **ASSERT**: if called with a "moved-from" object (i.e. ``other.get() == MPI_INFO_NULL``)
+     * @brief Copy constructor: construct this info object with a copy of the given info object.
+     * @details Retains the [key, value]-pair ordering.
+     * @param[in] other the copied info object
+     *
+     * @pre @p other may not be in the moved-from state
+     * @post the newly constructed object is in a valid state
+     *
+     * @assert{ if called with a moved-from object }
+     *
+     * @calls{ int MPI_Info_dup(MPI_info info, MPI_info *newinfo); }
      */
     inline info::info(const info& other) {
         MPICXX_ASSERT(other.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is undefined behavior.");
@@ -166,25 +153,28 @@ namespace mpicxx {
         MPI_Info_dup(other.info_, &info_);
     }
     /**
-     * Calls:
-     * @code
-     * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
-     * @endcode
+     * @brief Move constructor: transfer the resources from the given info object to this object.
+     * @details Retains the [key, value]-pair ordering.
+     * @param[in] other the moved-from info object
+     *
+     * @post the newly constructed object is in a valid state iff @p other was not in the moved-from state\n
+     * @post @p other is now in the moved-from state (i.e. `this->get() == MPI_INFO_NULL`)
      */
     inline info::info(info&& other) : info_(std::move(other.info_)) {
         other.info_ = MPI_INFO_NULL;
     }
     /**
-     * Calls:
-     * @code
-     * int MPI_Info_free(MPI_info *info);
-     * @endcode
+     * @brief Destruct this info object.
+     * @details If this object is in the moved-from state, no free function is called.
+     *
+     * @calls{ int MPI_Info_free(MPI_info *info); }
      */
     inline info::~info() {
         if (info_ != MPI_INFO_NULL) {
             MPI_Info_free(&info_);
         }
     }
+
 
     // ------------------------------------------------------------------------ //
     //                           assignment operator                            //
