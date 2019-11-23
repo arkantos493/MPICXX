@@ -1,0 +1,15 @@
+dl.assert
+{
+    margin-left: -7px;
+    padding-left: 3px;
+    border-left: 4px solid;
+    border-color: #FF0000;
+}
+
+dl.calls
+{
+    margin-left: -7px;
+    padding-left: 3px;
+    border-left: 4px solid;
+    border-color: #4287f5;
+}
