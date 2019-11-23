@@ -74,8 +74,9 @@ namespace mpicxx {
         info(const info& other);
         /**
          * Move constructor: transfer the resources from the other info object to this object.
+         * Retains the [key, value]-pair ordering.
          *
-         * Calling any method on ``other`` (except constructors, destructor or assignment operators)
+         * Calling any method on ``other`` (**except** constructors, destructor, assignment operators or ``get()``)
          * yields **undefined behaviour**.
          * @param[in] other the moved from info object
          */
@@ -94,8 +95,9 @@ namespace mpicxx {
         info& operator=(const info& rhs);
         /**
          * Move assignment operator: transfer the resources from the other info object to this object.
+         * Retains the [key, value]-pair ordering.
          *
-         * Calling any method on ``other`` (except constructors, destructor or assignment operators)
+         * Calling any method on ``rhs`` (**except** constructors, destructor, assignment operators or ``get()``)
          * yields **undefined behaviour**.
          */
         info& operator=(info&& rhs);
@@ -155,12 +157,22 @@ namespace mpicxx {
      * @code
      * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
      * @endcode
+     * @warning
+     * **ASSERT**: if called with a "moved-from" object (i.e. ``other.get() == MPI_INFO_NULL``)
      */
-    inline info::info(const info& other) { // TODO 2019-11-21 21:05 marcel: what if other was moved from?
+    inline info::info(const info& other) {
+        MPICXX_ASSERT(other.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is undefined behavior.");
+
         MPI_Info_dup(other.info_, &info_);
     }
+    /**
+     * Calls:
+     * @code
+     * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
+     * @endcode
+     */
     inline info::info(info&& other) : info_(std::move(other.info_)) {
-        other.info_ = nullptr;
+        other.info_ = MPI_INFO_NULL;
     }
     /**
      * Calls:
@@ -169,7 +181,7 @@ namespace mpicxx {
      * @endcode
      */
     inline info::~info() {
-        if (info_ != nullptr) {
+        if (info_ != MPI_INFO_NULL) {
             MPI_Info_free(&info_);
         }
     }
@@ -183,11 +195,14 @@ namespace mpicxx {
      * int MPI_Info_free(MPI_info *info);
      * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
      * @endcode
+     * @warning
+     * **ASSERT**: if called with a "moved-from" object (i.e. ``other.get() == MPI_INFO_NULL``)
      */
     inline info& info::operator=(const info& rhs) {
+        MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is undefined behavior.");
         if (this != &rhs) {
             // delete current MPI_Info object if necessary
-            if (info_ != nullptr) {
+            if (info_ != MPI_INFO_NULL) {
                 MPI_Info_free(&info_);
             }
             // copy rhs info object
@@ -202,16 +217,14 @@ namespace mpicxx {
      * @endcode
      */
     inline info& info::operator=(info&& rhs) {
-        if (this != &rhs) {
-            // delete the current MPI_Info object if necessary
-            if (info_ != nullptr) {
-                MPI_Info_free(&info_);
-            }
-            // transfer ownership
-            info_ = std::move(rhs.info_);
-            // set moved from object to a valid state
-            rhs.info_ = nullptr;
+        // delete the current MPI_Info object if necessary
+        if (info_ != MPI_INFO_NULL) {
+            MPI_Info_free(&info_);
         }
+        // transfer ownership
+        info_ = std::move(rhs.info_);
+        // set moved from object to a valid state
+        rhs.info_ = MPI_INFO_NULL;
         return *this;
     }
 
