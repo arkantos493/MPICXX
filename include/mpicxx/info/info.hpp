@@ -1,11 +1,11 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-11-20
+ * @date 2019-11-23
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
- * The @ref mpicxx::info class tries to provide a std::map like interface.
+ * The @ref mpicxx::info class tries to provide a std::map like interface (if feasible).
  */
 
 #ifndef MPICXX_INFO_HPP
@@ -21,7 +21,8 @@
 
 namespace mpicxx {
     /**
-     * This class is a wrapper to the *MPI_Info* object providing a <a href="https://en.cppreference.com/w/cpp/container/map">std::map</a> like interface.
+     * This class is a wrapper to the *MPI_Info* object providing a
+     * <a href="https://en.cppreference.com/w/cpp/container/map">std::map</a> like interface (if feasible).
      *
      * TODO: usage example
      */
@@ -72,37 +73,22 @@ namespace mpicxx {
         info& operator=(const info& rhs);
         info& operator=(info&& rhs);
 
-        /**
-         * Returns whether this info object is empty, i.e. has no [key, value]-pairs, or not.
-         * @return true iff ``this->size == 0``
-         */
-        bool empty() const;
-        /**
-         * Get the number of [key, value]-pairs in this info object
-         * @return the number of keys (= number of values)
-         */
-        size_type size() const;
-
-        /**
-         * Get a proxy object to access the value associated with the given key.
-         * @tparam T forwarding reference (in essence: ``std::string``, ``const char*`` or ``const char[]``)
-         * @param[in] key the accessed key
-         * @return a proxy object (to distinguish between read and write accesses)
-         */
+        // access
         template <typename T>
         proxy operator[](T&& key);
 
+        // capacity
+        bool empty() const;
+        size_type size() const;
+
+        // modifier
 
 
-        /**
-         * Get the underlying *MPI_Info* object.
-         * @return the *MPI_Info* wrapped in this info object
-         */
+        // lookup
+
+
+        // getter
         MPI_Info get() noexcept;
-        /**
-         * Get the underlying *MPI_Info* object (as const).
-         * @return the *MPI_Info* wrapped in this info object
-         */
         MPI_Info get() const noexcept;
 
     private:
@@ -137,7 +123,6 @@ namespace mpicxx {
      */
     inline info::info(const info& other) {
         MPICXX_ASSERT(other.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
-
         MPI_Info_dup(other.info_, &info_);
     }
     /**
@@ -182,7 +167,6 @@ namespace mpicxx {
      */
     inline info& info::operator=(const info& rhs) {
         MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
-
         // check against self-assignment
         if (this != std::addressof(rhs)) {
             // delete current MPI_Info object if it is in a valid state
@@ -197,7 +181,8 @@ namespace mpicxx {
     /**
      *
      * @brief Move assignment operator: transfer the resources from the given info object to this object.
-     * @details Retains the [key, value]-pair ordering. Does **not** handle self-assignment (as of https://isocpp.org/wiki/faq/assignment-operators).
+     * @details Retains the [key, value]-pair ordering. Does **not** handle self-assignment
+     * (as of https://isocpp.org/wiki/faq/assignment-operators).
      * @param[in] rhs the moved-from info object
      *
      * @post the assigned to object is in a valid state iff @p rhs was **not** in the moved-from state\n
@@ -218,57 +203,50 @@ namespace mpicxx {
     }
 
 
-    // ------------------------------------------------------------------------ //
-    //                                 capacity                                 //
-    // ------------------------------------------------------------------------ //
-    /**
-     * Calls (indirectly):
-     * @code
-     * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-     * @endcode
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                                   access                                                   //
+    // ---------------------------------------------------------------------------------------------------------- //
+    /*
+     * TODO 2019-11-23 21:40 marcel: ???
+     * template <typename T>
+       concept String = std::is_same_v<std::decay_t<T>, std::string> ||
+                 std::is_same_v<std::decay_t<T>, const char*> ||
+                 std::is_same_v<std::decay_t<T>, char*>;
+       TODO 2019-11-23 21:45 marcel: what if key doesn't exist?
+       TODO 2019-11-23 21:48 marcel: size as precondition
      */
-    inline bool info::empty() const {
-        return this->size() == 0;
-    }
     /**
-     * Calls:
-     * @code
-     * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-     * @endcode
-     */
-    inline info::size_type info::size() const {
-        int nkeys;
-        MPI_Info_get_nkeys(info_, &nkeys);
-        return static_cast<size_type>(nkeys);
-    }
-
-    // ------------------------------------------------------------------------ //
-    //                                  access                                  //
-    // ------------------------------------------------------------------------ //
-    /**
-     * Write a value:
-     * @code
-     * info_object["key"] = "value";
-     * @endcode
-     * Read a value:
-     * @code
-     * const std::string value = info_object["key"];
-     * @endcode
-     * @attention
-     * The proxy returns the set value *by-value*, i.e. changing the returned value won't alter
-     * this object's internal value!
-     * @warning
-     * **ASSERT**: if the key's length (including a null terminator) is greater then *MPI_MAX_INFO_KEY*
+     * @brief Access the value associated with the given @p key.
+     * @details Returns a proxy class which is used to distinguish between read and write accesses).
+     * @tparam T forwarding reference (in essence: ``std::string``, ``const char*`` or ``const char[]``)
+     * @param[in] key the accessed key
+     * @return a proxy object
      *
-     * Calls:
+     * Example:
      * @code
+     * info_object["key"] = "value";                    // write value
+     * const std::string value = info_object["key"];    // read value
+     * @endcode
+     *
+     * @pre `this` may **not** be in the moved-from state
+     * @pre if not called with a `std::string` @p key **must** contain a null terminator
+     * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
+     * this object's internal value!
+     *
+     * @assert{
+     * if called through a moved-from object\n
+     * if the key's length (including a null terminator) is greater then *MPI_MAX_INFO_KEY*
+     * }
+     *
+     * @calls{
      * int MPI_Info_set(MPI_Info info, const char *key, const char *value)                     // on write
      * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag)     // on read
      * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag)  // on read
-     * @endcode
+     * }
      */
     template <typename T>
     inline info::proxy info::operator[](T&& key) {
+        MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
         if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
             // use std::string::size() if the given template type decays to a string
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
@@ -285,16 +263,67 @@ namespace mpicxx {
         return proxy(this, std::forward<T>(key));
     }
 
-    // ------------------------------------------------------------------------ //
-    //                                modifiers                                 //
-    // ------------------------------------------------------------------------ //
 
-    // ------------------------------------------------------------------------ //
-    //                                 lookup                                   //
-    // ------------------------------------------------------------------------ //
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                                  capacity                                                  //
+    // ---------------------------------------------------------------------------------------------------------- //
+    /**
+     * @brief Returns whether this info object is empty or not.
+     * @details An info object is empty iff it has no [key, value]-pairs.
+     * @return `true` iff `this->size() == 0`
+     *
+     * @pre `this` may **not** be in the moved-from state
+     *
+     * @assert{ if called through a moved-from object }
+     *
+     * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
+     */
+    inline bool info::empty() const {
+        MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
+        return this->size() == 0;
+    }
+    /**
+     * @brief Returns the number of [key, value]-pairs contained in this info object.
+     * @return the number of [key, value]-pairs
+     *
+     * @pre `this` may **not** be in the moved-from state
+     *
+     * @assert{ if called through a moved-from object }
+     *
+     * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
+     */
+    inline info::size_type info::size() const {
+        MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
+        int nkeys;
+        MPI_Info_get_nkeys(info_, &nkeys);
+        return static_cast<size_type>(nkeys);
+    }
 
 
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                                  modifiers                                                 //
+    // ---------------------------------------------------------------------------------------------------------- //
+    // TODO 2019-11-23 21:18 marcel: add methods
+
+
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                                   lookup                                                   //
+    // ---------------------------------------------------------------------------------------------------------- //
+    // TODO 2019-11-23 21:18 marcel: add methods
+
+
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                                   getter                                                   //
+    // ---------------------------------------------------------------------------------------------------------- //
+    /**
+     * @brief Get the underlying *MPI_Info*.
+     * @return the *MPI_Info* wrapped in this info object
+     */
     inline MPI_Info info::get() noexcept { return info_; }
+    /**
+     * @brief Get the underlying *MPI_Info* (as const).
+     * @return the *MPI_Info* wrapped in this info object
+     */
     inline MPI_Info info::get() const noexcept { return info_; }
 
 }
