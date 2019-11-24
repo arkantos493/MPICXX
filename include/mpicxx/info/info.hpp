@@ -1,11 +1,11 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-11-23
+ * @date 2019-11-24
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
- * The @ref mpicxx::info class tries to provide a std::map like interface (if feasible).
+ * The @ref mpicxx::info class interface is inspired by the `std::map` interface.
  */
 
 #ifndef MPICXX_INFO_HPP
@@ -23,8 +23,8 @@
 
 namespace mpicxx {
     /**
-     * This class is a wrapper to the *MPI_Info* object providing a
-     * <a href="https://en.cppreference.com/w/cpp/container/map">std::map</a> like interface (if feasible).
+     * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
+     * <a href="https://en.cppreference.com/w/cpp/container/map">std::map</a>.
      *
      * TODO: usage example
      */
@@ -36,43 +36,22 @@ namespace mpicxx {
         using iterator = void; // TODO 2019-11-23 22:06 marcel: implement iterator
         using const_iterator = void; // TODO 2019-11-23 22:06 marcel: implement const iterator
 
+        /**
+         * @brief This proxy class is used to distinguish between read and write accesses in @ref mpicxx::info::operator[].
+         */
         class proxy {
         public:
+            // constructors
             template <typename T>
-            proxy(info* ptr, T&& key) : ptr(ptr), key(std::forward<T>(key)) { }
+            proxy(info* ptr, T&& key);
 
-            template <typename T>
-            void operator=(T&& value) { // TODO 2019-11-23 22:04 marcel: no forwarding reference needed
-                if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-                    // a std::string has been passed
-                    MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                                  "Info value to long!: max size: %u, provided size (with null terminator): %i",
-                                  MPI_MAX_INFO_VAL, value.size() + 1);
-                    MPI_Info_set(ptr->info_, key.c_str(), value.c_str());
-                } else {
-                    // a c-style string has been passed
-                    MPICXX_ASSERT(std::strlen(value) < MPI_MAX_INFO_VAL,
-                                  "Info value to long!: max size: %u, provided size (with null terminator): %u",
-                                  MPI_MAX_INFO_KEY, std::strlen(value) + 1);
-                    MPI_Info_set(ptr->info_, key.c_str(), value);
-                }
-            }
+            // write access
+            void operator=(const std::string& value);
+            void operator=(const char* value);
 
-            operator std::string() const {
-                // int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag)
-                // int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag)
-                int valuelen = 0, flag;
-                MPI_Info_get_valuelen(ptr->info_, key.c_str(), &valuelen, &flag);
+            // read access
+            operator std::string() const;
 
-                MPICXX_ASSERT(flag, "Key not found!: %s", key);
-
-                std::string value(valuelen, ' ');
-                MPI_Info_get(ptr->info_, key.c_str(), valuelen, value.data(), &flag);
-
-                MPICXX_ASSERT(flag, "Key not found!: %s", key);
-
-                return value;
-            }
         private:
             info* ptr;
             const std::string key;
@@ -263,6 +242,7 @@ namespace mpicxx {
      *
      * @pre `this` may **not** be in the moved-from state
      * @pre if not called with a `std::string` @p key **must** contain a null terminator
+     * @pre the length of the key (including a null terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
      * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
      * this object's internal value!
      *
@@ -358,6 +338,79 @@ namespace mpicxx {
      * @return the *MPI_Info* wrapped in this info object
      */
     inline MPI_Info info::get() const noexcept { return info_; }
+
+
+
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                     proxy class for mpicxx::operator[]                                     //
+    // ---------------------------------------------------------------------------------------------------------- //
+    /**
+     * @brief Constructs a new proxy object.
+     * @details Uses perfect forwarding to construct the internal key as `std::string`.
+     * @tparam T type of the key
+     * @param ptr pointer to the parent info object
+     * @param key the provided key
+     */
+    template <typename T>
+    inline info::proxy::proxy(info* ptr, T&& key) : ptr(ptr), key(std::forward<T>(key)) { }
+    /**
+     * @brief Adds the provided value with the used key to this info object.
+     * @details Creates a new [key, value]-pair if key doesn't exist, otherwise overwrites the existing @p value.
+     * @param value the value associated with the key
+     *
+     * @pre the length of the value (including a null terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+     *
+     * @assert{ if the value's length (including a null terminator) is greater then *MPI_MAX_INFO_VAL* }
+     *
+     * @calls{ int MPI_Info_set(MPI_Info info, const char *key, const char *value); }
+     */
+    inline void info::proxy::operator=(const std::string& value) {
+        MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                      "Info value to long!: max size: %u, provided size (with null terminator): %i",
+                      MPI_MAX_INFO_VAL, value.size() + 1);
+        MPI_Info_set(ptr->info_, key.c_str(), value.c_str());
+    }
+    /**
+     * @copydoc info::proxy::operator=(const std::string&)
+     */
+    inline void info::proxy::operator=(const char* value) {
+        MPICXX_ASSERT(std::strlen(value) < MPI_MAX_INFO_VAL,
+                      "Info value to long!: max size: %u, provided size (with null terminator): %u",
+                      MPI_MAX_INFO_KEY, std::strlen(value) + 1);
+        MPI_Info_set(ptr->info_, key.c_str(), value);
+    }
+    /**
+     * @brief Returns the value associated to the provided key.
+     * @details If the key doesn't exists yet, it will be inserted with an empty string as value,
+     * also returning an empty string.
+     * @return the value associated to key
+     *
+     * @post the info::size() increases iff the requested key did not exist
+     * @attention This function returns the associated value *by-value*, i.e. changing the returned value won't alter
+     * this object's internal value!
+     *
+     * @calls{
+     * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag)
+     * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag)
+     * }
+     */
+    inline info::proxy::operator std::string() const {
+        // get the length of the value
+        int valuelen = 0, flag;
+        MPI_Info_get_valuelen(ptr->info_, key.c_str(), &valuelen, &flag);
+
+        if (flag == 0) {
+            // the key doesn't exist yet -> add a new [key, value]-pair
+            MPI_Info_set(ptr->info_, key.c_str(), "");
+            return std::string();
+        }
+
+        // key exists -> get the associated value
+        std::string value(valuelen, ' ');
+        MPI_Info_get(ptr->info_, key.c_str(), valuelen, value.data(), &flag);
+        return value;
+    }
+
 
 }
 
