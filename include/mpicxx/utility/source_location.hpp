@@ -3,9 +3,9 @@
  * @author Marcel Breyer
  * @date 2019-11-24
  *
- * @brief Provides the ``std::source_location`` implementation.
+ * @brief Provides the `std::source_location` implementation.
  *
- * Uses the ``std::source_location`` (or ``std::experimental::source_location``) implementation
+ * Uses the `std::source_location` (or `std::experimental::source_location`) implementation
  * if available else a custom implementation is provided.
  */
 
@@ -14,7 +14,7 @@
 
 #if __has_include(<source_location>)
 
-/// use standard source_location if available
+// use standard source_location if available
 #include <source_location>
 namespace mpicxx::utility {
     using source_location = std::source_location;
@@ -22,7 +22,7 @@ namespace mpicxx::utility {
 
 #elif __has_include(<experimental/source_location>)
 
-/// use experimental source_location if available
+// use experimental source_location if available
 #include <experimental/source_location>
 namespace mpicxx::utility {
     using source_location = std::experimental::source_location;
@@ -30,20 +30,23 @@ namespace mpicxx::utility {
 
 #else
 
-/// use custom implementation if no other is available
+// use custom implementation if no other is available
 namespace mpicxx::utility {
     /**
-     * Implementation of the ``std::source_location`` class.
+     * @brief Implementation of the
+     * <a href="https://en.cppreference.com/w/cpp/utility/source_location">std::source_location</a> class.
      */
     class source_location {
     public:
         /**
-         * Constructs a new source_location with respective information about the current call side.
+         * @brief Constructs a new source_location with respective information about the current call side.
          * @param file the file name (path)
          * @param func the function name
          * @param line the line number
-         * @param column the column number (**ALWAYS** initialized to 0)
+         * @param column the column number
          * @return the source_location holding the call side location information
+         *
+         * @attention @p column is always (independent of the call side position) default initialized to 0 (= unknown)
          */
         static source_location current(
                 const char* file = __builtin_FILE(),
@@ -60,23 +63,25 @@ namespace mpicxx::utility {
         }
 
         /**
-         * Returns the absolute path name of this file.
+         * @brief Returns the absolute path name of this file.
          * @return the file name
          */
         constexpr const char* file_name() const noexcept { return file_; }
         /**
-         * Returns the function name without additional signature information (i.e. return type or parameters).
+         * @brief Returns the function name without additional signature information (i.e. return type or parameters).
          * @return the function name
          */
         constexpr const char* function_name() const noexcept { return func_; }
         /**
-         * Returns the line number.
+         * @brief Returns the line number.
          * @return the line number
          */
         constexpr int line() const noexcept { return line_; }
         /**
-         * Returns the column number. **NOT** usefully set in @ref source_location::current().
+         * @brief Returns the column number.
          * @return the column number
+         *
+         * @attention default value in @ref source_location::current() always 0
          */
         constexpr int column() const noexcept { return column_; }
 
