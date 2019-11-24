@@ -13,6 +13,7 @@
 
 #include <cstring>
 #include <initializer_list>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -20,6 +21,7 @@
 #include <mpi.h>
 
 #include <mpicxx/utility/assert.hpp>
+#include <mpicxx/utility/string.hpp>
 
 namespace mpicxx {
     /**
@@ -70,6 +72,8 @@ namespace mpicxx {
         info& operator=(info&& rhs);
 
         // access
+        template <typename T>
+        proxy at(T&& key);
         template <typename T>
         proxy operator[](T&& key);
 
@@ -224,12 +228,56 @@ namespace mpicxx {
        concept String = std::is_same_v<std::decay_t<T>, std::string> ||
                  std::is_same_v<std::decay_t<T>, const char*> ||
                  std::is_same_v<std::decay_t<T>, char*>;
-       TODO 2019-11-23 21:45 marcel: what if key doesn't exist?
-       TODO 2019-11-23 21:48 marcel: size as precondition
      */
     /**
+     * @brief Access the value associated with the given @p key including bounds checks.
+     * @details Returns a proxy class which is used to distinguish between read and write accesses.\n
+     * Queries the @p key's value length to determine if the key exists.
+     * @tparam T forwarding reference (in essence: ``std::string``, ``const char*`` or ``const char[]``)
+     * @param[in] key the accessed key
+     * @return a proxy object
+
+     * @pre `this` may **not** be in the moved-from state
+     * @pre if not called with a `std::string` @p key **must** contain a null terminator
+     * @pre the length of the key (including a null terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+     * @pre the @p key **must** already exist
+     * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
+     * this object's internal value!
+     *
+     * @assert{
+     * if called through a moved-from object\n
+     * if the key's length (including a null terminator) is greater then *MPI_MAX_INFO_KEY*
+     * }
+     *
+     * @throws std::out_of_range if @p key doesn't already exist
+     *
+     * @calls{
+     * MPI_Info_get_valuelen(info_, key.c_str(), &valuelen, &flag);                            // for bounds checking
+     * int MPI_Info_set(MPI_Info info, const char *key, const char *value)                     // on write
+     * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag)     // on read
+     * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag)  // on read
+     * }
+     */
+    template <typename T>
+    inline info::proxy info::at(T&& key) {
+        MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
+        MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
+                      "Info key to long!: max size: %u, provided size (with null terminator): %u",
+                      MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
+
+        // query the value length associated to key to determine if the key exists
+        int valuelen, flag;
+        MPI_Info_get_valuelen(info_, key.c_str(), &valuelen, &flag);
+        if (flag == 0) {
+            // key doesn't exist
+            throw std::out_of_range("The specified key doesn't exist!");
+        }
+        // create proxy object and forward key
+        return proxy(this, std::forward<T>(key));
+    }
+    /**
      * @brief Access the value associated with the given @p key.
-     * @details Returns a proxy class which is used to distinguish between read and write accesses).
+     * @details Returns a proxy class which is used to distinguish between read and write accesses.
      * @tparam T forwarding reference (in essence: ``std::string``, ``const char*`` or ``const char[]``)
      * @param[in] key the accessed key
      * @return a proxy object
@@ -260,18 +308,10 @@ namespace mpicxx {
     template <typename T>
     inline info::proxy info::operator[](T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-            // use std::string::size() if the given template type decays to a string
-            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                          MPI_MAX_INFO_KEY, key.size() + 1);
-        } else {
-            // use the std::strlen() function otherwise (on c-style strings)
-            // requires a null terminator!
-            MPICXX_ASSERT(std::strlen(key) < MPI_MAX_INFO_KEY,
-                          "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                          MPI_MAX_INFO_KEY, std::strlen(key) + 1);
-        }
+        MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
+                      "Info key to long!: max size: %u, provided size (with null terminator): %u",
+                      MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
+
         // create proxy object and forward key
         return proxy(this, std::forward<T>(key));
     }
@@ -338,6 +378,7 @@ namespace mpicxx {
      * @return the *MPI_Info* wrapped in this info object
      */
     inline MPI_Info info::get() const noexcept { return info_; }
+
 
 
 
