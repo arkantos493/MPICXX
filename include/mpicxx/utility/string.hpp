@@ -10,7 +10,10 @@
 #define MPICXX_STRING_HPP
 
 namespace mpicxx::utility {
-
+    // TODO 2019-11-24 20:12 marcel: add tests
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                             to c-style strings                                             //
+    // ---------------------------------------------------------------------------------------------------------- //
     /**
      * @brief Function to provide a uniform possibility to convert a `std::string` or `char*` to a c-style string.
      * @param str the given string
@@ -42,6 +45,10 @@ namespace mpicxx::utility {
         return str;
     }
 
+
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                                    size                                                    //
+    // ---------------------------------------------------------------------------------------------------------- //
     /**
      * @brief Function to provide a uniform possibility to get the size of a string.
      * @param str the given string
