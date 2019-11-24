@@ -1,7 +1,7 @@
 /**
  * @file assert.hpp
  * @author Marcel Breyer
- * @date 2019-11-20
+ * @date 2019-11-24
  *
  * @brief Provides a more verbose assert alternative.
  *
@@ -40,7 +40,7 @@
 #include <mpicxx/utility/source_location.hpp>
 
 
-namespace mpicxx {
+namespace mpicxx::utility {
     /**
      * @brief This function gets called by the @ref MPICXX_ASSERT macro and does the actual assertion checking.
      *
@@ -63,7 +63,7 @@ namespace mpicxx {
      * @param args the arguments used to fill the ``printf`` like placeholders in the custom message
      */
     template <typename... Args>
-    inline void check(const bool cond, const char* cond_str, const mpicxx::source_location& loc, const char* msg, const Args... args) {
+    inline void check(const bool cond, const char* cond_str, const source_location& loc, const char* msg, const Args... args) {
         if (!cond) {
             std::cerr << "Assertion '" << cond_str << "' failed\n"
                       << "    in file " << loc.file_name() << "\n"
@@ -95,7 +95,7 @@ namespace mpicxx {
  * Defines the @ref MPICXX_ASSERT macro iff ``NDEBUG`` is **not** set, otherwise this macro does nothing.
  *
  * This macro effectively calls the @ref check() function by insertion the condition as string argument, adding the current
- * location information (by using @ref mpicxx::source_location) and forwarding all other parameters.
+ * location information (by using @ref mpicxx::utility::source_location) and forwarding all other parameters.
  *
  * @param cond the assert condition
  * @param msg the custom assert message
@@ -104,7 +104,7 @@ namespace mpicxx {
 #ifdef NDEBUG
 #define MPICXX_ASSERT(cond, msg, ...)
 #else
-#define MPICXX_ASSERT(cond, msg, ...) mpicxx::check(cond, #cond, mpicxx::source_location::current(), msg, ##__VA_ARGS__)
+#define MPICXX_ASSERT(cond, msg, ...) mpicxx::utility::check(cond, #cond, mpicxx::utility::source_location::current(), msg, ##__VA_ARGS__)
 #endif
 
 #endif // MPICXX_ASSERT_HPP

@@ -1,7 +1,7 @@
 /**
  * @file source_location.hpp
  * @author Marcel Breyer
- * @date 2019-11-18
+ * @date 2019-11-24
  *
  * @brief Provides the ``std::source_location`` implementation.
  *
@@ -16,7 +16,7 @@
 
 /// use standard source_location if available
 #include <source_location>
-namespace mpicxx {
+namespace mpicxx::utility {
     using source_location = std::source_location;
 }
 
@@ -24,14 +24,14 @@ namespace mpicxx {
 
 /// use experimental source_location if available
 #include <experimental/source_location>
-namespace mpicxx {
+namespace mpicxx::utility {
     using source_location = std::experimental::source_location;
 }
 
 #else
 
 /// use custom implementation if no other is available
-namespace mpicxx {
+namespace mpicxx::utility {
     /**
      * Implementation of the ``std::source_location`` class.
      */

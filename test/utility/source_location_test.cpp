@@ -11,7 +11,7 @@
 #include <mpicxx/utility/source_location.hpp>
 
 TEST(UtilityTests, CurrentSourceLocation) {
-    mpicxx::source_location loc = mpicxx::source_location::current();
+    mpicxx::utility::source_location loc = mpicxx::utility::source_location::current();
 
     // test file name
     EXPECT_STREQ(loc.file_name(), __FILE__);
