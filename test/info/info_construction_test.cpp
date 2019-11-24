@@ -8,6 +8,8 @@
  * This file provides test cases for the constructoion of a mpicxx::info object.
  */
 
+#include <string>
+
 #include <gtest/gtest.h>
 #include <mpi.h>
 
@@ -23,6 +25,41 @@ TEST(InfoTests, DefaultConstruction) {
 
     // a newly created MPI_Info object should be emtpy
     EXPECT_EQ(nkeys, 0);
+
+}
+
+TEST(InfoTests, InitializerListConstruction) {
+
+    std::string str("key3");
+    char arr[] = {"key1"};
+    // construct a info object using a std::initializer_list<>
+    mpicxx::info info = { {"key1", "value1"},
+                          {"key2", std::string("value2")},
+                          {arr, "value1_override"},
+                          {str, "value3"} };
+
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+
+    // info object should now contain 3 entries
+    EXPECT_EQ(nkeys, 3);
+
+    // check if all [key, value]-pairs were added
+    int flag;
+    char value[MPI_MAX_INFO_VAL];
+    MPI_Info_get(info.get(), "key1", 15, value, &flag);
+    // check if the key exists
+    EXPECT_TRUE(static_cast<bool>(flag));
+    // be sure that, if the same key is provided multiple times, the last value is used
+    EXPECT_STREQ(value, "value1_override");
+
+    MPI_Info_get(info.get(), "key2", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+
+    MPI_Info_get(info.get(), "key3", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value3");
 
 }
 

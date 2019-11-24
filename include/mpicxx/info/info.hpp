@@ -32,9 +32,7 @@ namespace mpicxx {
      */
     class info {
         using size_type = std::size_t;
-        using key_type = std::string; // TODO 2019-11-23 22:13 marcel: anschauen
-        using mapped_type = std::string;
-        using value_type = std::pair<const key_type, mapped_type>;
+        using value_type = std::pair<const std::string, const std::string>; // TODO 2019-11-24 20:15 marcel: more efficient?
         using iterator = void; // TODO 2019-11-23 22:06 marcel: implement iterator
         using const_iterator = void; // TODO 2019-11-23 22:06 marcel: implement const iterator
 
@@ -124,6 +122,50 @@ namespace mpicxx {
      */
     inline info::info() {
         MPI_Info_create(&info_);
+    }
+    /**
+     * @brief Provides a constructor to initialize the info object directly with multiple [key, value]-pairs.
+     * @details If the same key is provided several times, the last usage will be the final value.
+     * @param ilist initializer list used to initialize the info object directly with multiple [key, value]-paris
+     *
+     * Example:
+     * @code
+     * mpicxx::info obj = { {"key1", "value1"},
+     *                      {"key2", "value2"},
+     *                      {"key1", "value1_override"},
+     *                      {"key3", "value3"} };
+     * @endcode
+     * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
+     * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
+     *
+     * @pre the length of **any** key (including a null terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+     * @pre the length of **any** value (including a null terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+     * @post the newly constructed object is in a valid state
+     *
+     * @assert{
+     *  if **any** key's length (including a null terminator) is greater then *MPI_MAX_INFO_KEY*\n
+     *  if **any** value's length (including a null terminator) is greater then *MPI_MAX_INFO_VAL*
+     * }
+     *
+     * @calls{
+     * int MPI_Info_create(MPI_Info *info);
+     * int MPI_Info_set(MPI_Info info, const char *key, const char *value);
+     * }
+     */
+    inline info::info(std::initializer_list<value_type> ilist) {
+        // create empty info object
+        MPI_Info_create(&info_);
+        // add all given pairs
+        for (const auto& [key, value] : ilist) {
+            MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
+                          "Info key to long!: max size: %u, provided size (with null terminator): %u",
+                          MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
+            MPICXX_ASSERT(utility::string_size(value) < MPI_MAX_INFO_VAL,
+                          "Info value to long!: max size: %u, provided size (with null terminator): %u",
+                          MPI_MAX_INFO_VAL, utility::string_size(value) + 1);
+            // add [key, value]-pair
+            MPI_Info_set(info_, key.c_str(), value.c_str());
+        }
     }
     /**
      * @brief Copy constructor: construct this info object with a copy of the given info object.
@@ -407,7 +449,7 @@ namespace mpicxx {
      */
     inline void info::proxy::operator=(const std::string& value) {
         MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                      "Info value to long!: max size: %u, provided size (with null terminator): %i",
+                      "Info value to long!: max size: %u, provided size (with null terminator): %u",
                       MPI_MAX_INFO_VAL, value.size() + 1);
         MPI_Info_set(ptr->info_, key.c_str(), value.c_str());
     }
