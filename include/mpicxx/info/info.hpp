@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-11-24
+ * @date 2019-11-25
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -32,7 +32,7 @@ namespace mpicxx {
      */
     class info {
         using size_type = std::size_t;
-        using value_type = std::pair<const std::string, const std::string>; // TODO 2019-11-24 20:15 marcel: more efficient?
+        using value_type = std::pair<const std::string, std::string>; // TODO 2019-11-24 20:15 marcel: more efficient?
         using iterator = void; // TODO 2019-11-23 22:06 marcel: implement iterator
         using const_iterator = void; // TODO 2019-11-23 22:06 marcel: implement const iterator
 
@@ -60,9 +60,11 @@ namespace mpicxx {
     public:
         // constructors and destructor
         info();
-        info(std::initializer_list<value_type> ilist); // TODO 2019-11-23 22:19 marcel: implement
         info(const info& other);
         info(info&& other);
+        template <std::input_iterator It>
+        info(It first, It last);
+        info(std::initializer_list<value_type> ilist);
         ~info();
 
         // assignment operators
@@ -83,29 +85,24 @@ namespace mpicxx {
         size_type size() const;
 
         // modifier
-//        void clear();
-//        std::pair<iterator, bool> insert(const key_type& key);
-//        template <typename InputIterator>
-//        void insert(InputIterator first, InputIterator last);
-//        void insert(std::initializer_list<value_type> ilist);
-//        template <typename M>
-//        std::pair<iterator, bool> insert_or_assign(const key_type& k, M&& obj); // TODO 2019-11-23 22:17 marcel: alle anschauen
+        void insert_or_assign(const std::string& key, const std::string& value);
+        template <std::input_iterator It>
+        void insert_or_assign(It first, It last);
 
         // lookup
-//        template <typename T>
-//        size_type count(const T& key) const;
-//        template <typename T>
-//        iterator find(const T& key);
-//        template <typename T>
-//        const_iterator find(const T& key) const;
-//        template <typename T>
-//        bool contains(const T& key) const;
+
 
         // getter
         MPI_Info get() noexcept;
         MPI_Info get() const noexcept;
 
     private:
+        bool key_exists(const std::string& key) {
+            int valuelen, flag;
+            MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
+            return static_cast<bool>(flag);
+        }
+
         MPI_Info info_;
     };
 
@@ -121,55 +118,12 @@ namespace mpicxx {
      * @calls{ int MPI_Info_create(MPI_Info *info); }
      */
     inline info::info() {
-        MPI_Info_create(&info_);
-    }
-    /**
-     * @brief Provides a constructor to initialize the info object directly with multiple [key, value]-pairs.
-     * @details If the same key is provided several times, the last usage will be the final value.
-     * @param ilist initializer list used to initialize the info object directly with multiple [key, value]-paris
-     *
-     * Example:
-     * @code
-     * mpicxx::info obj = { {"key1", "value1"},
-     *                      {"key2", "value2"},
-     *                      {"key1", "value1_override"},
-     *                      {"key3", "value3"} };
-     * @endcode
-     * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
-     * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
-     *
-     * @pre the length of **any** key (including a null terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-     * @pre the length of **any** value (including a null terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
-     * @post the newly constructed object is in a valid state
-     *
-     * @assert{
-     *  if **any** key's length (including a null terminator) is greater then *MPI_MAX_INFO_KEY*\n
-     *  if **any** value's length (including a null terminator) is greater then *MPI_MAX_INFO_VAL*
-     * }
-     *
-     * @calls{
-     * int MPI_Info_create(MPI_Info *info);
-     * int MPI_Info_set(MPI_Info info, const char *key, const char *value);
-     * }
-     */
-    inline info::info(std::initializer_list<value_type> ilist) {
         // create empty info object
         MPI_Info_create(&info_);
-        // add all given pairs
-        for (const auto& [key, value] : ilist) {
-            MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
-                          "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                          MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
-            MPICXX_ASSERT(utility::string_size(value) < MPI_MAX_INFO_VAL,
-                          "Info value to long!: max size: %u, provided size (with null terminator): %u",
-                          MPI_MAX_INFO_VAL, utility::string_size(value) + 1);
-            // add [key, value]-pair
-            MPI_Info_set(info_, key.c_str(), value.c_str());
-        }
     }
     /**
      * @brief Copy constructor: construct this info object with a copy of the given info object.
-     * @details Retains the [key, value]-pair ordering.
+     * @details Retains @p other's [key, value]-pair ordering.
      * @param[in] other the copied info object
      *
      * @pre @p other may **not** be in the moved-from state
@@ -185,14 +139,92 @@ namespace mpicxx {
     }
     /**
      * @brief Move constructor: transfer the resources from the given info object to this object.
-     * @details Retains the [key, value]-pair ordering.
+     * @details Retains @p other's [key, value]-pair ordering.
      * @param[in] other the moved-from info object
      *
-     * @post the newly constructed object is in a valid state iff @p other was **not** in the moved-from state\n
-     * @post @p other is now in the moved-from state (i.e. `this->get() == MPI_INFO_NULL`)
+     * @post the newly constructed object is in a valid state iff @p other was in a valid state\n
+     * @post @p other is now in the moved-from state
      */
     inline info::info(info&& other) : info_(std::move(other.info_)) {
         other.info_ = MPI_INFO_NULL;
+    }
+    /**
+     * @brief Iterator-Range constructor: construct a new info object by adding all [key, value]-pairs denoted by
+     * `[first, last)`.
+     * @details If the same key is added multiple times, its last occurrence determines the final value.
+     * @tparam It any iterator fulfilling the
+     * <a href="https://en.cppreference.com/w/cpp/iterator"><i>InputIterator</i></a> requirements
+     * @param[in] first iterator to the first element in the range
+     * @param[in] last one of the end iterator in the range
+     *
+     * Example:
+     * @code
+     * std::vector<std::pair<std::string, std::string>> key_value_pairs;
+     * key_value_pairs.emplace_back("key1", "value1");
+     * key_value_pairs.emplace_back("key2", "value2");
+     * key_value_pairs.emplace_back("key1", "value1_override");
+     * key_value_pairs.emplace_back("key3", "value3");
+     *
+     * mpicxx::info obj(key_value_pairs.begin(), key_value_pairs.end());
+     * @endcode
+     * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
+     * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
+     *
+     * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+     * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+     * @post the newly constructed object is in a valid state
+     *
+     * @assert{
+     *  if **any** key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+     *  if **any** value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL*
+     * }
+     *
+     * @calls{
+     * int MPI_Info_create(MPI_Info *info);
+     * int MPI_Info_set(MPI_Info info, const char *key, const char *value);
+     * }
+     */
+    template <std::input_iterator It>
+    inline info::info(It first, It last) {
+        // create empty info object
+        MPI_Info_create(&info_);
+        // add all given pairs
+        this->insert_or_assign(first, last);
+    }
+    /**
+     * @brief Provides a constructor to initialize the info object directly with multiple [key, value]-pairs.
+     * @details If the same key is added multiple times, its last occurrence determines the final value.
+     * @param[in] ilist initializer list used to initialize the info object directly with multiple [key, value]-pairs
+     *
+     * Example:
+     * @code
+     * mpicxx::info obj = { {"key1", "value1"},
+     *                      {"key2", "value2"},
+     *                      {"key1", "value1_override"},
+     *                      {"key3", "value3"} };
+     * @endcode
+     * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
+     * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
+     *
+     * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+     * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+     * @post the newly constructed object is in a valid state
+     *
+     * @assert{
+     *  if **any** key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+     *  if **any** value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL*
+     * }
+     *
+     * @calls{
+     * int MPI_Info_create(MPI_Info *info);
+     * int MPI_Info_set(MPI_Info info, const char *key, const char *value);
+     * }
+     */
+    inline info::info(std::initializer_list<value_type> ilist) {
+        // create empty info object
+        MPI_Info_create(&info_);
+        // add all given pairs
+        this->insert_or_assign(ilist.begin(), ilist.end());
     }
     /**
      * @brief Destruct this info object.
@@ -212,7 +244,7 @@ namespace mpicxx {
     // ---------------------------------------------------------------------------------------------------------- //
     /**
      * @brief Copy assignment operator: assign the copy of the given info object to this info object.
-     * @details Retains the [key, value]-pair ordering. Gracefully handles self-assignment.
+     * @details Retains @p rhs's [key, value]-pair ordering. Gracefully handles self-assignment.
      * @param[in] rhs the copied info object
      * @return the lhs object (being the copy of @p rhs)
      *
@@ -221,7 +253,10 @@ namespace mpicxx {
      *
      * @assert{ if called with a moved-from object }
      *
-     * @calls{ int MPI_Info_dup(MPI_info info, MPI_info *newinfo); }
+     * @calls{
+     * int MPI_Info_free(MPI_info *info);
+     * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
+     * }
      */
     inline info& info::operator=(const info& rhs) {
         MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
@@ -239,12 +274,12 @@ namespace mpicxx {
     /**
      *
      * @brief Move assignment operator: transfer the resources from the given info object to this object.
-     * @details Retains the [key, value]-pair ordering. Does **not** handle self-assignment
+     * @details Retains @p rhs's [key, value]-pair ordering. Does **not** handle self-assignment
      * (as of https://isocpp.org/wiki/faq/assignment-operators).
      * @param[in] rhs the moved-from info object
      *
-     * @post the assigned to object is in a valid state iff @p rhs was **not** in the moved-from state\n
-     * @post @p rhs is now in the moved-from state (i.e. `this->get() == MPI_INFO_NULL`)
+     * @post the assigned to object is in a valid state iff @p rhs was in a valid state\n
+     * @post @p rhs is now in the moved-from state
      *
      * @calls{ int MPI_Info_free(MPI_info *info); }
      */
@@ -399,6 +434,22 @@ namespace mpicxx {
     //                                                  modifiers                                                 //
     // ---------------------------------------------------------------------------------------------------------- //
     // TODO 2019-11-23 21:18 marcel: add methods
+    inline void info::insert_or_assign(const std::string& key, const std::string& value) {
+        MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                      "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                      MPI_MAX_INFO_KEY, key.size() + 1);
+        MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                      "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                      MPI_MAX_INFO_VAL, value.size() + 1);
+
+        MPI_Info_set(info_, key.data(), value.data());
+    }
+    template <std::input_iterator It>
+    inline void info::insert_or_assign(It first, It last) {
+        for (; first != last; ++first) {
+            this->insert_or_assign(first->first, first->second);
+        }
+    }
 
 
     // ---------------------------------------------------------------------------------------------------------- //

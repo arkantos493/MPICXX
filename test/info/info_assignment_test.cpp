@@ -1,7 +1,7 @@
 /**
  * @file info_assignment_test.cpp
  * @author Marcel Breyer
- * @date 2019-11-20
+ * @date 2019-11-25
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -85,7 +85,7 @@ TEST(InfoTests, MoveAssignment) {
     MPI_Info_get_nkeys(info_move.get(), &nkeys_move);
     EXPECT_EQ(nkeys_move, 2);
 
-    // be sure the moved from object has released it's state
+    // be sure the moved from object has released it's resources and is now in the moved-from state
     EXPECT_EQ(info.get(), MPI_INFO_NULL);
 
 }

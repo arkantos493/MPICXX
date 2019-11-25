@@ -1,14 +1,14 @@
 /**
  * @file info_construction_test.cpp
  * @author Marcel Breyer
- * @date 2019-11-20
+ * @date 2019-11-25
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
- * This file provides test cases for the constructoion of a mpicxx::info object.
+ * This file provides test cases for the construction of a mpicxx::info object.
  */
 
-#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
@@ -25,41 +25,6 @@ TEST(InfoTests, DefaultConstruction) {
 
     // a newly created MPI_Info object should be emtpy
     EXPECT_EQ(nkeys, 0);
-
-}
-
-TEST(InfoTests, InitializerListConstruction) {
-
-    std::string str("key3");
-    char arr[] = {"key1"};
-    // construct a info object using a std::initializer_list<>
-    mpicxx::info info = { {"key1", "value1"},
-                          {"key2", std::string("value2")},
-                          {arr, "value1_override"},
-                          {str, "value3"} };
-
-    int nkeys;
-    MPI_Info_get_nkeys(info.get(), &nkeys);
-
-    // info object should now contain 3 entries
-    EXPECT_EQ(nkeys, 3);
-
-    // check if all [key, value]-pairs were added
-    int flag;
-    char value[MPI_MAX_INFO_VAL];
-    MPI_Info_get(info.get(), "key1", 15, value, &flag);
-    // check if the key exists
-    EXPECT_TRUE(static_cast<bool>(flag));
-    // be sure that, if the same key is provided multiple times, the last value is used
-    EXPECT_STREQ(value, "value1_override");
-
-    MPI_Info_get(info.get(), "key2", 6, value, &flag);
-    EXPECT_TRUE(static_cast<bool>(flag));
-    EXPECT_STREQ(value, "value2");
-
-    MPI_Info_get(info.get(), "key3", 6, value, &flag);
-    EXPECT_TRUE(static_cast<bool>(flag));
-    EXPECT_STREQ(value, "value3");
 
 }
 
@@ -135,7 +100,77 @@ TEST(InfoTests, MoveConstruction) {
     MPI_Info_get_nkeys(info_move.get(), &nkeys_move);
     EXPECT_EQ(nkeys_move, 2);
 
-    // be sure the moved from object has released it's state
+    // be sure the moved from object has released it's resources and is now in the moved-from state
     EXPECT_EQ(info.get(), MPI_INFO_NULL);
+
+}
+
+TEST(InfoTests, IteratorRangeConstruction) {
+
+    // create vector with alle [key, value]-pairs
+    std::vector<std::pair<std::string, std::string>> key_value_pairs;
+    key_value_pairs.emplace_back("key1", "value1");
+    key_value_pairs.emplace_back("key2", "value2");
+    key_value_pairs.emplace_back("key1", "value1_override");
+    key_value_pairs.emplace_back("key3", "value3");
+
+    // construct a info object from an iterator range
+    mpicxx::info info(key_value_pairs.cbegin(), key_value_pairs.cend());
+
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+
+    // info object should now contain 3 entries
+    EXPECT_EQ(nkeys, 3);
+
+    // check if all [key, value]-pairs were added
+    int flag;
+    char value[MPI_MAX_INFO_VAL];
+    MPI_Info_get(info.get(), "key1", 15, value, &flag);
+    // check if the key exists
+    EXPECT_TRUE(static_cast<bool>(flag));
+    // be sure that, if the same key is provided multiple times, the last value is used
+    EXPECT_STREQ(value, "value1_override");
+
+    MPI_Info_get(info.get(), "key2", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+
+    MPI_Info_get(info.get(), "key3", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value3");
+
+}
+
+TEST(InfoTests, InitializerListConstruction) {
+
+    // construct a info object using a std::initializer_list<>
+    mpicxx::info info = { {"key1", "value1"},
+                          {"key2", "value2"},
+                          {"key1", "value1_override"},
+                          {"key3", "value3"} };
+
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+
+    // info object should now contain 3 entries
+    EXPECT_EQ(nkeys, 3);
+
+    // check if all [key, value]-pairs were added
+    int flag;
+    char value[MPI_MAX_INFO_VAL];
+    MPI_Info_get(info.get(), "key1", 15, value, &flag);
+    // check if the key exists
+    EXPECT_TRUE(static_cast<bool>(flag));
+    // be sure that, if the same key is provided multiple times, the last value is used
+    EXPECT_STREQ(value, "value1_override");
+
+    MPI_Info_get(info.get(), "key2", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+
+    MPI_Info_get(info.get(), "key3", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value3");
 
 }
