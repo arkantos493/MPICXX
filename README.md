@@ -11,7 +11,7 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Prerequisites
 
-- GCC 9.1 or newer
+- GCC trunk (10.0.0)
 - [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
 - cmake (minimum required 3.5)
 - Doxygen and Sphinx (for documentation only)
