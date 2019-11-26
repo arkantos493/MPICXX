@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-11-25
+ * @date 2019-11-26
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -11,6 +11,7 @@
 #ifndef MPICXX_INFO_HPP
 #define MPICXX_INFO_HPP
 
+#include <compare>
 #include <cstring>
 #include <initializer_list>
 #include <stdexcept>
@@ -31,11 +32,6 @@ namespace mpicxx {
      * TODO: usage example
      */
     class info {
-        using size_type = std::size_t;
-        using value_type = std::pair<const std::string, std::string>; // TODO 2019-11-24 20:15 marcel: more efficient?
-        using iterator = void; // TODO 2019-11-23 22:06 marcel: implement iterator
-        using const_iterator = void; // TODO 2019-11-23 22:06 marcel: implement const iterator
-
         /**
          * @brief This proxy class is used to distinguish between read and write accesses in @ref mpicxx::info::operator[].
          */
@@ -57,7 +53,227 @@ namespace mpicxx {
             const std::string key;
         };
 
+        /**
+         * @brief Provides all necessary iterators for an info object.
+         * @details These iterators are: iterator, const_iterator, reverse_iterator, const_reverse_iterator.
+         * @tparam is_const if `true` a const_(reverse_)iterator is used
+         * @tparam is_reverse if `true` a (const_)reverse_iterator is used
+         */
+        template <bool is_const, bool is_reverse>
+        class info_iterator {
+            // needed to be able to construct a const_iterator from a iterator
+            template <bool, bool>
+            friend class info_iterator;
+        public:
+            // iterator traits
+            using difference_type = int;
+            using value_type = std::pair<const std::string, std::string>;
+            using pointer = std::conditional_t<is_const, const value_type&, value_type&>;
+            using reference = std::conditional_t<is_const, const value_type*, value_type*>;
+            using iterator_category = std::random_access_iterator_tag;
+            using size_type = int;
+            using info_pointer = std::conditional_t<is_const, const info*, info*>;
+
+            /**
+             * @brief Construct a new iterator.
+             * @param ptr pointer to the referred to info object
+             * @param pos the iterator's start position
+             */
+            info_iterator(info_pointer ptr, const int pos) : ptr_(ptr), pos_(pos) { }
+            /**
+             * @brief Destruct this iterator.
+             * @details Default generated.
+             */
+            ~info_iterator() = default;
+
+            /**
+             * @brief Construct a const_iterator/const_reverse_iterator from a iterator/reverse_iterator.
+             * @tparam is_const_convertible used to SFINAE away this constructor for non-const iterators
+             * @param other the copied non-const iterator
+             */
+            template <bool is_const_convertible = is_const, typename std::enable_if_t<is_const_convertible, int> = 0>
+            info_iterator(const info_iterator<false, is_reverse>& other) : ptr_(other.ptr_), pos_(other.pos_) { }
+            /**
+             * @brief Copy constructor: construct this iterator with a copy of the given iterator.
+             * @details Default generated.
+             * @param[in] other the copied iterator
+             */
+            info_iterator(const info_iterator& other) = default;
+            /**
+             * @brief Copy assignment operator: assign the copy of the iterator to this iterator.
+             * @details Default generated.
+             * @param[in] rhs the copied info object
+             * @return the lhs object (being the copy of @p rhs)
+             */
+            info_iterator& operator=(const info_iterator& rhs) = default;
+
+            /**
+             * @brief Automatically generate all comparison operators using the three-way comparison operator.
+             * @details Two iterators are equal iff they refer to the same info object **and**
+             * point to the same position.
+             * @param rhs the iterator to which this one should be compared
+             * @return the respective ordering
+             */
+            auto operator<=>(const info_iterator& rhs) const = default;
+
+            /**
+             * @brief Move this iterator one position forward.
+             * @return the modified iterator
+             */
+            info_iterator& operator++() {
+                if constexpr (is_reverse) {
+                    --pos_;
+                } else {
+                    ++pos_;
+                }
+                return *this;
+            }
+            /**
+             * @brief Move the iterator one position forward (postfix).
+             * @return a new iterator referring to the new position
+             */
+            info_iterator operator++(int) {
+                info_iterator tmp{*this};
+                operator++();
+                return tmp;
+            }
+            /**
+             *@brief Move this iterator @p inc steps forward.
+             * @param[in] inc number of steps
+             * @return the modified iterator
+             */
+            info_iterator& operator+=(const size_type inc) {
+                if constexpr (is_reverse) {
+                    pos_ -= inc;
+                } else {
+                    pos_ += inc;
+                }
+                return *this;
+            }
+            /**
+             * @brief Move the iterator @p inc steps forward.
+             * @param[in] it copy of the old iterator
+             * @param[in] inc number of steps
+             * @return the new iterator referring to the new position
+             */
+            friend info_iterator operator+(info_iterator it, const size_type inc) {
+                if constexpr (is_reverse) {
+                    it.pos_ -= inc;
+                } else {
+                    it.pos_ += inc;
+                }
+                return it;
+            }
+            /**
+             * @copydoc info_iterator::operator+(info_iterator, const size_type)
+             */
+            friend info_iterator operator+(const size_type inc, info_iterator it) {
+                return it + inc;
+            }
+            /**
+             * @brief Move this iterator one position backward.
+             * @return the modified iterator
+             */
+            info_iterator& operator--() {
+                if constexpr (is_reverse) {
+                    ++pos_;
+                } else {
+                    --pos_;
+                }
+                return *this;
+            }
+            /**
+             * @brief Move the iterator one position backward (postfix).
+             * @return a new iterator referring to the new position
+             */
+            info_iterator operator--(int) {
+                info_iterator tmp{*this};
+                operator--();
+                return tmp;
+            }
+            /**
+             * @brief Move this iterator @p inc steps backward.
+             * @param[in] inc number of steps
+             * @return the modified iterator
+             */
+            info_iterator& operator-=(const size_type inc) {
+                if constexpr (is_reverse) {
+                    pos_ += inc;
+                } else {
+                    pos_ -= inc;
+                }
+                return *this;
+            }
+            /**
+             * @brief Move the iterator @p inc steps backward.
+             * @param[in] it copy of the old iterator
+             * @param[in] inc number of steps
+             * @return the new iterator referring to the new position
+             */
+            friend info_iterator operator-(info_iterator it, const size_type inc) {
+                if constexpr (is_reverse) {
+                    it.pos_ += inc;
+                } else {
+                    it.pos_ -= inc;
+                }
+                return it;
+            }
+            /**
+             * @brief Calculate the distance between the two given iterators.
+             * @param[in] lhs start iterator
+             * @param[in] rhs end iterator
+             * @return number of elements between start and end
+             */
+            friend difference_type operator-(const info_iterator& lhs, const info_iterator& rhs) {
+                return lhs.pos_ - rhs.pos_;
+            }
+
+            // TODO 2019-11-26 20:48 marcel: const <-> non-const -> by value return -> no changes possible?
+            /**
+             * @brief Get the [key, value]-pair at the current iterator position.
+             * @return the [key, value]-pair
+             *
+             * @pre the current position may **not** by greater or equal to `info::size()`
+             *
+             * @calls{
+             * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
+             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
+             * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+             * }
+             */
+            value_type operator*() const {
+                // get the requested key
+                char key_c[MPI_MAX_INFO_VAL];
+                MPI_Info_get_nthkey(ptr_->info_, pos_, key_c);
+                const std::string key(key_c);
+
+                // get the length of the value associated with the current key
+                int valuelen, flag;
+                MPI_Info_get_valuelen(ptr_->info_, key.data(), &valuelen, &flag);
+
+                // get the value associated with the current key
+                std::string value(valuelen, ' ');
+                MPI_Info_get(ptr_->info_, key.data(), valuelen, value.data(), &flag);
+
+                // return retrieved [key, value]-pair
+                return std::make_pair(key, value);
+            }
+
+        private:
+            info_pointer ptr_;
+            int pos_;
+        };
+
+
     public:
+        // TODO 2019-11-25 21:43 marcel: document?
+        using size_type = std::size_t;
+        using value_type = std::pair<const std::string, std::string>;
+        using iterator = info_iterator<false, false>;
+        using const_iterator = info_iterator<true, false>;
+        using reverse_iterator = info_iterator<false, true>;
+        using const_reverse_iterator = info_iterator<true, true>;
+
         // constructors and destructor
         info();
         info(const info& other);
@@ -78,7 +294,18 @@ namespace mpicxx {
         proxy operator[](T&& key);
 
         // iterators
-
+        iterator begin() { return iterator(this, 0); }
+        iterator end() { return iterator(this, this->size()); }
+        const_iterator begin() const { return const_iterator(this, 0); }
+        const_iterator end() const { return const_iterator(this, this->size()); }
+        const_iterator cbegin() const { return const_iterator(this, 0); }
+        const_iterator cend() const { return const_iterator(this, this->size()); }
+        reverse_iterator rbegin() { return reverse_iterator(this, this->size() - 1); }
+        reverse_iterator rend() { return reverse_iterator(this, -1); }
+        const_reverse_iterator rbegin() const { return const_reverse_iterator(this, this->size() - 1); }
+        const_reverse_iterator rend() const { return const_reverse_iterator(this, -1); }
+        const_reverse_iterator crbegin() const { return const_reverse_iterator(this, this->size() - 1); }
+        const_reverse_iterator crend() const { return const_reverse_iterator(this, -1); }
 
         // capacity
         bool empty() const;
@@ -545,6 +772,11 @@ namespace mpicxx {
         return value;
     }
 
+
+
+    // ---------------------------------------------------------------------------------------------------------- //
+    //                                               iterator class                                               //
+    // ---------------------------------------------------------------------------------------------------------- //
 
 }
 
