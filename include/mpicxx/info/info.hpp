@@ -54,25 +54,28 @@ namespace mpicxx {
         };
 
         /**
-         * @brief Provides all necessary iterators for an info object.
-         * @details These iterators are: iterator, const_iterator, reverse_iterator, const_reverse_iterator.
-         * @tparam is_const if `true` a const_(reverse_)iterator is used
-         * @tparam is_reverse if `true` a (const_)reverse_iterator is used
+         * @brief Provides iterator and const_iterator for an info object.
+         * @details The standard reverse_iterator and const_reverse_iterator are provided
+         * in terms of std::reverse_iterator<iterator> and std::reverse_iterator<const_iterator> respectively.
+         * @tparam is_const if `true` a const_iterator is instantiated, otherwise a iterator
          */
-        template <bool is_const, bool is_reverse>
+        template <bool is_const>
         class info_iterator {
             // needed to be able to construct a const_iterator from a iterator
-            template <bool, bool>
+            template <bool>
             friend class info_iterator;
         public:
+            using info_pointer = std::conditional_t<is_const, const info*, info*>;
             // iterator traits
             using difference_type = int;
             using value_type = std::pair<const std::string, std::string>;
-            using pointer = std::conditional_t<is_const, const value_type&, value_type&>;
-            using reference = std::conditional_t<is_const, const value_type*, value_type*>;
+            using pointer = std::conditional_t<is_const, const value_type*, value_type*>;
+            using reference = value_type; // std::conditional_t<is_const, const value_type&, value_type&>; // TODO 2019-11-27 14:57 marcel:
             using iterator_category = std::random_access_iterator_tag;
+            using iterator_concept = iterator_category;
             using size_type = int;
-            using info_pointer = std::conditional_t<is_const, const info*, info*>;
+
+            // TODO 2019-11-27 14:44 marcel: compare const and non const, use std::make_reverse_iterator
 
             /**
              * @brief Construct a new iterator.
@@ -92,7 +95,7 @@ namespace mpicxx {
              * @param other the copied non-const iterator
              */
             template <bool is_const_convertible = is_const, typename std::enable_if_t<is_const_convertible, int> = 0>
-            info_iterator(const info_iterator<false, is_reverse>& other) : ptr_(other.ptr_), pos_(other.pos_) { }
+            info_iterator(const info_iterator<false>& other) : ptr_(other.ptr_), pos_(other.pos_) { }
             /**
              * @brief Copy constructor: construct this iterator with a copy of the given iterator.
              * @details Default generated.
@@ -121,11 +124,7 @@ namespace mpicxx {
              * @return the modified iterator
              */
             info_iterator& operator++() {
-                if constexpr (is_reverse) {
-                    --pos_;
-                } else {
-                    ++pos_;
-                }
+                ++pos_;
                 return *this;
             }
             /**
@@ -143,11 +142,7 @@ namespace mpicxx {
              * @return the modified iterator
              */
             info_iterator& operator+=(const size_type inc) {
-                if constexpr (is_reverse) {
-                    pos_ -= inc;
-                } else {
-                    pos_ += inc;
-                }
+                pos_ += inc;
                 return *this;
             }
             /**
@@ -157,11 +152,7 @@ namespace mpicxx {
              * @return the new iterator referring to the new position
              */
             friend info_iterator operator+(info_iterator it, const size_type inc) {
-                if constexpr (is_reverse) {
-                    it.pos_ -= inc;
-                } else {
-                    it.pos_ += inc;
-                }
+                it.pos_ += inc;
                 return it;
             }
             /**
@@ -175,11 +166,7 @@ namespace mpicxx {
              * @return the modified iterator
              */
             info_iterator& operator--() {
-                if constexpr (is_reverse) {
-                    ++pos_;
-                } else {
-                    --pos_;
-                }
+                --pos_;
                 return *this;
             }
             /**
@@ -197,11 +184,7 @@ namespace mpicxx {
              * @return the modified iterator
              */
             info_iterator& operator-=(const size_type inc) {
-                if constexpr (is_reverse) {
-                    pos_ += inc;
-                } else {
-                    pos_ -= inc;
-                }
+                pos_ -= inc;
                 return *this;
             }
             /**
@@ -211,11 +194,7 @@ namespace mpicxx {
              * @return the new iterator referring to the new position
              */
             friend info_iterator operator-(info_iterator it, const size_type inc) {
-                if constexpr (is_reverse) {
-                    it.pos_ += inc;
-                } else {
-                    it.pos_ -= inc;
-                }
+                it.pos_ -= inc;
                 return it;
             }
             /**
@@ -241,7 +220,7 @@ namespace mpicxx {
              * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
              * }
              */
-            value_type operator*() const {
+            reference operator*() const {
                 // get the requested key
                 char key_c[MPI_MAX_INFO_VAL];
                 MPI_Info_get_nthkey(ptr_->info_, pos_, key_c);
@@ -269,10 +248,10 @@ namespace mpicxx {
         // TODO 2019-11-25 21:43 marcel: document?
         using size_type = std::size_t;
         using value_type = std::pair<const std::string, std::string>;
-        using iterator = info_iterator<false, false>;
-        using const_iterator = info_iterator<true, false>;
-        using reverse_iterator = info_iterator<false, true>;
-        using const_reverse_iterator = info_iterator<true, true>;
+        using iterator = info_iterator<false>;
+        using const_iterator = info_iterator<true>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         // constructors and destructor
         info();
@@ -300,12 +279,13 @@ namespace mpicxx {
         const_iterator end() const { return const_iterator(this, this->size()); }
         const_iterator cbegin() const { return const_iterator(this, 0); }
         const_iterator cend() const { return const_iterator(this, this->size()); }
-        reverse_iterator rbegin() { return reverse_iterator(this, this->size() - 1); }
-        reverse_iterator rend() { return reverse_iterator(this, -1); }
-        const_reverse_iterator rbegin() const { return const_reverse_iterator(this, this->size() - 1); }
-        const_reverse_iterator rend() const { return const_reverse_iterator(this, -1); }
-        const_reverse_iterator crbegin() const { return const_reverse_iterator(this, this->size() - 1); }
-        const_reverse_iterator crend() const { return const_reverse_iterator(this, -1); }
+        // reverse iterators
+        reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
+        reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
+        const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->end()); }
+        const_reverse_iterator rend() const { return std::make_reverse_iterator(this->begin()); }
+        const_reverse_iterator crbegin() const { return std::make_reverse_iterator(this->cend()); }
+        const_reverse_iterator crend() const { return std::make_reverse_iterator(this->cbegin()); }
 
         // capacity
         bool empty() const;

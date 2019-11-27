@@ -39,24 +39,45 @@ TEST(InfoTests, Iterator) {
     EXPECT_STREQ(keys.c_str(), "key1key2key3key4");
     EXPECT_STREQ(values.c_str(), "value1value2value3value4");
 
+    // check all [key, value]-pairs using a iterator for loop
+    keys = "";
+    values = "";
+    for (auto it = info.begin(), end = info.end(); it != end; ++it) {
+        keys += (*it).first;
+        values += (*it).second;
+    }
+    EXPECT_STREQ(keys.c_str(), "key1key2key3key4");
+    EXPECT_STREQ(values.c_str(), "value1value2value3value4");
+
+    // check all [key, value]-pairs using a reversed iterator for loop
+    keys = "";
+    values = "";
+    for (auto it = info.rbegin(), end = info.rend(); it != end; ++it) {
+        auto pair = *it;
+        keys += pair.first;
+        values += pair.second;
+    }
+    EXPECT_STREQ(keys.c_str(), "key4key3key2key1");
+    EXPECT_STREQ(values.c_str(), "value4value3value2value1");
+
     EXPECT_TRUE(info.begin() == info.begin());
     EXPECT_FALSE(info.begin() == info.end());
     EXPECT_TRUE(info.begin() < info.begin() + 1);
     mpicxx::info info_2;
     EXPECT_FALSE(info.begin() == info_2.begin());
 
-    mpicxx::info::iterator it = info.begin();
-    mpicxx::info::iterator it_copy = it;
-    mpicxx::info::const_iterator const_it = info.cbegin();
-    mpicxx::info::const_iterator const_it_copy = const_it;
-
-    mpicxx::info::const_iterator const_it_2 = info.begin();
-    mpicxx::info::const_iterator const_it_2_copy = it;
-
-    mpicxx::info::reverse_iterator reverse_it = info.rbegin();
-    mpicxx::info::const_reverse_iterator const_reverse_it = info.crbegin();
-    mpicxx::info::const_reverse_iterator const_reverse_it_2 = info.rbegin();
-    mpicxx::info::const_reverse_iterator const_reverse_it_3 = reverse_it;
+//    mpicxx::info::iterator it = info.begin();
+//    mpicxx::info::iterator it_copy = it;
+//    mpicxx::info::const_iterator const_it = info.cbegin();
+//    mpicxx::info::const_iterator const_it_copy = const_it;
+//
+//    mpicxx::info::const_iterator const_it_2 = info.begin();
+//    mpicxx::info::const_iterator const_it_2_copy = it;
+//
+//    mpicxx::info::reverse_iterator reverse_it = info.rbegin();
+//    mpicxx::info::const_reverse_iterator const_reverse_it = info.crbegin();
+//    mpicxx::info::const_reverse_iterator const_reverse_it_2 = info.rbegin();
+//    mpicxx::info::const_reverse_iterator const_reverse_it_3 = reverse_it;
 
 //    mpicxx::info::iterator it_3 = info.rbegin();
 //    mpicxx::info::reverse_iterator rit = info.begin();
