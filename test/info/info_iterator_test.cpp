@@ -65,12 +65,22 @@ TEST(InfoTests, Iterator) {
     EXPECT_TRUE(info.begin() < info.begin() + 1);
     mpicxx::info info_2;
     EXPECT_FALSE(info.begin() == info_2.begin());
+    EXPECT_TRUE(info.cbegin() == info.begin());
 
-//    mpicxx::info::iterator it = info.begin();
-//    mpicxx::info::iterator it_copy = it;
-//    mpicxx::info::const_iterator const_it = info.cbegin();
-//    mpicxx::info::const_iterator const_it_copy = const_it;
-//
+    mpicxx::info::iterator it = info.begin();
+    mpicxx::info::iterator it_copy = it;
+    mpicxx::info::const_iterator const_it = info.cbegin();
+    mpicxx::info::const_iterator const_it_copy = const_it;
+
+    it = it_copy;
+    const_it = const_it_copy;
+
+    const_it = it;
+//    it = const_it;
+
+
+    EXPECT_EQ(info.end() - info.cbegin(), 4);
+
 //    mpicxx::info::const_iterator const_it_2 = info.begin();
 //    mpicxx::info::const_iterator const_it_2_copy = it;
 //

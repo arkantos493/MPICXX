@@ -32,27 +32,85 @@ namespace mpicxx {
      * TODO: usage example
      */
     class info {
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                             string proxy class                                             //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief This proxy class is used to distinguish between read and write accesses in @ref mpicxx::info::operator[].
+         * @brief A proxy class for a `std::string` object to distinguish between a read or write access.
+         * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string&) on a read access.
          */
-        class proxy {
+        class string_proxy {
         public:
-            // constructors
+            /**
+             * @brief Constructs a new proxy object.
+             * @details Uses perfect forwarding to construct the internal key as `const std::string`.
+             * @tparam T type of the key
+             * @param ptr pointer to the parent info object
+             * @param key the provided key
+             */
             template <typename T>
-            proxy(info* ptr, T&& key);
+            string_proxy(info* ptr, T&& key) : ptr_(ptr), key_(std::forward<T>(key)) { }
 
-            // write access
-            void operator=(const std::string& value);
-            void operator=(const char* value);
+            /**
+             * @brief On write access, add the provided @p value and saved key to the info object.
+             * @details Creates a new [key, value]-pair if the key doesn't already exist, otherwise overwrites the existing @p value.
+             * @param value the value associated with the key
+             *
+             * @pre the length of the value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+             * @post the info::size() increases iff the requested key did not already exist
+             *
+             * @assert{ if the value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL* }
+             *
+             * @calls{ int MPI_Info_set(MPI_Info info, const char *key, const char *value); }
+             */
+            void operator=(const std::string& value) {
+                MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                              "Info value to long!: max size: %u, provided size (with null-terminator): %u",
+                              MPI_MAX_INFO_VAL, value.size() + 1);
+                MPI_Info_set(ptr_->info_, key_.data(), value.data());
+            }
 
-            // read access
-            operator std::string() const;
+            /**
+             * @brief On read access return the value associated with the key.
+             * @details If the key doesn't exists yet, it will be inserted with an empty string as value, also returning an empty string.
+             * @return the value associated with key
+             *
+             * @post the info::size() increases iff the requested key did not already exist
+             * @attention This function returns the associated value *by-value*, i.e. changing the returned `std::string` **won't** alter
+             * this object's internal value!
+             *
+             * @calls{
+             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
+             * int MPI_Info_set(MPI_Info info, const char *key, const char *value);
+             * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);
+             * }
+             */
+            operator std::string() const {
+                // get the length of the value
+                int valuelen = 0, flag;
+                MPI_Info_get_valuelen(ptr_->info_, key_.data(), &valuelen, &flag);
+
+                if (flag == 0) {
+                    // the key doesn't exist yet -> add a new [key, value]-pair and return an empty `std::string`
+                    MPI_Info_set(ptr_->info_, key_.data(), "");
+                    return std::string();
+                }
+
+                // key exists -> get the associated value
+                std::string value(valuelen, ' ');
+                MPI_Info_get(ptr_->info_, key_.data(), valuelen, value.data(), &flag);
+                return value;
+            }
 
         private:
-            info* ptr;
-            const std::string key;
+            info* ptr_;
+            const std::string key_;
         };
 
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                  iterators                                                 //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Provides iterator and const_iterator for an info object.
          * @details The standard reverse_iterator and const_reverse_iterator are provided
@@ -64,61 +122,85 @@ namespace mpicxx {
             // needed to be able to construct a const_iterator from a iterator
             template <bool>
             friend class info_iterator;
-        public:
+            // use pointer to const if const_iterator has been requested
             using info_pointer = std::conditional_t<is_const, const info*, info*>;
-            // iterator traits
+        public:
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                         iterator_traits definitions                                        //
+            // ---------------------------------------------------------------------------------------------------------- //
+            /**
+             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
+             * difference type to identify the distance between iterators
+             */
             using difference_type = int;
-            using value_type = std::pair<const std::string, std::string>;
-            using pointer = std::conditional_t<is_const, const value_type*, value_type*>;
-            using reference = value_type; // std::conditional_t<is_const, const value_type&, value_type&>; // TODO 2019-11-27 14:57 marcel:
+            /**
+             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
+             * value type that can be obtained by dereferencing the iterator
+             * @details In case of a non-const iterator, the value will be returned by a @ref info::string_proxy object to allow changing
+             * its value. \n In case of a const iterator, the value will directly be returned as `const std::string` because changing the
+             * value is forbidden by definition.
+             */
+            using value_type = std::conditional_t<is_const,
+                                                  std::pair<const std::string, const std::string>,
+                                                  std::pair<const std::string, string_proxy>>;
+            /**
+             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
+             * pointer type (**not** meaningful because the dereferencing functions return **by-value**)
+             */
+            using pointer = value_type;
+            /**
+             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
+             * reference type (**not** meaningful because the dereferencing functions return **by-value**)
+             */
+            using reference = value_type;
+            /**
+             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
+             * iterator category
+             */
             using iterator_category = std::random_access_iterator_tag;
-            using iterator_concept = iterator_category;
-            using size_type = int;
+            /**
+             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
+             * iterator concept (for C++20 concepts)
+             */
+            using iterator_concept = std::random_access_iterator_tag;
 
-            // TODO 2019-11-27 14:44 marcel: compare const and non const, use std::make_reverse_iterator
 
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                                constructors                                                //
+            // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Construct a new iterator.
-             * @param ptr pointer to the referred to info object
+             * @param ptr pointer to the iterated over info object
              * @param pos the iterator's start position
              */
             info_iterator(info_pointer ptr, const int pos) : ptr_(ptr), pos_(pos) { }
             /**
-             * @brief Destruct this iterator.
-             * @details Default generated.
+             * @brief Copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
+             * @details For const_iterator the default generated copy constructor is used.
+             * @tparam is_const_iterator
+             * @param other the copied iterator
              */
-            ~info_iterator() = default;
+            template <bool is_const_iterator>
+            requires is_const
+            info_iterator(const info_iterator<is_const_iterator>& other) : ptr_(other.ptr_), pos_(other.pos_) { }
 
-            /**
-             * @brief Construct a const_iterator/const_reverse_iterator from a iterator/reverse_iterator.
-             * @tparam is_const_convertible used to SFINAE away this constructor for non-const iterators
-             * @param other the copied non-const iterator
-             */
-            template <bool is_const_convertible = is_const, typename std::enable_if_t<is_const_convertible, int> = 0>
-            info_iterator(const info_iterator<false>& other) : ptr_(other.ptr_), pos_(other.pos_) { }
-            /**
-             * @brief Copy constructor: construct this iterator with a copy of the given iterator.
-             * @details Default generated.
-             * @param[in] other the copied iterator
-             */
-            info_iterator(const info_iterator& other) = default;
-            /**
-             * @brief Copy assignment operator: assign the copy of the iterator to this iterator.
-             * @details Default generated.
-             * @param[in] rhs the copied info object
-             * @return the lhs object (being the copy of @p rhs)
-             */
-            info_iterator& operator=(const info_iterator& rhs) = default;
 
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                            relational operators                                            //
+            // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Automatically generate all comparison operators using the three-way comparison operator.
              * @details Two iterators are equal iff they refer to the same info object **and**
-             * point to the same position.
+             * point at the same position.
              * @param rhs the iterator to which this one should be compared
              * @return the respective ordering
              */
             auto operator<=>(const info_iterator& rhs) const = default;
 
+
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                            modifying operations                                            //
+            // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Move this iterator one position forward.
              * @return the modified iterator
@@ -141,7 +223,7 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return the modified iterator
              */
-            info_iterator& operator+=(const size_type inc) {
+            info_iterator& operator+=(const int inc) {
                 pos_ += inc;
                 return *this;
             }
@@ -151,14 +233,14 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return the new iterator referring to the new position
              */
-            friend info_iterator operator+(info_iterator it, const size_type inc) {
+            friend info_iterator operator+(info_iterator it, const int inc) {
                 it.pos_ += inc;
                 return it;
             }
             /**
-             * @copydoc info_iterator::operator+(info_iterator, const size_type)
+             * @copydoc info_iterator::operator+(info_iterator, const int)
              */
-            friend info_iterator operator+(const size_type inc, info_iterator it) {
+            friend info_iterator operator+(const int inc, info_iterator it) {
                 return it + inc;
             }
             /**
@@ -183,7 +265,7 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return the modified iterator
              */
-            info_iterator& operator-=(const size_type inc) {
+            info_iterator& operator-=(const int inc) {
                 pos_ -= inc;
                 return *this;
             }
@@ -193,20 +275,29 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return the new iterator referring to the new position
              */
-            friend info_iterator operator-(info_iterator it, const size_type inc) {
+            friend info_iterator operator-(info_iterator it, const int inc) {
                 it.pos_ -= inc;
                 return it;
             }
+
+
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                            distance calculation                                            //
+            // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Calculate the distance between the two given iterators.
-             * @param[in] lhs start iterator
+             * @param[in] lhs begin iterator
              * @param[in] rhs end iterator
-             * @return number of elements between start and end
+             * @return number of elements between @p begin and @p end
              */
             friend difference_type operator-(const info_iterator& lhs, const info_iterator& rhs) {
                 return lhs.pos_ - rhs.pos_;
             }
 
+
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                          dereferencing operations                                          //
+            // ---------------------------------------------------------------------------------------------------------- //
             // TODO 2019-11-26 20:48 marcel: const <-> non-const -> by value return -> no changes possible?
             /**
              * @brief Get the [key, value]-pair at the current iterator position.
@@ -235,7 +326,11 @@ namespace mpicxx {
                 MPI_Info_get(ptr_->info_, key.data(), valuelen, value.data(), &flag);
 
                 // return retrieved [key, value]-pair
-                return std::make_pair(key, value);
+                if constexpr (is_const) {
+                    return std::make_pair(key, value);
+                } else {
+                    return std::make_pair(key, string_proxy(ptr_, key));
+                }
             }
 
         private:
@@ -268,9 +363,9 @@ namespace mpicxx {
 
         // access
         template <typename T>
-        proxy at(T&& key);
+        string_proxy at(T&& key);
         template <typename T>
-        proxy operator[](T&& key);
+        string_proxy operator[](T&& key);
 
         // iterators
         iterator begin() { return iterator(this, 0); }
@@ -543,7 +638,7 @@ namespace mpicxx {
      * }
      */
     template <typename T>
-    inline info::proxy info::at(T&& key) {
+    inline info::string_proxy info::at(T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
         MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
                       "Info key to long!: max size: %u, provided size (with null terminator): %u",
@@ -557,7 +652,7 @@ namespace mpicxx {
             throw std::out_of_range("The specified key doesn't exist!");
         }
         // create proxy object and forward key
-        return proxy(this, std::forward<T>(key));
+        return string_proxy(this, std::forward<T>(key));
     }
     /**
      * @brief Access the value associated with the given @p key.
@@ -590,14 +685,14 @@ namespace mpicxx {
      * }
      */
     template <typename T>
-    inline info::proxy info::operator[](T&& key) {
+    inline info::string_proxy info::operator[](T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
         MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
                       "Info key to long!: max size: %u, provided size (with null terminator): %u",
                       MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
 
         // create proxy object and forward key
-        return proxy(this, std::forward<T>(key));
+        return string_proxy(this, std::forward<T>(key));
     }
 
 
@@ -679,78 +774,6 @@ namespace mpicxx {
      */
     inline MPI_Info info::get() const noexcept { return info_; }
 
-
-
-
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                     proxy class for mpicxx::operator[]                                     //
-    // ---------------------------------------------------------------------------------------------------------- //
-    /**
-     * @brief Constructs a new proxy object.
-     * @details Uses perfect forwarding to construct the internal key as `std::string`.
-     * @tparam T type of the key
-     * @param ptr pointer to the parent info object
-     * @param key the provided key
-     */
-    template <typename T>
-    inline info::proxy::proxy(info* ptr, T&& key) : ptr(ptr), key(std::forward<T>(key)) { }
-    /**
-     * @brief Adds the provided value with the used key to this info object.
-     * @details Creates a new [key, value]-pair if key doesn't exist, otherwise overwrites the existing @p value.
-     * @param value the value associated with the key
-     *
-     * @pre the length of the value (including a null terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
-     *
-     * @assert{ if the value's length (including a null terminator) is greater then *MPI_MAX_INFO_VAL* }
-     *
-     * @calls{ int MPI_Info_set(MPI_Info info, const char *key, const char *value); }
-     */
-    inline void info::proxy::operator=(const std::string& value) {
-        MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                      "Info value to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_VAL, value.size() + 1);
-        MPI_Info_set(ptr->info_, key.c_str(), value.c_str());
-    }
-    /**
-     * @copydoc info::proxy::operator=(const std::string&)
-     */
-    inline void info::proxy::operator=(const char* value) {
-        MPICXX_ASSERT(std::strlen(value) < MPI_MAX_INFO_VAL,
-                      "Info value to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, std::strlen(value) + 1);
-        MPI_Info_set(ptr->info_, key.c_str(), value);
-    }
-    /**
-     * @brief Returns the value associated to the provided key.
-     * @details If the key doesn't exists yet, it will be inserted with an empty string as value,
-     * also returning an empty string.
-     * @return the value associated to key
-     *
-     * @post the info::size() increases iff the requested key did not exist
-     * @attention This function returns the associated value *by-value*, i.e. changing the returned value won't alter
-     * this object's internal value!
-     *
-     * @calls{
-     * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag)
-     * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag)
-     * }
-     */
-    inline info::proxy::operator std::string() const {
-        // get the length of the value
-        int valuelen = 0, flag;
-        MPI_Info_get_valuelen(ptr->info_, key.c_str(), &valuelen, &flag);
-
-        if (flag == 0) {
-            // the key doesn't exist yet -> add a new [key, value]-pair
-            MPI_Info_set(ptr->info_, key.c_str(), "");
-            return std::string();
-        }
-
-        // key exists -> get the associated value
-        std::string value(valuelen, ' ');
-        MPI_Info_get(ptr->info_, key.c_str(), valuelen, value.data(), &flag);
-        return value;
-    }
 
 
 
