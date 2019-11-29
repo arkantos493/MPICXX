@@ -116,7 +116,7 @@ namespace mpicxx {
          * @brief Provides iterator and const_iterator for an info object.
          * @details The standard reverse_iterator and const_reverse_iterator are provided
          * in terms of std::reverse_iterator<iterator> and std::reverse_iterator<const_iterator> respectively.
-         * @tparam is_const if `true` a const_iterator is instantiated, otherwise a iterator
+         * @tparam is_const if `true` a const_iterator is instantiated, otherwise a non-const iterator
          */
         template <bool is_const>
         class info_iterator {
@@ -415,21 +415,42 @@ namespace mpicxx {
 
 
     public:
-        // TODO 2019-11-25 21:43 marcel: document?
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                              alias definitions                                             //
+        // ---------------------------------------------------------------------------------------------------------- //
         using size_type = std::size_t;
         using value_type = std::pair<const std::string, std::string>;
+        /**
+         * @brief Alias for an iterator using the `info_iterator` template class with `is_const` set to `false`.
+         */
         using iterator = info_iterator<false>;
+        /**
+         * @brief Alias for a const_iterator using the `info_iterator` template class with `is_const` set to `true`.
+         */
         using const_iterator = info_iterator<true>;
+        /**
+         * @brief Alias for the reverse_iterator using `std::reverse_iterator`.
+         */
         using reverse_iterator = std::reverse_iterator<iterator>;
+        /**
+         * @brief Alias for the const_reverse_iterator using `std::reverse_iterator`.
+         */
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        // constructors and destructor
+
+        // TODO 2019-11-29 21:34 marcel: env
+//        static const info env;
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                        constructors and destructor                                         //
+        // ---------------------------------------------------------------------------------------------------------- //
         info();
         info(const info& other);
-        info(info&& other);
+        info(info&& other); // TODO 2019-11-29 21:37 marcel: noexcept?
         template <std::input_iterator It>
         info(It first, It last);
         info(std::initializer_list<value_type> ilist);
+        constexpr info(MPI_Info other) : info_(other) { } // TODO 2019-11-29 21:34 marcel: implement?
         ~info();
 
         // assignment operators
@@ -482,6 +503,8 @@ namespace mpicxx {
 
         MPI_Info info_;
     };
+
+//    inline const info info::env = info(MPI_INFO_ENV);
 
 
     // ---------------------------------------------------------------------------------------------------------- //
