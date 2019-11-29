@@ -172,10 +172,35 @@ TEST(InfoTests, Iterator) {
     keys = "";
     values = "";
     for (auto it = info.begin(), end = info.end(); it != end; ++it) {
-        keys += (*it).first;
-        values += (*it).second;
+        keys += it->first;
+        values += it->second;
     }
     EXPECT_STREQ(keys.c_str(), "key1key2key3key4");
     EXPECT_STREQ(values.c_str(), "value1value2value3value4");
+
+}
+
+TEST(InfoTests, ReverseIterator) {
+
+    // construct a info object using a std::initializer_list<>
+    mpicxx::info info = {{ "key1", "value1" },
+                         { "key2", "value2" },
+                         { "key3", "value3" },
+                         { "key4", "value4" }};
+
+    // info object should now contain 4 entries
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 4);
+
+    // test reverse loop
+    std::string keys = "";
+    std::string values = "";
+    for (auto it = info.rbegin(), end = info.rend(); it != end; ++it) {
+        keys += it->first;
+        values += it->second;
+    }
+    EXPECT_STREQ(keys.c_str(), "key4key3key2key1");
+    EXPECT_STREQ(values.c_str(), "value4value3value2value1");
 
 }
