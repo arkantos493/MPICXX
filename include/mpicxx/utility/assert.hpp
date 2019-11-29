@@ -73,9 +73,9 @@ namespace mpicxx::utility {
             std::cerr << std::endl;
             // call MPI_Abort only if we are currently in the MPI environment
             // i.e. MPI_Init has already been called, but MPI_Finalize not
-            int is_initialized;
+            int is_initialized = 0;
             MPI_Initialized(&is_initialized);
-            int is_finalized;
+            int is_finalized = 0;
             MPI_Finalized(&is_finalized);
             if (is_initialized != 0 && is_finalized == 0) {
                 // we are currently in an active MPI environment
