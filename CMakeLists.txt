@@ -121,7 +121,7 @@ endif(ENABLE_COVERALLS_REPORT)
 
 # generate documentation if requested
 if (GENERATE_DOCUMENTATION)
-    message(STATUS "Enabled documentation generation with Doxygen -> Doxyrest -> Sphinx")
+    message(STATUS "Enabled documentation generation with Doxygen")
     add_subdirectory(doc)
 endif (GENERATE_DOCUMENTATION)
 
