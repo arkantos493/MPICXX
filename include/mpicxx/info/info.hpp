@@ -14,6 +14,7 @@
 #include <compare>
 #include <cstring>
 #include <initializer_list>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -145,12 +146,14 @@ namespace mpicxx {
                                                   std::pair<const std::string, string_proxy>>;
             /**
              * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * pointer type (**not** meaningful because the dereferencing functions return **by-value**)
+             * pointer type to the elements iterated over
+             * @details Because it is not possible to simply return value_type* (dangling pointer to a local object),
+             * it is necessary to wrap value_type in a `std::unique_ptr`.
              */
-            using pointer = value_type;
+            using pointer = std::unique_ptr<value_type>;
             /**
              * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * reference type (**not** meaningful because the dereferencing functions return **by-value**)
+             * reference type (**not** meaningful because operator*() has to return **by-value** (using a string_proxy for write access))
              */
             using reference = value_type;
             /**
@@ -234,7 +237,7 @@ namespace mpicxx {
             template <bool is_rhs_const>
             bool operator<=(const info_iterator<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ == rhs.ptr_ && pos_ <=> rhs.pos_;
+                return ptr_ == rhs.ptr_ && pos_ <= rhs.pos_;
             }
             /**
              * @copydoc operator==()
@@ -354,39 +357,55 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                          dereferencing operations                                          //
             // ---------------------------------------------------------------------------------------------------------- //
-            // TODO 2019-11-26 20:48 marcel: const <-> non-const -> by value return -> no changes possible?
             /**
              * @brief Get the [key, value]-pair at the current iterator position.
+             * @details If the current iterator is a const_iterator, the returned type is a
+             * `std::pair<const std::string, const std::string>`, i.e. everything gets returned **by-value** and can't by changed.\n
+             * If the current iterator is a non-const iterator, the returned type is a `std::pair<const std::string, string_proxy>`, i.e.
+             * even though the [key, value]-pair gets returned **by-value**, someone can change the value through the string_proxy class.
              * @return the [key, value]-pair
              *
              * @pre the current position may **not** by greater or equal to `info::size()`
              *
              * @calls{
-             * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
-             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
-             * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+             * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
+             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // const: directly, non-const: on read access
+             * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // const: directly, non-const: on read access
              * }
              */
-            reference operator*() const {
+            value_type operator*() const {
                 // get the requested key
-                char key_c[MPI_MAX_INFO_VAL];
-                MPI_Info_get_nthkey(ptr_->info_, pos_, key_c);
-                const std::string key(key_c);
+                char key_arr[MPI_MAX_INFO_KEY];
+                MPI_Info_get_nthkey(ptr_->info_, pos_, key_arr);
+                const std::string key(key_arr);
 
-                // get the length of the value associated with the current key
-                int valuelen, flag;
-                MPI_Info_get_valuelen(ptr_->info_, key.data(), &valuelen, &flag);
-
-                // get the value associated with the current key
-                std::string value(valuelen, ' ');
-                MPI_Info_get(ptr_->info_, key.data(), valuelen, value.data(), &flag);
-
-                // return retrieved [key, value]-pair
                 if constexpr (is_const) {
-                    return std::make_pair(key, value);
+                    // this is currently a const_iterator
+                    // -> retrieve the value associated to the key
+
+                    // get the length of the value associated with the current key
+                    int valuelen, flag;
+                    MPI_Info_get_valuelen(ptr_->info_, key.data(), &valuelen, &flag);
+
+                    // get the value associated with the current key
+                    std::string value(valuelen, ' ');
+                    MPI_Info_get(ptr_->info_, key.data(), valuelen, value.data(), &flag);
+
+                    return std::make_pair(std::move(key), std::move(value));
                 } else {
-                    return std::make_pair(key, string_proxy(ptr_, key));
+                    // this is currently a non-const iterator
+                    // -> create a string_proxy object and return that as value in place of a `std::string` to allow changing the value
+
+                    string_proxy proxy(ptr_, key);
+                    return std::make_pair(std::move(key), std::move(proxy));
                 }
+            }
+
+            /**
+             * @copydoc operator*()
+             */
+            pointer operator->() const {
+                return std::make_unique<value_type>(this->operator*());
             }
 
         private:
