@@ -189,13 +189,61 @@ namespace mpicxx {
             //                                            relational operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
-             * @brief Automatically generate all comparison operators using the three-way comparison operator.
-             * @details Two iterators are equal iff they refer to the same info object **and**
-             * point at the same position.
-             * @param rhs the iterator to which this one should be compared
-             * @return the respective ordering
+             * @brief Perform the respective comparison operation on this iterator and the given @p rhs one.
+             * @details this iterator and @p rhs iterator may not necessarily have the same constness.
+             * @tparam is_rhs_const
+             * @param rhs the other iterator
+             * @return the comparison result
+             *
+             * @pre this iterator and @p rhs iterator have to point to the same info object
+             *
+             * @assert{ if the two iterators don't point to the same info object }
              */
-            auto operator<=>(const info_iterator& rhs) const = default;
+            template <bool is_rhs_const>
+            bool operator==(const info_iterator<is_rhs_const>& rhs) const {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
+                return ptr_ == rhs.ptr_ && pos_ == rhs.pos_;
+            }
+            /**
+             * @copydoc operator==()
+             */
+            template <bool is_rhs_const>
+            bool operator!=(const info_iterator<is_rhs_const>& rhs) const {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
+                return ptr_ != rhs.ptr_ || pos_ != rhs.pos_;
+            }
+            /**
+             * @copydoc operator==()
+             */
+            template <bool is_rhs_const>
+            bool operator<(const info_iterator<is_rhs_const>& rhs) const {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
+                return ptr_ == rhs.ptr_ && pos_ < rhs.pos_;
+            }
+            /**
+             * @copydoc operator==()
+             */
+            template <bool is_rhs_const>
+            bool operator>(const info_iterator<is_rhs_const>& rhs) const {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
+                return ptr_ == rhs.ptr_ && pos_ > rhs.pos_;
+            }
+            /**
+             * @copydoc operator==()
+             */
+            template <bool is_rhs_const>
+            bool operator<=(const info_iterator<is_rhs_const>& rhs) const {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
+                return ptr_ == rhs.ptr_ && pos_ <=> rhs.pos_;
+            }
+            /**
+             * @copydoc operator==()
+             */
+            template <bool is_rhs_const>
+            bool operator>=(const info_iterator<is_rhs_const>& rhs) const {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
+                return ptr_ == rhs.ptr_ && pos_ >= rhs.pos_;
+            }
 
 
             // ---------------------------------------------------------------------------------------------------------- //
@@ -284,14 +332,22 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            distance calculation                                            //
             // ---------------------------------------------------------------------------------------------------------- //
-            /**
-             * @brief Calculate the distance between the two given iterators.
-             * @param[in] lhs begin iterator
-             * @param[in] rhs end iterator
-             * @return number of elements between @p begin and @p end
-             */
-            friend difference_type operator-(const info_iterator& lhs, const info_iterator& rhs) {
-                return lhs.pos_ - rhs.pos_;
+             /**
+              * @brief Calculate the distance between this iterator and the given @p rhs one.
+              * @details this iterator and @p rhs iterator may not necessarily have the same constness.
+              * @tparam is_rhs_const determines whether the @p rhs iterator is const or not
+              * @param rhs the end iterator
+              * @return number of elements between this iterator and the @p rhs iterator
+              *
+              * @pre this iterator and @p rhs iterator have to point to the same info object
+              *
+              * @assert{ if the two iterators don't point to the same info object }
+              */
+             template <bool is_rhs_const>
+             difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
+                MPICXX_ASSERT(ptr_ == rhs.ptr_,
+                              "The two iterators have to point to the same info object in order to calculate the distance between them!");
+                return pos_ - rhs.pos_;
             }
 
 
@@ -601,13 +657,6 @@ namespace mpicxx {
     // ---------------------------------------------------------------------------------------------------------- //
     //                                                   access                                                   //
     // ---------------------------------------------------------------------------------------------------------- //
-    /*
-     * TODO 2019-11-23 21:40 marcel: ???
-     * template <typename T>
-       concept String = std::is_same_v<std::decay_t<T>, std::string> ||
-                 std::is_same_v<std::decay_t<T>, const char*> ||
-                 std::is_same_v<std::decay_t<T>, char*>;
-     */
     /**
      * @brief Access the value associated with the given @p key including bounds checks.
      * @details Returns a proxy class which is used to distinguish between read and write accesses.\n
