@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-11-26
+ * @date 2019-11-30
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -11,10 +11,10 @@
 #ifndef MPICXX_INFO_HPP
 #define MPICXX_INFO_HPP
 
-#include <compare>
-#include <cstring>
+#include <cstring> // TODO 2019-11-30 20:22 marcel: remove later
 #include <initializer_list>
 #include <memory>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -23,7 +23,7 @@
 #include <mpi.h>
 
 #include <mpicxx/utility/assert.hpp>
-#include <mpicxx/utility/string.hpp>
+#include <mpicxx/utility/string.hpp> // TODO 2019-11-30 20:23 marcel: remove later
 
 namespace mpicxx {
     /**
@@ -39,7 +39,8 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief A proxy class for a `std::string` object to distinguish between a read or write access.
-         * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string&) on a read access.
+         * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string&) on a read access.\n
+         * Can be printed directly through an `operator<<` overload.
          */
         class string_proxy {
         public:
@@ -82,9 +83,9 @@ namespace mpicxx {
              * this object's internal value!
              *
              * @calls{
-             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
-             * int MPI_Info_set(MPI_Info info, const char *key, const char *value);
-             * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);
+             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // always
+             * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // iff key doesn't exist yet
+             * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // always
              * }
              */
             operator std::string() const {
@@ -102,6 +103,25 @@ namespace mpicxx {
                 std::string value(valuelen, ' ');
                 MPI_Info_get(ptr_->info_, key_.data(), valuelen, value.data(), &flag);
                 return value;
+            }
+
+            /**
+             * @brief Convenient overload to be able to directly print a string_proxy object.
+             * @param out the output-stream to write on
+             * @param rhs the string_proxy object
+             * @return the output-stream
+             *
+             * @post the info::size() increases iff the requested key did not already exist
+             *
+             * @calls{
+             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // always
+             * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // iff key doesn't exist yet
+             * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // always
+             * }
+             */
+            friend std::ostream& operator<<(std::ostream& out, const string_proxy& rhs) {
+                out << static_cast<std::string>(rhs.operator std::string());
+                return out;
             }
 
         private:

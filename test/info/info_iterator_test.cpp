@@ -1,7 +1,7 @@
 /**
  * @file info_iterator_test.cpp
  * @author Marcel Breyer
- * @date 2019-11-26
+ * @date 2019-11-30
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
