@@ -117,6 +117,8 @@ namespace mpicxx {
          * @details The standard reverse_iterator and const_reverse_iterator are provided
          * in terms of std::reverse_iterator<iterator> and std::reverse_iterator<const_iterator> respectively.
          * @tparam is_const if `true` a const_iterator is instantiated, otherwise a non-const iterator
+         *
+         * @attention Any modifying operation on the info object may invalidate the iterators.
          */
         template <bool is_const>
         class info_iterator {
@@ -335,19 +337,19 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            distance calculation                                            //
             // ---------------------------------------------------------------------------------------------------------- //
-             /**
-              * @brief Calculate the distance between this iterator and the given @p rhs one.
-              * @details this iterator and @p rhs iterator may not necessarily have the same constness.
-              * @tparam is_rhs_const determines whether the @p rhs iterator is const or not
-              * @param rhs the end iterator
-              * @return number of elements between this iterator and the @p rhs iterator
-              *
-              * @pre this iterator and @p rhs iterator have to point to the same info object
-              *
-              * @assert{ if the two iterators don't point to the same info object }
-              */
-             template <bool is_rhs_const>
-             difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
+            /**
+             * @brief Calculate the distance between this iterator and the given @p rhs one.
+             * @details this iterator and @p rhs iterator may not necessarily have the same constness.
+             * @tparam is_rhs_const determines whether the @p rhs iterator is const or not
+             * @param rhs the end iterator
+             * @return number of elements between this iterator and the @p rhs iterator
+             *
+             * @pre this iterator and @p rhs iterator have to point to the same info object
+             *
+             * @assert{ if the two iterators don't point to the same info object }
+             */
+            template <bool is_rhs_const>
+            difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
                 MPICXX_ASSERT(ptr_ == rhs.ptr_,
                               "The two iterators have to point to the same info object in order to calculate the distance between them!");
                 return pos_ - rhs.pos_;
@@ -358,14 +360,18 @@ namespace mpicxx {
             //                                          dereferencing operations                                          //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
-             * @brief Get the [key, value]-pair at the current iterator position.
+             * @brief Get the [key, value]-pair at the current iterator position + @p n.
              * @details If the current iterator is a const_iterator, the returned type is a
              * `std::pair<const std::string, const std::string>`, i.e. everything gets returned **by-value** and can't by changed.\n
              * If the current iterator is a non-const iterator, the returned type is a `std::pair<const std::string, string_proxy>`, i.e.
              * even though the [key, value]-pair gets returned **by-value**, someone can change the value through the string_proxy class.
+             * @param[in] n the requested offset of this iterator
              * @return the [key, value]-pair
              *
-             * @pre the current position may **not** by greater or equal to `info::size()`
+             * @pre the current position + @p n may **not** be less than 0
+             * @pre the current position + @p n may **not** be greater or equal than `info::size()`
+             *
+             * @assert{ if dereferencing an out-of-bounds iterator }
              *
              * @calls{
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
@@ -373,10 +379,14 @@ namespace mpicxx {
              * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // const: directly, non-const: on read access
              * }
              */
-            value_type operator*() const {
-                // get the requested key
+            value_type operator[](const int n) const {
+                MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < static_cast<int>(ptr_->size()),
+                              "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
+                              0, ptr_->size(), pos_ + n);
+
+                // get the requested key (with an offset of n)
                 char key_arr[MPI_MAX_INFO_KEY];
-                MPI_Info_get_nthkey(ptr_->info_, pos_, key_arr);
+                MPI_Info_get_nthkey(ptr_->info_, pos_ + n, key_arr);
                 const std::string key(key_arr);
 
                 if constexpr (is_const) {
@@ -402,10 +412,33 @@ namespace mpicxx {
             }
 
             /**
+             * @brief Get the [key, value]-pair at the current iterator position.
+             * @details If the current iterator is a const_iterator, the returned type is a
+             * `std::pair<const std::string, const std::string>`, i.e. everything gets returned **by-value** and can't by changed.\n
+             * If the current iterator is a non-const iterator, the returned type is a `std::pair<const std::string, string_proxy>`, i.e.
+             * even though the [key, value]-pair gets returned **by-value**, someone can change the value through the string_proxy class.
+             * @return the [key, value]-pair
+             *
+             * @pre the current position + @p n may **not** be less than 0
+             * @pre the current position may **not** be greater or equal than `info::size()`
+             *
+             * @assert{ if dereferencing an out-of-bounds iterator }
+             *
+             * @calls{
+             * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
+             * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // const: directly, non-const: on read access
+             * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // const: directly, non-const: on read access
+             * }
+             */
+            value_type operator*() const {
+                return this->operator[](0);
+            }
+
+            /**
              * @copydoc operator*()
              */
             pointer operator->() const {
-                return std::make_unique<value_type>(this->operator*());
+                return std::make_unique<value_type>(this->operator[](0));
             }
 
         private:
@@ -450,7 +483,7 @@ namespace mpicxx {
         template <std::input_iterator It>
         info(It first, It last);
         info(std::initializer_list<value_type> ilist);
-        constexpr info(MPI_Info other) : info_(other) { } // TODO 2019-11-29 21:34 marcel: implement?
+//        constexpr info(MPI_Info other) : info_(other) { } // TODO 2019-11-29 21:34 marcel: implement?
         ~info();
 
         // assignment operators

@@ -156,6 +156,25 @@ TEST(InfoTests, Iterator) {
     // modifying through const_iterator not allowed -> compile error
 //    const_it_dereference->second = "value1";
 
+    // test dereferencing operator: []
+    // non-const iterator
+    it_dereference = info_dereference.begin();
+    auto key_value_pair_3 = it_dereference[1];
+    EXPECT_STREQ(key_value_pair_3.first.c_str(), "key2");
+    EXPECT_STREQ(static_cast<std::string>(key_value_pair_3.second).c_str(), "value2");
+    // check modifying through non-const iterator
+    it_dereference[2].second = "value_override3";
+    const std::string value_3 = it_dereference[2].second;
+    EXPECT_STREQ(value_3.c_str(), "value_override3");
+
+    // const_iterator
+    const_it_dereference = info_dereference.begin();
+    auto const_key_value_pair_3 = *const_it_dereference;
+    EXPECT_STREQ(const_key_value_pair_3.first.c_str(), "key1");
+    EXPECT_STREQ(const_key_value_pair_3.second.c_str(), "value1");
+    // modifying through const_iterator not allowed -> compile error
+//    (*const_it_dereference).second = "value1";
+
     // loops
 
     // check all [key, value]-pairs using a range based for loop
