@@ -8,6 +8,9 @@
  * This file provides test cases for the iterators of a mpicxx::info object.
  */
 
+#include <algorithm>
+#include <iterator>
+
 #include <gtest/gtest.h>
 #include <mpi.h>
 
@@ -230,3 +233,20 @@ TEST(InfoTests, ReverseIterator) {
     EXPECT_STREQ(values.c_str(), "value4value3value2value1");
 
 }
+
+//TEST(InfoTests, Inserter) {
+//    // TODO 2019-12-01 20:27 marcel: add info::insert()
+//    // construct a info object using a std::initializer_list<>
+//    mpicxx::info info = {{ "key1", "value1" },
+//                         { "key2", "value2" },
+//                         { "key3", "value3" },
+//                         { "key4", "value4" }};
+//
+//    // insert a new element using std::inserter
+//    std::fill_n(std::inserter(info, info.end()), 1, std::make_pair("key5", "value5"));
+//
+//    // check if new [key, value]-pair has been added
+//    int nkeys;
+//    MPI_Info_get_nkeys(info.get(), &nkeys);
+//    EXPECT_EQ(nkeys, 5);
+//}
