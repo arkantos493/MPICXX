@@ -1,7 +1,7 @@
 /**
  * @file info_iterator_test.cpp
  * @author Marcel Breyer
- * @date 2019-11-30
+ * @date 2019-12-01
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -143,6 +143,13 @@ TEST(InfoTests, Iterator) {
     EXPECT_STREQ(const_key_value_pair.second.c_str(), "value_override1");
     // modifying through const_iterator not allowed -> compile error
 //    (*const_it_dereference).second = "value1";
+
+    // const info object
+    const mpicxx::info const_info(info);
+    auto const_info_it = const_info.begin();        // calling begin() on a const info object results in a const_iterator
+    EXPECT_STREQ(const_info_it->first.c_str(), "key1");
+//    const_info_it->second = "value_override1";
+
 
     // test dereferencing operator: ->
 
