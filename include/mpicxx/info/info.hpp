@@ -517,12 +517,13 @@ namespace mpicxx {
          *
          * @pre @p other may **not** be in the moved-from state
          * @post the newly constructed object is in a valid state
+         * @attention Every copied info object is automatically marked freeable even if the copied-from is not.
          *
          * @assert{ if called with a moved-from object }
          *
          * @calls{ int MPI_Info_dup(MPI_info info, MPI_info *newinfo); }
          */
-        info(const info& other) : is_freeable_(other.is_freeable_) {
+        info(const info& other) : is_freeable_(true) {
             MPICXX_ASSERT(other.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
             MPI_Info_dup(other.info_, &info_);
         }
@@ -645,9 +646,64 @@ namespace mpicxx {
         }
 
 
-        // assignment operators
-        info& operator=(const info& rhs);
-        info& operator=(info&& rhs);
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                            assignment operators                                            //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Copy assignment operator: assign the copy of the given info object to this info object.
+         * @details Retains @p rhs's [key, value]-pair ordering. Gracefully handles self-assignment.
+         * @param[in] rhs the copied info object
+         * @return the lhs object (being the copy of @p rhs)
+         *
+         * @pre @p rhs may **not** be in the moved-from state
+         * @post the assigned to object is in a valid state
+         * @attention Every copied info object is automatically marked freeable even if the copied-from is not.
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{
+         * int MPI_Info_free(MPI_info *info);                       // iff no self-assignment and normal destruction would occur
+         * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);      // iff no self-assignment
+         * }
+         */
+        info& operator=(const info& rhs) {
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
+            // check against self-assignment
+            if (this != std::addressof(rhs)) {
+                // delete current MPI_Info object if it is in a valid state
+                if (is_freeable_ && info_ != MPI_INFO_NULL) {
+                    MPI_Info_free(&info_);
+                }
+                // copy rhs info object
+                MPI_Info_dup(rhs.info_, &info_);
+                is_freeable_ = true;
+            }
+            return *this;
+        }
+        /**
+         * @brief Move assignment operator: transfer the resources from the given info object to this object.
+         * @details Retains @p rhs's [key, value]-pair ordering. Does **not** handle self-assignment
+         * (as of https://isocpp.org/wiki/faq/assignment-operators).
+         * @param[in] rhs the moved-from info object
+         *
+         * @post the assigned to object is in a valid state iff @p rhs was in a valid state\n
+         * @post @p rhs is now in the moved-from state
+         *
+         * @calls{ int MPI_Info_free(MPI_info *info);       // iff normal destruction would occur }
+         */
+        info& operator=(info&& rhs) {
+            // delete the current MPI_Info object if it is freeable and in a valid state
+            if (is_freeable_ && info_ != MPI_INFO_NULL) {
+                MPI_Info_free(&info_);
+            }
+            // transfer ownership
+            info_ = std::move(rhs.info_);
+            is_freeable_ = std::move(rhs.is_freeable_);
+            // set moved from object to the moved-from state
+            rhs.info_ = MPI_INFO_NULL;
+            is_freeable_ = false;
+            return *this;
+        }
 
         // access
         template <typename T>
@@ -698,66 +754,9 @@ namespace mpicxx {
         bool is_freeable_;
     };
 
-
+    // initialize static environment object
     inline const info info::env = info(MPI_INFO_ENV, false);
 
-
-
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                            assignment operators                                            //
-    // ---------------------------------------------------------------------------------------------------------- //
-    /**
-     * @brief Copy assignment operator: assign the copy of the given info object to this info object.
-     * @details Retains @p rhs's [key, value]-pair ordering. Gracefully handles self-assignment.
-     * @param[in] rhs the copied info object
-     * @return the lhs object (being the copy of @p rhs)
-     *
-     * @pre @p rhs may **not** be in the moved-from state
-     * @post the assigned to object is in a valid state
-     *
-     * @assert{ if called with a moved-from object }
-     *
-     * @calls{
-     * int MPI_Info_free(MPI_info *info);
-     * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);
-     * }
-     */
-    inline info& info::operator=(const info& rhs) {
-        MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
-        // check against self-assignment
-        if (this != std::addressof(rhs)) {
-            // delete current MPI_Info object if it is in a valid state
-            if (info_ != MPI_INFO_NULL) {
-                MPI_Info_free(&info_);
-            }
-            // copy rhs info object
-            MPI_Info_dup(rhs.info_, &info_);
-        }
-        return *this;
-    }
-    /**
-     *
-     * @brief Move assignment operator: transfer the resources from the given info object to this object.
-     * @details Retains @p rhs's [key, value]-pair ordering. Does **not** handle self-assignment
-     * (as of https://isocpp.org/wiki/faq/assignment-operators).
-     * @param[in] rhs the moved-from info object
-     *
-     * @post the assigned to object is in a valid state iff @p rhs was in a valid state\n
-     * @post @p rhs is now in the moved-from state
-     *
-     * @calls{ int MPI_Info_free(MPI_info *info); }
-     */
-    inline info& info::operator=(info&& rhs) {
-        // delete the current MPI_Info object if it is in a valid state
-        if (info_ != MPI_INFO_NULL) {
-            MPI_Info_free(&info_);
-        }
-        // transfer ownership
-        info_ = std::move(rhs.info_);
-        // set moved from object to the moved-from state
-        rhs.info_ = MPI_INFO_NULL;
-        return *this;
-    }
 
 
     // ---------------------------------------------------------------------------------------------------------- //
