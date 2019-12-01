@@ -1,7 +1,7 @@
 /**
  * @file info_construction_test.cpp
  * @author Marcel Breyer
- * @date 2019-11-25
+ * @date 2019-12-01
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -172,5 +172,40 @@ TEST(InfoTests, InitializerListConstruction) {
     MPI_Info_get(info.get(), "key3", 6, value, &flag);
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value3");
+
+}
+
+TEST(InfoTests, MPI_InfoConstruction) {
+
+    MPI_Info info_ptr;
+    MPI_Info_create(&info_ptr);
+    MPI_Info_set(info_ptr, "key", "value");
+
+    // construct a info object using a MPI_Info object
+    // NO AUTOMATIC MPI_Info_free CALL!
+    {
+        mpicxx::info info(info_ptr, false);
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        // info object should now contain 1 entry
+        EXPECT_EQ(nkeys, 1);
+
+        // check if all [key, value]-pairs were added
+        int flag;
+        char value[MPI_MAX_INFO_VAL];
+        MPI_Info_get(info.get(), "key", 5, value, &flag);
+        // check if the key exists
+        EXPECT_TRUE(static_cast<bool>(flag));
+        // be sure that, if the same key is provided multiple times, the last value is used
+        EXPECT_STREQ(value, "value");
+
+        mpicxx::info info_copy(info);
+        mpicxx::info info_move(std::move(info));
+
+    } // no automatic MPI_Info_free called here or the following MPI_Info_free call would terminate the program
+
+    MPI_Info_free(&info_ptr);
 
 }
