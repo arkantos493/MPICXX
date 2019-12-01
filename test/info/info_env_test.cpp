@@ -18,6 +18,9 @@ TEST(InfoTests, InfoEnv) {
     int nkeys_env;
     MPI_Info_get_nkeys(MPI_INFO_ENV, &nkeys_env);
 
-    EXPECT_EQ(nkeys_env, mpicxx::info::env.size());
+    int nkeys;
+    MPI_Info_get_nkeys(mpicxx::info::env.get(), &nkeys);
+
+    EXPECT_EQ(nkeys_env, nkeys);
 
 }
