@@ -230,6 +230,7 @@ TAB_SIZE               = 4
 
 ALIASES                += assert{1}="<dl class=\"section assert\"><dt>Assertions</dt><dd>\1</dd></dl>"
 ALIASES                += calls{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>@code \1 @endcode</dd></dl>"
+ALIASES                += calls_ref{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>\1</dd></dl>"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"

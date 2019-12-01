@@ -391,7 +391,9 @@ namespace mpicxx {
              * @pre the current position + @p n may **not** be less than 0
              * @pre the current position + @p n may **not** be greater or equal than `info::size()`
              *
-             * @assert{ if dereferencing an out-of-bounds iterator }
+             * @assert{
+             * if dereferencing an out-of-bounds iterator
+             * }
              *
              * @calls{
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
@@ -400,6 +402,7 @@ namespace mpicxx {
              * }
              */
             value_type operator[](const int n) const {
+//                MPICXX_ASSERT(ptr_.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported."); // TODO 2019-12-01 20:46 marcel: assertions? if the pointed to info object is in the moved-from state\n
                 MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < static_cast<int>(ptr_->size()),
                               "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
                               0, ptr_->size(), pos_ + n);
@@ -711,19 +714,101 @@ namespace mpicxx {
         template <typename T>
         string_proxy operator[](T&& key);
 
-        // iterators
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                  iterators                                                 //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Returns an iterator to the first element of this info object.
+         * @details If the info object is empty this iterator equals info::end().
+         * @return the iterator
+         *
+         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         */
         iterator begin() { return iterator(this, 0); }
+        /**
+         * @brief Returns an iterator to the element one after the last element of this info object.
+         * @details Attempts to access this element, i.e. dereferencing the returned iterator, results in undefined behaviour.
+         * @return the iterator
+         *
+         * @calls_ref{
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * for dereferencing operations see @ref info_iterator
+         * }
+         */
         iterator end() { return iterator(this, this->size()); }
+        /**
+         * @brief Returns a const_iterator to the first element of this info object.
+         * @details If the info object is empty this const_iterator equals info::end().
+         * @return the const_iterator
+         *
+         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         */
         const_iterator begin() const { return const_iterator(this, 0); }
+        /**
+         * @brief Returns a const_iterator to the element one after the last element of this info object.
+         * @details Attempts to access this element, i.e. dereferencing the returned const_iterator, results in undefined behaviour.
+         * @return the const_iterator
+         *
+         * @calls_ref{
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * for dereferencing operations see @ref info_iterator
+         * }
+         */
         const_iterator end() const { return const_iterator(this, this->size()); }
+        /**
+         * @copydoc begin() const
+         */
         const_iterator cbegin() const { return const_iterator(this, 0); }
+        /**
+         * @copydoc end() const
+         */
         const_iterator cend() const { return const_iterator(this, this->size()); }
-        // reverse iterators
+        /**
+         * @brief Returns a reverse_iterator to the last element of this info object.
+         * @details If the info object is empty this reverse_iterator equals info::rend().
+         * @return the reverse_iterator
+         *
+         * @calls_ref{
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * for dereferencing operations see @ref info_iterator
+         * }
+         */
         reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
+        /**
+         * @brief Returns a reverse_iterator to the element one before the first element of this info object.
+         * @details Attempts to access this element, i.e. dereferencing the returned reverse_iterator, results in undefined behaviour.
+         * @return the reverse_iterator
+         *
+         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         */
         reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
+        /**
+         * @brief Returns a const_reverse_iterator to the last element of this info object.
+         * @details If the info object is empty this const_reverse_iterator equals info::rend().
+         * @return the const_reverse_iterator
+         *
+         * @calls_ref{
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * for dereferencing operations see @ref info_iterator
+         * }
+         */
         const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->end()); }
+        /**
+         * @brief Returns a const_reverse_iterator to the element one before the first element of this info object.
+         * @details Attempts to access this element, i.e. dereferencing the returned const_reverse_iterator, results in undefined behaviour.
+         * @return the const_reverse_iterator
+         *
+         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         */
         const_reverse_iterator rend() const { return std::make_reverse_iterator(this->begin()); }
+        /**
+         * @copydoc rbegin() const
+         */
         const_reverse_iterator crbegin() const { return std::make_reverse_iterator(this->cend()); }
+        /**
+         * @copydoc rend() const
+         */
         const_reverse_iterator crend() const { return std::make_reverse_iterator(this->cbegin()); }
 
         // capacity
