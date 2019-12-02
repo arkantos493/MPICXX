@@ -867,6 +867,37 @@ namespace mpicxx {
         void insert_or_assign(It first, It last);
         void insert_or_assign(std::initializer_list<value_type> ilist);
 
+        iterator erase(const_iterator pos) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            // TODO 2019-12-02 20:50 marcel: pos points to this info object?
+
+            MPI_Info_delete(info_, (*pos).first.data());
+            return iterator(this, pos - this->cbegin()); // TODO 2019-12-02 20:52 marcel: better???
+        }
+        iterator erase(const_iterator first, const_iterator last) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            int count = last - first;
+            int pos = first - this->cbegin();
+            char key[MPI_MAX_INFO_KEY];
+            for (int i = 0; i < count; ++i) {
+                MPI_Info_get_nthkey(info_, pos, key);
+                MPI_Info_delete(info_, key);
+            }
+            return iterator(this, pos);
+        }
+        size_type erase(const std::string& key) {
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            if (this->key_exists(key)) {
+                MPI_Info_delete(info_, key.data());
+                return 1;
+            } else {
+                return 0;
+            }
+        }
         /**
          * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
          * @details Invalidates all iterators.
