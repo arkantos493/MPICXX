@@ -821,9 +821,42 @@ namespace mpicxx {
          */
         const_reverse_iterator crend() const { return std::make_reverse_iterator(this->cbegin()); }
 
-        // capacity
-        bool empty() const;
-        size_type size() const;
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                  capacity                                                  //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Returns whether this info object is empty or not.
+         * @details An info object is empty iff it has no [key, value]-pairs.
+         * @return `true` iff `this->size() == 0`
+         *
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
+         */
+        bool empty() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            return this->size() == 0;
+        }
+        /**
+         * @brief Returns the number of [key, value]-pairs contained in this info object.
+         * @return the number of [key, value]-pairs
+         *
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
+         */
+        size_type size() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            int nkeys;
+            MPI_Info_get_nkeys(info_, &nkeys);
+            return static_cast<size_type>(nkeys);
+        }
+
 
         // modifier
         void insert_or_assign(const std::string& key, const std::string& value);
@@ -942,42 +975,6 @@ namespace mpicxx {
 
         // create proxy object and forward key
         return string_proxy(this, std::forward<T>(key));
-    }
-
-
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                                  capacity                                                  //
-    // ---------------------------------------------------------------------------------------------------------- //
-    /**
-     * @brief Returns whether this info object is empty or not.
-     * @details An info object is empty iff it has no [key, value]-pairs.
-     * @return `true` iff `this->size() == 0`
-     *
-     * @pre `this` may **not** be in the moved-from state
-     *
-     * @assert{ if called through a moved-from object }
-     *
-     * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
-     */
-    inline bool info::empty() const {
-        MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        return this->size() == 0;
-    }
-    /**
-     * @brief Returns the number of [key, value]-pairs contained in this info object.
-     * @return the number of [key, value]-pairs
-     *
-     * @pre `this` may **not** be in the moved-from state
-     *
-     * @assert{ if called through a moved-from object }
-     *
-     * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
-     */
-    inline info::size_type info::size() const {
-        MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        int nkeys;
-        MPI_Info_get_nkeys(info_, &nkeys);
-        return static_cast<size_type>(nkeys);
     }
 
 
