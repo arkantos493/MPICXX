@@ -866,6 +866,17 @@ namespace mpicxx {
         template <std::input_iterator It>
         void insert_or_assign(It first, It last);
         void insert_or_assign(std::initializer_list<value_type> ilist);
+
+        void clear() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            const size_type size = this->size();
+            char key[MPI_MAX_INFO_KEY];
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, 0, key);
+                MPI_Info_delete(info_, key);
+            }
+        }
         /**
          * @brief Swaps the contents of this info object with @p other.
          * @details Does not invoke any move, copy or swap operations on individual elements.\n
@@ -880,6 +891,7 @@ namespace mpicxx {
             swap(is_freeable_, other.is_freeable_);
         }
 
+        // TODO 2019-12-02 19:46 marcel: @param[in] <-
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                   lookup                                                   //

@@ -6,6 +6,7 @@ set(TEST_SOURCES
         info_access_test.cpp
         info_iterator_test.cpp
         info_capacity_test.cpp
+        info_modifier_test.cpp
         info_lookup_test.cpp
         info_non-member_functions_test.cpp
 )
