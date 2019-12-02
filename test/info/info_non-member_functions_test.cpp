@@ -1,11 +1,12 @@
 /**
- * @file info_relational_test.cpp
+ * @file info_non-member_functions_test.cpp
  * @author Marcel Breyer
  * @date 2019-12-02
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
- * This file provides test cases for the relational operators of a mpicxx::info object.
+ * This file provides test cases for the non-member functions (i.e. relational operators and specializations of std::swap and
+ * std::erase_if) of a mpicxx::info object.
  */
 
 #include <gtest/gtest.h>
