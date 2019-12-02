@@ -400,7 +400,7 @@ namespace mpicxx {
              * @calls{
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // const: directly, non-const: on read access
-             * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // const: directly, non-const: on read access
+             * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // const: directly, non-const: on read access
              * }
              */
             value_type operator[](const int n) const {
@@ -455,7 +455,7 @@ namespace mpicxx {
              * @calls{
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // const: directly, non-const: on read access
-             * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // const: directly, non-const: on read access
+             * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // const: directly, non-const: on read access
              * }
              */
             value_type operator*() const {
@@ -865,7 +865,6 @@ namespace mpicxx {
         void insert_or_assign(std::initializer_list<value_type> ilist);
 
 
-
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                   lookup                                                   //
         // ---------------------------------------------------------------------------------------------------------- //
@@ -958,6 +957,69 @@ namespace mpicxx {
         bool contains(const std::string& key) const {
             return this->find_pos(key) != this->size();
         }
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                            relational operators                                            //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Compares two info objects for equality.
+         * @details Two info objects are equal iff their contents are equal.
+         * @param lhs the @p lhs info object
+         * @param rhs the @p rhs info object
+         * @return `true` if the two info objects are equal, `false` otherwise
+         *
+         * @pre @p lhs and @p rhs may **not** be in the moved-from state
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // 2-3 times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 2 * `lhs.size()` times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most 2 * `lhs.size()` times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most 2 * `lhs.size()` times
+         * }
+         */
+        friend bool operator==(const info& lhs, const info& rhs) {
+            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (lhs).");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (rhs).");
+
+            // not the same number of [key, value]-pairs therefore can't compare equal
+            if (lhs.size() != rhs.size()) {
+                return false;
+            }
+
+            // check all [key, value]-pairs for equality
+            const_iterator lhs_it = lhs.cbegin();
+            const_iterator rhs_it = rhs.cbegin();
+            for (const_iterator end = lhs.cend(); lhs_it != end; ++lhs_it, ++rhs_it) {
+                // both info elements don't compare equal
+                if (*lhs_it != *rhs_it) {
+                    return false;
+                }
+            }
+            // all elements are equal
+            return true;
+        }
+        /**
+         * @brief Compares two info objects for inequality.
+         * @details Two info objects are inequal if they have different number of elements or at least one element compares inequal.
+         * @param lhs the @p lhs info object
+         * @param rhs the @p rhs info object
+         * @return `true` if the two info objects are inequal, `false` otherwise
+         *
+         * @pre @p lhs and @p rhs may **not** be in the moved-from state
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // 2-3 times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 2 * `lhs.size()` times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most 2 * `lhs.size()` times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most 2 * `lhs.size()` times
+         * }
+         */
+         friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
 
 
         // getter

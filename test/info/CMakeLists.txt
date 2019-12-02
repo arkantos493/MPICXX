@@ -7,6 +7,7 @@ set(TEST_SOURCES
         info_iterator_test.cpp
         info_capacity_test.cpp
         info_lookup_test.cpp
+        info_relational_test.cpp
 )
 
 # create google test with MPI support
