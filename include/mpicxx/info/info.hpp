@@ -728,6 +728,7 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
+        // TODO 2019-12-02 19:39 marcel: pass this or info_ ??? -> iterator invalidation...
         /**
          * @brief Returns an iterator to the first element of this info object.
          * @details If the info object is empty this iterator equals info::end().
@@ -858,11 +859,26 @@ namespace mpicxx {
         }
 
 
-        // modifier
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                  modifier                                                  //
+        // ---------------------------------------------------------------------------------------------------------- //
         void insert_or_assign(const std::string& key, const std::string& value);
         template <std::input_iterator It>
         void insert_or_assign(It first, It last);
         void insert_or_assign(std::initializer_list<value_type> ilist);
+        /**
+         * @brief Swaps the contents of this info object with @p other.
+         * @details Does not invoke any move, copy or swap operations on individual elements.\n
+         * Invalidates all iterators.
+         * @param other the @p other info object
+         *
+         * @post `this` is in a valid state iff @p other was in a valid state (and vice versa)
+         */
+        void swap(info& other) noexcept {
+            using std::swap;
+            swap(info_, other.info_);
+            swap(is_freeable_, other.is_freeable_);
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -985,9 +1001,7 @@ namespace mpicxx {
             MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (rhs).");
 
             // not the same number of [key, value]-pairs therefore can't compare equal
-            if (lhs.size() != rhs.size()) {
-                return false;
-            }
+            if (lhs.size() != rhs.size()) { return false; }
 
             // check all [key, value]-pairs for equality
             const_iterator lhs_it = lhs.cbegin();
@@ -1019,7 +1033,17 @@ namespace mpicxx {
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most 2 * `lhs.size()` times
          * }
          */
-         friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
+        friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
+        /**
+         * @brief Swaps the contents of both info objects.
+         * @details Does not invoke any move, copy or swap operations on individual elements.\n
+         * Invalidates all iterators.
+         * @param lhs the @p lhs info object
+         * @param rhs the @p rhs info object
+         *
+         * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa)
+         */
+        friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
 
 
         // getter
