@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-01
+ * @date 2019-12-02
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -390,9 +390,11 @@ namespace mpicxx {
              *
              * @pre the current position + @p n may **not** be less than 0
              * @pre the current position + @p n may **not** be greater or equal than `info::size()`
+             * @pre the pointed to info object may **not** be in the moved-from state
              *
              * @assert{
-             * if dereferencing an out-of-bounds iterator
+             * if dereferencing an out-of-bounds iterator\n
+             * if the pointed to info object is in the moved-from state
              * }
              *
              * @calls{
@@ -402,7 +404,7 @@ namespace mpicxx {
              * }
              */
             value_type operator[](const int n) const {
-//                MPICXX_ASSERT(ptr_.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported."); // TODO 2019-12-01 20:46 marcel: assertions? if the pointed to info object is in the moved-from state\n
+                MPICXX_ASSERT(ptr_->info_ != MPI_INFO_NULL, "Accessing an element of a \"moved-from\" object is not supported.");
                 MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < static_cast<int>(ptr_->size()),
                               "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
                               0, ptr_->size(), pos_ + n);
@@ -433,7 +435,6 @@ namespace mpicxx {
                     return std::make_pair(std::move(key), std::move(proxy));
                 }
             }
-
             /**
              * @brief Get the [key, value]-pair at the current iterator position.
              * @details If the current iterator is a const_iterator, the returned type is a
@@ -444,8 +445,12 @@ namespace mpicxx {
              *
              * @pre the current position + @p n may **not** be less than 0
              * @pre the current position may **not** be greater or equal than `info::size()`
+             * @pre the pointed to info object may **not** be in the moved-from state
              *
-             * @assert{ if dereferencing an out-of-bounds iterator }
+             * @assert{
+             * if dereferencing an out-of-bounds iterator\n
+             * if the pointed to info object is in the moved-from state
+             * }
              *
              * @calls{
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // always directly
@@ -456,7 +461,6 @@ namespace mpicxx {
             value_type operator*() const {
                 return this->operator[](0);
             }
-
             /**
              * @copydoc operator*()
              */
@@ -537,6 +541,7 @@ namespace mpicxx {
          *
          * @post the newly constructed object is in a valid state iff @p other was in a valid state\n
          * @post @p other is now in the moved-from state
+         * @post all iterators pointing to @p other are invalidated
          */
         constexpr info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
             // other should stay in a operable state
@@ -691,6 +696,7 @@ namespace mpicxx {
          *
          * @post the assigned to object is in a valid state iff @p rhs was in a valid state\n
          * @post @p rhs is now in the moved-from state
+         * @post all iterators pointing to @p rhs are invalidated
          *
          * @calls{ int MPI_Info_free(MPI_info *info);       // iff normal destruction would occur }
          */
@@ -708,11 +714,15 @@ namespace mpicxx {
             return *this;
         }
 
-        // access
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                               element access                                               //
+        // ---------------------------------------------------------------------------------------------------------- //
         template <typename T>
         string_proxy at(T&& key);
         template <typename T>
         string_proxy operator[](T&& key);
+        // TODO 2019-12-02 14:30 marcel: update
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -793,7 +803,7 @@ namespace mpicxx {
          * for dereferencing operations see @ref info_iterator
          * }
          */
-        const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->end()); }
+        const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->cend()); }
         /**
          * @brief Returns a const_reverse_iterator to the element one before the first element of this info object.
          * @details Attempts to access this element, i.e. dereferencing the returned const_reverse_iterator, results in undefined behaviour.
@@ -801,7 +811,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        const_reverse_iterator rend() const { return std::make_reverse_iterator(this->begin()); }
+        const_reverse_iterator rend() const { return std::make_reverse_iterator(this->cbegin()); }
         /**
          * @copydoc rbegin() const
          */
