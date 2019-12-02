@@ -867,11 +867,27 @@ namespace mpicxx {
         void insert_or_assign(It first, It last);
         void insert_or_assign(std::initializer_list<value_type> ilist);
 
+        /**
+         * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
+         * @details Invalidates all iterators.
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @post this info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // `this->size()` times
+         * int MPI_Info_delete(MPI_Info info, const char *key);         // `this->size()` times
+         * }
+         */
         void clear() {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
 
             const size_type size = this->size();
             char key[MPI_MAX_INFO_KEY];
+            // repeat nkeys times and always remove the first element
             for (size_type i = 0; i < size; ++i) {
                 MPI_Info_get_nthkey(info_, 0, key);
                 MPI_Info_delete(info_, key);
