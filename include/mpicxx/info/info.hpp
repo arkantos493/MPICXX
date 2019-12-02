@@ -928,7 +928,7 @@ namespace mpicxx {
          * @brief Swaps the contents of this info object with @p other.
          * @details Does not invoke any move, copy or swap operations on individual elements.\n
          * Invalidates all iterators.
-         * @param other the @p other info object
+         * @param[inout] other the @p other info object
          *
          * @post `this` is in a valid state iff @p other was in a valid state (and vice versa)
          */
@@ -938,7 +938,6 @@ namespace mpicxx {
             swap(is_freeable_, other.is_freeable_);
         }
 
-        // TODO 2019-12-02 19:46 marcel: @param[in] <-
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                   lookup                                                   //
@@ -946,7 +945,7 @@ namespace mpicxx {
         /**
          * @brief Search in this info object for number of occurrences of the given @p key.
          * @details Because an info object doesn't support duplicated keys the returned value is either 0 (key not found) or 1 (key found).
-         * @param key the searched key
+         * @param[in] key the searched key
          * @return the number of found keys equal to @p key (0 or 1)
          *
          * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
@@ -969,7 +968,7 @@ namespace mpicxx {
          * @brief Search in this info object for the given @p key.
          * @details If the key is found, returns an iterator pointing to the corresponding element,
          * otherwise the past-the-end iterator is returned (see end()).
-         * @param key the searched key
+         * @param[in] key the searched key
          * @return the iterator
          *
          * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
@@ -992,7 +991,7 @@ namespace mpicxx {
          * @brief Search in this info object for the given @p key.
          * @details If the key is found, returns a const_iterator pointing to the corresponding element,
          * otherwise the past-the-end const_iterator is returned (see cend()).
-         * @param key the searched key
+         * @param[in] key the searched key
          * @return the const_iterator
          *
          * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
@@ -1013,7 +1012,7 @@ namespace mpicxx {
         }
         /**
          * @brief Search in this info object whether the given @p key exists.
-         * @param key the searched key
+         * @param[in] key the searched key
          * @return `true` iff the searched key exists, otherwise `false`
          *
          * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
@@ -1040,8 +1039,8 @@ namespace mpicxx {
         /**
          * @brief Compares two info objects for equality.
          * @details Two info objects are equal iff their contents are equal.
-         * @param lhs the @p lhs info object
-         * @param rhs the @p rhs info object
+         * @param[in] lhs the @p lhs info object
+         * @param[in] rhs the @p rhs info object
          * @return `true` if the two info objects are equal, `false` otherwise
          *
          * @pre @p lhs and @p rhs may **not** be in the moved-from state
@@ -1077,8 +1076,8 @@ namespace mpicxx {
         /**
          * @brief Compares two info objects for inequality.
          * @details Two info objects are inequal if they have different number of elements or at least one element compares inequal.
-         * @param lhs the @p lhs info object
-         * @param rhs the @p rhs info object
+         * @param[in] lhs the @p lhs info object
+         * @param[in] rhs the @p rhs info object
          * @return `true` if the two info objects are inequal, `false` otherwise
          *
          * @pre @p lhs and @p rhs may **not** be in the moved-from state
@@ -1097,8 +1096,8 @@ namespace mpicxx {
          * @brief Swaps the contents of both info objects.
          * @details Does not invoke any move, copy or swap operations on individual elements.\n
          * Invalidates all iterators.
-         * @param lhs the @p lhs info object
-         * @param rhs the @p rhs info object
+         * @param[inout] lhs the @p lhs info object
+         * @param[inout] rhs the @p rhs info object
          *
          * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa)
          */
