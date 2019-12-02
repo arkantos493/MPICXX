@@ -1,11 +1,12 @@
 # specify all source files for this test suite
 set(TEST_SOURCES
-        info_construction_test.cpp
         info_env_test.cpp
+        info_construction_test.cpp
         info_assignment_test.cpp
-        info_capacity_test.cpp
         info_access_test.cpp
         info_iterator_test.cpp
+        info_capacity_test.cpp
+        info_lookup_test.cpp
 )
 
 # create google test with MPI support

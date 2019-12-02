@@ -864,7 +864,100 @@ namespace mpicxx {
         void insert_or_assign(It first, It last);
         void insert_or_assign(std::initializer_list<value_type> ilist);
 
-        // lookup
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                   lookup                                                   //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Search in this info object for number of occurrences of the given @p key.
+         * @details Because an info object doesn't support duplicated keys the returned value is either 0 (key not found) or 1 (key found).
+         * @param key the searched key
+         * @return the number of found keys equal to @p key (0 or 1)
+         *
+         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{
+         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+         * if called with a moved-from object
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // 2 times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * }
+         */
+        size_type count(const std::string& key) const {
+            return static_cast<size_type>(this->contains(key));
+        }
+        /**
+         * @brief Search in this info object for the given @p key.
+         * @details If the key is found, returns an iterator pointing to the corresponding element,
+         * otherwise the past-the-end iterator is returned (see end()).
+         * @param key the searched key
+         * @return the iterator
+         *
+         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{
+         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+         * if called with a moved-from object
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * }
+         */
+        iterator find(const std::string& key) {
+            return iterator(this, this->find_pos(key));
+        }
+        /**
+         * @brief Search in this info object for the given @p key.
+         * @details If the key is found, returns a const_iterator pointing to the corresponding element,
+         * otherwise the past-the-end const_iterator is returned (see cend()).
+         * @param key the searched key
+         * @return the const_iterator
+         *
+         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{
+         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+         * if called with a moved-from object
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * }
+         */
+        const_iterator find(const std::string& key) const {
+            return const_iterator(this, this->find_pos(key));
+        }
+        /**
+         * @brief Search in this info object whether the given @p key exists.
+         * @param key the searched key
+         * @return `true` iff the searched key exists, otherwise `false`
+         *
+         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{
+         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+         * if called with a moved-from object
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // 2 times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * }
+         */
+        bool contains(const std::string& key) const {
+            return this->find_pos(key) != this->size();
+        }
 
 
         // getter
@@ -872,6 +965,28 @@ namespace mpicxx {
         MPI_Info get() const noexcept;
 
     private:
+
+        size_type find_pos(const std::string& key) const {
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            char info_key[MPI_MAX_INFO_KEY];
+            const size_type nkeys = this->size();
+            // loop until a matching key is found
+            for (size_type i = 0; i < nkeys; ++i) {
+                MPI_Info_get_nthkey(info_, i, info_key);
+                // found equal key -> return position
+                if (key.compare(info_key) == 0) {
+                    return i;
+                }
+            }
+            // no matching key found
+            return nkeys;
+        }
+
+
         bool key_exists(const std::string& key) {
             int valuelen, flag;
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
