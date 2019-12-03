@@ -1,7 +1,7 @@
 /**
  * @file info_iterator_test.cpp
  * @author Marcel Breyer
- * @date 2019-12-01
+ * @date 2019-12-03
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -28,6 +28,16 @@ TEST(InfoTests, Iterator) {
     int nkeys;
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 4);
+
+    // check construction and assignment
+    mpicxx::info::const_iterator const_it1_construction(info.begin());       // construct const_iterator from iterator
+    mpicxx::info::const_iterator const_it2_construction(info.cbegin());      // construct const_iterator from const_iterator
+    mpicxx::info::iterator it1_construction(info.begin());                   // construct iterator from iterator
+//    mpicxx::info::iterator it2_construction(info.cbegin());                  // construct iterator from const_iterator -> shouldn't compile
+    const_it1_construction = info.begin();          // assign const_iterator to const_iterator
+    const_it1_construction = info.cbegin();         // assign iterator to const_iterator
+    it1_construction = info.begin();                // assign iterator to iterator
+//    it1_construction = info.cbegin();               // assign const_iterator to iterator -> shouldn't compile
 
     // create a copy
     mpicxx::info info_copy(info);

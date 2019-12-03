@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-02
+ * @date 2019-12-03
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -52,7 +52,7 @@ namespace mpicxx {
              * @param key the provided key
              */
             template <typename T>
-            string_proxy(info* ptr, T&& key) : ptr_(ptr), key_(std::forward<T>(key)) { }
+            string_proxy(MPI_Info ptr, T&& key) : ptr_(ptr), key_(std::forward<T>(key)) { }
 
             /**
              * @brief On write access, add the provided @p value and saved key to the info object.
@@ -70,7 +70,7 @@ namespace mpicxx {
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
                               "Info value to long!: max size: %u, provided size (with null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
-                MPI_Info_set(ptr_->info_, key_.data(), value.data());
+                MPI_Info_set(ptr_, key_.data(), value.data());
             }
 
             /**
@@ -91,17 +91,17 @@ namespace mpicxx {
             operator std::string() const {
                 // get the length of the value
                 int valuelen = 0, flag;
-                MPI_Info_get_valuelen(ptr_->info_, key_.data(), &valuelen, &flag);
+                MPI_Info_get_valuelen(ptr_, key_.data(), &valuelen, &flag);
 
                 if (flag == 0) {
                     // the key doesn't exist yet -> add a new [key, value]-pair and return an empty `std::string`
-                    MPI_Info_set(ptr_->info_, key_.data(), "");
+                    MPI_Info_set(ptr_, key_.data(), "");
                     return std::string();
                 }
 
                 // key exists -> get the associated value
                 std::string value(valuelen, ' ');
-                MPI_Info_get(ptr_->info_, key_.data(), valuelen, value.data(), &flag);
+                MPI_Info_get(ptr_, key_.data(), valuelen, value.data(), &flag);
                 return value;
             }
 
@@ -125,7 +125,7 @@ namespace mpicxx {
             }
 
         private:
-            info* ptr_;
+            MPI_Info ptr_;
             const std::string key_;
         };
 
@@ -145,8 +145,8 @@ namespace mpicxx {
             // needed to be able to construct a const_iterator from a iterator
             template <bool>
             friend class info_iterator;
-            // use pointer to const if const_iterator has been requested
-            using info_pointer = std::conditional_t<is_const, const info*, info*>;
+            // info class can now directly access the pos member
+            friend class info;
         public:
             // ---------------------------------------------------------------------------------------------------------- //
             //                                         iterator_traits definitions                                        //
@@ -195,19 +195,35 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Construct a new iterator.
-             * @param ptr pointer to the iterated over info object
-             * @param pos the iterator's start position
+             * @param[inout] info_ptr pointer to the iterated over *MPI_Info* object
+             * @param[in] pos the iterator's start position
              */
-            info_iterator(info_pointer ptr, const int pos) : ptr_(ptr), pos_(pos) { }
+            info_iterator(MPI_Info info_ptr, const int pos) : info_ptr_(info_ptr), pos_(pos) { }
             /**
-             * @brief Copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
-             * @details For const_iterator the default generated copy constructor is used.
+             * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
-             * @param other the copied iterator
+             * @param[in] other the copied iterator
              */
             template <bool is_const_iterator>
             requires is_const
-            info_iterator(const info_iterator<is_const_iterator>& other) : ptr_(other.ptr_), pos_(other.pos_) { }
+            info_iterator(const info_iterator<is_const_iterator>& other) : info_ptr_(other.info_ptr_), pos_(other.pos_) { }
+
+
+            // ---------------------------------------------------------------------------------------------------------- //
+            //                                            assignment operator                                             //
+            // ---------------------------------------------------------------------------------------------------------- //
+            /**
+             * @brief Special copy assignment operator: defined to be able to assign a non-const iterator to a const_iterator.
+             * @tparam is_const_iterator
+             * @param[in] rhs the copied iterator
+             */
+            template <bool is_const_iterator>
+            requires is_const
+            info_iterator& operator=(const info_iterator<is_const_iterator>& rhs) {
+                info_ptr_ = rhs.info_ptr_;
+                pos_ = rhs.pos_;
+                return *this;
+            }
 
 
             // ---------------------------------------------------------------------------------------------------------- //
@@ -217,7 +233,7 @@ namespace mpicxx {
              * @brief Perform the respective comparison operation on this iterator and the given @p rhs one.
              * @details this iterator and @p rhs iterator may not necessarily have the same constness.
              * @tparam is_rhs_const
-             * @param rhs the other iterator
+             * @param[in] rhs the other iterator
              * @return the comparison result
              *
              * @pre this iterator and @p rhs iterator have to point to the same info object
@@ -226,48 +242,60 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator==(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ == rhs.ptr_ && pos_ == rhs.pos_;
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                              "The two iterators have to point to the same info object in order to compare them!");
+
+                return info_ptr_ == rhs.info_ptr_ && pos_ == rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator!=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ != rhs.ptr_ || pos_ != rhs.pos_;
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                              "The two iterators have to point to the same info object in order to compare them!");
+
+                return info_ptr_ != rhs.info_ptr_ || pos_ != rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator<(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ == rhs.ptr_ && pos_ < rhs.pos_;
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                              "The two iterators have to point to the same info object in order to compare them!");
+
+                return info_ptr_ == rhs.info_ptr_ && pos_ < rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator>(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ == rhs.ptr_ && pos_ > rhs.pos_;
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                              "The two iterators have to point to the same info object in order to compare them!");
+
+                return info_ptr_ == rhs.info_ptr_ && pos_ > rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator<=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ == rhs.ptr_ && pos_ <= rhs.pos_;
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                              "The two iterators have to point to the same info object in order to compare them!");
+
+                return info_ptr_ == rhs.info_ptr_ && pos_ <= rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator>=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_, "The two iterators have to point to the same info object in order to compare them!");
-                return ptr_ == rhs.ptr_ && pos_ >= rhs.pos_;
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                              "The two iterators have to point to the same info object in order to compare them!");
+
+                return info_ptr_ == rhs.info_ptr_ && pos_ >= rhs.pos_;
             }
 
 
@@ -370,8 +398,9 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
-                MPICXX_ASSERT(ptr_ == rhs.ptr_,
+                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
                               "The two iterators have to point to the same info object in order to calculate the distance between them!");
+
                 return pos_ - rhs.pos_;
             }
 
@@ -388,13 +417,13 @@ namespace mpicxx {
              * @param[in] n the requested offset of this iterator
              * @return the [key, value]-pair
              *
+             * @pre the pointed to info object may **not** be in the moved-from state
              * @pre the current position + @p n may **not** be less than 0
              * @pre the current position + @p n may **not** be greater or equal than `info::size()`
-             * @pre the pointed to info object may **not** be in the moved-from state
              *
              * @assert{
-             * if dereferencing an out-of-bounds iterator\n
              * if the pointed to info object is in the moved-from state
+             * if dereferencing an out-of-bounds iterator\n
              * }
              *
              * @calls{
@@ -404,14 +433,19 @@ namespace mpicxx {
              * }
              */
             value_type operator[](const int n) const {
-                MPICXX_ASSERT(ptr_->info_ != MPI_INFO_NULL, "Accessing an element of a \"moved-from\" object is not supported.");
-                MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < static_cast<int>(ptr_->size()),
+                // calculate size if in debug mode to assert an out-of-bounds access
+#ifndef NDEBUG
+                int nkeys;
+                MPI_Info_get_nkeys(info_ptr_, &nkeys);
+#endif
+                MPICXX_ASSERT(info_ptr_ != MPI_INFO_NULL, "Accessing an element of a \"moved-from\" object is not supported.");
+                MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < nkeys,
                               "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
-                              0, ptr_->size(), pos_ + n);
+                              0, nkeys, pos_ + n);
 
                 // get the requested key (with an offset of n)
                 char key_arr[MPI_MAX_INFO_KEY];
-                MPI_Info_get_nthkey(ptr_->info_, pos_ + n, key_arr);
+                MPI_Info_get_nthkey(info_ptr_, pos_ + n, key_arr);
                 const std::string key(key_arr);
 
                 if constexpr (is_const) {
@@ -420,18 +454,18 @@ namespace mpicxx {
 
                     // get the length of the value associated with the current key
                     int valuelen, flag;
-                    MPI_Info_get_valuelen(ptr_->info_, key.data(), &valuelen, &flag);
+                    MPI_Info_get_valuelen(info_ptr_, key.data(), &valuelen, &flag);
 
                     // get the value associated with the current key
                     std::string value(valuelen, ' ');
-                    MPI_Info_get(ptr_->info_, key.data(), valuelen, value.data(), &flag);
+                    MPI_Info_get(info_ptr_, key.data(), valuelen, value.data(), &flag);
 
                     return std::make_pair(std::move(key), std::move(value));
                 } else {
                     // this is currently a non-const iterator
                     // -> create a string_proxy object and return that as value in place of a `std::string` to allow changing the value
 
-                    string_proxy proxy(ptr_, key);
+                    string_proxy proxy(info_ptr_, key);
                     return std::make_pair(std::move(key), std::move(proxy));
                 }
             }
@@ -443,13 +477,13 @@ namespace mpicxx {
              * even though the [key, value]-pair gets returned **by-value**, someone can change the value through the string_proxy class.
              * @return the [key, value]-pair
              *
+             * @pre the pointed to info object may **not** be in the moved-from state
              * @pre the current position + @p n may **not** be less than 0
              * @pre the current position may **not** be greater or equal than `info::size()`
-             * @pre the pointed to info object may **not** be in the moved-from state
              *
              * @assert{
-             * if dereferencing an out-of-bounds iterator\n
              * if the pointed to info object is in the moved-from state
+             * if dereferencing an out-of-bounds iterator\n
              * }
              *
              * @calls{
@@ -468,8 +502,9 @@ namespace mpicxx {
                 return std::make_unique<value_type>(this->operator[](0));
             }
 
+
         private:
-            info_pointer ptr_;
+            MPI_Info info_ptr_;
             int pos_;
         };
 
@@ -728,7 +763,6 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
-        // TODO 2019-12-02 19:39 marcel: pass this or info_ ??? -> iterator invalidation...
         /**
          * @brief Returns an iterator to the first element of this info object.
          * @details If the info object is empty this iterator equals info::end().
@@ -736,7 +770,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        iterator begin() { return iterator(this, 0); }
+        iterator begin() { return iterator(info_, 0); }
         /**
          * @brief Returns an iterator to the element one after the last element of this info object.
          * @details Attempts to access this element, i.e. dereferencing the returned iterator, results in undefined behaviour.
@@ -747,7 +781,7 @@ namespace mpicxx {
          * for dereferencing operations see @ref info_iterator
          * }
          */
-        iterator end() { return iterator(this, this->size()); }
+        iterator end() { return iterator(info_, this->size()); }
         /**
          * @brief Returns a const_iterator to the first element of this info object.
          * @details If the info object is empty this const_iterator equals info::end().
@@ -755,7 +789,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        const_iterator begin() const { return const_iterator(this, 0); }
+        const_iterator begin() const { return const_iterator(info_, 0); }
         /**
          * @brief Returns a const_iterator to the element one after the last element of this info object.
          * @details Attempts to access this element, i.e. dereferencing the returned const_iterator, results in undefined behaviour.
@@ -766,15 +800,15 @@ namespace mpicxx {
          * for dereferencing operations see @ref info_iterator
          * }
          */
-        const_iterator end() const { return const_iterator(this, this->size()); }
+        const_iterator end() const { return const_iterator(info_, this->size()); }
         /**
          * @copydoc begin() const
          */
-        const_iterator cbegin() const { return const_iterator(this, 0); }
+        const_iterator cbegin() const { return const_iterator(info_, 0); }
         /**
          * @copydoc end() const
          */
-        const_iterator cend() const { return const_iterator(this, this->size()); }
+        const_iterator cend() const { return const_iterator(info_, this->size()); }
         /**
          * @brief Returns a reverse_iterator to the last element of this info object.
          * @details If the info object is empty this reverse_iterator equals info::rend().
@@ -872,7 +906,7 @@ namespace mpicxx {
             // TODO 2019-12-02 20:50 marcel: pos points to this info object?
 
             MPI_Info_delete(info_, (*pos).first.data());
-            return iterator(this, pos - this->cbegin()); // TODO 2019-12-02 20:52 marcel: better???
+            return iterator(info_, pos - this->cbegin()); // TODO 2019-12-02 20:52 marcel: better???
         }
         iterator erase(const_iterator first, const_iterator last) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
@@ -883,7 +917,7 @@ namespace mpicxx {
                 MPI_Info_get_nthkey(info_, pos, key);
                 MPI_Info_delete(info_, key);
             }
-            return iterator(this, pos);
+            return iterator(info_, pos);
         }
         size_type erase(const std::string& key) {
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
@@ -985,7 +1019,7 @@ namespace mpicxx {
          * }
          */
         iterator find(const std::string& key) {
-            return iterator(this, this->find_pos(key));
+            return iterator(info_, this->find_pos(key));
         }
         /**
          * @brief Search in this info object for the given @p key.
@@ -1008,7 +1042,7 @@ namespace mpicxx {
          * }
          */
         const_iterator find(const std::string& key) const {
-            return const_iterator(this, this->find_pos(key));
+            return const_iterator(info_, this->find_pos(key));
         }
         /**
          * @brief Search in this info object whether the given @p key exists.
@@ -1193,7 +1227,7 @@ namespace mpicxx {
             throw std::out_of_range("The specified key doesn't exist!");
         }
         // create proxy object and forward key
-        return string_proxy(this, std::forward<T>(key));
+        return string_proxy(info_, std::forward<T>(key));
     }
     /**
      * @brief Access the value associated with the given @p key.
@@ -1233,7 +1267,7 @@ namespace mpicxx {
                       MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
 
         // create proxy object and forward key
-        return string_proxy(this, std::forward<T>(key));
+        return string_proxy(info_, std::forward<T>(key));
     }
 
 
