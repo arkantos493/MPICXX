@@ -195,10 +195,10 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Construct a new iterator.
-             * @param[inout] info_ptr pointer to the iterated over *MPI_Info* object
+             * @param[inout] wrapped_info pointer to the iterated over *MPI_Info* object
              * @param[in] pos the iterator's start position
              */
-            info_iterator(MPI_Info info_ptr, const int pos) : info_ptr_(info_ptr), pos_(pos) { }
+            info_iterator(MPI_Info wrapped_info, const int pos) : info_(wrapped_info), pos_(pos) { }
             /**
              * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
@@ -206,7 +206,7 @@ namespace mpicxx {
              */
             template <bool is_const_iterator>
             requires is_const
-            info_iterator(const info_iterator<is_const_iterator>& other) : info_ptr_(other.info_ptr_), pos_(other.pos_) { }
+            info_iterator(const info_iterator<is_const_iterator>& other) : info_(other.info_), pos_(other.pos_) { }
 
 
             // ---------------------------------------------------------------------------------------------------------- //
@@ -220,7 +220,7 @@ namespace mpicxx {
             template <bool is_const_iterator>
             requires is_const
             info_iterator& operator=(const info_iterator<is_const_iterator>& rhs) {
-                info_ptr_ = rhs.info_ptr_;
+                info_ = rhs.info_;
                 pos_ = rhs.pos_;
                 return *this;
             }
@@ -242,60 +242,60 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator==(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to compare them!");
 
-                return info_ptr_ == rhs.info_ptr_ && pos_ == rhs.pos_;
+                return info_ == rhs.info_ && pos_ == rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator!=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to compare them!");
 
-                return info_ptr_ != rhs.info_ptr_ || pos_ != rhs.pos_;
+                return info_ != rhs.info_ || pos_ != rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator<(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to compare them!");
 
-                return info_ptr_ == rhs.info_ptr_ && pos_ < rhs.pos_;
+                return info_ == rhs.info_ && pos_ < rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator>(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to compare them!");
 
-                return info_ptr_ == rhs.info_ptr_ && pos_ > rhs.pos_;
+                return info_ == rhs.info_ && pos_ > rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator<=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to compare them!");
 
-                return info_ptr_ == rhs.info_ptr_ && pos_ <= rhs.pos_;
+                return info_ == rhs.info_ && pos_ <= rhs.pos_;
             }
             /**
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
             bool operator>=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to compare them!");
 
-                return info_ptr_ == rhs.info_ptr_ && pos_ >= rhs.pos_;
+                return info_ == rhs.info_ && pos_ >= rhs.pos_;
             }
 
 
@@ -398,7 +398,7 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
-                MPICXX_ASSERT(info_ptr_ == rhs.info_ptr_,
+                MPICXX_ASSERT(info_ == rhs.info_,
                               "The two iterators have to point to the same info object in order to calculate the distance between them!");
 
                 return pos_ - rhs.pos_;
@@ -422,8 +422,8 @@ namespace mpicxx {
              * @pre the current position + @p n may **not** be greater or equal than `info::size()`
              *
              * @assert{
-             * if the pointed to info object is in the moved-from state
-             * if dereferencing an out-of-bounds iterator\n
+             * if the pointed to info object is in the moved-from state\n
+             * if dereferencing an out-of-bounds iterator
              * }
              *
              * @calls{
@@ -436,16 +436,16 @@ namespace mpicxx {
                 // calculate size if in debug mode to assert an out-of-bounds access
 #ifndef NDEBUG
                 int nkeys;
-                MPI_Info_get_nkeys(info_ptr_, &nkeys);
+                MPI_Info_get_nkeys(info_, &nkeys);
 #endif
-                MPICXX_ASSERT(info_ptr_ != MPI_INFO_NULL, "Accessing an element of a \"moved-from\" object is not supported.");
+                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Accessing an element of a \"moved-from\" object is not supported.");
                 MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < nkeys,
                               "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
                               0, nkeys, pos_ + n);
 
                 // get the requested key (with an offset of n)
                 char key_arr[MPI_MAX_INFO_KEY];
-                MPI_Info_get_nthkey(info_ptr_, pos_ + n, key_arr);
+                MPI_Info_get_nthkey(info_, pos_ + n, key_arr);
                 const std::string key(key_arr);
 
                 if constexpr (is_const) {
@@ -454,18 +454,18 @@ namespace mpicxx {
 
                     // get the length of the value associated with the current key
                     int valuelen, flag;
-                    MPI_Info_get_valuelen(info_ptr_, key.data(), &valuelen, &flag);
+                    MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
 
                     // get the value associated with the current key
                     std::string value(valuelen, ' ');
-                    MPI_Info_get(info_ptr_, key.data(), valuelen, value.data(), &flag);
+                    MPI_Info_get(info_, key.data(), valuelen, value.data(), &flag);
 
                     return std::make_pair(std::move(key), std::move(value));
                 } else {
                     // this is currently a non-const iterator
                     // -> create a string_proxy object and return that as value in place of a `std::string` to allow changing the value
 
-                    string_proxy proxy(info_ptr_, key);
+                    string_proxy proxy(info_, key);
                     return std::make_pair(std::move(key), std::move(proxy));
                 }
             }
@@ -504,7 +504,7 @@ namespace mpicxx {
 
 
         private:
-            MPI_Info info_ptr_;
+            MPI_Info info_;
             int pos_;
         };
 
@@ -894,6 +894,7 @@ namespace mpicxx {
             return static_cast<size_type>(nkeys);
         }
 
+
         // TODO 2019-12-03 18:45 marcel: correctly document iterator invalidation
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  modifier                                                  //
@@ -903,36 +904,127 @@ namespace mpicxx {
         void insert_or_assign(It first, It last);
         void insert_or_assign(std::initializer_list<value_type> ilist);
 
+
+        /**
+         * @brief Removes the element at @p pos.
+         * @param[in] pos iterator to the element to remove
+         * @return iterator following the last removed element
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre @p pos must refer to `this` info object
+         * @pre the position denoted by @p pos may **not** be less than 0
+         * @pre the position denoted by @p pos may **not** be greater or equal than `this->size()`
+         *
+         * @assert{
+         * if called with a moved-from object\n
+         * if @p pos does not refer to `this` info object\n
+         * if dereferencing an out-of-bounds iterator
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
+         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * }
+         */
         iterator erase(const_iterator pos) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            // TODO 2019-12-02 20:50 marcel: pos points to this info object?
+            MPICXX_ASSERT(pos.info_ == info_, "The given iterator must refer to the same info object as this.");
+            MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
+                          "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
+                          0, this->size(), pos.pos_);
 
-            MPI_Info_delete(info_, (*pos).first.data());
-            return iterator(info_, pos - this->cbegin()); // TODO 2019-12-02 20:52 marcel: better???
+            char key[MPI_MAX_INFO_KEY];
+            MPI_Info_get_nthkey(info_, pos.pos_, key);
+            MPI_Info_delete(info_, key);
+            return iterator(info_, pos.pos_);
         }
+        /**
+         * @brief Removes the elements in the range [first, last).
+         * @details [first, last) must be a valid range in `*this`.
+         * @param[in] first iterator to the first element in the range
+         * @param[in] last iterator one-past the last element in the range
+         * @return iterator following the last removed element
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre @p first and @p last must refer to `this` info object
+         * @pre the position denoted by @p first may **not** be less than 0
+         * @pre the position denoted by @p first may **not** be greater or equal than `this->size()`
+         * @pre the position denoted by @p last may **not** be less than 0
+         * @pre the position denoted by @p first may **not** be greater than `this->size()`
+         * @pre @p first must be less or equal than @p last
+         *
+         * @assert{
+         * if called with a moved-from object\n
+         * if @p first or @p last does not refer to `this` info object\n
+         * if dereferencing an out-of-bounds iterator\n
+         * if @p first is greater than @p last
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // `last - first` times
+         * int MPI_Info_delete(MPI_Info info, const char *key);             // `last - first` times
+         * }
+         */
         iterator erase(const_iterator first, const_iterator last) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(first.info_ == info_, "The given iterator (first) must refer to the same info object as this.");
+            MPICXX_ASSERT(last.info_ == info_, "The given iterator (last) must refer to the same info object as this.");
+            MPICXX_ASSERT(first.pos_ >= 0 && first.pos_ < static_cast<int>(this->size()),
+                          "Requested an illegal out-of-bounds access (first)! Legal interval: [%i, %u), requested position: %i",
+                          0, this->size(), first.pos_);
+            MPICXX_ASSERT(last.pos_ >= 0 && last.pos_ <= static_cast<int>(this->size()),
+                          "Requested an illegal out-of-bounds access (last)! Legal interval: [%i, %u], requested position: %i",
+                          0, this->size(), last.pos_);
+            MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
+
             int count = last - first;
-            int pos = first - this->cbegin();
             char key[MPI_MAX_INFO_KEY];
+            // delete all [key, value]-pairs in the range [first, last)
             for (int i = 0; i < count; ++i) {
-                MPI_Info_get_nthkey(info_, pos, key);
+                MPI_Info_get_nthkey(info_, first.pos_, key);
                 MPI_Info_delete(info_, key);
             }
-            return iterator(info_, pos);
+            return iterator(info_, first.pos_);
         }
+        /**
+         * @brief Removes the element (if one exists) with the [**key**, value] equivalent to @p key.
+         * @details Returns either 1 (key found and removed) or 0 (no such key found and therefore nothing removed).
+         * @param[in] key the key to be deleted
+         * @return number of elements removed
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre the length of @p key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         *
+         * @assert{
+         * if called with a moved-from object\n
+         * if the @p key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // at most `this->size()` times
+         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * }
+         */
         size_type erase(const std::string& key) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
 
-            if (this->key_exists(key)) {
-                MPI_Info_delete(info_, key.data());
-                return 1;
-            } else {
-                return 0;
+            const size_type size = this->size();
+            char key_arr[MPI_MAX_INFO_KEY];
+            // search for the given key
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, i, key_arr);
+                // key found -> remove [key, value]-pair
+                if (key.compare(key_arr) == 0) {
+                    MPI_Info_delete(info_, key_arr);
+                    return 1;
+                }
             }
+            // key not found -> nothing removed
+            return 0;
         }
         /**
          * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
