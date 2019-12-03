@@ -894,7 +894,7 @@ namespace mpicxx {
             return static_cast<size_type>(nkeys);
         }
 
-
+        // TODO 2019-12-03 18:45 marcel: correctly document iterator invalidation
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  modifier                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
@@ -993,7 +993,7 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // 2 times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
          * }
          */
@@ -1021,7 +1021,8 @@ namespace mpicxx {
          * }
          */
         iterator find(const std::string& key) {
-            return iterator(info_, this->find_pos(key));
+            const size_type size = this->size();
+            return iterator(info_, this->find_pos(key, size));
         }
         /**
          * @brief Search in this info object for the given @p key.
@@ -1044,7 +1045,8 @@ namespace mpicxx {
          * }
          */
         const_iterator find(const std::string& key) const {
-            return const_iterator(info_, this->find_pos(key));
+            const size_type size = this->size();
+            return const_iterator(info_, this->find_pos(key, size));
         }
         /**
          * @brief Search in this info object whether the given @p key exists.
@@ -1060,12 +1062,13 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // 2 times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
          * }
          */
         bool contains(const std::string& key) const {
-            return this->find_pos(key) != this->size();
+            const size_type size = this->size();
+            return this->find_pos(key, size) != size;
         }
 
 
@@ -1172,26 +1175,24 @@ namespace mpicxx {
 
     private:
 
-        size_type find_pos(const std::string& key) const {
+        size_type find_pos(const std::string& key, const size_type size) const {
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
 
             char info_key[MPI_MAX_INFO_KEY];
-            const size_type nkeys = this->size();
             // loop until a matching key is found
-            for (size_type i = 0; i < nkeys; ++i) {
+            for (size_type i = 0; i < size; ++i) {
                 MPI_Info_get_nthkey(info_, i, info_key);
-                // found equal key -> return position
+                // found equal key
                 if (key.compare(info_key) == 0) {
                     return i;
                 }
             }
             // no matching key found
-            return nkeys;
+            return size;
         }
-
 
         bool key_exists(const std::string& key) {
             int valuelen, flag;
