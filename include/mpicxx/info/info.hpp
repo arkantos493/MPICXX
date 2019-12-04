@@ -952,6 +952,13 @@ namespace mpicxx {
          * }
          */
         std::pair<iterator, bool> insert(const std::string& key, const std::string& value) {
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+            MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                          "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                          MPI_MAX_INFO_VAL, value.size() + 1);
+
             char key_arr[MPI_MAX_INFO_KEY];
             const size_type size = this->size();
             for (size_type i = 0; i < size; ++i) {
@@ -975,10 +982,13 @@ namespace mpicxx {
          * @pre `this` may **not** be in the moved-from state
          * @pre @p first and @p last must refer to the same container
          * @pre @p first must be less or equal than @p last
+         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if @p first is greater than @p last
+         * if called with a moved-from object \n
+         * if @p first is greater than @p last \n
+         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
          * }
          *
          * @calls{
@@ -992,23 +1002,30 @@ namespace mpicxx {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
 
-            char key[MPI_MAX_INFO_KEY];
+            char key_arr[MPI_MAX_INFO_KEY];
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
                 // retrieve element
-                const value_type key_value_pair = *first;
+                const auto [key, value] = *first;
+
+                MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                              "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                              MPI_MAX_INFO_KEY, key.size() + 1);
+                MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                              "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                              MPI_MAX_INFO_VAL, value.size() + 1);
 
                 // check whether key already exists in this info object
                 const size_type size = this->size();
                 for (size_type i = 0; i < size; ++i) {
-                    MPI_Info_get_nthkey(info_, i, key);
-                    if (key_value_pair.first.compare(key) == 0) {
+                    MPI_Info_get_nthkey(info_, i, key_arr);
+                    if (key.compare(key_arr) == 0) {
                         // key already existing -> continue with next input [key, value]-pair
                         goto next_insert_iteration;
                     }
                 }
                 // key not already contained in this info object -> add new [key, value]-pair
-                MPI_Info_set(info_, key_value_pair.first.data(), key_value_pair.second.data());
+                MPI_Info_set(info_, key.data(), value.data());
 
                 next_insert_iteration:;
             }
@@ -1020,8 +1037,13 @@ namespace mpicxx {
          * @param[in] ilist initializer list to insert the [key, value]-pairs from
          *
          * @pre `this` may **not** be in the moved-from state
+         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
          *
-         * @assert{ if called with a moved-from object }
+         * @assert{
+         * if called with a moved-from object\n
+         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // at most `last - first` times
