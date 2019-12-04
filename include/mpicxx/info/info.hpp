@@ -933,6 +933,106 @@ namespace mpicxx {
             }
         }
         /**
+         * @brief Insert the given [key, value]-pair if the info object does not already contain an element with an equivalent key.
+         * @param key the @p key to be inserted
+         * @param value the @p value to be inserted
+         * @return a pair consisting of an iterator to the inserted element (or the one element that prevented the insertion) and a `bool`
+         * denoting whether the insertion took place
+         *
+         * @pre the key's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre the value's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         *
+         * @assert{
+         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+         * if the value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL*
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `2 * this->size()`
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most once
+         * }
+         */
+        std::pair<iterator, bool> insert(const std::string& key, const std::string& value) {
+            char key_arr[MPI_MAX_INFO_KEY];
+            const size_type size = this->size();
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, i, key_arr);
+                if (key.compare(key_arr) == 0) {
+                    return std::make_pair(iterator(info_, i), false);
+                }
+            }
+            MPI_Info_set(info_, key.data(), value.data());
+            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
+        }
+        /**
+         * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
+         * @details If multiple elements in the range have the same key, the first occurrence is used. \n
+         * [first, last) must be a valid range in `*this`.
+         * @tparam InputIt must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">input iterator</a> requirements
+         * @param[in] first iterator to the first element in the range
+         * @param[in] last iterator one-past the last element in the range
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre @p first and @p last must refer to the same container
+         * @pre @p first must be less or equal than @p last
+         *
+         * @assert{
+         * if called with a moved-from object\n
+         * if @p first is greater than @p last
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // at most `last - first` times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `(last - first) * this->size()` times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * }
+         */
+        template <std::input_iterator InputIt>
+        void insert(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
+
+            char key[MPI_MAX_INFO_KEY];
+            // try to insert every element in the range [first, last)
+            for (; first != last; ++first) {
+                // retrieve element
+                const value_type key_value_pair = *first;
+
+                // check whether key already exists in this info object
+                const size_type size = this->size();
+                for (size_type i = 0; i < size; ++i) {
+                    MPI_Info_get_nthkey(info_, i, key);
+                    if (key_value_pair.first.compare(key) == 0) {
+                        // key already existing -> continue with next input [key, value]-pair
+                        goto next_insert_iteration;
+                    }
+                }
+                // key not already contained in this info object -> add new [key, value]-pair
+                MPI_Info_set(info_, key_value_pair.first.data(), key_value_pair.second.data());
+
+                next_insert_iteration:;
+            }
+        }
+        /**
+         * @brief Inserts elements from the initializer list @p ilist if the info object does not already contain an element with
+         * an equivalent key.
+         * @details If multiple elements in the list have the same key, the first occurrence is used.
+         * @param[in] ilist initializer list to insert the [key, value]-pairs from
+         *
+         * @pre `this` may **not** be in the moved-from state
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // at most `last - first` times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `(last - first) * this->size()` times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * }
+         */
+        void insert(std::initializer_list<value_type> ilist) { this->insert(ilist.begin(), ilist.end()); }
+
+        /**
          * @brief Removes the element at @p pos.
          * @param[in] pos iterator to the element to remove
          * @return iterator following the last removed element

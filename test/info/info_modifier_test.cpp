@@ -8,6 +8,8 @@
  * This file provides test cases for the modifying methods of a mpicxx::info object.
  */
 
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <mpi.h>
 
@@ -36,6 +38,58 @@ TEST(InfoTests, Clear) {
     info.clear();
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 0);
+
+}
+
+TEST(InfoTests, Insert) {
+
+    // check values
+    mpicxx::info correct_info = { {"key4", "value4"}, {"key1", "value1"}, {"key2", "value2"} };
+
+    // multiple inserts
+    {
+        // construct an info object
+        mpicxx::info info = { {"key4", "value4"} };
+        info.insert("key1", "value1");
+        info.insert("key2", "value2");
+        info.insert("key1", "value10");     // <- shouldn't get added
+        info.insert("key4", "value4");      // <- shouldn't get added
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        EXPECT_EQ(nkeys, 3);
+        EXPECT_TRUE(info == correct_info);
+    }
+    // insert via iterator range
+    {
+        // construct an info object
+        mpicxx::info info = { {"key4", "value4"} };
+        std::vector<std::pair<const std::string, std::string>> vec = { {"key1", "value1"},  {"key2", "value2"},
+                                                                       {"key1", "value10"}, {"key4", "value4"} };   // <- shouldn't get added
+
+        info.insert(vec.begin(), vec.end());
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        EXPECT_EQ(nkeys, 3);
+        EXPECT_TRUE(info == correct_info);
+    }
+    // insert via initializer list
+    {
+        // construct an info object
+        mpicxx::info info = { {"key4", "value4"} };
+
+        info.insert({ {"key1", "value1"},  {"key2", "value2"},
+                      {"key1", "value10"}, {"key4", "value4"} });   // <- shouldn't get added
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        EXPECT_EQ(nkeys, 3);
+        EXPECT_TRUE(info == correct_info);
+    }
 
 }
 
