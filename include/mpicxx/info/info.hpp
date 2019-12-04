@@ -205,8 +205,7 @@ namespace mpicxx {
              * @tparam is_const_iterator
              * @param[in] other the copied iterator
              */
-            template <bool is_const_iterator>
-            requires is_const
+            template <bool is_const_iterator> requires is_const
             info_iterator(const info_iterator<is_const_iterator>& other) : info_(other.info_), pos_(other.pos_) { }
 
 
@@ -219,8 +218,7 @@ namespace mpicxx {
              * @param[in] rhs the copied iterator
              */
             template <bool is_const_iterator>
-            requires is_const
-            info_iterator& operator=(const info_iterator<is_const_iterator>& rhs) {
+            info_iterator& operator=(const info_iterator<is_const_iterator>& rhs) requires is_const {
                 info_ = rhs.info_;
                 pos_ = rhs.pos_;
                 return *this;
@@ -965,6 +963,7 @@ namespace mpicxx {
             MPI_Info_set(info_, key.data(), value.data());
             return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
         }
+        // TODO 2019-12-04 21:42 marcel: test requires
         /**
          * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
          * @details If multiple elements in the range have the same key, the first occurrence is used. \n
