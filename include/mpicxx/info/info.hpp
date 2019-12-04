@@ -1150,6 +1150,73 @@ namespace mpicxx {
             // key not found -> nothing removed
             return std::nullopt;
         }
+        /**
+         * @brief Attempts to extract each element in @p source and insert it into `this`.
+         * @details If there is an element in `this` with key equivalent of an element from @p source, than the element is not extracted
+         * from @p source.
+         * @param[inout] source the info object from which should be merged
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre @p source may **not** be in the moved-from state
+         *
+         * @assert{ if `this` or @p source are in the moved-from state }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // `source.size() + 1` times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // at most source.size() * this->size()` times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at most `source.size()` times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most `source.size()` times
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most `source.size()` times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most `source.size()` times
+         * }
+         */
+        void merge(info& source) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (this).");
+            MPICXX_ASSERT(source.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (source).");
+
+            // do nothing if a "self-merge" is attempted
+            if (this == std::addressof(source)) return;
+
+            size_type source_size = source.size();
+            char source_key[MPI_MAX_INFO_KEY];
+            size_type source_pos = 0;
+
+            // loop as long as there is at least one [key, value]-pair not visited yet
+            while(source_pos != source_size) {
+                // get source_key
+                MPI_Info_get_nthkey(source.info_, source_pos, source_key);
+
+                // check whether this contains the source_key
+                const size_type target_size = this->size();
+                char target_key[MPI_MAX_INFO_KEY];
+                for (size_type target_pos = 0; target_pos < target_size; ++target_pos) {
+                    MPI_Info_get_nthkey(info_, target_pos, target_key);
+                    if (std::strcmp(source_key, target_key) == 0) {
+                        // the source_key already exists -> continue with next source [key, value]-pair
+                        ++source_pos;
+                        goto next_source_iteration;
+                    }
+                }
+
+                // this doesn't contain the source_key yet -> extract the [key, value]-pair and add it to this
+                {
+                    // get source_value associated with source_key
+                    int valuelen, flag;
+                    MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
+                    char* source_value = new char[valuelen + 1];
+                    MPI_Info_get(source.info_, source_key, valuelen, source_value, &flag);
+                    // remove [key, value]-pair from source info object
+                    MPI_Info_delete(source.info_, source_key);
+                    // add [key, value]-pair to this info object
+                    MPI_Info_set(info_, source_key, source_value);
+                    // source info object now contains one [key, value]-pair less
+                    --source_size;
+                    delete[] source_value;
+                }
+
+                next_source_iteration:;
+            }
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //

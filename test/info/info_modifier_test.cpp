@@ -181,3 +181,42 @@ TEST(InfoTests, Extract) {
     EXPECT_TRUE(nullopt_pair == std::nullopt);
 
 }
+
+TEST(InfoTests, Merge) {
+
+    // construct a info object using a std::initializer_list<>
+    mpicxx::info info = { {"key1", "value1"},
+                          {"key2", "value2"},
+                          {"key3", "value3"},
+                          {"key4", "value4"} };
+    mpicxx::info info_2 = { {"key1", "value10"}, {"key5", "value5"} };
+
+    // check info object sizes
+    int nkeys, flag;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 4);
+    MPI_Info_get_nkeys(info_2.get(), &nkeys);
+    EXPECT_EQ(nkeys, 2);
+
+    // merge info objects
+    info.merge(info_2);
+
+    // check new sizes and [key, value]-pairs
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 5);
+    char info_value[6 + 1];
+    MPI_Info_get(info.get(), "key5", 6, info_value, &flag);
+    EXPECT_STREQ(info_value, "value5");
+
+    MPI_Info_get_nkeys(info_2.get(), &nkeys);
+    EXPECT_EQ(nkeys, 1);
+    char info_2_value[7 + 1];
+    MPI_Info_get(info_2.get(), "key1", 7, info_2_value, &flag);
+    EXPECT_STREQ(info_2_value, "value10");
+
+    // check self-merge -> should do nothing
+    info.merge(info);
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 5);
+
+}
