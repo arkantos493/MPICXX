@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-03
+ * @date 2019-12-04
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -14,6 +14,7 @@
 #include <cstring> // TODO 2019-11-30 20:22 marcel: remove later
 #include <initializer_list>
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -906,6 +907,32 @@ namespace mpicxx {
 
 
         /**
+         * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
+         * @details Invalidates all iterators.
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @post this info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`
+         *
+         * @assert{ if called with a moved-from object }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // `this->size()` times
+         * int MPI_Info_delete(MPI_Info info, const char *key);         // `this->size()` times
+         * }
+         */
+        void clear() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            const size_type size = this->size();
+            char key[MPI_MAX_INFO_KEY];
+            // repeat nkeys times and always remove the first element
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, 0, key);
+                MPI_Info_delete(info_, key);
+            }
+        }
+        /**
          * @brief Removes the element at @p pos.
          * @param[in] pos iterator to the element to remove
          * @return iterator following the last removed element
@@ -987,7 +1014,7 @@ namespace mpicxx {
             return iterator(info_, first.pos_);
         }
         /**
-         * @brief Removes the element (if one exists) with the [**key**, value] equivalent to @p key.
+         * @brief Removes the element (if one exists) with the [**key**, value]-pair equivalent to @p key.
          * @details Returns either 1 (key found and removed) or 0 (no such key found and therefore nothing removed).
          * @param[in] key the key to be deleted
          * @return number of elements removed
@@ -1027,32 +1054,6 @@ namespace mpicxx {
             return 0;
         }
         /**
-         * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
-         * @details Invalidates all iterators.
-         *
-         * @pre `this` may **not** be in the moved-from state
-         * @post this info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`
-         *
-         * @assert{ if called with a moved-from object }
-         *
-         * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // `this->size()` times
-         * int MPI_Info_delete(MPI_Info info, const char *key);         // `this->size()` times
-         * }
-         */
-        void clear() {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-
-            const size_type size = this->size();
-            char key[MPI_MAX_INFO_KEY];
-            // repeat nkeys times and always remove the first element
-            for (size_type i = 0; i < size; ++i) {
-                MPI_Info_get_nthkey(info_, 0, key);
-                MPI_Info_delete(info_, key);
-            }
-        }
-        /**
          * @brief Swaps the contents of this info object with @p other.
          * @details Does not invoke any move, copy or swap operations on individual elements.\n
          * Invalidates all iterators.
@@ -1064,6 +1065,90 @@ namespace mpicxx {
             using std::swap;
             swap(info_, other.info_);
             swap(is_freeable_, other.is_freeable_);
+        }
+        /**
+         * @brief Removes the element at @p pos and returns the removed [key, value]-pair.
+         * @param[in] pos iterator to the element to remove
+         * @return the extracted [key, value]-pair
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre @p pos must refer to `this` info object
+         * @pre the position denoted by @p pos may **not** be less than 0
+         * @pre the position denoted by @p pos may **not** be greater or equal than `this->size()`
+         *
+         * @assert{
+         * if called with a moved-from object\n
+         * if @p pos does not refer to `this` info object\n
+         * if dereferencing an out-of-bounds iterator
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);
+         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * }
+         */
+        value_type extract(const_iterator pos) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(pos.info_ == info_, "The given iterator must refer to the same info object as this.");
+            MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
+                          "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
+                          0, this->size(), pos.pos_);
+
+            // get [key, value]-pair pointed to by pos
+            value_type key_value_pair = *pos;
+            // remove [key, value]-pair from info object
+            MPI_Info_delete(info_, key_value_pair.first.data());
+            // return extracted [key, value]-pair
+            return key_value_pair;
+        }
+        /**
+         * @brief Removes the element (if one exists) with the [**key**, value]-pair equivalent to @p key
+         * and returns the removed [key, value]-pair.
+         * @details Returns a `std::optional` holding the removed [key, value]-pair if the @p key exists, `std::nullopt` otherwise
+         * @param[in] key the key to be extracted
+         * @return the extracted [key, value]-pair
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre the length of @p key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         *
+         * @assert{
+         * if called with a moved-from object\n
+         * if the @p key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);
+         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * }
+         */
+        std::optional<value_type> extract(const std::string& key) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
+            const size_type size = this->size();
+            char key_arr[MPI_MAX_INFO_KEY];
+            // search for the given key
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, i, key_arr);
+                // key found -> remove [key, value]-pair
+                if (key.compare(key_arr) == 0) {
+                    // get associated key
+                    int valuelen, flag;
+                    MPI_Info_get_valuelen(info_, key_arr, &valuelen, &flag);
+                    std::string value(valuelen, ' ');
+                    MPI_Info_get(info_, key_arr, valuelen, value.data(), &flag);
+                    MPI_Info_delete(info_, key_arr);
+                    return std::make_optional<value_type>(std::make_pair(std::string(key_arr), std::move(value)));
+                }
+            }
+            // key not found -> nothing removed
+            return std::nullopt;
         }
 
 

@@ -1,7 +1,7 @@
 /**
  * @file info_modifier_test.cpp
  * @author Marcel Breyer
- * @date 2019-12-03
+ * @date 2019-12-04
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -13,6 +13,31 @@
 
 #include <mpicxx/info/info.hpp>
 
+
+TEST(InfoTests, Clear) {
+
+    // construct a info object using a std::initializer_list<>
+    mpicxx::info info = { {"key1", "value1"},
+                          {"key2", "value2"},
+                          {"key3", "value3"},
+                          {"key4", "value4"} };
+
+    // info object should now contain 4 entries
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 4);
+
+    // clear content
+    info.clear();
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 0);
+
+    // invoking another clear should be fine
+    info.clear();
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 0);
+
+}
 
 TEST(InfoTests, Erase) {
 
@@ -106,7 +131,7 @@ TEST(InfoTests, Erase) {
 
 }
 
-TEST(InfoTests, Clear) {
+TEST(InfoTests, Extract) {
 
     // construct a info object using a std::initializer_list<>
     mpicxx::info info = { {"key1", "value1"},
@@ -119,14 +144,40 @@ TEST(InfoTests, Clear) {
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 4);
 
-    // clear content
-    info.clear();
+    // extract [key, value]-pair by iterator
+    std::pair<std::string, std::string> key_value_pair = info.extract(info.begin() + 1);
     MPI_Info_get_nkeys(info.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
+    EXPECT_EQ(nkeys, 3);
 
-    // invoking another clear should be fine
-    info.clear();
+    // extracted [key, value]-pair is correct
+    EXPECT_STREQ(key_value_pair.first.c_str(), "key2");
+    EXPECT_STREQ(key_value_pair.second.c_str(), "value2");
+
+    // change extracted [key, value]-pair and add it again
+    key_value_pair.first = "key5";
+    MPI_Info_set(info.get(), key_value_pair.first.c_str(), key_value_pair.second.c_str());
+
+    // check if added correctly
     MPI_Info_get_nkeys(info.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
+    EXPECT_EQ(nkeys, 4);
+
+
+    // extract [key, value]-pair by key
+    auto opt_pair = info.extract("key1");
+    EXPECT_TRUE(opt_pair.has_value());
+    if (opt_pair.has_value()) {
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+        EXPECT_EQ(nkeys, 3);
+
+        // extracted [key, value]-pair is correct
+        EXPECT_STREQ(opt_pair.value().first.c_str(), "key1");
+        EXPECT_STREQ(opt_pair.value().second.c_str(), "value1");
+
+    }
+
+    // try to extract non-existing key
+    auto nullopt_pair = info.extract("key1");
+    EXPECT_FALSE(nullopt_pair.has_value());
+    EXPECT_TRUE(nullopt_pair == std::nullopt);
 
 }
