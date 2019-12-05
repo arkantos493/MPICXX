@@ -1777,9 +1777,9 @@ namespace mpicxx {
     template <typename T>
     inline info::string_proxy info::at(T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        MPICXX_ASSERT(utility::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
+        MPICXX_ASSERT(detail::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
                       "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, utility::string_size(key, MPI_MAX_INFO_KEY) + 1);
+                      MPI_MAX_INFO_KEY, detail::string_size(key, MPI_MAX_INFO_KEY) + 1);
 
         // query the value length associated to key to determine if the key exists
         int valuelen, flag;
@@ -1824,9 +1824,9 @@ namespace mpicxx {
     template <typename T>
     inline info::string_proxy info::operator[](T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        MPICXX_ASSERT(utility::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
+        MPICXX_ASSERT(detail::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
                       "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, utility::string_size(key, MPI_MAX_INFO_KEY) + 1);
+                      MPI_MAX_INFO_KEY, detail::string_size(key, MPI_MAX_INFO_KEY) + 1);
 
         // create proxy object and forward key
         return string_proxy(info_, std::forward<T>(key));

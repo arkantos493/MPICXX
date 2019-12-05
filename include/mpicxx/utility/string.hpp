@@ -11,7 +11,7 @@
 
 #include <type_traits>
 
-namespace mpicxx::utility {
+namespace mpicxx::detail {
 
     // ---------------------------------------------------------------------------------------------------------- //
     //                                             to c-style strings                                             //
