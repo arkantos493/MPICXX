@@ -1,7 +1,7 @@
 /**
  * @file info_modifier_test.cpp
  * @author Marcel Breyer
- * @date 2019-12-04
+ * @date 2019-12-05
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -83,6 +83,58 @@ TEST(InfoTests, Insert) {
 
         info.insert({ {"key1", "value1"},  {"key2", "value2"},
                       {"key1", "value10"}, {"key4", "value4"} });   // <- shouldn't get added
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        EXPECT_EQ(nkeys, 3);
+        EXPECT_TRUE(info == correct_info);
+    }
+
+}
+
+TEST(InfoTests, InsertOrAssign) {
+
+    // check values
+    mpicxx::info correct_info = { {"key4", "value40"}, {"key1", "value10"}, {"key2", "value2"} };
+
+    // multiple inserts
+    {
+        // construct an info object
+        mpicxx::info info = { {"key4", "value4"} };
+        info.insert_or_assign("key1", "value1");
+        info.insert_or_assign("key2", "value2");
+        info.insert_or_assign("key1", "value10");      // <- should override {"key1", "value1"}
+        info.insert_or_assign("key4", "value40");      // <- should override {"key4", "value4"}
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        EXPECT_EQ(nkeys, 3);
+        EXPECT_TRUE(info == correct_info);
+    }
+    // insert via iterator range
+    {
+        // construct an info object
+        mpicxx::info info = { {"key4", "value4"} };
+        std::vector<std::pair<const std::string, std::string>> vec = { {"key1", "value1"},  {"key2", "value2"},
+                                                                       {"key1", "value10"}, {"key4", "value40"} };   // <- should override
+
+        info.insert_or_assign(vec.begin(), vec.end());
+
+        int nkeys;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+
+        EXPECT_EQ(nkeys, 3);
+        EXPECT_TRUE(info == correct_info);
+    }
+    // insert via initializer list
+    {
+        // construct an info object
+        mpicxx::info info = { {"key4", "value4"} };
+
+        info.insert_or_assign({ {"key1", "value1"},  {"key2", "value2"},
+                                {"key1", "value10"}, {"key4", "value40"} });   // <- should override
 
         int nkeys;
         MPI_Info_get_nkeys(info.get(), &nkeys);

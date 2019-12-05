@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-04
+ * @date 2019-12-05
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -895,15 +895,10 @@ namespace mpicxx {
 
 
         // TODO 2019-12-03 18:45 marcel: correctly document iterator invalidation
+        // TODO 2019-12-04 21:42 marcel: test requires
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  modifier                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
-        void insert_or_assign(const std::string& key, const std::string& value);
-        template <std::input_iterator It>
-        void insert_or_assign(It first, It last);
-        void insert_or_assign(std::initializer_list<value_type> ilist);
-
-
         /**
          * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
          * @details Invalidates all iterators.
@@ -970,7 +965,6 @@ namespace mpicxx {
             MPI_Info_set(info_, key.data(), value.data());
             return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
         }
-        // TODO 2019-12-04 21:42 marcel: test requires
         /**
          * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
          * @details If multiple elements in the range have the same key, the first occurrence is used. \n
@@ -1052,7 +1046,114 @@ namespace mpicxx {
          * }
          */
         void insert(std::initializer_list<value_type> ilist) { this->insert(ilist.begin(), ilist.end()); }
+        /**
+         * @brief Insert or assign the given [key, value]-pair to this info object.
+         * @param key the @p key to be inserted or assigned
+         * @param value the @p value to be inserted or assigned
+         * @return a pair consisting of an iterator to the inserted or element and a `bool` denoting whether the insertion (`true`) or
+         * assignment (`false`) took place
+         *
+         * @pre the key's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre the value's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         *
+         * @assert{
+         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
+         * if the value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL*
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `2 * this->size()`
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most once
+         * }
+         */
+        std::pair<iterator, bool> insert_or_assign(const std::string& key, const std::string& value) {
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+            MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                          "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                          MPI_MAX_INFO_VAL, value.size() + 1);
 
+
+            char key_arr[MPI_MAX_INFO_KEY];
+            const size_type size = this->size();
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, i, key_arr);
+                if (key.compare(key_arr) == 0) {
+                    // updated already existing key
+                    MPI_Info_set(info_, key.data(), value.data());
+                    return std::make_pair(iterator(info_, i), false);
+                }
+            }
+            // insertion takes place
+            MPI_Info_set(info_, key.data(), value.data());
+            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
+        }
+        /**
+         * @brief Inserts or assigns elements from range [first, last) to this info object.
+         * @details If multiple elements in the range have the same key, the **last** occurrence is used. \n
+         * [first, last) must be a valid range in `*this`.
+         * @tparam InputIt must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">input iterator</a> requirements
+         * @param[in] first iterator to the first element in the range
+         * @param[in] last iterator one-past the last element in the range
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre @p first and @p last must refer to the same container
+         * @pre @p first must be less or equal than @p last
+         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         *
+         * @assert{
+         * if called with a moved-from object \n
+         * if @p first is greater than @p last \n
+         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * }
+         *
+         * @calls{
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * }
+         */
+        template <std::input_iterator InputIt>
+        void insert_or_assign(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
+
+            // insert or assign every element in the range [first, last)
+            for (; first != last; ++first) {
+                // retrieve element
+                const auto [key, value] = *first;
+
+                MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                              "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                              MPI_MAX_INFO_KEY, key.size() + 1);
+                MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
+                              "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                              MPI_MAX_INFO_VAL, value.size() + 1);
+
+                // insert or update [key, value]-pair
+                MPI_Info_set(info_, key.data(), value.data());
+            }
+        }
+        /**
+         * @brief Inserts or assigns elements from the initializer list @p ilist to this info object.
+         * @details If multiple elements in the list have the same key, the **last** occurrence is used.
+         * @param[in] ilist initializer list to insert the [key, value]-pairs from
+         *
+         * @pre `this` may **not** be in the moved-from state
+         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         *
+         * @assert{
+         * if called with a moved-from object \n
+         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * }
+         *
+         * @calls{
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * }
+         */
+        void insert_or_assign(std::initializer_list<value_type> ilist) { this->insert_or_assign(ilist.begin(), ilist.end()); }
         /**
          * @brief Removes the element at @p pos.
          * @param[in] pos iterator to the element to remove
@@ -1665,29 +1766,6 @@ namespace mpicxx {
     }
 
 
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                                  modifiers                                                 //
-    // ---------------------------------------------------------------------------------------------------------- //
-    // TODO 2019-11-23 21:18 marcel: add methods
-    inline void info::insert_or_assign(const std::string& key, const std::string& value) {
-        MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                      "Info key to long!: max size: %u, provided size (including null-terminator): %u",
-                      MPI_MAX_INFO_KEY, key.size() + 1);
-        MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                      "Info value to long!: max size: %u, provided size (including null-terminator): %u",
-                      MPI_MAX_INFO_VAL, value.size() + 1);
-
-        MPI_Info_set(info_, key.data(), value.data());
-    }
-    template <std::input_iterator It>
-    inline void info::insert_or_assign(It first, It last) {
-        for (; first != last; ++first) {
-            this->insert_or_assign(first->first, first->second);
-        }
-    }
-    inline void info::insert_or_assign(std::initializer_list<value_type> ilist) {
-        this->insert_or_assign(ilist.begin(), ilist.end());
-    }
 
 
     // ---------------------------------------------------------------------------------------------------------- //
