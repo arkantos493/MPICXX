@@ -1635,9 +1635,19 @@ namespace mpicxx {
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
 
 
-        // getter
-        MPI_Info get() noexcept;
-        MPI_Info get() const noexcept;
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                   getter                                                   //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Get the underlying *MPI_Info* object.
+         * @return the *MPI_Info* object wrapped in this info object
+         */
+        MPI_Info get() noexcept { return info_; }
+        /**
+         * @brief Get the underlying *MPI_Info* object (as const).
+         * @return the *MPI_Info* object wrapped in this info object
+         */
+        MPI_Info get() const noexcept { return info_; }
 
     private:
 
@@ -1764,36 +1774,6 @@ namespace mpicxx {
         // create proxy object and forward key
         return string_proxy(info_, std::forward<T>(key));
     }
-
-
-
-
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                                   lookup                                                   //
-    // ---------------------------------------------------------------------------------------------------------- //
-    // TODO 2019-11-23 21:18 marcel: add methods
-
-
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                                   getter                                                   //
-    // ---------------------------------------------------------------------------------------------------------- //
-    /**
-     * @brief Get the underlying *MPI_Info*.
-     * @return the *MPI_Info* wrapped in this info object
-     */
-    inline MPI_Info info::get() noexcept { return info_; }
-    /**
-     * @brief Get the underlying *MPI_Info* (as const).
-     * @return the *MPI_Info* wrapped in this info object
-     */
-    inline MPI_Info info::get() const noexcept { return info_; }
-
-
-
-
-    // ---------------------------------------------------------------------------------------------------------- //
-    //                                               iterator class                                               //
-    // ---------------------------------------------------------------------------------------------------------- //
 
 }
 
