@@ -954,16 +954,28 @@ namespace mpicxx {
                           "Info value to long!: max size: %u, provided size (including null-terminator): %u",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
-            char key_arr[MPI_MAX_INFO_KEY];
-            const size_type size = this->size();
-            for (size_type i = 0; i < size; ++i) {
-                MPI_Info_get_nthkey(info_, i, key_arr);
-                if (key.compare(key_arr) == 0) {
-                    return std::make_pair(iterator(info_, i), false);
-                }
+            bool key_already_exists = this->key_exists(key);
+            if (!key_already_exists) {
+                MPI_Info_set(info_, key.data(), value.data());
             }
-            MPI_Info_set(info_, key.data(), value.data());
-            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
+            char key_arr[MPI_MAX_INFO_KEY];
+            size_type pos = 0;
+            while (true) {
+                MPI_Info_get_nthkey(info_, pos, key_arr);
+                if (key.compare(key_arr) == 0) break;
+                ++pos;
+            }
+            return std::make_pair(iterator(info_, pos), !key_already_exists);
+//            char key_arr[MPI_MAX_INFO_KEY];
+//            const size_type size = this->size();
+//            for (size_type i = 0; i < size; ++i) {
+//                MPI_Info_get_nthkey(info_, i, key_arr);
+//                if (key.compare(key_arr) == 0) {
+//                    return std::make_pair(iterator(info_, i), false);
+//                }
+//            }
+//            MPI_Info_set(info_, key.data(), value.data());
+//            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
         }
         /**
          * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
@@ -996,7 +1008,7 @@ namespace mpicxx {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
 
-            char key_arr[MPI_MAX_INFO_KEY];
+//            char key_arr[MPI_MAX_INFO_KEY];
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
                 // retrieve element
@@ -1009,19 +1021,22 @@ namespace mpicxx {
                               "Info value to long!: max size: %u, provided size (including null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
-                // check whether key already exists in this info object
-                const size_type size = this->size();
-                for (size_type i = 0; i < size; ++i) {
-                    MPI_Info_get_nthkey(info_, i, key_arr);
-                    if (key.compare(key_arr) == 0) {
-                        // key already existing -> continue with next input [key, value]-pair
-                        goto next_insert_iteration;
-                    }
+                if (!this->key_exists(key)) {
+                    MPI_Info_set(info_, key.data(), value.data());
                 }
-                // key not already contained in this info object -> add new [key, value]-pair
-                MPI_Info_set(info_, key.data(), value.data());
-
-                next_insert_iteration:;
+//                // check whether key already exists in this info object
+//                const size_type size = this->size();
+//                for (size_type i = 0; i < size; ++i) {
+//                    MPI_Info_get_nthkey(info_, i, key_arr);
+//                    if (key.compare(key_arr) == 0) {
+//                        // key already existing -> continue with next input [key, value]-pair
+//                        goto next_insert_iteration;
+//                    }
+//                }
+//                // key not already contained in this info object -> add new [key, value]-pair
+//                MPI_Info_set(info_, key.data(), value.data());
+//
+//                next_insert_iteration:;
             }
         }
         /**
@@ -1075,20 +1090,29 @@ namespace mpicxx {
                           "Info value to long!: max size: %u, provided size (including null-terminator): %u",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
-
-            char key_arr[MPI_MAX_INFO_KEY];
-            const size_type size = this->size();
-            for (size_type i = 0; i < size; ++i) {
-                MPI_Info_get_nthkey(info_, i, key_arr);
-                if (key.compare(key_arr) == 0) {
-                    // updated already existing key
-                    MPI_Info_set(info_, key.data(), value.data());
-                    return std::make_pair(iterator(info_, i), false);
-                }
-            }
-            // insertion takes place
+            bool key_already_exists = this->key_exists(key);
             MPI_Info_set(info_, key.data(), value.data());
-            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
+            char key_arr[MPI_MAX_INFO_KEY];
+            size_type pos = 0;
+            while (true) {
+                MPI_Info_get_nthkey(info_, pos, key_arr);
+                if (key.compare(key_arr) == 0) break;
+                ++pos;
+            }
+            return std::make_pair(iterator(info_, pos), !key_already_exists);
+//            char key_arr[MPI_MAX_INFO_KEY];
+//            const size_type size = this->size();
+//            for (size_type i = 0; i < size; ++i) {
+//                MPI_Info_get_nthkey(info_, i, key_arr);
+//                if (key.compare(key_arr) == 0) {
+//                    // updated already existing key
+//                    MPI_Info_set(info_, key.data(), value.data());
+//                    return std::make_pair(iterator(info_, i), false);
+//                }
+//            }
+//            // insertion takes place
+//            MPI_Info_set(info_, key.data(), value.data());
+//            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
         }
         /**
          * @brief Inserts or assigns elements from range [first, last) to this info object.
@@ -1261,19 +1285,25 @@ namespace mpicxx {
                           "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
-            const size_type size = this->size();
-            char key_arr[MPI_MAX_INFO_KEY];
-            // search for the given key
-            for (size_type i = 0; i < size; ++i) {
-                MPI_Info_get_nthkey(info_, i, key_arr);
-                // key found -> remove [key, value]-pair
-                if (key.compare(key_arr) == 0) {
-                    MPI_Info_delete(info_, key_arr);
-                    return 1;
-                }
+            if (this->key_exists(key)) {
+                MPI_Info_delete(info_, key.data());
+                return 1;
+            } else {
+                return 0;
             }
-            // key not found -> nothing removed
-            return 0;
+//            const size_type size = this->size();
+//            char key_arr[MPI_MAX_INFO_KEY];
+//            // search for the given key
+//            for (size_type i = 0; i < size; ++i) {
+//                MPI_Info_get_nthkey(info_, i, key_arr);
+//                // key found -> remove [key, value]-pair
+//                if (key.compare(key_arr) == 0) {
+//                    MPI_Info_delete(info_, key_arr);
+//                    return 1;
+//                }
+//            }
+//            // key not found -> nothing removed
+//            return 0;
         }
         /**
          * @brief Swaps the contents of this info object with @p other.
@@ -1353,24 +1383,34 @@ namespace mpicxx {
                           "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
-            const size_type size = this->size();
-            char key_arr[MPI_MAX_INFO_KEY];
-            // search for the given key
-            for (size_type i = 0; i < size; ++i) {
-                MPI_Info_get_nthkey(info_, i, key_arr);
-                // key found -> remove [key, value]-pair
-                if (key.compare(key_arr) == 0) {
-                    // get associated key
-                    int valuelen, flag;
-                    MPI_Info_get_valuelen(info_, key_arr, &valuelen, &flag);
-                    std::string value(valuelen, ' ');
-                    MPI_Info_get(info_, key_arr, valuelen, value.data(), &flag);
-                    MPI_Info_delete(info_, key_arr);
-                    return std::make_optional<value_type>(std::make_pair(std::string(key_arr), std::move(value)));
-                }
+            if (this->key_exists(key)) {
+                int valuelen, flag;
+                MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
+                std::string value(valuelen, ' ');
+                MPI_Info_get(info_, key.data(), valuelen, value.data(), &flag);
+                MPI_Info_delete(info_, key.data());
+                return std::make_optional<value_type>(std::make_pair(key, std::move(value)));
+            } else {
+                return std::nullopt;
             }
-            // key not found -> nothing removed
-            return std::nullopt;
+//            const size_type size = this->size();
+//            char key_arr[MPI_MAX_INFO_KEY];
+//            // search for the given key
+//            for (size_type i = 0; i < size; ++i) {
+//                MPI_Info_get_nthkey(info_, i, key_arr);
+//                // key found -> remove [key, value]-pair
+//                if (key.compare(key_arr) == 0) {
+//                    // get associated key
+//                    int valuelen, flag;
+//                    MPI_Info_get_valuelen(info_, key_arr, &valuelen, &flag);
+//                    std::string value(valuelen, ' ');
+//                    MPI_Info_get(info_, key_arr, valuelen, value.data(), &flag);
+//                    MPI_Info_delete(info_, key_arr);
+//                    return std::make_optional<value_type>(std::make_pair(std::string(key_arr), std::move(value)));
+//                }
+//            }
+//            // key not found -> nothing removed
+//            return std::nullopt;
         }
         /**
          * @brief Attempts to extract each element in @p source and insert it into `this`.
@@ -1408,20 +1448,9 @@ namespace mpicxx {
                 // get source_key
                 MPI_Info_get_nthkey(source.info_, source_pos, source_key);
 
-                // check whether this contains the source_key
-                const size_type target_size = this->size();
-                char target_key[MPI_MAX_INFO_KEY];
-                for (size_type target_pos = 0; target_pos < target_size; ++target_pos) {
-                    MPI_Info_get_nthkey(info_, target_pos, target_key);
-                    if (std::strcmp(source_key, target_key) == 0) {
-                        // the source_key already exists -> continue with next source [key, value]-pair
-                        ++source_pos;
-                        goto next_source_iteration;
-                    }
-                }
-
-                // this doesn't contain the source_key yet -> extract the [key, value]-pair and add it to this
-                {
+                if (this->key_exists(source_key)) {
+                    ++source_pos;
+                } else {
                     // get source_value associated with source_key
                     int valuelen, flag;
                     MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
@@ -1435,8 +1464,35 @@ namespace mpicxx {
                     --source_size;
                     delete[] source_value;
                 }
-
-                next_source_iteration:;
+//                // check whether this contains the source_key
+//                const size_type target_size = this->size();
+//                char target_key[MPI_MAX_INFO_KEY];
+//                for (size_type target_pos = 0; target_pos < target_size; ++target_pos) {
+//                    MPI_Info_get_nthkey(info_, target_pos, target_key);
+//                    if (std::strcmp(source_key, target_key) == 0) {
+//                        // the source_key already exists -> continue with next source [key, value]-pair
+//                        ++source_pos;
+//                        goto next_source_iteration;
+//                    }
+//                }
+//
+//                // this doesn't contain the source_key yet -> extract the [key, value]-pair and add it to this
+//                {
+//                    // get source_value associated with source_key
+//                    int valuelen, flag;
+//                    MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
+//                    char* source_value = new char[valuelen + 1];
+//                    MPI_Info_get(source.info_, source_key, valuelen, source_value, &flag);
+//                    // remove [key, value]-pair from source info object
+//                    MPI_Info_delete(source.info_, source_key);
+//                    // add [key, value]-pair to this info object
+//                    MPI_Info_set(info_, source_key, source_value);
+//                    // source info object now contains one [key, value]-pair less
+//                    --source_size;
+//                    delete[] source_value;
+//                }
+//
+//                next_source_iteration:;
             }
         }
 
@@ -1671,8 +1727,9 @@ namespace mpicxx {
         }
 
         bool key_exists(const std::string& key) {
-            int valuelen, flag;
-            MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
+            char value;
+            int flag;
+            MPI_Info_get(info_, key.data(), 0, &value, &flag);
             return static_cast<bool>(flag);
         }
 
@@ -1720,9 +1777,9 @@ namespace mpicxx {
     template <typename T>
     inline info::string_proxy info::at(T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
+        MPICXX_ASSERT(utility::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
                       "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
+                      MPI_MAX_INFO_KEY, utility::string_size(key, MPI_MAX_INFO_KEY) + 1);
 
         // query the value length associated to key to determine if the key exists
         int valuelen, flag;
@@ -1767,9 +1824,9 @@ namespace mpicxx {
     template <typename T>
     inline info::string_proxy info::operator[](T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        MPICXX_ASSERT(utility::string_size(key) < MPI_MAX_INFO_KEY,
+        MPICXX_ASSERT(utility::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
                       "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, utility::string_size(key) + 1);
+                      MPI_MAX_INFO_KEY, utility::string_size(key, MPI_MAX_INFO_KEY) + 1);
 
         // create proxy object and forward key
         return string_proxy(info_, std::forward<T>(key));
