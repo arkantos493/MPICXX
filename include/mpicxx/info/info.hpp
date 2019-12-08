@@ -18,13 +18,14 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
 #include <mpi.h>
 
 #include <mpicxx/utility/assert.hpp>
-#include <mpicxx/utility/string.hpp> // TODO 2019-11-30 20:23 marcel: remove later
+
 
 namespace mpicxx {
     /**
@@ -764,38 +765,38 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Returns an iterator to the first element of this info object.
-         * @details If the info object is empty this iterator equals info::end().
-         * @return the iterator
+         * @details If the info object is empty this iterator equals end().
+         * @return iterator to the first element
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
         iterator begin() { return iterator(info_, 0); }
         /**
-         * @brief Returns an iterator to the element one after the last element of this info object.
-         * @details Attempts to access this element, i.e. dereferencing the returned iterator, results in undefined behaviour.
-         * @return the iterator
+         * @brief Returns an iterator to the element following the last element of this info object.
+         * @details This element acts as a placeholder; attempting to access it results in undefined behavior.
+         * @return iterator to the element following the last element
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * for dereferencing operations see @ref info_iterator
          * }
          */
         iterator end() { return iterator(info_, this->size()); }
         /**
          * @brief Returns a const_iterator to the first element of this info object.
-         * @details If the info object is empty this const_iterator equals info::end().
-         * @return the const_iterator
+         * @details If the info object is empty this const_iterator equals end().
+         * @return const_iterator to the first element
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
         const_iterator begin() const { return const_iterator(info_, 0); }
         /**
-         * @brief Returns a const_iterator to the element one after the last element of this info object.
-         * @details Attempts to access this element, i.e. dereferencing the returned const_iterator, results in undefined behaviour.
-         * @return the const_iterator
+         * @brief Returns a const_iterator to the element following the last element of this info object.
+         * @details This element acts as a placeholder; attempting to access it results in undefined behavior.
+         * @return const_iterator to the element following the last element
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * for dereferencing operations see @ref info_iterator
          * }
          */
@@ -808,34 +809,35 @@ namespace mpicxx {
          * @copydoc end() const
          */
         const_iterator cend() const { return const_iterator(info_, this->size()); }
+
         /**
-         * @brief Returns a reverse_iterator to the last element of this info object.
-         * @details If the info object is empty this reverse_iterator equals info::rend().
-         * @return the reverse_iterator
+         * @brief Returns a reverse_iterator to the first element of the reversed info object.
+         * @details It corresponds to the last element of the non-reversed info object.
+         * If the info object is empty, the returned reverse_iterator is equal to rend().
+         * @return reverse_iterator to the first element
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * for dereferencing operations see @ref info_iterator
          * }
          */
         reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
         /**
-         * @brief Returns a reverse_iterator to the element one before the first element of this info object.
-         * @details Attempts to access this element, i.e. dereferencing the returned reverse_iterator, results in undefined behaviour.
-         * @return the reverse_iterator
+         * @brief Returns a reverse_iterator to the element following the last element of the reversed info object.
+         * @details It corresponds to the element preceding the first element of the non-reversed info object.
+         * This element acts as a placeholder, attempting to access it results in undefined behavior.
+         * @return reverse_iterator to the element following the last element
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
         reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
         /**
-         * @brief Returns a const_reverse_iterator to the last element of this info object.
-         * @details If the info object is empty this const_reverse_iterator equals info::rend().
-         * @return the const_reverse_iterator
+         * @brief Returns a const_reverse_iterator to the element following the last element of the reversed info object.
+         * @details It corresponds to the element preceding the first element of the non-reversed info object.
+         * This element acts as a placeholder, attempting to access it results in undefined behavior.
+         * @return const_reverse_iterator to the element following the last element
          *
-         * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys); @endcode
-         * for dereferencing operations see @ref info_iterator
-         * }
+         * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
         const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->cend()); }
         /**
@@ -860,15 +862,16 @@ namespace mpicxx {
         //                                                  capacity                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Returns whether this info object is empty or not.
-         * @details An info object is empty iff it has no [key, value]-pairs.
-         * @return `true` iff `this->size() == 0`
+         * @brief Checks if this info object has no elements, i.e. wheter `begin() == end()`.
+         * @return `true` if this info object is empty, `false` otherwise
          *
-         * @pre `this` may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
          *
-         * @assert{ if called with a moved-from object }
+         * @assert{ If called with a moved-from object. }
          *
-         * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
+         * }
          */
         bool empty() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
@@ -876,14 +879,16 @@ namespace mpicxx {
             return this->size() == 0;
         }
         /**
-         * @brief Returns the number of [key, value]-pairs contained in this info object.
-         * @return the number of [key, value]-pairs
+         * @brief Returns the number of [key, value]-pairs in this info object, i.e. `std::distance(begin(), end())`.
+         * @return the number of [key, value]-pairs in this info object
          *
-         * @pre `this` may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
          *
-         * @assert{ if called with a moved-from object }
+         * @assert{ If called with a moved-from object. }
          *
-         * @calls{ int MPI_Info_get_nkeys(MPI_Info info, int *nkeys); }
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
+         * }
          */
         size_type size() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
@@ -895,23 +900,22 @@ namespace mpicxx {
 
 
         // TODO 2019-12-03 18:45 marcel: correctly document iterator invalidation
-        // TODO 2019-12-04 21:42 marcel: test requires
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  modifier                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Clears the content of this info object, i.e. removes all [key, value]-pairs.
-         * @details Invalidates all iterators.
+         * @brief Erase all elements from the info object.
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @post this info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`
+         * @pre `*this` **may not** be in the moved-from state.
+         * @post The info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`.
+         * @post Invalidates any iterator referring to contained elements. Any past-the-end iterator remains valid.
          *
-         * @assert{ if called with a moved-from object }
+         * @assert{ If called with a moved-from object. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // `this->size()` times
-         * int MPI_Info_delete(MPI_Info info, const char *key);         // `this->size()` times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // exactly 'this->size()' times
+         * int MPI_Info_delete(MPI_Info info, const char *key);         // exactly 'this->size()' times
          * }
          */
         void clear() {
@@ -925,82 +929,74 @@ namespace mpicxx {
                 MPI_Info_delete(info_, key);
             }
         }
+
         /**
-         * @brief Insert the given [key, value]-pair if the info object does not already contain an element with an equivalent key.
-         * @param key the @p key to be inserted
-         * @param value the @p value to be inserted
+         * @brief Insert the given [key, value]-pair if the info object doesn't already contain an element with an equivalent key.
+         * @param[in] key element @p key to insert
+         * @param[in] value element @p value to insert
          * @return a pair consisting of an iterator to the inserted element (or the one element that prevented the insertion) and a `bool`
          * denoting whether the insertion took place
          *
-         * @pre the key's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre the value's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre **Both** @p key **and** @p value **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          *
          * @assert{
-         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
-         * if the value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL*
+         * If called with a moved-from object. \n
+         * If @p key or @p value exceed their size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `2 * this->size()`
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most once
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // at most 'this->size()' times
          * }
          */
-        std::pair<iterator, bool> insert(const std::string& key, const std::string& value) {
+        std::pair<iterator, bool> insert(const std::string_view key, const std::string_view value) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                          "Info key to long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
             MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                          "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                          "Info value to long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
-            bool key_already_exists = this->key_exists(key);
+            // check if key already exists
+            const bool key_already_exists = this->key_exists(key);
             if (!key_already_exists) {
+                // key doesn't exist -> add new [key, value]-pair
                 MPI_Info_set(info_, key.data(), value.data());
             }
-            char key_arr[MPI_MAX_INFO_KEY];
-            size_type pos = 0;
-            while (true) {
-                MPI_Info_get_nthkey(info_, pos, key_arr);
-                if (key.compare(key_arr) == 0) break;
-                ++pos;
-            }
-            return std::make_pair(iterator(info_, pos), !key_already_exists);
-//            char key_arr[MPI_MAX_INFO_KEY];
-//            const size_type size = this->size();
-//            for (size_type i = 0; i < size; ++i) {
-//                MPI_Info_get_nthkey(info_, i, key_arr);
-//                if (key.compare(key_arr) == 0) {
-//                    return std::make_pair(iterator(info_, i), false);
-//                }
-//            }
-//            MPI_Info_set(info_, key.data(), value.data());
-//            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
+            // search position of the key and return iterator
+            return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
          * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
-         * @details If multiple elements in the range have the same key, the first occurrence is used. \n
+         * @details If multiple elements in the range have the same key, the **first** occurrence determines the value. \n
          * [first, last) must be a valid range in `*this`.
-         * @tparam InputIt must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">input iterator</a> requirements
+         * @tparam InputIt must meet the requirements of
+         * <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>.
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre @p first and @p last must refer to the same container
-         * @pre @p first must be less or equal than @p last
-         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p first and @p last **must** refer to the same container.
+         * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
+         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          *
          * @assert{
-         * if called with a moved-from object \n
-         * if @p first is greater than @p last \n
-         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * If called with a moved-from object. \n
+         * If @p first and @p last don't denote a valid range. \n
+         * If any key or value exceed their size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // at most `last - first` times
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `(last - first) * this->size()` times
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // exactly 'last - first' times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most 'last - first' times
          * }
          */
         template <std::input_iterator InputIt>
@@ -1008,81 +1004,74 @@ namespace mpicxx {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
 
-//            char key_arr[MPI_MAX_INFO_KEY];
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
                 // retrieve element
                 const auto [key, value] = *first;
 
                 MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                              "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                              "Info key to long!: max size: %i, provided size (including the null-terminator): %u",
                               MPI_MAX_INFO_KEY, key.size() + 1);
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                              "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                              "Info value to long!: max size: %i, provided size (including the null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
+                // check if key already exists
                 if (!this->key_exists(key)) {
+                    // key doesn't exist yet -> add new [key, value]-pair
                     MPI_Info_set(info_, key.data(), value.data());
                 }
-//                // check whether key already exists in this info object
-//                const size_type size = this->size();
-//                for (size_type i = 0; i < size; ++i) {
-//                    MPI_Info_get_nthkey(info_, i, key_arr);
-//                    if (key.compare(key_arr) == 0) {
-//                        // key already existing -> continue with next input [key, value]-pair
-//                        goto next_insert_iteration;
-//                    }
-//                }
-//                // key not already contained in this info object -> add new [key, value]-pair
-//                MPI_Info_set(info_, key.data(), value.data());
-//
-//                next_insert_iteration:;
             }
         }
         /**
          * @brief Inserts elements from the initializer list @p ilist if the info object does not already contain an element with
          * an equivalent key.
-         * @details If multiple elements in the list have the same key, the first occurrence is used.
+         * @details If multiple elements in the initializer list have the same key, the **first** occurrence determines the value.
          * @param[in] ilist initializer list to insert the [key, value]-pairs from
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * If called with a moved-from object. \n
+         * If any key or value exceed their size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // at most `last - first` times
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `(last - first) * this->size()` times
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // exactly 'ilist.size()' times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most 'ilist.size()' times
          * }
          */
         void insert(std::initializer_list<value_type> ilist) { this->insert(ilist.begin(), ilist.end()); }
+
         /**
          * @brief Insert or assign the given [key, value]-pair to this info object.
-         * @param key the @p key to be inserted or assigned
-         * @param value the @p value to be inserted or assigned
-         * @return a pair consisting of an iterator to the inserted or element and a `bool` denoting whether the insertion (`true`) or
-         * assignment (`false`) took place
+         * @param[in] key element @p key to insert
+         * @param[in] value element @p value to insert
+         * @return a pair consisting of an iterator to the inserted or assigned element and a `bool`
+         * denoting whether the insertion (`true`) or the assignment (`false`) took place
          *
-         * @pre the key's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre the value's length (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre **Both** @p key **and** @p value **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          *
          * @assert{
-         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
-         * if the value's length (including the null-terminator) is greater then *MPI_MAX_INFO_VAL*
+         * If called with a moved-from object. \n
+         * If @p key or @p value exceed their size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                    // at most `2 * this->size()`
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // exactly once
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // at most 'this->size()' times
          * }
          */
-        std::pair<iterator, bool> insert_or_assign(const std::string& key, const std::string& value) {
+        std::pair<iterator, bool> insert_or_assign(const std::string_view key, const std::string_view value) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "Info key to long!: max size: %u, provided size (including null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
@@ -1090,52 +1079,37 @@ namespace mpicxx {
                           "Info value to long!: max size: %u, provided size (including null-terminator): %u",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
-            bool key_already_exists = this->key_exists(key);
+            // check whether an insertion or assignment will take place
+            const bool key_already_exists = this->key_exists(key);
+            // updated (i.e. insert or assign) the [key, value]-pair
             MPI_Info_set(info_, key.data(), value.data());
-            char key_arr[MPI_MAX_INFO_KEY];
-            size_type pos = 0;
-            while (true) {
-                MPI_Info_get_nthkey(info_, pos, key_arr);
-                if (key.compare(key_arr) == 0) break;
-                ++pos;
-            }
-            return std::make_pair(iterator(info_, pos), !key_already_exists);
-//            char key_arr[MPI_MAX_INFO_KEY];
-//            const size_type size = this->size();
-//            for (size_type i = 0; i < size; ++i) {
-//                MPI_Info_get_nthkey(info_, i, key_arr);
-//                if (key.compare(key_arr) == 0) {
-//                    // updated already existing key
-//                    MPI_Info_set(info_, key.data(), value.data());
-//                    return std::make_pair(iterator(info_, i), false);
-//                }
-//            }
-//            // insertion takes place
-//            MPI_Info_set(info_, key.data(), value.data());
-//            return std::make_pair(iterator(info_, this->find_pos(key, size)), true);
+            // search position of the key and return iterator
+            return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
          * @brief Inserts or assigns elements from range [first, last) to this info object.
-         * @details If multiple elements in the range have the same key, the **last** occurrence is used. \n
+         * @details If multiple elements in the range have the same key, the **last** occurrence determines the value. \n
          * [first, last) must be a valid range in `*this`.
-         * @tparam InputIt must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">input iterator</a> requirements
+         * @tparam InputIt must meet the requirements of
+         * <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>.
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre @p first and @p last must refer to the same container
-         * @pre @p first must be less or equal than @p last
-         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p first and @p last **must** refer to the same container.
+         * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
+         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          *
          * @assert{
-         * if called with a moved-from object \n
-         * if @p first is greater than @p last \n
-         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * If called with a moved-from object. \n
+         * If @p first and @p last don't denote a valid range. \n
+         * If any key or value exceed their size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly 'last - first' times
          * }
          */
         template <std::input_iterator InputIt>
@@ -1155,53 +1129,54 @@ namespace mpicxx {
                               "Info value to long!: max size: %u, provided size (including null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
-                // insert or update [key, value]-pair
+                // insert or assign [key, value]-pair
                 MPI_Info_set(info_, key.data(), value.data());
             }
         }
         /**
          * @brief Inserts or assigns elements from the initializer list @p ilist to this info object.
-         * @details If multiple elements in the list have the same key, the **last** occurrence is used.
-         * @param[in] ilist initializer list to insert the [key, value]-pairs from
+         * @details If multiple elements in the initializer list have the same key, the **last** occurrence determines the value.
+         * @param[in] ilist initializer list to insert or assign the [key, value]-pairs from
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre the length of **any** key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre the length of **any** value (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_VAL*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          *
          * @assert{
-         * if called with a moved-from object \n
-         * if **any** key or value is greater than *MPI_MAX_INFO_KEY* or *MPI_MAX_INFO_VAL* respectively
+         * If called with a moved-from object. \n
+         * If any key or value exceed their size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most `last - first` times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly 'ilist.size()' times
          * }
          */
         void insert_or_assign(std::initializer_list<value_type> ilist) { this->insert_or_assign(ilist.begin(), ilist.end()); }
+
         /**
          * @brief Removes the element at @p pos.
          * @param[in] pos iterator to the element to remove
          * @return iterator following the last removed element
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre @p pos must refer to `this` info object
-         * @pre the position denoted by @p pos may **not** be less than 0
-         * @pre the position denoted by @p pos may **not** be greater or equal than `this->size()`
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p pos **must** refer to `*this` info object.
+         * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if @p pos does not refer to `this` info object\n
-         * if dereferencing an out-of-bounds iterator
+         * If called with a moved-from object. \n
+         * If @p pos does not refer to `*this` info object. \n
+         * If trying to dereference an out-of-bounds iterator.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
-         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // exactly once
+         * int MPI_Info_delete(MPI_Info info, const char *key);             // exactly once
          * }
          */
         iterator erase(const_iterator pos) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(pos.info_ == info_, "The given iterator must refer to the same info object as this.");
+            MPICXX_ASSERT(pos.info_ == info_, "The given iterator must refer to the same info object as *this.");
             MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
                           "Requested an illegal out-of-bounds access! Legal interval: [%i, %u), requested position: %i",
                           0, this->size(), pos.pos_);
@@ -1218,24 +1193,22 @@ namespace mpicxx {
          * @param[in] last iterator one-past the last element in the range
          * @return iterator following the last removed element
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre @p first and @p last must refer to `this` info object
-         * @pre the position denoted by @p first may **not** be less than 0
-         * @pre the position denoted by @p first may **not** be greater or equal than `this->size()`
-         * @pre the position denoted by @p last may **not** be less than 0
-         * @pre the position denoted by @p first may **not** be greater than `this->size()`
-         * @pre @p first must be less or equal than @p last
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p first and @p last **must** refer to `*this` info object
+         * @pre The position denoted by @p first **must** be in the half-open interval [0, `this->size()`).
+         * @pre The position denoted by @p last **must** be in the half-open interval [0, `this->size()`).
+         * @pre @p first **must** be less or equal than @p last.
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if @p first or @p last does not refer to `this` info object\n
-         * if dereferencing an out-of-bounds iterator\n
-         * if @p first is greater than @p last
+         * If called with a moved-from object. \n
+         * If @p first or @p last does not refer to `*this` info object. \n
+         * If trying to dereference an out-of-bounds iterator.
+         * If @p first is greater than @p last.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // `last - first` times
-         * int MPI_Info_delete(MPI_Info info, const char *key);             // `last - first` times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // exactly 'last - first' times
+         * int MPI_Info_delete(MPI_Info info, const char *key);             // exactly 'last - first' times
          * }
          */
         iterator erase(const_iterator first, const_iterator last) {
@@ -1250,7 +1223,7 @@ namespace mpicxx {
                           0, this->size(), last.pos_);
             MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
 
-            int count = last - first;
+            const int count = last - first;
             char key[MPI_MAX_INFO_KEY];
             // delete all [key, value]-pairs in the range [first, last)
             for (int i = 0; i < count; ++i) {
@@ -1262,83 +1235,72 @@ namespace mpicxx {
         /**
          * @brief Removes the element (if one exists) with the [**key**, value]-pair equivalent to @p key.
          * @details Returns either 1 (key found and removed) or 0 (no such key found and therefore nothing removed).
-         * @param[in] key the key to be deleted
+         * @param[in] key the key to delete
          * @return number of elements removed
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre the length of @p key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if the @p key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // at most `this->size()` times
-         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most once
          * }
          */
-        size_type erase(const std::string& key) {
+        size_type erase(const std::string_view key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
+            // check if key really exists
             if (this->key_exists(key)) {
+                // key exists -> delete the [key, value]-pair
                 MPI_Info_delete(info_, key.data());
                 return 1;
-            } else {
-                return 0;
             }
-//            const size_type size = this->size();
-//            char key_arr[MPI_MAX_INFO_KEY];
-//            // search for the given key
-//            for (size_type i = 0; i < size; ++i) {
-//                MPI_Info_get_nthkey(info_, i, key_arr);
-//                // key found -> remove [key, value]-pair
-//                if (key.compare(key_arr) == 0) {
-//                    MPI_Info_delete(info_, key_arr);
-//                    return 1;
-//                }
-//            }
-//            // key not found -> nothing removed
-//            return 0;
+            return 0;
         }
+
         /**
-         * @brief Swaps the contents of this info object with @p other.
-         * @details Does not invoke any move, copy or swap operations on individual elements.\n
-         * Invalidates all iterators.
-         * @param[inout] other the @p other info object
+         * @brief Exchanges the contents of this info object with those of @p other.
+         * @details Does not invoke any move, copy, or swap operations on individual elements.
+         * @param[inout] other info object to exchange the contents with
          *
-         * @post `this` is in a valid state iff @p other was in a valid state (and vice versa)
+         * @post All iterators and references remain valid. The past-the-end iterator is invalidated.
+         * @post `*this` is in a valid state iff @p other was in a valid state (and vice versa).
          */
         void swap(info& other) noexcept {
             using std::swap;
             swap(info_, other.info_);
             swap(is_freeable_, other.is_freeable_);
         }
+
         /**
          * @brief Removes the element at @p pos and returns the removed [key, value]-pair.
          * @param[in] pos iterator to the element to remove
          * @return the extracted [key, value]-pair
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre @p pos must refer to `this` info object
-         * @pre the position denoted by @p pos may **not** be less than 0
-         * @pre the position denoted by @p pos may **not** be greater or equal than `this->size()`
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p pos **must** refer to `*this` info object.
+         * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if @p pos does not refer to `this` info object\n
-         * if dereferencing an out-of-bounds iterator
+         * If called with a moved-from object. \n
+         * If @p pos does not refer to `*this` info object. \n
+         * If trying to dereference an out-of-bounds iterator.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);
-         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // exactly once
          * }
          */
         value_type extract(const_iterator pos) {
@@ -1359,77 +1321,64 @@ namespace mpicxx {
          * @brief Removes the element (if one exists) with the [**key**, value]-pair equivalent to @p key
          * and returns the removed [key, value]-pair.
          * @details Returns a `std::optional` holding the removed [key, value]-pair if the @p key exists, `std::nullopt` otherwise
-         * @param[in] key the key to be extracted
+         * @param[in] key the key to extract
          * @return the extracted [key, value]-pair
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre the length of @p key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          *
          * @assert{
-         * if called with a moved-from object\n
-         * if the @p key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);
-         * int MPI_Info_delete(MPI_Info info, const char *key);
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at least once, at most twice
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at most once
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most once
          * }
          */
-        std::optional<value_type> extract(const std::string& key) {
+        std::optional<value_type> extract(const std::string_view key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
+            // check if key really exists
             if (this->key_exists(key)) {
+                // key exists -> delete the [key, value]-pair and return it
+                // get the value associated with the given key
                 int valuelen, flag;
                 MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
                 std::string value(valuelen, ' ');
                 MPI_Info_get(info_, key.data(), valuelen, value.data(), &flag);
+                // delete the [key, value]-pair from this info object
                 MPI_Info_delete(info_, key.data());
-                return std::make_optional<value_type>(std::make_pair(key, std::move(value)));
-            } else {
-                return std::nullopt;
+                // return the extracted [key, value]-pair
+                return std::make_optional<value_type>(std::make_pair(std::string(key), std::move(value)));
             }
-//            const size_type size = this->size();
-//            char key_arr[MPI_MAX_INFO_KEY];
-//            // search for the given key
-//            for (size_type i = 0; i < size; ++i) {
-//                MPI_Info_get_nthkey(info_, i, key_arr);
-//                // key found -> remove [key, value]-pair
-//                if (key.compare(key_arr) == 0) {
-//                    // get associated key
-//                    int valuelen, flag;
-//                    MPI_Info_get_valuelen(info_, key_arr, &valuelen, &flag);
-//                    std::string value(valuelen, ' ');
-//                    MPI_Info_get(info_, key_arr, valuelen, value.data(), &flag);
-//                    MPI_Info_delete(info_, key_arr);
-//                    return std::make_optional<value_type>(std::make_pair(std::string(key_arr), std::move(value)));
-//                }
-//            }
-//            // key not found -> nothing removed
-//            return std::nullopt;
+            return std::nullopt;
         }
+
         /**
-         * @brief Attempts to extract each element in @p source and insert it into `this`.
-         * @details If there is an element in `this` with key equivalent of an element from @p source, than the element is not extracted
-         * from @p source.
-         * @param[inout] source the info object from which should be merged
+         * @brief Attempts to extract each element in @p source and insert it into `*this`.
+         * @details If there is an element in `*this` with key equivalent of an element from @p source, than the element is not extracted
+         * from @p source. \n
+         * Directly returns if a "self-extraction" is attempted.
+         * @param[inout] source the info object to transfer the [key, value]-pairs from
          *
-         * @pre `this` may **not** be in the moved-from state
-         * @pre @p source may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p source **may not** be in the moved-from state.
          *
-         * @assert{ if `this` or @p source are in the moved-from state }
+         * @assert{ If `*this` or @p source are in the moved-from state. }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // `source.size() + 1` times
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // at most source.size() * this->size()` times
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at most `source.size()` times
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most `source.size()` times
-         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most `source.size()` times
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most `source.size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at least 'source.size()' times, at most '2 * source.size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at most 'source.size()' times
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most 'source.size()' times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most 'source.size()' times
          * }
          */
         void merge(info& source) {
@@ -1448,51 +1397,24 @@ namespace mpicxx {
                 // get source_key
                 MPI_Info_get_nthkey(source.info_, source_pos, source_key);
 
+                // check if source_key already exists in *this
                 if (this->key_exists(source_key)) {
+                    // source_key already exists in *this -> check next key in source
                     ++source_pos;
                 } else {
-                    // get source_value associated with source_key
+                    // get the value associated with source_key
                     int valuelen, flag;
                     MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
                     char* source_value = new char[valuelen + 1];
                     MPI_Info_get(source.info_, source_key, valuelen, source_value, &flag);
                     // remove [key, value]-pair from source info object
                     MPI_Info_delete(source.info_, source_key);
-                    // add [key, value]-pair to this info object
+                    // add [key, value]-pair to *this info object
                     MPI_Info_set(info_, source_key, source_value);
                     // source info object now contains one [key, value]-pair less
                     --source_size;
                     delete[] source_value;
                 }
-//                // check whether this contains the source_key
-//                const size_type target_size = this->size();
-//                char target_key[MPI_MAX_INFO_KEY];
-//                for (size_type target_pos = 0; target_pos < target_size; ++target_pos) {
-//                    MPI_Info_get_nthkey(info_, target_pos, target_key);
-//                    if (std::strcmp(source_key, target_key) == 0) {
-//                        // the source_key already exists -> continue with next source [key, value]-pair
-//                        ++source_pos;
-//                        goto next_source_iteration;
-//                    }
-//                }
-//
-//                // this doesn't contain the source_key yet -> extract the [key, value]-pair and add it to this
-//                {
-//                    // get source_value associated with source_key
-//                    int valuelen, flag;
-//                    MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
-//                    char* source_value = new char[valuelen + 1];
-//                    MPI_Info_get(source.info_, source_key, valuelen, source_value, &flag);
-//                    // remove [key, value]-pair from source info object
-//                    MPI_Info_delete(source.info_, source_key);
-//                    // add [key, value]-pair to this info object
-//                    MPI_Info_set(info_, source_key, source_value);
-//                    // source info object now contains one [key, value]-pair less
-//                    --source_size;
-//                    delete[] source_value;
-//                }
-//
-//                next_source_iteration:;
             }
         }
 
@@ -1501,94 +1423,98 @@ namespace mpicxx {
         //                                                   lookup                                                   //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Search in this info object for number of occurrences of the given @p key.
-         * @details Because an info object doesn't support duplicated keys the returned value is either 0 (key not found) or 1 (key found).
-         * @param[in] key the searched key
-         * @return the number of found keys equal to @p key (0 or 1)
+         * @brief Returns the number of elements with [**key**, value]-pair that compares equivalent to the specified @p key.
+         * @details Since info object doesn't allow duplicated keys the returned value is either 0 (key not found) or 1 (key found).
+         * @param[in] key @p key value of the elements to count
+         * @return number of elements with [**key**, value]-pair that compares equivalent to @p key, which is either 1 or 0
          *
-         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre `this` may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          *
          * @assert{
-         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
-         * if called with a moved-from object
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        size_type count(const std::string& key) const {
+        size_type count(const std::string_view key) const {
             return static_cast<size_type>(this->contains(key));
         }
         /**
-         * @brief Search in this info object for the given @p key.
+         * @brief Finds an element with [**key**, value]-pair equivalent to @p key.
          * @details If the key is found, returns an iterator pointing to the corresponding element,
          * otherwise the past-the-end iterator is returned (see end()).
-         * @param[in] key the searched key
-         * @return the iterator
+         * @param[in] key key value of the element to search for
+         * @return iterator to an element with [**key**, value]-pair to @p key
          *
-         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre `this` may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          *
          * @assert{
-         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
-         * if called with a moved-from object
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        iterator find(const std::string& key) {
+        iterator find(const std::string_view key) {
             const size_type size = this->size();
             return iterator(info_, this->find_pos(key, size));
         }
         /**
-         * @brief Search in this info object for the given @p key.
+         * @brief Finds an element with [**key**, value]-pair equivalent to @p key.
          * @details If the key is found, returns a const_iterator pointing to the corresponding element,
          * otherwise the past-the-end const_iterator is returned (see cend()).
-         * @param[in] key the searched key
-         * @return the const_iterator
+         * @param[in] key key value of the element to search for
+         * @return const_iterator to an element with [**key**, value]-pair to @p key
          *
-         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre `this` may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          *
          * @assert{
-         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
-         * if called with a moved-from object
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        const_iterator find(const std::string& key) const {
+        const_iterator find(const std::string_view key) const {
             const size_type size = this->size();
             return const_iterator(info_, this->find_pos(key, size));
         }
         /**
-         * @brief Search in this info object whether the given @p key exists.
-         * @param[in] key the searched key
-         * @return `true` iff the searched key exists, otherwise `false`
+         * @brief Checks if there is an element with [**key**, value]-pair equivalent to @p key in this info object.
+         * @param[in] key @p key value of the element to search for
+         * @return `true` if there is such an element, otherwise `false`
          *
-         * @pre the length of the searched key (including the null-terminator) may **not** be greater then *MPI_MAX_INFO_KEY*
-         * @pre `this` may **not** be in the moved-from state
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          *
          * @assert{
-         * if the key's length (including the null-terminator) is greater then *MPI_MAX_INFO_KEY*\n
-         * if called with a moved-from object
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most `this->size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        bool contains(const std::string& key) const {
+        bool contains(const std::string_view key) const {
             const size_type size = this->size();
             return this->find_pos(key, size) != size;
         }
@@ -1599,20 +1525,20 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Compares two info objects for equality.
-         * @details Two info objects are equal iff their contents are equal.
-         * @param[in] lhs the @p lhs info object
-         * @param[in] rhs the @p rhs info object
-         * @return `true` if the two info objects are equal, `false` otherwise
+         * @details Two info objects are equal iff their contents are equal including their ordering.
+         * @param[in] lhs the @p lhs info object whose contents to compare
+         * @param[in] rhs the @p rhs info object whose contents to compare
+         * @return `true` if the contents of the info objects are equal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs may **not** be in the moved-from state
+         * @pre @p lhs and @p rhs **may not** be in the moved-from state.
          *
-         * @assert{ if called with a moved-from object }
+         * @assert{ If called with a moved-from object. }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // 2 times
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 2 * `lhs.size()` times
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most 2 * `lhs.size()` times
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most 2 * `lhs.size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most '2 * lhs.size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
         friend bool operator==(const info& lhs, const info& rhs) {
@@ -1621,7 +1547,7 @@ namespace mpicxx {
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
-            if (size != rhs.size()) { return false; }
+            if (size != rhs.size()) return false;
 
             // check all [key, value]-pairs for equality
             char lhs_key[MPI_MAX_INFO_KEY];
@@ -1663,30 +1589,29 @@ namespace mpicxx {
         /**
          * @brief Compares two info objects for inequality.
          * @details Two info objects are inequal if they have different number of elements or at least one element compares inequal.
-         * @param[in] lhs the @p lhs info object
-         * @param[in] rhs the @p rhs info object
-         * @return `true` if the two info objects are inequal, `false` otherwise
+         * @param[in] lhs the @p lhs info object whose contents to compare
+         * @param[in] rhs the @p rhs info object whose contents to compare
+         * @return `true` if the contents of the info objects are inequal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs may **not** be in the moved-from state
+         * @pre @p lhs and @p rhs **may not** be in the moved-from state.
          *
-         * @assert{ if called with a moved-from object }
+         * @assert{ If called with a moved-from object. }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // 2-3 times
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 2 * `lhs.size()` times
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most 2 * `lhs.size()` times
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most 2 * `lhs.size()` times
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most '2 * lhs.size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
         friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
         /**
-         * @brief Swaps the contents of both info objects.
-         * @details Does not invoke any move, copy or swap operations on individual elements.\n
-         * Invalidates all iterators.
-         * @param[inout] lhs the @p lhs info object
-         * @param[inout] rhs the @p rhs info object
+         * @brief Specializes the `std::swap` algorithm for info objects. Swaps the contents of @p lhs and @p rhs.
+         * @details Does not invoke any move, copy or swap operations on individual elements.
+         * @param[inout] lhs the info object whose contents to swap with @p rhs
+         * @param[inout] rhs the info object whose contents to swap with @p lhs
          *
-         * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa)
+         * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa).
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
 
@@ -1707,7 +1632,7 @@ namespace mpicxx {
 
     private:
 
-        size_type find_pos(const std::string& key, const size_type size) const {
+        size_type find_pos(const std::string_view key, const size_type size) const {
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
@@ -1726,7 +1651,7 @@ namespace mpicxx {
             return size;
         }
 
-        bool key_exists(const std::string& key) {
+        bool key_exists(const std::string_view key) {
             char value;
             int flag;
             MPI_Info_get(info_, key.data(), 0, &value, &flag);
@@ -1777,9 +1702,9 @@ namespace mpicxx {
     template <typename T>
     inline info::string_proxy info::at(T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        MPICXX_ASSERT(detail::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
-                      "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, detail::string_size(key, MPI_MAX_INFO_KEY) + 1);
+//        MPICXX_ASSERT(detail::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
+//                      "Info key to long!: max size: %u, provided size (with null terminator): %u",
+//                      MPI_MAX_INFO_KEY, detail::string_size(key, MPI_MAX_INFO_KEY) + 1);
 
         // query the value length associated to key to determine if the key exists
         int valuelen, flag;
@@ -1824,9 +1749,9 @@ namespace mpicxx {
     template <typename T>
     inline info::string_proxy info::operator[](T&& key) {
         MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling through a \"moved-from\" object is not supported.");
-        MPICXX_ASSERT(detail::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
-                      "Info key to long!: max size: %u, provided size (with null terminator): %u",
-                      MPI_MAX_INFO_KEY, detail::string_size(key, MPI_MAX_INFO_KEY) + 1);
+//        MPICXX_ASSERT(detail::string_size(key, MPI_MAX_INFO_KEY) < MPI_MAX_INFO_KEY,
+//                      "Info key to long!: max size: %u, provided size (with null terminator): %u",
+//                      MPI_MAX_INFO_KEY, detail::string_size(key, MPI_MAX_INFO_KEY) + 1);
 
         // create proxy object and forward key
         return string_proxy(info_, std::forward<T>(key));
