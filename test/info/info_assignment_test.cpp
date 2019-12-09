@@ -1,7 +1,7 @@
 /**
  * @file info_assignment_test.cpp
  * @author Marcel Breyer
- * @date 2019-11-25
+ * @date 2019-12-09
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -87,5 +87,33 @@ TEST(InfoTests, MoveAssignment) {
 
     // be sure the moved from object has released it's resources and is now in the moved-from state
     EXPECT_EQ(info.get(), MPI_INFO_NULL);
+
+}
+
+TEST(InfoTests, InitializerListAssignment) {
+
+    // default construct a mpicxx::info object
+    mpicxx::info info;
+
+    // add an element to the info object
+    MPI_Info_set(info.get(), "key", "value");
+
+    // be sure the key was successfully added
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 1);
+
+    // assign new values via an initializer list
+    info = { { "key1", "value1" }, { "key2", "value2" } };
+
+    // now two [key, value]-pairs should be present
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 2);
+
+    // old [key, value]-pair is not contained anymore
+    int flag;
+    char value[3 + 1];
+    MPI_Info_get(info.get(), "key", 3, value, &flag);
+    EXPECT_FALSE(static_cast<bool>(flag));
 
 }
