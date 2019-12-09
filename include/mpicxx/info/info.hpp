@@ -770,7 +770,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        iterator begin() { return iterator(info_, 0); }
+        [[nodiscard]] iterator begin() { return iterator(info_, 0); }
         /**
          * @brief Returns an iterator to the element following the last element of this info object.
          * @details This element acts as a placeholder; attempting to access it results in undefined behavior.
@@ -781,7 +781,7 @@ namespace mpicxx {
          * for dereferencing operations see @ref info_iterator
          * }
          */
-        iterator end() { return iterator(info_, this->size()); }
+        [[nodiscard]] iterator end() { return iterator(info_, this->size()); }
         /**
          * @brief Returns a const_iterator to the first element of this info object.
          * @details If the info object is empty this const_iterator equals end().
@@ -789,7 +789,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        const_iterator begin() const { return const_iterator(info_, 0); }
+        [[nodiscard]] const_iterator begin() const { return const_iterator(info_, 0); }
         /**
          * @brief Returns a const_iterator to the element following the last element of this info object.
          * @details This element acts as a placeholder; attempting to access it results in undefined behavior.
@@ -800,15 +800,15 @@ namespace mpicxx {
          * for dereferencing operations see @ref info_iterator
          * }
          */
-        const_iterator end() const { return const_iterator(info_, this->size()); }
+        [[nodiscard]] const_iterator end() const { return const_iterator(info_, this->size()); }
         /**
          * @copydoc begin() const
          */
-        const_iterator cbegin() const { return const_iterator(info_, 0); }
+        [[nodiscard]] const_iterator cbegin() const { return const_iterator(info_, 0); }
         /**
          * @copydoc end() const
          */
-        const_iterator cend() const { return const_iterator(info_, this->size()); }
+        [[nodiscard]] const_iterator cend() const { return const_iterator(info_, this->size()); }
 
         /**
          * @brief Returns a reverse_iterator to the first element of the reversed info object.
@@ -821,7 +821,7 @@ namespace mpicxx {
          * for dereferencing operations see @ref info_iterator
          * }
          */
-        reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
+        [[nodiscard]] reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
         /**
          * @brief Returns a reverse_iterator to the element following the last element of the reversed info object.
          * @details It corresponds to the element preceding the first element of the non-reversed info object.
@@ -830,7 +830,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
+        [[nodiscard]] reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
         /**
          * @brief Returns a const_reverse_iterator to the element following the last element of the reversed info object.
          * @details It corresponds to the element preceding the first element of the non-reversed info object.
@@ -839,7 +839,7 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->cend()); }
+        [[nodiscard]] const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->cend()); }
         /**
          * @brief Returns a const_reverse_iterator to the element one before the first element of this info object.
          * @details Attempts to access this element, i.e. dereferencing the returned const_reverse_iterator, results in undefined behaviour.
@@ -847,15 +847,15 @@ namespace mpicxx {
          *
          * @calls_ref{ for dereferencing operations see @ref info_iterator }
          */
-        const_reverse_iterator rend() const { return std::make_reverse_iterator(this->cbegin()); }
+        [[nodiscard]] const_reverse_iterator rend() const { return std::make_reverse_iterator(this->cbegin()); }
         /**
          * @copydoc rbegin() const
          */
-        const_reverse_iterator crbegin() const { return std::make_reverse_iterator(this->cend()); }
+        [[nodiscard]] const_reverse_iterator crbegin() const { return std::make_reverse_iterator(this->cend()); }
         /**
          * @copydoc rend() const
          */
-        const_reverse_iterator crend() const { return std::make_reverse_iterator(this->cbegin()); }
+        [[nodiscard]] const_reverse_iterator crend() const { return std::make_reverse_iterator(this->cbegin()); }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -873,7 +873,7 @@ namespace mpicxx {
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
-        bool empty() const {
+        [[nodiscard]] bool empty() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
 
             return this->size() == 0;
@@ -890,7 +890,7 @@ namespace mpicxx {
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
-        size_type size() const {
+        [[nodiscard]] size_type size() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
 
             int nkeys;
@@ -1303,7 +1303,7 @@ namespace mpicxx {
          * int MPI_Info_delete(MPI_Info info, const char *key);                                         // exactly once
          * }
          */
-        value_type extract(const_iterator pos) {
+        [[nodiscard]] value_type extract(const_iterator pos) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(pos.info_ == info_, "The given iterator must refer to the same info object as this.");
             MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
@@ -1339,7 +1339,7 @@ namespace mpicxx {
          * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most once
          * }
          */
-        std::optional<value_type> extract(const std::string_view key) {
+        [[nodiscard]] std::optional<value_type> extract(const std::string_view key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %u, provided size (with null-terminator): %u",
@@ -1442,7 +1442,7 @@ namespace mpicxx {
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        size_type count(const std::string_view key) const {
+        [[nodiscard]] size_type count(const std::string_view key) const {
             return static_cast<size_type>(this->contains(key));
         }
         /**
@@ -1466,7 +1466,7 @@ namespace mpicxx {
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        iterator find(const std::string_view key) {
+        [[nodiscard]] iterator find(const std::string_view key) {
             const size_type size = this->size();
             return iterator(info_, this->find_pos(key, size));
         }
@@ -1491,7 +1491,7 @@ namespace mpicxx {
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        const_iterator find(const std::string_view key) const {
+        [[nodiscard]] const_iterator find(const std::string_view key) const {
             const size_type size = this->size();
             return const_iterator(info_, this->find_pos(key, size));
         }
@@ -1514,7 +1514,7 @@ namespace mpicxx {
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
          * }
          */
-        bool contains(const std::string_view key) const {
+        [[nodiscard]] bool contains(const std::string_view key) const {
             const size_type size = this->size();
             return this->find_pos(key, size) != size;
         }
@@ -1541,7 +1541,7 @@ namespace mpicxx {
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
-        friend bool operator==(const info& lhs, const info& rhs) {
+        [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
             MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (lhs).");
             MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (rhs).");
 
@@ -1604,7 +1604,7 @@ namespace mpicxx {
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
-        friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
+        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
         /**
          * @brief Specializes the `std::swap` algorithm for info objects. Swaps the contents of @p lhs and @p rhs.
          * @details Does not invoke any move, copy or swap operations on individual elements.
@@ -1623,12 +1623,12 @@ namespace mpicxx {
          * @brief Get the underlying *MPI_Info* object.
          * @return the *MPI_Info* object wrapped in this info object
          */
-        MPI_Info get() noexcept { return info_; }
+        [[nodiscard]] MPI_Info get() noexcept { return info_; }
         /**
          * @brief Get the underlying *MPI_Info* object (as const).
          * @return the *MPI_Info* object wrapped in this info object
          */
-        MPI_Info get() const noexcept { return info_; }
+        [[nodiscard]] MPI_Info get() const noexcept { return info_; }
 
     private:
 
