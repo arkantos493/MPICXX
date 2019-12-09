@@ -25,6 +25,7 @@
 #include <mpi.h>
 
 #include <mpicxx/utility/assert.hpp>
+#include <mpicxx/utility/concepts.hpp>
 
 
 namespace mpicxx {
@@ -48,10 +49,12 @@ namespace mpicxx {
         public:
             /**
              * @brief Construct a new proxy object.
+             * @tparam T must meet the requirements of concept detail::string
              * @param[in] ptr pointer to the parent info object
              * @param[in] key the provided key
              */
-            string_proxy(MPI_Info ptr, const std::string_view key) : ptr_(ptr), key_(key) { }
+            template <detail::string T>
+            string_proxy(MPI_Info ptr, T&& key) : ptr_(ptr), key_(std::forward<T>(key)) { }
 
             /**
              * @brief On write access, add the provided @p value and saved key to the referred info object.
@@ -795,6 +798,7 @@ namespace mpicxx {
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
          * @details Returns a proxy class which is used to distinguish between read and write accesses.
+         * @tparam T must meet the requirements of concept detail::string
          * @param[in] key the key of the element to find
          * @return a proxy object
          *
@@ -827,11 +831,12 @@ namespace mpicxx {
          * @endcode
          * }
          */
-        string_proxy at(const std::string_view key) {
+        template <detail::string T>
+        string_proxy at(T&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+            MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
-                          MPI_MAX_INFO_KEY, key.size() + 1);
+                          MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // check whether the key really exists
             if (this->key_exists(key)) {
@@ -839,7 +844,7 @@ namespace mpicxx {
                 throw std::out_of_range("The specified key does not exist!");
             }
             // create proxy object and forward key
-            return string_proxy(info_, key);
+            return string_proxy(info_, std::forward<T>(key));
         }
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
@@ -886,6 +891,7 @@ namespace mpicxx {
         /**
          * @brief Access the value associated with the given @p key.
          * @details Returns a proxy class which is used to distinguish between read and write accesses.
+         * @tparam T must meet the requirements of concept detail::string
          * @param[in] key the key of the element to find
          * @return a proxy object
          *
@@ -919,14 +925,15 @@ namespace mpicxx {
          * @endcode
          * }
          */
-        string_proxy operator[](const std::string_view key) {
+        template <detail::string T>
+        string_proxy operator[](T&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+            MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
-                          MPI_MAX_INFO_KEY, key.size() + 1);
+                          MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // create proxy object and forward key
-            return string_proxy(info_, key);
+            return string_proxy(info_, std::forward<T>(key));
         }
 
 
