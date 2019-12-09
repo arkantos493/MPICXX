@@ -512,22 +512,22 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                              alias definitions                                             //
         // ---------------------------------------------------------------------------------------------------------- //
-        using size_type = std::size_t;
+        /// The value type saved in the info object class.
         using value_type = std::pair<const std::string, std::string>;
-        /**
-         * @brief Alias for an iterator using the `info_iterator` template class with `is_const` set to `false`.
-         */
+        /// The type used for every function which returns a value associated with an info objects size.
+        using size_type = std::size_t;
+        /// Alias for an iterator using the `info_iterator` template class with `is_const` set to `false`.
         using iterator = info_iterator<false>;
-        /**
-         * @brief Alias for a const_iterator using the `info_iterator` template class with `is_const` set to `true`.
-         */
+        /// Alias for a const_iterator using the `info_iterator` template class with `is_const` set to `true`.
         using const_iterator = info_iterator<true>;
         /**
-         * @brief Alias for the reverse_iterator using `std::reverse_iterator`.
+         * @brief Alias for the reverse_iterator using
+         * <a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator"><i>std::reverse_iterator</i></a>.
          */
         using reverse_iterator = std::reverse_iterator<iterator>;
         /**
-         * @brief Alias for the const_reverse_iterator using `std::reverse_iterator`.
+         * @brief Alias for the const_reverse_iterator using
+         * <a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator"><i>std::reverse_iterator</i></a>.
          */
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
