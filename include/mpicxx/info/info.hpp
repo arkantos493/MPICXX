@@ -49,12 +49,10 @@ namespace mpicxx {
         public:
             /**
              * @brief Construct a new proxy object.
-             * @tparam T must meet the requirements of concept detail::string
              * @param[in] ptr pointer to the parent info object
-             * @param[in] key the provided key
+             * @param[in] key the provided key (must meet the requirements of the detail::string concept)
              */
-            template <detail::string T>
-            string_proxy(MPI_Info ptr, T&& key) : ptr_(ptr), key_(std::forward<T>(key)) { }
+            string_proxy(MPI_Info ptr, detail::string auto&& key) : ptr_(ptr), key_(std::forward<decltype(key)>(key)) { }
 
             /**
              * @brief On write access, add the provided @p value and saved key to the referred info object.
@@ -132,6 +130,7 @@ namespace mpicxx {
             MPI_Info ptr_;
             const std::string key_;
         };
+
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  iterators                                                 //
