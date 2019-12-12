@@ -1,7 +1,7 @@
 /**
  * @file info_non-member_functions_test.cpp
  * @author Marcel Breyer
- * @date 2019-12-02
+ * @date 2019-12-12
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -88,5 +88,39 @@ TEST(InfoTests, Swap) {
     EXPECT_EQ(nkeys, 4);
     MPI_Info_get_nkeys(empty_info.get(), &nkeys);
     EXPECT_EQ(nkeys, 0);
+
+}
+
+TEST(InfoTests, EraseIf) {
+
+    // construct a info object using a std::initializer_list<>
+    mpicxx::info info = { {"key1", "value1"},
+                          {"key2", "value2"},
+                          {"key3", "value3"},
+                          {"key4", "value4"} };
+
+    // check correct size
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 4);
+
+    // erase certain elements
+    erase_if(info, [](const auto& pair) { return pair.first == "key1" || pair.second == "value3"; });
+
+    // check new size
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_EQ(nkeys, 2);
+
+    // two [key, value]-pairs should remain
+    char value[6 + 1];
+    int flag;
+    // check first [key, value]-pair
+    MPI_Info_get(info.get(), "key2", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+    // check second [key, value]-pair
+    MPI_Info_get(info.get(), "key4", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value4");
 
 }

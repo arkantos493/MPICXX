@@ -1802,9 +1802,53 @@ namespace mpicxx {
          * @post All iterators remain valid, but now refer to the other info object.
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
-
+        // TODO 2019-12-12 21:40 marcel: MPI guarantees
+        /**
+         * @brief Erases all elements that satisfy the predicate @p pred from the info object.
+         * @tparam Pred a valid predicate which accepts a `value_type` and returns a `bool`
+         * @param[inout] c info object from which to erase
+         * @param[in] pred predicate that returns `true` if the element should be erased
+         *
+         * @pre The info object @p c **may not** be in the moved-from state.
+         *
+         * @assert{ If called with a moved-from object. }
+         *
+         * @calls{
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly `c.size()` times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly `c.size()` times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly `c.size()` times
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most `c.size()` times
+         * }
+         */
         template <typename Pred>
-        friend void erase_if(info& c, Pred pred);
+        friend void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, value_type> {
+            MPICXX_ASSERT(c.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            info::size_type size = c.size();
+            char key[MPI_MAX_INFO_KEY];
+
+            // loop through all [key, value]-pairs
+            for (info::size_type i = 0; i < size; ) {
+                // get key
+                MPI_Info_get_nthkey(c.info_, i, key);
+                // get value associated with key
+                int valuelen, flag;
+                MPI_Info_get_valuelen(c.info_, key, &valuelen, &flag);
+                std::string value(valuelen, ' ');
+                MPI_Info_get(c.info_, key, valuelen, value.data(), &flag);
+                // create [key, value]-pair as std::pair
+                info::value_type key_value_pair = std::make_pair(std::string(key), std::move(value));
+                // check whether the predicate holds
+                if (pred(key_value_pair)) {
+                    // the predicate evaluates to true -> erase the current element
+                    MPI_Info_delete(c.info_, key);
+                    --size;
+                } else {
+                    // the predicate evaluates to false -> go to next element
+                    ++i;
+                }
+            }
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -1925,6 +1969,11 @@ namespace mpicxx {
 
     // initialize static environment object
     inline const info info::env = info(MPI_INFO_ENV, false);
+
+    // without this templated friend functions would not be a member of the current namespace
+    // TODO 2019-12-12 21:43 marcel: remove this somehow
+    template <typename Pred>
+    inline void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, info::value_type>;
 
 }
 
