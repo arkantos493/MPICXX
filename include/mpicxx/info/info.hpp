@@ -582,6 +582,7 @@ namespace mpicxx {
          *
          * @post The newly constructed object is in a valid state iff @p other was in a valid state.
          * @post @p other is now in the moved-from state.
+         * @post All iterators referring to @p other remain valid, but now refer to `*this`.
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
             // other should stay in a operable state
@@ -685,6 +686,8 @@ namespace mpicxx {
          * If any of this conditions is **not** fulfilled, no free function will be called (because doing so is unnecessary and would lead
          * to a crash of the MPI runtime system).
          *
+         * @post Invalidates **all** iterators referring to `*this`.
+         *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
          * }
@@ -740,6 +743,7 @@ namespace mpicxx {
          *
          * @post The assigned to object is in a valid state iff @p rhs was in a valid state
          * @post @p rhs is now in the moved-from state.
+         * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
@@ -803,6 +807,7 @@ namespace mpicxx {
          * @pre @p key **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise an exception will be thrown.
+         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
          * this object's internal value!
          *
@@ -851,6 +856,7 @@ namespace mpicxx {
          * @pre @p key **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise an exception will be thrown.
+         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
          * @attention This const overload does **not** return a proxy object, but a real `std::string` (by-value)!
          *
          * @assert{
@@ -899,6 +905,7 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
          * this object's internal value!
          *
@@ -1070,7 +1077,6 @@ namespace mpicxx {
         }
 
 
-        // TODO 2019-12-03 18:45 marcel: correctly document iterator invalidation
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  modifier                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
@@ -1079,7 +1085,7 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @post The info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`.
-         * @post Invalidates any iterator referring to contained elements. Any past-the-end iterator remains valid.
+         * @post Invalidates **all** iterators referring to `*this`.
          *
          * @assert{ If called with a moved-from object. }
          *
@@ -1112,6 +1118,7 @@ namespace mpicxx {
          * @pre **Both** @p key **and** @p value **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1156,6 +1163,7 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include a null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @post If an assertion took place, all iterators before **any** insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1202,6 +1210,7 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include a null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1226,6 +1235,7 @@ namespace mpicxx {
          * @pre **Both** @p key **and** @p value **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1268,6 +1278,7 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include a null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @post If an assertion took place, all iterators before **any** insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1309,6 +1320,7 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include a null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1329,6 +1341,7 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p pos **must** refer to `*this` info object.
          * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
+         * @post All iterators before the erasure point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1353,6 +1366,7 @@ namespace mpicxx {
             MPI_Info_delete(info_, key);
             return iterator(info_, pos.pos_);
         }
+        // TODO 2019-12-12 19:25 marcel: MPI guarantees
         /**
          * @brief Removes the elements in the range [first, last).
          * @details [first, last) must be a valid range in `*this`.
@@ -1408,6 +1422,7 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @post If an erasure took place, all iterators before the erasure point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1439,8 +1454,8 @@ namespace mpicxx {
          * @details Does not invoke any move, copy, or swap operations on individual elements.
          * @param[inout] other info object to exchange the contents with
          *
-         * @post All iterators and references remain valid. The past-the-end iterator is invalidated.
          * @post `*this` is in a valid state iff @p other was in a valid state (and vice versa).
+         * @post All iterators remain valid, but now refer to the other info object.
          */
         void swap(info& other) noexcept {
             using std::swap;
@@ -1456,6 +1471,7 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p pos **must** refer to `*this` info object.
          * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
+         * @post All iterators before the extraction point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1494,6 +1510,7 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @post If an extraction took place, all iterators before the extraction point remain valid, all other iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1528,6 +1545,7 @@ namespace mpicxx {
             return std::nullopt;
         }
 
+        // TODO 2019-12-12 19:35 marcel: MPI guarantees
         /**
          * @brief Attempts to extract each element in @p source and insert it into `*this`.
          * @details If there is an element in `*this` with key equivalent of an element from @p source, than the element is not extracted
@@ -1537,6 +1555,8 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p source **may not** be in the moved-from state.
+         * @post All iterators before **any** insertion point in `*this` remain valid, all other iterators in `*this` are invalidated.
+         * @post All iterators before **any** extraction point in @p other remain valid, all other iterators in @p other are invalidated.
          *
          * @assert{ If `*this` or @p source are in the moved-from state. }
          *
@@ -1779,6 +1799,7 @@ namespace mpicxx {
          * @param[inout] rhs the info object whose contents to swap with @p lhs
          *
          * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa).
+         * @post All iterators remain valid, but now refer to the other info object.
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
 
