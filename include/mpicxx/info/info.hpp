@@ -31,7 +31,7 @@
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
-     * <a href="https://en.cppreference.com/w/cpp/container/map">std::map</a>.
+     * [`std::map`](https://en.cppreference.com/w/cpp/container/map).
      *
      * TODO: usage example
      */
@@ -153,13 +153,13 @@ namespace mpicxx {
             //                                         iterator_traits definitions                                        //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
-             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * difference type to identify the distance between iterators
+             * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) difference type to identify the
+             * distance between iterators.
              */
             using difference_type = int;
             /**
-             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * value type that can be obtained by dereferencing the iterator
+             * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) value type that can be obtained
+             * by dereferencing the iterator.
              * @details In case of a non-const iterator, the value will be returned by a @ref info::string_proxy object to allow changing
              * its value. \n
              * In case of a const iterator, the value will directly be returned as `const std::string` because changing the
@@ -169,26 +169,20 @@ namespace mpicxx {
                                                   std::pair<const std::string, const std::string>,
                                                   std::pair<const std::string, string_proxy>>;
             /**
-             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * pointer type to the elements iterated over
+             * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) pointer type to the elements
+             * iterated over.
              * @details Because it is not possible to simply return value_type* (dangling pointer to a local object),
              * it is necessary to wrap value_type in a `std::unique_ptr`.
              */
             using pointer = std::unique_ptr<value_type>;
             /**
-             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * reference type (**not** meaningful because operator*() has to return **by-value** (using a string_proxy for write access))
+             * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) reference type
+             * (**not** meaningful because operator*() and operator->() has to return **by-value** (using a string_proxy for write access)).
              */
             using reference = value_type;
-            /**
-             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * iterator category
-             */
+            /// [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) iterator category.
             using iterator_category = std::random_access_iterator_tag;
-            /**
-             * @brief <a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><i>std::iterator_traits</i></a>
-             * iterator concept (for C++20 concepts)
-             */
+            /// [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) iterator concept (for C++20 concepts)
             using iterator_concept = std::random_access_iterator_tag;
 
 
@@ -439,7 +433,7 @@ namespace mpicxx {
              * for access operations see @ref string_proxy
              * }
              */
-            value_type operator[](const int n) const {
+            reference operator[](const int n) const {
                 // calculate size if in debug mode to assert an out-of-bounds access
 #ifndef NDEBUG
                 int nkeys;
@@ -504,7 +498,7 @@ namespace mpicxx {
              * for access operations see @ref string_proxy
              * }
              */
-            value_type operator*() const {
+            reference operator*() const {
                 return this->operator[](0);
             }
             /**
@@ -533,15 +527,9 @@ namespace mpicxx {
         using iterator = info_iterator<false>;
         /// Alias for a const_iterator using the `info_iterator` template class with `is_const` set to `true`.
         using const_iterator = info_iterator<true>;
-        /**
-         * @brief Alias for the reverse_iterator using
-         * <a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator"><i>std::reverse_iterator</i></a>.
-         */
+        /// Alias for a reverse_iterator using [`std::reverse_iterator`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator).
         using reverse_iterator = std::reverse_iterator<iterator>;
-        /**
-         * @brief Alias for the const_reverse_iterator using
-         * <a href="https://en.cppreference.com/w/cpp/iterator/reverse_iterator"><i>std::reverse_iterator</i></a>.
-         */
+        /// Alias for a const_reverse_iterator using [`std::reverse_iterator`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator).
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         /**
@@ -602,8 +590,7 @@ namespace mpicxx {
         /**
          * @brief Constructs this info object with the contents of the range [first, last).
          * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
-         * @tparam InputIt must meet the requirements of
-         * <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>.
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          *
@@ -1162,8 +1149,7 @@ namespace mpicxx {
         /**
          * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
          * @details If multiple elements in the range have the same key, the **first** occurrence determines the value.
-         * @tparam InputIt must meet the requirements of
-         * <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>.
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          *
@@ -1275,8 +1261,7 @@ namespace mpicxx {
         /**
          * @brief Inserts or assigns elements from range [first, last) to this info object.
          * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
-         * @tparam InputIt must meet the requirements of
-         * <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>.
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          *
