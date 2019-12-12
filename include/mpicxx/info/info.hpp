@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-09
+ * @date 2019-12-12
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -21,6 +21,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <mpi.h>
 
@@ -1784,6 +1785,16 @@ namespace mpicxx {
          * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa).
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
+
+        template <typename Pred>
+        friend void erase_if(info& c, Pred pred);
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                            additional functions                                            //
+        // ---------------------------------------------------------------------------------------------------------- //
+        [[nodiscard]] std::vector<std::string> keys() const;
+        [[nodiscard]] std::vector<std::string> values() const;
 
 
         // ---------------------------------------------------------------------------------------------------------- //
