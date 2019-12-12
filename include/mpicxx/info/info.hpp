@@ -62,7 +62,7 @@ namespace mpicxx {
              * @pre @p value **must** include a null-terminator.
              * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
              *
-             * @assert{ If @p key exceeds its size limit. }
+             * @assert{ If @p value exceeds its size limit. }
              *
              * @calls{
              * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly once
@@ -78,7 +78,7 @@ namespace mpicxx {
 
             /**
              * @brief On read access return the value associated with the saved key.
-             * @details If the key doesn't exists yet, it will be inserted with an empty string as value, also returning an
+             * @details If the key doesn't exist yet, it will be inserted with an empty string as value, also returning an
              * empty `std::string`.
              * @return the value associated with key
              *
