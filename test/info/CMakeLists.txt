@@ -9,6 +9,7 @@ set(TEST_SOURCES
         info_modifier_test.cpp
         info_lookup_test.cpp
         info_non-member_functions_test.cpp
+        info_additional_functions_test.cpp
 )
 
 # create google test with MPI support

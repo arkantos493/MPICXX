@@ -1810,8 +1810,71 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            additional functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
-        [[nodiscard]] std::vector<std::string> keys() const;
-        [[nodiscard]] std::vector<std::string> values() const;
+        /**
+         * @brief Returns a `std::vector` containing all keys of this info object.
+         * @return all keys of this info object
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         *
+         * @assert{ If called with a moved-from object. }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // exactly 'this->size()' times
+         * }
+         */
+        [[nodiscard]] std::vector<std::string> keys() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            // create vector which will hold all keys
+            const size_type size = this->size();
+            std::vector<std::string> keys(size);
+            char key[MPI_MAX_INFO_KEY];
+
+            for (size_type i = 0; i < size; ++i) {
+                // get key and add it to the vector
+                MPI_Info_get_nthkey(info_, i, key);
+                keys[i] = key;
+            }
+
+            return keys;
+        }
+        /**
+         * @brief Returns a `std::vector` containing all values of this info object.
+         * @return all values of this info object
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         *
+         * @assert{ If called with a moved-from object. }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly 'this->size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly 'this->size()' times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly 'this->size()' times
+         * }
+         */
+        [[nodiscard]] std::vector<std::string> values() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            // create vector which will hold all values
+            const size_type size = this->size();
+            std::vector<std::string> values(size);
+            char key[MPI_MAX_INFO_KEY];
+
+            for (size_type i = 0; i < size; ++i) {
+                // get key
+                MPI_Info_get_nthkey(info_, i, key);
+                // get value associated with key and add it to the vector
+                int valuelen, flag;
+                MPI_Info_get_valuelen(info_, key, &valuelen, &flag);
+                std::string value(valuelen, ' ');
+                MPI_Info_get(info_, key, valuelen, value.data(), &flag);
+                values[i] = std::move(value);
+            }
+
+            return values;
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
