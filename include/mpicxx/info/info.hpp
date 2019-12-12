@@ -796,8 +796,7 @@ namespace mpicxx {
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
          * @details Returns a proxy class which is used to distinguish between read and write accesses.
-         * @tparam T must meet the requirements of concept detail::string
-         * @param[in] key the key of the element to find
+         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
          * @return a proxy object
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -829,8 +828,7 @@ namespace mpicxx {
          * @endcode
          * }
          */
-        template <detail::string T>
-        string_proxy at(T&& key) {
+        string_proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
@@ -842,7 +840,7 @@ namespace mpicxx {
                 throw std::out_of_range("The specified key does not exist!");
             }
             // create proxy object and forward key
-            return string_proxy(info_, std::forward<T>(key));
+            return string_proxy(info_, std::forward<decltype(key)>(key));
         }
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
@@ -889,8 +887,7 @@ namespace mpicxx {
         /**
          * @brief Access the value associated with the given @p key.
          * @details Returns a proxy class which is used to distinguish between read and write accesses.
-         * @tparam T must meet the requirements of concept detail::string
-         * @param[in] key the key of the element to find
+         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
          * @return a proxy object
          *
          * Example:
@@ -923,15 +920,14 @@ namespace mpicxx {
          * @endcode
          * }
          */
-        template <detail::string T>
-        string_proxy operator[](T&& key) {
+        string_proxy operator[](detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // create proxy object and forward key
-            return string_proxy(info_, std::forward<T>(key));
+            return string_proxy(info_, std::forward<decltype(key)>(key));
         }
 
 
