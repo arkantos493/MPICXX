@@ -1955,6 +1955,11 @@ namespace mpicxx {
          * @return the *MPI_Info* object wrapped in this info object
          */
         [[nodiscard]] MPI_Info get() const noexcept { return info_; }
+        /**
+         * @brief Returns whether the underlying *MPI_Info* object gets automatically freed upon construction.
+         * @return destructor calls *MPI_Info_free* only if @ref freeable() const noexcept returns `true`
+         */
+        [[nodiscard]] bool freeable() const noexcept { return is_freeable_; }
 
 
     private:
