@@ -1948,11 +1948,6 @@ namespace mpicxx {
          * @brief Get the underlying *MPI_Info* object.
          * @return the *MPI_Info* object wrapped in this info object
          */
-        [[nodiscard]] MPI_Info get() noexcept { return info_; }
-        /**
-         * @brief Get the underlying *MPI_Info* object (as const).
-         * @return the *MPI_Info* object wrapped in this info object
-         */
         [[nodiscard]] MPI_Info get() const noexcept { return info_; }
 
     private:
