@@ -1970,11 +1970,6 @@ namespace mpicxx {
     // initialize static environment object
     inline const info info::env = info(MPI_INFO_ENV, false);
 
-    // without this templated friend functions would not be a member of the current namespace
-    // TODO 2019-12-12 21:43 marcel: remove this somehow
-    template <typename Pred>
-    inline void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, info::value_type>;
-
 }
 
 #endif // MPICXX_INFO_HPP
