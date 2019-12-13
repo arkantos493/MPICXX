@@ -520,8 +520,12 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                              alias definitions                                             //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// The type of the keys of the info object class.
+        using key_type = std::string;
+        /// The type of the value of the info object class.
+        using mapped_type = std::string;
         /// The value type saved in the info object class.
-        using value_type = std::pair<const std::string, std::string>;
+        using value_type = std::pair<const key_type, mapped_type>;
         /// The type used for every function which returns a value associated with an info objects size.
         using size_type = std::size_t;
         /// Alias for an iterator using the `info_iterator` template class with `is_const` set to `false`.
@@ -533,11 +537,13 @@ namespace mpicxx {
         /// Alias for a const_reverse_iterator using [`std::reverse_iterator`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator).
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+
         /**
          * @brief Static member that holds all environment information contained in *MPI_INFO_ENV*.
          * @details **No** *MPI_Info_free* gets called upon destruction.
          */
         static const info env;
+
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                        constructors and destructor                                         //
@@ -1949,6 +1955,7 @@ namespace mpicxx {
          * @return the *MPI_Info* object wrapped in this info object
          */
         [[nodiscard]] MPI_Info get() const noexcept { return info_; }
+
 
     private:
         /*
