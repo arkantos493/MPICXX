@@ -64,7 +64,10 @@ namespace mpicxx::utility {
      */
     template <typename... Args>
     inline void check(const bool cond, const char* cond_str, const source_location& loc, const char* msg, const Args... args) {
-        if (!cond) {
+        int rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        // only print on "master" rank
+        if (!cond && rank == 0) {
             std::cerr << "Assertion '" << cond_str << "' failed\n"
                       << "    in file " << loc.file_name() << "\n"
                       << "    in function '" << loc.function_name() << "'\n"
