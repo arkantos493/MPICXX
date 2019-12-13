@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-12
+ * @date 2019-12-13
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -820,7 +820,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
          * @endcode
          * On write: \n
          * @code
@@ -1126,10 +1126,10 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most once
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // at most 'this->size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);      // exactly once
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                      // at most once
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                        // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                 // at most 'this->size()' times
          * }
          */
         std::pair<iterator, bool> insert(const std::string_view key, const std::string_view value) {
@@ -1172,8 +1172,8 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // exactly 'last - first' times
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most 'last - first' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly 'last - first' times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most 'last - first' times
          * }
          */
         template <std::input_iterator InputIt>
@@ -1184,7 +1184,7 @@ namespace mpicxx {
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
                 // retrieve element
-                const auto [key, value] = *first;
+                const auto& [key, value] = *first;
 
                 MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                               "Info key to long!: max size: %i, provided size (including the null-terminator): %u",
@@ -1243,7 +1243,7 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
          * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // exactly once
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // at most 'this->size()' times
@@ -1430,8 +1430,8 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
-         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most once
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);      // exactly once
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                      // at most once
          * }
          */
         size_type erase(const std::string_view key) {
@@ -1518,8 +1518,8 @@ namespace mpicxx {
          * }
          *
          * @calls{
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at least once, at most twice
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at most once
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at least once, at most twice
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
          * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most once
          * }
          */
@@ -1562,8 +1562,8 @@ namespace mpicxx {
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at least 'source.size()' times, at most '2 * source.size()' times
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at most 'source.size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // at least 'source.size()' times, at most '2 * source.size()' times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most 'source.size()' times
          * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most 'source.size()' times
          * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most 'source.size()' times
          * }
@@ -1630,6 +1630,11 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] size_type count(const std::string_view key) const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
             return static_cast<size_type>(this->contains(key));
         }
         /**
@@ -1654,6 +1659,11 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] iterator find(const std::string_view key) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
             const size_type size = this->size();
             return iterator(info_, this->find_pos(key, size));
         }
@@ -1679,6 +1689,11 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_iterator find(const std::string_view key) const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
             const size_type size = this->size();
             return const_iterator(info_, this->find_pos(key, size));
         }
@@ -1702,6 +1717,11 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] bool contains(const std::string_view key) const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
             const size_type size = this->size();
             return this->find_pos(key, size) != size;
         }
@@ -1936,13 +1956,20 @@ namespace mpicxx {
         [[nodiscard]] MPI_Info get() const noexcept { return info_; }
 
     private:
-
+        /*
+         * @brief Finds the position of the given @p key in this info object.
+         * @param key the key to find
+         * @param size the current size of this info object
+         * @return the position of the @p key or @p size if the @p key does not exist
+         *
+         * @attention No assertions are performed because this function is only callable from within this class and every caller already checks
+         * all preconditions.
+         *
+         * @calls{
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
+         * }
+         */
         size_type find_pos(const std::string_view key, const size_type size) const {
-            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
-                          MPI_MAX_INFO_KEY, key.size() + 1);
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-
             char info_key[MPI_MAX_INFO_KEY];
             // loop until a matching key is found
             for (size_type i = 0; i < size; ++i) {
@@ -1956,10 +1983,21 @@ namespace mpicxx {
             return size;
         }
 
+        /*
+         * @brief Tests whether the given @p key already exists in this info object.
+         * @param key the key to check
+         * @return `true` if the @p key already exists, `false` otherwise
+         *
+         * @attention No assertions are performed because this function is only callable from within this class and every caller already checks
+         * all preconditions.
+         *
+         * @calls{
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // exactly once
+         * }
+         */
         bool key_exists(const std::string_view key) {
-            char value;
-            int flag;
-            MPI_Info_get(info_, key.data(), 0, &value, &flag);
+            int valuelen, flag;
+            MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
             return static_cast<bool>(flag);
         }
 
