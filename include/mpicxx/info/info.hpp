@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-13
+ * @date 2019-12-15
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -538,6 +538,9 @@ namespace mpicxx {
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                             static data member                                             //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Static member that holds all environment information contained in *MPI_INFO_ENV*.
          * @details **No** *MPI_Info_free* gets called upon destruction.
