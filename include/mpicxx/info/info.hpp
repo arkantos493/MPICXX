@@ -1820,7 +1820,12 @@ namespace mpicxx {
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
-        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
+        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) {
+            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (lhs).");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (rhs).");
+
+            return !(lhs == rhs);
+        }
         /**
          * @brief Specializes the `std::swap` algorithm for info objects. Swaps the contents of @p lhs and @p rhs.
          * @details Does not invoke any move, copy or swap operations on individual elements.
