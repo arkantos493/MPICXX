@@ -768,7 +768,7 @@ namespace mpicxx {
             is_freeable_ = std::move(rhs.is_freeable_);
             // set moved from object to the moved-from state
             rhs.info_ = MPI_INFO_NULL;
-            is_freeable_ = false;
+            rhs.is_freeable_ = false;
             return *this;
         }
         /**
