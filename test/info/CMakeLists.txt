@@ -16,12 +16,13 @@ set(TEST_SOURCES
         capacity/empty.cpp
         capacity/size.cpp
 
+        additional_functions/keys.cpp
+        additional_functions/values.cpp
+
         info_access_test.cpp
         info_iterator_test.cpp
         info_modifier_test.cpp
         info_lookup_test.cpp
-        info_non-member_functions_test.cpp
-        info_additional_functions_test.cpp
 )
 
 # create google test with MPI support
