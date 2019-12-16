@@ -1836,9 +1836,12 @@ namespace mpicxx {
          * @post All iterators remain valid, but now refer to the other info object.
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
-        // TODO 2019-12-12 21:40 marcel: MPI guarantees
         /**
          * @brief Erases all elements that satisfy the predicate @p pred from the info object.
+         * @details The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. Therefore (to be compliant with
+         * the standard) at first all keys of the [key, value]-pairs, which should be deleted, are saved in a `std::vector<std::string>>`.
+         * In a second step all [key, value]-pairs with a key contained in the vector are deleted.
          * @tparam Pred a valid predicate which accepts a `value_type` and returns a `bool`
          * @param[inout] c info object from which to erase
          * @param[in] pred predicate that returns `true` if the element should be erased
@@ -1861,8 +1864,10 @@ namespace mpicxx {
             info::size_type size = c.size();
             char key[MPI_MAX_INFO_KEY];
 
+            std::vector<std::string> keys_to_delete;
+
             // loop through all [key, value]-pairs
-            for (info::size_type i = 0; i < size; ) {
+            for (info::size_type i = 0; i < size; ++i) {
                 // get key
                 MPI_Info_get_nthkey(c.info_, i, key);
                 // get value associated with key
@@ -1872,15 +1877,17 @@ namespace mpicxx {
                 MPI_Info_get(c.info_, key, valuelen, value.data(), &flag);
                 // create [key, value]-pair as std::pair
                 info::value_type key_value_pair = std::make_pair(std::string(key), std::move(value));
+
                 // check whether the predicate holds
                 if (pred(key_value_pair)) {
-                    // the predicate evaluates to true -> erase the current element
-                    MPI_Info_delete(c.info_, key);
-                    --size;
-                } else {
-                    // the predicate evaluates to false -> go to next element
-                    ++i;
+                    // the predicate evaluates to true -> remember key for deletion
+                    keys_to_delete.emplace_back(std::move(key_value_pair.first));
                 }
+            }
+
+            // delete all [key, value]-pairs for which pred returns true
+            for (const auto& str : keys_to_delete) {
+                MPI_Info_delete(c.info_, str.data());
             }
         }
 
