@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-15
+ * @date 2019-12-16
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -1375,10 +1375,14 @@ namespace mpicxx {
             MPI_Info_delete(info_, key);
             return iterator(info_, pos.pos_);
         }
-        // TODO 2019-12-12 19:25 marcel: MPI guarantees
         /**
          * @brief Removes the elements in the range [first, last).
          * @details [first, last) must be a valid range in `*this`.
+         *
+         * The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. Therefore (to be compliant with
+         * the standard) at first all keys of the [key, value]-pairs, which should be deleted, are saved in a `std::vector<std::string>>`.
+         * In a second step all [key, value]-pairs with a key contained in the vector are deleted.
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          * @return iterator following the last removed element
@@ -1415,11 +1419,19 @@ namespace mpicxx {
 
             const int count = last - first;
             char key[MPI_MAX_INFO_KEY];
+            std::vector<std::string> keys_to_delete(count);
+
             // delete all [key, value]-pairs in the range [first, last)
             for (int i = 0; i < count; ++i) {
-                MPI_Info_get_nthkey(info_, first.pos_, key);
-                MPI_Info_delete(info_, key);
+                MPI_Info_get_nthkey(info_, first.pos_ + i, key);
+                keys_to_delete[i] = key;
             }
+
+            // delete all requested [key, value]-pairs
+            for (const auto& str : keys_to_delete) {
+                MPI_Info_delete(info_, str.data());
+            }
+
             return iterator(info_, first.pos_);
         }
         /**
@@ -1554,12 +1566,16 @@ namespace mpicxx {
             return std::nullopt;
         }
 
-        // TODO 2019-12-12 19:35 marcel: MPI guarantees
         /**
          * @brief Attempts to extract each element in @p source and insert it into `*this`.
          * @details If there is an element in `*this` with key equivalent of an element from @p source, than the element is not extracted
          * from @p source. \n
          * Directly returns if a "self-extraction" is attempted.
+         *
+         * The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. Therefore (to be compliant with
+         * the standard) at first all keys of the [key, value]-pairs, which should be deleted, are saved in a `std::vector<std::string>>`.
+         * In a second step all [key, value]-pairs with a key contained in the vector are deleted.
          * @param[inout] source the info object to transfer the [key, value]-pairs from
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -1584,33 +1600,33 @@ namespace mpicxx {
             // do nothing if a "self-merge" is attempted
             if (this == std::addressof(source)) return;
 
-            size_type source_size = source.size();
+            size_type size = source.size();
             char source_key[MPI_MAX_INFO_KEY];
-            size_type source_pos = 0;
+            std::vector<std::string> keys_to_delete;
 
             // loop as long as there is at least one [key, value]-pair not visited yet
-            while(source_pos != source_size) {
+            for (size_type i = 0; i < size; ++i) {
                 // get source_key
-                MPI_Info_get_nthkey(source.info_, source_pos, source_key);
+                MPI_Info_get_nthkey(source.info_, i, source_key);
 
                 // check if source_key already exists in *this
-                if (this->key_exists(source_key)) {
-                    // source_key already exists in *this -> check next key in source
-                    ++source_pos;
-                } else {
+                if (!this->key_exists(source_key)) {
                     // get the value associated with source_key
                     int valuelen, flag;
                     MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
                     char* source_value = new char[valuelen + 1];
                     MPI_Info_get(source.info_, source_key, valuelen, source_value, &flag);
-                    // remove [key, value]-pair from source info object
-                    MPI_Info_delete(source.info_, source_key);
+                    // remember the source's key
+                    keys_to_delete.emplace_back(source_key);
                     // add [key, value]-pair to *this info object
                     MPI_Info_set(info_, source_key, source_value);
-                    // source info object now contains one [key, value]-pair less
-                    --source_size;
                     delete[] source_value;
                 }
+            }
+
+            // delete all [key, value]-pairs merged into *this info object
+            for (const auto& str : keys_to_delete) {
+                MPI_Info_delete(source.info_, str.data());
             }
         }
 
