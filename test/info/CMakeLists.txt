@@ -13,9 +13,11 @@ set(TEST_SOURCES
         assignment/move_assignment.cpp
         assignment/initializer_list_assignment.cpp
 
+        capacity/empty.cpp
+        capacity/size.cpp
+
         info_access_test.cpp
         info_iterator_test.cpp
-        info_capacity_test.cpp
         info_modifier_test.cpp
         info_lookup_test.cpp
         info_non-member_functions_test.cpp
