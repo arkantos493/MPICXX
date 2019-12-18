@@ -16,6 +16,9 @@ set(TEST_SOURCES
         capacity/empty.cpp
         capacity/size.cpp
 
+        modifier/at.cpp
+        modifier/operator[].cpp
+
         non-member_functions/equality.cpp
         non-member_functions/inequality.cpp
         non-member_functions/swap.cpp
@@ -24,7 +27,6 @@ set(TEST_SOURCES
         additional_functions/keys.cpp
         additional_functions/values.cpp
 
-        info_access_test.cpp
         info_iterator_test.cpp
         info_modifier_test.cpp
         info_lookup_test.cpp
