@@ -1,7 +1,7 @@
 /**
  * @file copy_construction.cpp
  * @author Marcel Breyer
- * @date 2019-12-15
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -14,7 +14,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(CopyConstructionTest, CreateFromValidObject) {
+TEST(ConstructionTest, CopyConstructFromValidObject) {
     mpicxx::info info;
     // add an element to the info object and be sure the key was successfully added
     MPI_Info_set(info.get(), "key", "value");
@@ -64,7 +64,7 @@ TEST(CopyConstructionTest, CreateFromValidObject) {
     EXPECT_EQ(info.freeable(), is_freeable);
 }
 
-TEST(CopyConstructionTest, CreateFromMovedFromObject) {
+TEST(ConstructionTest, CopyConstructFromMovedFromObject) {
     // create an new info object by invoking the move constructor
     mpicxx::info move_dummy;
     mpicxx::info dummy(std::move(move_dummy));

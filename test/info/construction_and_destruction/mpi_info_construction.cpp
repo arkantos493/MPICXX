@@ -1,7 +1,7 @@
 /**
  * @file mpi_info_construction.cpp
  * @author Marcel Breyer
- * @date 2019-12-15
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -14,7 +14,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(MPIInfoConstructionTest, CreateFromValidObject) {
+TEST(ConstructionTest, MPIConstructFromValidObject) {
     MPI_Info info_ptr;
     MPI_Info_create(&info_ptr);
     MPI_Info_set(info_ptr, "key", "value");
@@ -45,7 +45,7 @@ TEST(MPIInfoConstructionTest, CreateFromValidObject) {
 //    MPI_Info_free(&info_ptr);
 }
 
-TEST(MPIInfoConstructionTest, CreateFromInvalidObject) {
+TEST(ConstructionTest, MPIConstructFromInvalidObject) {
     MPI_Info info_ptr = MPI_INFO_NULL;
 
     // construct an info object using a MPI_Info object

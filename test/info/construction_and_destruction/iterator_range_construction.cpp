@@ -1,7 +1,7 @@
 /**
  * @file iterator_range_construction.cpp
  * @author Marcel Breyer
- * @date 2019-12-15
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -16,7 +16,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorRangeConstructionTest, IteratorRangeConstruction) {
+TEST(ConstructionTest, IteratorRangeConstruction) {
     // create vector with alle [key, value]-pairs
     std::vector<std::pair<std::string, std::string>> key_value_pairs;
     key_value_pairs.emplace_back("key1", "value1");

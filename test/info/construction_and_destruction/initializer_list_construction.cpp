@@ -1,7 +1,7 @@
 /**
  * @file initializer_list_construction.cpp
  * @author Marcel Breyer
- * @date 2019-12-15
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -14,7 +14,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(InitializerListConstructionTest, InitializerListConstruction) {
+TEST(ConstructionTest, InitializerListConstruction) {
     // construct a info object using a std::initializer_list<>
     mpicxx::info info = { {"key1", "value1"},
                           {"key2", "value2"},
