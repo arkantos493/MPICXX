@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2019-12-18
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -71,7 +71,7 @@ namespace mpicxx {
              */
             void operator=(const std::string_view value) {
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                              "Info value to long!: max size: %i, provided size (with null-terminator): %u",
+                              "Info value too long!: max. size: %i, provided size (with the null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
                 MPI_Info_set(ptr_, key_.data(), value.data());
@@ -79,12 +79,14 @@ namespace mpicxx {
 
             /**
              * @brief On read access return the value associated with the saved key.
-             * @details If the key doesn't exist yet, it will be inserted with an empty string as value, also returning an
-             * empty `std::string`.
+             * @details If the key doesn't exist yet, it will be inserted with a string consisting only of one whitespace as value,
+             * also returning a `std::string(" ")`.
              * @return the value associated with key
              *
              * @attention This function returns the associated value *by-value*, i.e. changing the returned `std::string` **won't** alter
              * this object's internal value!
+             * @attention Because inserting an empty string `""` is not allowed, a `" "` string is inserted instead if the key does not
+             * already exist.
              *
              * @calls{
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
@@ -98,9 +100,9 @@ namespace mpicxx {
                 MPI_Info_get_valuelen(ptr_, key_.data(), &valuelen, &flag);
 
                 if (flag == 0) {
-                    // the key doesn't exist yet -> add a new [key, value]-pair and return an empty `std::string`
-                    MPI_Info_set(ptr_, key_.data(), "");
-                    return std::string();
+                    // the key doesn't exist yet -> add a new [key, value]-pair and return a `std::string` consisting of only one whitespace
+                    MPI_Info_set(ptr_, key_.data(), " ");
+                    return std::string(" ");
                 }
 
                 // key exists -> get the associated value
@@ -984,11 +986,11 @@ namespace mpicxx {
         string_proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
+                          "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // check whether the key really exists
-            if (this->key_exists(key)) {
+            if (!this->key_exists(key)) {
                 // key doesn't exist
                 throw std::out_of_range("The specified key does not exist!");
             }
@@ -1022,7 +1024,7 @@ namespace mpicxx {
         std::string at(const std::string_view key) const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
+                          "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             // get the length of the value associated with key
@@ -1041,13 +1043,16 @@ namespace mpicxx {
         /**
          * @brief Access the value associated with the given @p key.
          * @details Returns a proxy class which is used to distinguish between read and write accesses.
+         *
+         * `operator[]` is non-const because it inserts the @p key if it doesn't exist. If this behavior is undesirable or if the container
+         * is const, `at()` may be used.
          * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
          * @return a proxy object
          *
          * Example:
          * @code
-         * info_object["key"] = "value";              // write value
-         * std::string value = info_object["key"];    // read value
+         * info_object["key"] = "value";                    // add new [key, value]-pair or override existing value
+         * const std::string value = info_object["key"];    // read value associated with key
          * @endcode
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -1078,7 +1083,7 @@ namespace mpicxx {
         string_proxy operator[](detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
+                          "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // create proxy object and forward key
