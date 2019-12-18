@@ -32,6 +32,7 @@ namespace mpicxx::utility {
 
 // use custom implementation if no other is available
 namespace mpicxx::utility {
+    // TODO 2019-12-18 20:42 marcel: test! and maybe __PRETTY_FUNC__ ?
     /**
      * @brief Implementation of the
      * <a href="https://en.cppreference.com/w/cpp/utility/source_location">std::source_location</a> class.
@@ -50,15 +51,15 @@ namespace mpicxx::utility {
          */
         static source_location current(
                 const char* file = __builtin_FILE(),
-                const char* func = __builtin_FUNCITON(),
+                const char* func = __builtin_FUNCTION(),
                 const int line = __builtin_LINE(),
                 const int column = 0
                 ) noexcept {
             source_location loc;
-            loc.file = file;
-            loc.func = func;
-            loc.line = line;
-            loc.column = column;
+            loc.file_ = file;
+            loc.func_ = func;
+            loc.line_ = line;
+            loc.column_ = column;
             return loc;
         }
 
