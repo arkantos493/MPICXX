@@ -12,11 +12,11 @@
 namespace mpicxx::detail {
 
     /**
-     * @brief Concepts that describes every "string" type, i.e. `std::string`, `char*` and `char[]`.
+     * @brief Concepts that describes every "string" type, i.e. `std::string`, `std::string_view`, `const char*` and `char[]`.
      * @tparam T
      */
     template <typename T>
-    concept string = std::is_same_v<std::string, std::remove_cvref_t<T>> || std::is_convertible_v<std::decay_t<T>, const char*>;
+    concept string = std::is_constructible_v<std::string, T>;
 
 }
 
