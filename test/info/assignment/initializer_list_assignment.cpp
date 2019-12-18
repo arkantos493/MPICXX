@@ -1,7 +1,7 @@
 /**
  * @file initializer_list_assignment.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -14,7 +14,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(InitializerListAssignmentTest, AssignInitializerListToValid) {
+TEST(AssignmentTest, AssignInitializerListToValid) {
     // create info object and add one element
     mpicxx::info info;
     MPI_Info_set(info.get(), "key", "value");
@@ -41,7 +41,7 @@ TEST(InitializerListAssignmentTest, AssignInitializerListToValid) {
     EXPECT_STREQ(value, "value2");
 }
 
-TEST(InitializerListAssignmentTest, AssignInitializerListToMovedFrom) {
+TEST(AssignmentTest, AssignInitializerListToMovedFrom) {
     // create info object and set it to the "moved-from" state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));

@@ -1,7 +1,7 @@
 /**
  * @file move_assignment.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -14,7 +14,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(MoveAssignmentTest, AssignValidToValid) {
+TEST(AssignmentTest, MoveAssignValidToValid) {
     // create empty info objects and add one element each
     mpicxx::info info_1;
     MPI_Info_set(info_1.get(), "key1", "value1");
@@ -37,7 +37,7 @@ TEST(MoveAssignmentTest, AssignValidToValid) {
     EXPECT_STREQ(value, "value2");
 }
 
-TEST(MoveAssignmentTest, AssignMovedFromToValid) {
+TEST(AssignmentTest, MoveAssignMovedFromToValid) {
     // create empty info objects and set them to the "moved-from" state
     mpicxx::info moved_from;
     mpicxx::info valid(std::move(moved_from));
@@ -52,7 +52,7 @@ TEST(MoveAssignmentTest, AssignMovedFromToValid) {
     EXPECT_FALSE(moved_from.freeable());
 }
 
-TEST(MoveAssignmentTest, AssignValidToMovedFrom) {
+TEST(AssignmentTest, MoveAssignValidToMovedFrom) {
     // create empty info objects and set them to the "moved-from" state
     mpicxx::info moved_from;
     mpicxx::info valid(std::move(moved_from));
@@ -75,7 +75,7 @@ TEST(MoveAssignmentTest, AssignValidToMovedFrom) {
     EXPECT_STREQ(value, "value");
 }
 
-TEST(MoveAssignmentTest, AssignMovedFromToMovedFrom) {
+TEST(AssignmentTest, MoveAssignMovedFromToMovedFrom) {
     // create empty info objects and set them to the "moved-from" state
     mpicxx::info moved_from_1;
     mpicxx::info dummy_1(std::move(moved_from_1));
@@ -92,7 +92,7 @@ TEST(MoveAssignmentTest, AssignMovedFromToMovedFrom) {
     EXPECT_FALSE(moved_from_2.freeable());
 }
 
-TEST(MoveAssignmentTest, NonFreeable) {
+TEST(AssignmentTest, MoveNonFreeable) {
     // create empty info object
     mpicxx::info info;
     // create non-freable info object

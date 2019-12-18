@@ -1,7 +1,7 @@
 /**
  * @file copy_assignment.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2019-12-18
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -14,7 +14,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(CopyAssignmentTest, AssignValidToValid) {
+TEST(AssignmentTest, CopyAssignValidToValid) {
     // create first info object
     mpicxx::info info_1;
     MPI_Info_set(info_1.get(), "key1", "value1");
@@ -47,7 +47,7 @@ TEST(CopyAssignmentTest, AssignValidToValid) {
     EXPECT_EQ(nkeys, 1);
 }
 
-TEST(CopyAssignmentTest, AssignMovedFromToValid) {
+TEST(AssignmentTest, CopyAssignMovedFromToValid) {
     // create empty info objects
     mpicxx::info moved_from;
     mpicxx::info valid(std::move(moved_from));
@@ -56,7 +56,7 @@ TEST(CopyAssignmentTest, AssignMovedFromToValid) {
 //    valid = moved_from;     // -> should assert
 }
 
-TEST(CopyAssignmentTest, AssignValidToMovedFrom) {
+TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
     // create first info object and set it to the "moved-from" state
     mpicxx::info info_1;
     mpicxx::info dummy(std::move(info_1));
@@ -92,7 +92,7 @@ TEST(CopyAssignmentTest, AssignValidToMovedFrom) {
     EXPECT_EQ(nkeys, 1);
 }
 
-TEST(CopyAssignmentTest, AssignMovedFromToMovedFrom) {
+TEST(AssignmentTest, CopyAssignMovedFromToMovedFrom) {
     // create empty info objects and set them to the "moved-from" state
     mpicxx::info moved_from_1;
     mpicxx::info dummy_1(std::move(moved_from_1));
@@ -103,7 +103,7 @@ TEST(CopyAssignmentTest, AssignMovedFromToMovedFrom) {
 //    moved_from_1 = moved_from_2;     // -> should assert
 }
 
-TEST(CopyAssignmentTest, SelfAssignment) {
+TEST(AssignmentTest, CopySelfAssignment) {
     // create empty info object
     mpicxx::info info;
     // add a [key, value]-pair
@@ -127,7 +127,7 @@ TEST(CopyAssignmentTest, SelfAssignment) {
     EXPECT_EQ(info.freeable(), is_freeable);
 }
 
-TEST(CopyAssignmentTest, NonFreeable) {
+TEST(AssignmentTest, CopyNonFreeable) {
     // create empty info object
     mpicxx::info info;
     // create non-freable info object
