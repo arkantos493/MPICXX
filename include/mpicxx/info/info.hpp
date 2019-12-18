@@ -983,7 +983,7 @@ namespace mpicxx {
          * @endcode
          * }
          */
-        string_proxy at(detail::string auto&& key) {
+        [[nodiscard]] string_proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
@@ -1021,7 +1021,7 @@ namespace mpicxx {
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
          * }
          */
-        std::string at(const std::string_view key) const {
+        [[nodiscard]] std::string at(const std::string_view key) const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
@@ -1080,7 +1080,7 @@ namespace mpicxx {
          * @endcode
          * }
          */
-        string_proxy operator[](detail::string auto&& key) {
+        [[nodiscard]] string_proxy operator[](detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
