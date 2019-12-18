@@ -804,150 +804,6 @@ namespace mpicxx {
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                               element access                                               //
-        // ---------------------------------------------------------------------------------------------------------- //
-        /**
-         * @brief Access the value associated with the given @p key including bounds checks.
-         * @details Returns a proxy class which is used to distinguish between read and write accesses.
-         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
-         * @return a proxy object
-         *
-         * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The @p key **must** already exist, otherwise an exception will be thrown.
-         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
-         * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value!
-         *
-         * @assert{
-         * If called with a moved-from object. \n
-         * If @p key exceeds its size limit.
-         * }
-         *
-         * @throws std::out_of_range if the info object does not have an element with the specified key
-         *
-         * @calls_ref{
-         * @code
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
-         * @endcode
-         * On write: \n
-         * @code
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // exactly once
-         * @endcode
-         * On read: \n
-         * @code
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
-         * @endcode
-         * }
-         */
-        string_proxy at(detail::string auto&& key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
-                          MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
-
-            // check whether the key really exists
-            if (this->key_exists(key)) {
-                // key doesn't exist
-                throw std::out_of_range("The specified key does not exist!");
-            }
-            // create proxy object and forward key
-            return string_proxy(info_, std::forward<decltype(key)>(key));
-        }
-        /**
-         * @brief Access the value associated with the given @p key including bounds checks.
-         * @param[in] key the key of the element to find
-         * @return the value associated with @p key
-         *
-         * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The @p key **must** already exist, otherwise an exception will be thrown.
-         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
-         * @attention This const overload does **not** return a proxy object, but a real `std::string` (by-value)!
-         *
-         * @assert{
-         * If called with a moved-from object. \n
-         * If @p key exceeds its size limit.
-         * }
-         *
-         * @throws std::out_of_range if the info object does not have an element with the specified key
-         *
-         * @calls{
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
-         * }
-         */
-        std::string at(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
-                          MPI_MAX_INFO_KEY, key.size() + 1);
-
-            // get the length of the value associated with key
-            int valuelen, flag;
-            MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
-            // check whether the key really exists
-            if (flag == 0) {
-                // key doesn't exist
-                throw std::out_of_range("The specified key does not exist!");
-            }
-            // get the value associated with key
-            std::string value(valuelen, ' ');
-            MPI_Info_get(info_, key.data(), valuelen, value.data(), &flag);
-            return value;
-        }
-        /**
-         * @brief Access the value associated with the given @p key.
-         * @details Returns a proxy class which is used to distinguish between read and write accesses.
-         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
-         * @return a proxy object
-         *
-         * Example:
-         * @code
-         * info_object["key"] = "value";              // write value
-         * std::string value = info_object["key"];    // read value
-         * @endcode
-         *
-         * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
-         * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value!
-         *
-         * @assert{
-         * If called with a moved-from object. \n
-         * If @p key exceeds its size limit.
-         * }
-         *
-         * @calls_ref{
-         * On write: \n
-         * @code
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // exactly once
-         * @endcode
-         * On read: \n
-         * @code
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
-         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most once
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
-         * @endcode
-         * }
-         */
-        string_proxy operator[](detail::string auto&& key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
-                          MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
-
-            // create proxy object and forward key
-            return string_proxy(info_, std::forward<decltype(key)>(key));
-        }
-
-
-        // ---------------------------------------------------------------------------------------------------------- //
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
@@ -1090,30 +946,143 @@ namespace mpicxx {
         //                                                  modifier                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Erase all elements from the info object.
+         * @brief Access the value associated with the given @p key including bounds checks.
+         * @details Returns a proxy class which is used to distinguish between read and write accesses.
+         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
+         * @return a proxy object
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @post The info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`.
-         * @post Invalidates **all** iterators referring to `*this`.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key **must** already exist, otherwise an exception will be thrown.
+         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
+         * this object's internal value!
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
+         * }
          *
-         * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // exactly 'this->size()' times
-         * int MPI_Info_delete(MPI_Info info, const char *key);         // exactly 'this->size()' times
+         * @throws std::out_of_range if the info object does not have an element with the specified key
+         *
+         * @calls_ref{
+         * @code
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
+         * @endcode
+         * On write: \n
+         * @code
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // exactly once
+         * @endcode
+         * On read: \n
+         * @code
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
+         * @endcode
          * }
          */
-        void clear() {
+        string_proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
+                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
-            const size_type size = this->size();
-            char key[MPI_MAX_INFO_KEY];
-            // repeat nkeys times and always remove the first element
-            for (size_type i = 0; i < size; ++i) {
-                MPI_Info_get_nthkey(info_, 0, key);
-                MPI_Info_delete(info_, key);
+            // check whether the key really exists
+            if (this->key_exists(key)) {
+                // key doesn't exist
+                throw std::out_of_range("The specified key does not exist!");
             }
+            // create proxy object and forward key
+            return string_proxy(info_, std::forward<decltype(key)>(key));
+        }
+        /**
+         * @brief Access the value associated with the given @p key including bounds checks.
+         * @param[in] key the key of the element to find
+         * @return the value associated with @p key
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key **must** already exist, otherwise an exception will be thrown.
+         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @attention This const overload does **not** return a proxy object, but a real `std::string` (by-value)!
+         *
+         * @assert{
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
+         * }
+         *
+         * @throws std::out_of_range if the info object does not have an element with the specified key
+         *
+         * @calls{
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
+         * }
+         */
+        std::string at(const std::string_view key) const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
+            // get the length of the value associated with key
+            int valuelen, flag;
+            MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
+            // check whether the key really exists
+            if (flag == 0) {
+                // key doesn't exist
+                throw std::out_of_range("The specified key does not exist!");
+            }
+            // get the value associated with key
+            std::string value(valuelen, ' ');
+            MPI_Info_get(info_, key.data(), valuelen, value.data(), &flag);
+            return value;
+        }
+        /**
+         * @brief Access the value associated with the given @p key.
+         * @details Returns a proxy class which is used to distinguish between read and write accesses.
+         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
+         * @return a proxy object
+         *
+         * Example:
+         * @code
+         * info_object["key"] = "value";              // write value
+         * std::string value = info_object["key"];    // read value
+         * @endcode
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include a null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
+         * this object's internal value!
+         *
+         * @assert{
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
+         * }
+         *
+         * @calls_ref{
+         * On write: \n
+         * @code
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // exactly once
+         * @endcode
+         * On read: \n
+         * @code
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most once
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
+         * @endcode
+         * }
+         */
+        string_proxy operator[](detail::string auto&& key) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
+                          "To be deleted info key to long!: max size: %i, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
+
+            // create proxy object and forward key
+            return string_proxy(info_, std::forward<decltype(key)>(key));
         }
 
         /**
@@ -1341,6 +1310,33 @@ namespace mpicxx {
          * }
          */
         void insert_or_assign(std::initializer_list<value_type> ilist) { this->insert_or_assign(ilist.begin(), ilist.end()); }
+
+        /**
+         * @brief Erase all elements from the info object.
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         * @post The info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`.
+         * @post Invalidates **all** iterators referring to `*this`.
+         *
+         * @assert{ If called with a moved-from object. }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);    // exactly 'this->size()' times
+         * int MPI_Info_delete(MPI_Info info, const char *key);         // exactly 'this->size()' times
+         * }
+         */
+        void clear() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+
+            const size_type size = this->size();
+            char key[MPI_MAX_INFO_KEY];
+            // repeat nkeys times and always remove the first element
+            for (size_type i = 0; i < size; ++i) {
+                MPI_Info_get_nthkey(info_, 0, key);
+                MPI_Info_delete(info_, key);
+            }
+        }
 
         /**
          * @brief Removes the element at @p pos.
