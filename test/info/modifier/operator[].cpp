@@ -79,7 +79,7 @@ TEST(ModifierTest, AccessOperatorWrite) {
     EXPECT_STREQ(value, "value1_override");
 }
 
-TEST(ModifierTest, AccessOperatorMovedFrom) {
+TEST(ModifierTest, MovedFromAccessOperator) {
     // create info object and set it to the "moved-from" state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));

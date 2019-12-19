@@ -67,7 +67,7 @@ TEST(ModifierTest, AtWrite) {
     EXPECT_STREQ(value, "value1_override");
 }
 
-TEST(ModifierTest, AtMovedFrom) {
+TEST(ModifierTest, MovedFromAt) {
     // create emtpy info and const info objects and set them to the "moved-from" state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));

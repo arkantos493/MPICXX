@@ -80,7 +80,7 @@ TEST(NonMemberFunctionTest, EraseIfAll) {
     EXPECT_EQ(nkeys, 0);
 }
 
-TEST(NonMemberFunctionTest, EraseIfMovedFrom) {
+TEST(NonMemberFunctionTest, MovedFromEraseIf) {
     // create empty info object and set it to the "moved-from" state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));

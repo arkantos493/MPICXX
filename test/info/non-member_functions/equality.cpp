@@ -45,7 +45,7 @@ TEST(NonMemberFunctionTest, EqualityInequal) {
     EXPECT_FALSE(info_1 == info_2);
 }
 
-TEST(NonMemberFunctionTest, EqualityMovedFrom) {
+TEST(NonMemberFunctionTest, MovedFromEquality) {
     // create two empty info objects and set them to the "moved-from" state
     mpicxx::info info_1;
     mpicxx::info dummy_1(std::move(info_1));
