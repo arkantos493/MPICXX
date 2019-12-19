@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-18
+ * @date 2019-12-19
  *
  * @brief Implements a wrapper class around the MPI info object.
  *

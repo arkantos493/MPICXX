@@ -1,6 +1,6 @@
 # specify all source files for this test suite
 set(TEST_SOURCES
-        info_env_test.cpp
+        env.cpp
 
         construction_and_destruction/default_construction.cpp
         construction_and_destruction/copy_construction.cpp
