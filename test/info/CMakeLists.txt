@@ -18,6 +18,8 @@ set(TEST_SOURCES
 
         modifier/at.cpp
         modifier/operator[].cpp
+        modifier/clear.cpp
+        modifier/swap.cpp
 
         lookup/count.cpp
         lookup/find.cpp
