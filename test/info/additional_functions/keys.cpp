@@ -51,3 +51,12 @@ TEST(NonMemberFunctionTest, Keys) {
         EXPECT_EQ(keys[i], correct_keys[i]);
     }
 }
+
+TEST(NonMemberFunctionTest, MovedFromKeys) {
+    // create info object and set it to the "moved-from" state
+    mpicxx::info info;
+    mpicxx::info dummy(std::move(info));
+
+    // call to empty from a "moved-from" info object is invalid
+//    [[maybe_unused]] const auto keys = info.keys();       // -> should assert
+}
