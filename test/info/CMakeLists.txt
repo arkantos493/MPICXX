@@ -19,6 +19,10 @@ set(TEST_SOURCES
         modifier/at.cpp
         modifier/operator[].cpp
 
+        lookup/count.cpp
+        lookup/find.cpp
+        lookup/contains.cpp
+
         non-member_functions/equality.cpp
         non-member_functions/inequality.cpp
         non-member_functions/swap.cpp
@@ -29,7 +33,6 @@ set(TEST_SOURCES
 
         info_iterator_test.cpp
         info_modifier_test.cpp
-        info_lookup_test.cpp
 )
 
 # create google test with MPI support
