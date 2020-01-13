@@ -607,7 +607,7 @@ namespace mpicxx {
          * @post All iterators referring to @p other remain valid, but now refer to `*this`.
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
-            // other should stay in an operable state
+            // set moved from object to the moved-from state
             other.info_ = MPI_INFO_NULL;
             other.is_freeable_ = false;
         }
@@ -733,7 +733,7 @@ namespace mpicxx {
          *
          * @pre @p rhs **may not** be in the moved-from state.
          * @post The assigned to info object is in a valid state.
-         * @attention Every copied info object is automatically marked freeable even if the copied-from is not.
+         * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
          *
          * @assert{ If called with a moved-from object. }
          *
@@ -764,7 +764,7 @@ namespace mpicxx {
          * @param[in] rhs another info object to use as data source
          * @return `*this`
          *
-         * @post The assigned to object is in a valid state iff @p rhs was in a valid state
+         * @post The assigned to object is in a valid state iff @p rhs was in a valid state.
          * @post @p rhs is now in the moved-from state.
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
          *
@@ -787,11 +787,11 @@ namespace mpicxx {
         }
         /**
          * @brief Replaces the contents with those identified by initializer list @p ilist.
-         * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
+         * @details If multiple elements in the range share the same key, the **last** occurrence determines the value.
          * @param ilist initializer list to initialize the elements of this info object with
          * @return `*this`
          *
-         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          * @post The assigned to info object is in a valid state.
