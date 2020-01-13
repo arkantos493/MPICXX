@@ -821,40 +821,40 @@ namespace mpicxx {
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Returns an iterator to the first element of this info object.
-         * @details If the info object is empty this iterator equals end().
+         * @brief Returns an @ref iterator to the first element of this info object.
+         * @details If the info object is empty, the returned @ref iterator will be equal to end().
          * @return iterator to the first element
          *
-         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
         [[nodiscard]] iterator begin() { return iterator(info_, 0); }
         /**
-         * @brief Returns an iterator to the element following the last element of this info object.
-         * @details This element acts as a placeholder; attempting to access it results in undefined behavior.
-         * @return iterator to the element following the last element
+         * @brief Returns an @ref iterator to the element following the last element of this info object.
+         * @details This element acts as a placeholder; attempting to access it results in **undefined behavior**.
+         * @return @ref iterator to the element following the last element
          *
          * @calls_ref{
          * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * for dereferencing operations see @ref info_iterator
+         * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] iterator end() { return iterator(info_, this->size()); }
         /**
-         * @brief Returns a const_iterator to the first element of this info object.
-         * @details If the info object is empty this const_iterator equals end().
-         * @return const_iterator to the first element
+         * @brief Returns a @ref const_iterator to the first element of this info object.
+         * @details If the info object is empty, the returned @ref const_iterator will be equal to cend().
+         * @return @ref const_iterator to the first element
          *
-         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
         [[nodiscard]] const_iterator begin() const { return const_iterator(info_, 0); }
         /**
-         * @brief Returns a const_iterator to the element following the last element of this info object.
-         * @details This element acts as a placeholder; attempting to access it results in undefined behavior.
-         * @return const_iterator to the element following the last element
+         * @brief Returns a @ref const_iterator to the element following the last element of this info object.
+         * @details This element acts as a placeholder; attempting to access it results in **undefined behavior**.
+         * @return @ref const_iterator to the element following the last element
          *
          * @calls_ref{
          * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * for dereferencing operations see @ref info_iterator
+         * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] const_iterator end() const { return const_iterator(info_, this->size()); }
@@ -868,41 +868,45 @@ namespace mpicxx {
         [[nodiscard]] const_iterator cend() const { return const_iterator(info_, this->size()); }
 
         /**
-         * @brief Returns a reverse_iterator to the first element of the reversed info object.
+         * @brief Returns a @ref reverse_iterator to the first element of the reversed info object.
          * @details It corresponds to the last element of the non-reversed info object.
-         * If the info object is empty, the returned reverse_iterator is equal to rend().
-         * @return reverse_iterator to the first element
+         * If the info object is empty, the returned @ref reverse_iterator will be equal to rend().
+         * @return @ref reverse_iterator to the first element
          *
          * @calls_ref{
          * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * for dereferencing operations see @ref info_iterator
+         * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
         /**
-         * @brief Returns a reverse_iterator to the element following the last element of the reversed info object.
+         * @brief Returns a @ref reverse_iterator to the element following the last element of the reversed info object.
          * @details It corresponds to the element preceding the first element of the non-reversed info object.
-         * This element acts as a placeholder, attempting to access it results in undefined behavior.
-         * @return reverse_iterator to the element following the last element
+         * This element acts as a placeholder, attempting to access it results in **undefined behavior**.
+         * @return @ref reverse_iterator to the element following the last element
          *
-         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
         [[nodiscard]] reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
         /**
-         * @brief Returns a const_reverse_iterator to the element following the last element of the reversed info object.
-         * @details It corresponds to the element preceding the first element of the non-reversed info object.
-         * This element acts as a placeholder, attempting to access it results in undefined behavior.
-         * @return const_reverse_iterator to the element following the last element
+         * @brief Returns a @ref const_reverse_iterator to the first element of the reversed info object.
+         * @details It corresponds to the last element of the non-reversed info object.
+         * If the info object is empty, the returned @ref const_reverse_iterator will be equal to crend().
+         * @return @ref const_reverse_iterator to the element following the last element
          *
-         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         * @calls_ref{
+         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
+         * For additionally called *MPI* functions see the @ref info_iterator documentation.
+         * }
          */
         [[nodiscard]] const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->cend()); }
         /**
-         * @brief Returns a const_reverse_iterator to the element one before the first element of this info object.
-         * @details Attempts to access this element, i.e. dereferencing the returned const_reverse_iterator, results in undefined behaviour.
-         * @return the const_reverse_iterator
+         * @brief Returns a @ref const_reverse_iterator to the element following the last element of the reversed info object.
+         * @details It corresponds to the element preceding the first element of the non-reversed info object.
+         * This element acts as a placeholder, attempting to access it results in **undefined behavior**.
+         * @return @ref const_reverse_iterator to the element following the last element
          *
-         * @calls_ref{ for dereferencing operations see @ref info_iterator }
+         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
         [[nodiscard]] const_reverse_iterator rend() const { return std::make_reverse_iterator(this->cbegin()); }
         /**
