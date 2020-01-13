@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2019-12-19
+ * @date 2020-01-13
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -11,6 +11,7 @@
 #ifndef MPICXX_INFO_HPP
 #define MPICXX_INFO_HPP
 
+#include <cstddef>
 #include <cstring>
 #include <initializer_list>
 #include <memory>
@@ -32,7 +33,7 @@
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
-     * [`std::map`](https://en.cppreference.com/w/cpp/container/map).
+     * [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map).
      *
      * TODO: usage example
      */
@@ -530,6 +531,16 @@ namespace mpicxx {
         using value_type = std::pair<const key_type, mapped_type>;
         /// The type used for every function which returns a value associated with an info objects size.
         using size_type = std::size_t;
+        /// The type used for the difference calculation of two pointers pointing to info objects.
+        using difference_type = std::ptrdiff_t;
+        /// The type of value_type used as a reference.
+        using reference = value_type&;
+        /// The type of value_type used as a const reference.
+        using const_reference = const value_type&;
+        /// The type of value_type used as a pointer.
+        using pointer = value_type*;
+        /// The type of value_type used as a const pointer.
+        using const_pointer = const value_type*;
         /// Alias for an iterator using the `info_iterator` template class with `is_const` set to `false`.
         using iterator = info_iterator<false>;
         /// Alias for a const_iterator using the `info_iterator` template class with `is_const` set to `true`.
