@@ -580,7 +580,7 @@ namespace mpicxx {
         /**
          * @brief Copy constructor. Constructs this info object with a copy of the contents of @p other.
          * @details Retains @p other's [key, value]-pair ordering.
-         * @param[in] other another info object to be used as source to initialize the elements of the container with
+         * @param[in] other another info object to be used as source to initialize the elements of this info object with
          *
          * @pre @p other **may not** be in the moved-from state.
          * @post The newly constructed info object is in a valid state.
@@ -600,7 +600,7 @@ namespace mpicxx {
         /**
          * @brief Move constructor. Constructs this info object with the contents of @p other using move semantics.
          * @details Retains @p other's [key, value]-pair ordering.
-         * @param[in] other another info object to be used as source to initialize the elements of the container with
+         * @param[in] other another info object to be used as source to initialize the elements of this info object with
          *
          * @post The newly constructed object is in a valid state iff @p other was in a valid state.
          * @post @p other is now in the moved-from state.
@@ -702,12 +702,12 @@ namespace mpicxx {
          * @details Only calls *MPI_Info_free* if:
          *      - The object is marked freeable. Only objects created through @ref info(MPI_Info, const bool) can be marked as non-freeable
          *        (or info objects which are moved-from such objects). \n
-         *        For example info::env is **non-freeable** due to the fact that the MPI runtime system would crash if
+         *        For example info::env is **non-freeable** due to the fact that the *MPI runtime system* would crash if
          *        *MPI_Info_free* is called with *MPI_INFO_ENV*.
          *      - This object ist **not** in the moved-from state.
          *
          * If any of this conditions is **not** fulfilled, no free function will be called (because doing so is unnecessary and would lead
-         * to a crash of the MPI runtime system).
+         * to a crash of the *MPI runtime system*).
          *
          * @post Invalidates **all** iterators referring to `*this`.
          *
