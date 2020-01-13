@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstring>
 #include <initializer_list>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <ostream>
@@ -923,7 +924,7 @@ namespace mpicxx {
         //                                                  capacity                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Checks if this info object has no elements, i.e. wheter `begin() == end()`.
+         * @brief Checks if this info object has no elements, i.e. whether `begin() == end()`.
          * @return `true` if this info object is empty, `false` otherwise
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -940,7 +941,8 @@ namespace mpicxx {
             return this->size() == 0;
         }
         /**
-         * @brief Returns the number of [key, value]-pairs in this info object, i.e. `std::distance(begin(), end())`.
+         * @brief Returns the number of [key, value]-pairs in this info object, i.e.
+         * [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(begin(), end())`.
          * @return the number of [key, value]-pairs in this info object
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -957,6 +959,20 @@ namespace mpicxx {
             int nkeys;
             MPI_Info_get_nkeys(info_, &nkeys);
             return static_cast<size_type>(nkeys);
+        }
+        /**
+         * @brief Returns the maximum number of [key, value]-pairs an info object is able to hold due to system or library implementation
+         * limitations, i.e. [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(begin(), end())` for the largest
+         * info object.
+         * @return maximum number of [key, value]-pairs
+         *
+         * @attention This value typically reflects the theoretical limit on the size of the info object, at most
+         * [`std::numeric_limits<`](https://en.cppreference.com/w/cpp/types/numeric_limits)@ref difference_type[`>::%max()`]
+         * (https://en.cppreference.com/w/cpp/types/numeric_limits).
+         * At runtime, the size of the info object may be limited to a value smaller than max_size() by the amount of RAM available.
+         */
+        [[nodiscard]] size_type max_size() const noexcept {
+            return std::numeric_limits<difference_type>::max();
         }
 
 

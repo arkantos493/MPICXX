@@ -15,6 +15,7 @@ set(TEST_SOURCES
 
         capacity/empty.cpp
         capacity/size.cpp
+        capacity/max_size.cpp
 
         modifier/at.cpp
         modifier/operator[].cpp
