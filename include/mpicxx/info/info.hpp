@@ -584,7 +584,7 @@ namespace mpicxx {
          *
          * @pre @p other **may not** be in the moved-from state.
          * @post The newly constructed info object is in a valid state.
-         * @attention Every copied info object is automatically marked **freeable** even if the copied-from is not.
+         * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
          *
          * @assert{ If called with a moved-from object. }
          *
@@ -607,20 +607,20 @@ namespace mpicxx {
          * @post All iterators referring to @p other remain valid, but now refer to `*this`.
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
-            // other should stay in a operable state
+            // other should stay in an operable state
             other.info_ = MPI_INFO_NULL;
             other.is_freeable_ = false;
         }
         /**
          * @brief Constructs this info object with the contents of the range [first, last).
-         * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
+         * @details If multiple elements in the range share the same key, the **last** occurrence determines the value.
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element in the range
          * @param[in] last iterator one-past the last element in the range
          *
          * Example:
          * @code
-         * std::vector<std::pair<std::string, std::string>> key_value_pairs;
+         * std::vector<std::pair<const std::string, std::string>> key_value_pairs;
          * key_value_pairs.emplace_back("key1", "value1");
          * key_value_pairs.emplace_back("key2", "value2");
          * key_value_pairs.emplace_back("key1", "value1_override");
@@ -633,7 +633,7 @@ namespace mpicxx {
          *
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
-         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
@@ -656,7 +656,7 @@ namespace mpicxx {
         }
         /**
          * @brief Constructs this info object with the contents of the initializer list @p init.
-         * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
+         * @details If multiple elements in the range share the same key, the **last** occurrence determines the value.
          * @param[in] init initializer list to initialize the elements of this info object with
          *
          * Example:
@@ -669,7 +669,7 @@ namespace mpicxx {
          * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
          * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
          *
-         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
@@ -694,6 +694,7 @@ namespace mpicxx {
          *
          * @post The newly constructed object is in a valid state iff @p other was in a valid state (i.e. **not** *MPI_INFO_NULL*).
          * @attention If @p is_freeable is set to `false` the user **has** to ensure that the *MPI_Info* object @p other gets properly freed
+         * via a call to *MPI_Info_free*.
          */
         constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) { }
         /**
