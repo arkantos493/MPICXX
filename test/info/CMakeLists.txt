@@ -25,6 +25,7 @@ set(TEST_SOURCES
         lookup/count.cpp
         lookup/find.cpp
         lookup/contains.cpp
+        lookup/equal_range.cpp
 
         non-member_functions/equality.cpp
         non-member_functions/inequality.cpp

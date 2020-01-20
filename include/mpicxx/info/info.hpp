@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2020-01-13
+ * @date 2020-01-20
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -63,7 +63,7 @@ namespace mpicxx {
              * @param value the value associated with key
              *
              * @pre @p value **must** include a null-terminator.
-             * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+             * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
              *
              * @assert{ If @p value exceeds its size limit. }
              *
@@ -635,8 +635,8 @@ namespace mpicxx {
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          * @pre All @p keys and @p values **must** include the null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
          *
          * @assert{
@@ -671,8 +671,8 @@ namespace mpicxx {
          * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
          *
          * @pre All @p keys and @p values **must** include the null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
          *
          * @assert{ If any key or value exceed their size limit. }
@@ -793,8 +793,8 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre All @p keys and @p values **must** include the null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post The assigned to info object is in a valid state.
          *
          * @assert{ If any key or value exceed their size limit. }
@@ -987,7 +987,7 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise an exception will be thrown.
          * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
@@ -1036,7 +1036,7 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise an exception will be thrown.
          * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
          * @attention This const overload does **not** return a proxy object, but a real `std::string` (by-value)!
@@ -1089,7 +1089,7 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
          * this object's internal value!
@@ -1131,8 +1131,8 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre **Both** @p key **and** @p value **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1176,8 +1176,8 @@ namespace mpicxx {
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          * @pre All @p keys and @p values **must** include a null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post If an assertion took place, all iterators before **any** insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1223,8 +1223,8 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre All @p keys and @p values **must** include a null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1248,8 +1248,8 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre **Both** @p key **and** @p value **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The @p value's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1291,8 +1291,8 @@ namespace mpicxx {
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          * @pre All @p keys and @p values **must** include a null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post If an assertion took place, all iterators before **any** insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1333,8 +1333,8 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre All @p keys and @p values **must** include a null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
          * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1475,7 +1475,7 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @post If an erasure took place, all iterators before the erasure point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1563,7 +1563,7 @@ namespace mpicxx {
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @post If an extraction took place, all iterators before the extraction point remain valid, all other iterators are invalidated.
          *
          * @assert{
@@ -1669,13 +1669,14 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Returns the number of elements with [**key**, value]-pair that compares equivalent to the specified @p key.
-         * @details Since info object doesn't allow duplicated keys the returned value is either 0 (key not found) or 1 (key found).
+         * @details Since info objects don't allow duplicated keys the returned value is either 0 (key not found) or 1 (key found).\n
+         * Therefore @ref contains(const std::string_view) const may be a better choice.
          * @param[in] key @p key value of the elements to count
-         * @return number of elements with [**key**, value]-pair that compares equivalent to @p key, which is either 1 or 0
+         * @return number of elements with [**key**, value]-pair that compares equivalent to @p key, which is either 0 or 1
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre @p key **must** include the null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1690,7 +1691,7 @@ namespace mpicxx {
         [[nodiscard]] size_type count(const std::string_view key) const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             return static_cast<size_type>(this->contains(key));
@@ -1698,13 +1699,14 @@ namespace mpicxx {
         /**
          * @brief Finds an element with [**key**, value]-pair equivalent to @p key.
          * @details If the key is found, returns an iterator pointing to the corresponding element,
-         * otherwise the past-the-end iterator is returned (see end()).
-         * @param[in] key key value of the element to search for
-         * @return iterator to an element with [**key**, value]-pair to @p key
+         * otherwise the past-the-end iterator is returned (see @ref end()).
+         * @param[in] key @p key value of the element to search for
+         * @return iterator to an element with [**key**, value]-pair equivalent to @p key
+         * or the past-the-end iterator if no such key is found
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre @p key **must** include the null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1719,7 +1721,7 @@ namespace mpicxx {
         [[nodiscard]] iterator find(const std::string_view key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
@@ -1728,13 +1730,14 @@ namespace mpicxx {
         /**
          * @brief Finds an element with [**key**, value]-pair equivalent to @p key.
          * @details If the key is found, returns a const_iterator pointing to the corresponding element,
-         * otherwise the past-the-end const_iterator is returned (see cend()).
-         * @param[in] key key value of the element to search for
-         * @return const_iterator to an element with [**key**, value]-pair to @p key
+         * otherwise the past-the-end const_iterator is returned (see @ref cend()).
+         * @param[in] key @p key value of the element to search for
+         * @return const_iterator to an element with [**key**, value]-pair equivalent to @p key
+         * or the past-the-end iterator if no such key is found
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre @p key **must** include the null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1749,7 +1752,7 @@ namespace mpicxx {
         [[nodiscard]] const_iterator find(const std::string_view key) const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
@@ -1761,8 +1764,8 @@ namespace mpicxx {
          * @return `true` if there is such an element, otherwise `false`
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater then *MPI_MAX_INFO_KEY*.
+         * @pre @p key **must** include the null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1777,11 +1780,95 @@ namespace mpicxx {
         [[nodiscard]] bool contains(const std::string_view key) const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key to long!: max size: %u, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
             return this->find_pos(key, size) != size;
+        }
+        /**
+         * @brief Returns a range containing all elements with [**key**, value]-pair that compare equal to @p key in this info object.
+         * The range is defined by two iterators, the first pointing to the first element of the wanted range and the second pointing past
+         * the last element of the range. \n
+         * Since info objects don't allow duplicated keys
+         * [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(it_range.first, it_range.second)`
+         * is either 0 (key not found) or 1 (key found). \n
+         * Therefore @ref find(const std::string_view) may be a better choice.
+         * @param[in] key @p key value to compare the elements to
+         * @return [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing a pair of iterators defining the wanted range;
+         * if there is no such element, past-the-end (see @ref end()) iterators are returned as both elements of the pair
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include the null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         *
+         * @assert{
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
+         * }
+         */
+        [[nodiscard]] std::pair<iterator, iterator> equal_range(const std::string_view key) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
+            const size_type size = this->size();
+            const size_type pos = this->find_pos(key, size);
+            if (pos != size) {
+                // found key in this info object
+                return std::make_pair(iterator(info_, pos), iterator(info_, pos + 1));
+            } else {
+                // the key is not in this info object
+                return std::make_pair(iterator(info_, size), iterator(info_, size));
+            }
+        }
+        /**
+         * @brief Returns a range containing all elements with [**key**, value]-pair that compare equal to @p key in this info object.
+         * The range is defined by two const_iterators, the first pointing to the first element of the wanted range and the second pointing
+         * past the last element of the range. \n
+         * Since info objects don't allow duplicated keys
+         * [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(const_it_range.first, const_it_range.second)`
+         * is either 0 (key not found) or 1 (key found). \n
+         * Therefore @ref find(const std::string_view) const may be a better choice.
+         * @param[in] key @p key value to compare the elements to
+         * @return [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing a pair of const_iterators defining the wanted
+         * range; if there is no such element, past-the-end (see @ref end()) const_iterators are returned as both elements of the pair
+         *
+         * @pre `*this` **may not** be in the moved-from state.
+         * @pre @p key **must** include the null-terminator.
+         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
+         *
+         * @assert{
+         * If called with a moved-from object. \n
+         * If @p key exceeds its size limit.
+         * }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
+         * }
+         */
+        [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const std::string_view key) const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
+                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          MPI_MAX_INFO_KEY, key.size() + 1);
+
+            const size_type size = this->size();
+            const size_type pos = this->find_pos(key, size);
+            if (pos != size) {
+                // found key in this info object
+                return std::make_pair(const_iterator(info_, pos), const_iterator(info_, pos + 1));
+            } else {
+                // the key is not in this info object
+                return std::make_pair(const_iterator(info_, size), const_iterator(info_, size));
+            }
         }
 
 
@@ -2029,12 +2116,12 @@ namespace mpicxx {
     private:
         /*
          * @brief Finds the position of the given @p key in this info object.
-         * @param key the key to find
+         * @param key the @p key to find
          * @param size the current size of this info object
-         * @return the position of the @p key or @p size if the @p key does not exist
+         * @return the position of the @p key or @p size if the @p key does not exist in this info object
          *
-         * @attention No assertions are performed because this function is only callable from within this class and every caller already checks
-         * all preconditions.
+         * @attention No assertions are performed because this function is only callable from within this class and
+         * every caller already checks all preconditions.
          *
          * @calls{
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);        // at most 'this->size()' times
@@ -2056,17 +2143,17 @@ namespace mpicxx {
 
         /*
          * @brief Tests whether the given @p key already exists in this info object.
-         * @param key the key to check
+         * @param key the @p key to check for
          * @return `true` if the @p key already exists, `false` otherwise
          *
-         * @attention No assertions are performed because this function is only callable from within this class and every caller already checks
-         * all preconditions.
+         * @attention No assertions are performed because this function is only callable from within this class and
+         * every caller already checks all preconditions.
          *
          * @calls{
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // exactly once
          * }
          */
-        bool key_exists(const std::string_view key) {
+        bool key_exists(const std::string_view key) const {
             int valuelen, flag;
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
             return static_cast<bool>(flag);
