@@ -1855,7 +1855,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state);
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
@@ -1876,10 +1876,10 @@ namespace mpicxx {
         //                                            non-member functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Compares two info objects for equality.
-         * @details Two info objects are equal iff their contents are equal including their ordering.
-         * @param[in] lhs the @p lhs info object whose contents to compare
-         * @param[in] rhs the @p rhs info object whose contents to compare
+         * @brief Compares the contents of the two info objects for equality.
+         * @details Two info objects compare equal iff they have the same size and their contents compare equal.
+         * @param[in] lhs the @p lhs info object to compare
+         * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are equal, `false` otherwise
          *
          * @pre @p lhs and @p rhs **may not** be in the moved-from state.
@@ -1888,49 +1888,54 @@ namespace mpicxx {
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most '2 * lhs.size()' times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
         [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (lhs).");
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (rhs).");
+            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "lhs is in the \"moved-from\" state");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "rhs is in the \"moved-from\" state");
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
             if (size != rhs.size()) return false;
 
             // check all [key, value]-pairs for equality
-            char lhs_key[MPI_MAX_INFO_KEY];
-            char rhs_key[MPI_MAX_INFO_KEY];
+            char key[MPI_MAX_INFO_KEY];
             for (size_type i = 0; i < size; ++i) {
-                // retrieve keys and compare them
-                MPI_Info_get_nthkey(lhs.info_, i, lhs_key);
-                MPI_Info_get_nthkey(rhs.info_, i, rhs_key);
-                if (std::strcmp(lhs_key, rhs_key) == 0) {
-                    // keys compare equal -> check values
-                    // get value lengths
-                    int lhs_valuelen, rhs_valuelen, flag;
-                    MPI_Info_get_valuelen(lhs.info_, lhs_key, &lhs_valuelen, &flag);
-                    MPI_Info_get_valuelen(rhs.info_, rhs_key, &rhs_valuelen, &flag);
-                    // allocate a buffer for each value with the correct length
-                    char* lhs_value = new char[lhs_valuelen + 1];
-                    char* rhs_value = new char[rhs_valuelen + 1];
-                    // retrieve values
-                    MPI_Info_get(lhs.info_, lhs_key, lhs_valuelen, lhs_value, &flag);
-                    MPI_Info_get(rhs.info_, rhs_key, rhs_valuelen, rhs_value, &flag);
-                    // check if the values are equal
-                    const bool are_values_equal = std::strcmp(lhs_value, rhs_value) == 0;
-                    // release buffer
-                    delete[] lhs_value;
-                    delete[] rhs_value;
-                    if (!are_values_equal) {
-                        // values compare inequal -> info objects can't be equal
-                        return false;
-                    }
-                } else {
-                    // keys compare inequal -> info objects can't be equal
+                // retrieve key
+                MPI_Info_get_nthkey(lhs.info_, i, key);
+
+                // check if rhs contains the current key
+                int valuelen, flag;
+                MPI_Info_get_valuelen(rhs.info_, key, &valuelen, &flag);
+                if (!static_cast<bool>(flag)) {
+                    // rhs does not contain the currently inspected lhs key -> info objects can't compare equal
+                    return false;
+                }
+
+                // both info objects contain the same key -> check for the respective values
+                int lhs_valuelen;
+                MPI_Info_get_valuelen(lhs.info_, key, &lhs_valuelen, &flag);
+                if (valuelen != lhs_valuelen) {
+                    // both values have different lengths -> different values -> info objects can't compare equal
+                    return false;
+                }
+
+                // allocate a buffer for each value with the correct length
+                char* lhs_value = new char[valuelen + 1];
+                char* rhs_value = new char[valuelen + 1];
+                // retrieve values
+                MPI_Info_get(lhs.info_, key, valuelen, lhs_value, &flag);
+                MPI_Info_get(rhs.info_, key, valuelen, rhs_value, &flag);
+                // check if the values are equal
+                const bool are_values_equal = std::strcmp(lhs_value, rhs_value) == 0;
+                // release buffer
+                delete[] lhs_value;
+                delete[] rhs_value;
+                if (!are_values_equal) {
+                    // values compare inequal -> info objects can't be equal
                     return false;
                 }
             }
@@ -1939,10 +1944,10 @@ namespace mpicxx {
             return true;
         }
         /**
-         * @brief Compares two info objects for inequality.
-         * @details Two info objects are inequal if they have different number of elements or at least one element compares inequal.
-         * @param[in] lhs the @p lhs info object whose contents to compare
-         * @param[in] rhs the @p rhs info object whose contents to compare
+         * @brief Compares the contents of the two info objects for inequality.
+         * @details Two info objects compare inequal iff they differ in size or at least one element compares inequal.
+         * @param[in] lhs the @p lhs info object to compare
+         * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are inequal, `false` otherwise
          *
          * @pre @p lhs and @p rhs **may not** be in the moved-from state.
@@ -1951,14 +1956,14 @@ namespace mpicxx {
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most '2 * lhs.size()' times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
         [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (lhs).");
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported (rhs).");
+            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "lhs is in the \"moved-from\" state");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "rhs is in the \"moved-from\" state");
 
             return !(lhs == rhs);
         }
