@@ -33,6 +33,7 @@
 
 // TODO 2020-01-22 16:25 marcel: consistency elements <-> [key, value]-pair, punctuation
 // TODO 2020-01-22 17:01 marcel: check for [in], [out], [inout]
+// TODO 2020-01-22 19:26 marcel: remaining tests
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
@@ -46,9 +47,10 @@ namespace mpicxx {
         //                                             string proxy class                                             //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief A proxy class for a `std::string` object to distinguish between a read or write access.
+         * @brief A proxy class for a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) object to distinguish between
+         * a read or write access.
          * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string_view) on a read access.\n
-         * Can be printed directly through an `operator<<` overload.
+         * Can be printed directly through an @ref operator<<(std::ostream&, const string_proxy&) overload.
          */
         class string_proxy {
         public:
@@ -60,11 +62,11 @@ namespace mpicxx {
             string_proxy(MPI_Info ptr, detail::string auto&& key) : ptr_(ptr), key_(std::forward<decltype(key)>(key)) { }
 
             /**
-             * @brief On write access, add the provided @p value and saved key to the referred info object.
+             * @brief On write access, add the provided @p value and saved key to the referred to info object.
              * @details Creates a new [key, value]-pair if the key doesn't already exist, otherwise overwrites the existing @p value.
              * @param value the value associated with key
              *
-             * @pre @p value **must** include a null-terminator.
+             * @pre @p value **must** include the null-terminator.
              * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
              *
              * @assert{ If @p value exceeds its size limit. }
@@ -84,12 +86,12 @@ namespace mpicxx {
             /**
              * @brief On read access return the value associated with the saved key.
              * @details If the key doesn't exist yet, it will be inserted with a string consisting only of one whitespace as value,
-             * also returning a `std::string(" ")`.
+             * also returning a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)`(" ")`.
              * @return the value associated with key
              *
-             * @attention This function returns the associated value *by-value*, i.e. changing the returned `std::string` **won't** alter
-             * this object's internal value!
-             * @attention Because inserting an empty string `""` is not allowed, a `" "` string is inserted instead if the key does not
+             * @attention This function returns the associated value *by-value*, i.e. changing the returned
+             * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) **won't** alter this object's internal value!
+             * @attention Because inserting an empty string `""` is not allowed, a `" "` string is inserted instead, if the key does not
              * already exist.
              *
              * @calls{
@@ -103,7 +105,7 @@ namespace mpicxx {
                 int valuelen, flag;
                 MPI_Info_get_valuelen(ptr_, key_.data(), &valuelen, &flag);
 
-                if (flag == 0) {
+                if (!static_cast<bool>(flag)) {
                     // the key doesn't exist yet -> add a new [key, value]-pair and return a `std::string` consisting of only one whitespace
                     MPI_Info_set(ptr_, key_.data(), " ");
                     return std::string(" ");
