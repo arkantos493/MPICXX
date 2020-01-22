@@ -983,17 +983,20 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
-         * @details Returns a proxy class which is used to distinguish between read and write accesses.
-         * @param[in] key the key of the element to find (must meet the requirements of the detail::string concept)
+         * @details Returns a proxy class which is used to distinguish between read and write access.
+         * @param[in] key the @p key of the element to find (must meet the requirements of the @p detail::string concept)
          * @return a proxy object
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
+         * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise an exception will be thrown.
-         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post On write access: As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators
+         * referring to `*this` are invalidated. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the element position or any
+         * elements after that are invalidated).
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value!
+         * this object's internal value! Changes can **only** be made through the proxy's `string_proxy::operator=()`.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1018,9 +1021,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] string_proxy at(detail::string auto&& key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
+                          "Info key too long!: max. size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // check whether the key really exists
@@ -1037,10 +1040,14 @@ namespace mpicxx {
          * @return the value associated with @p key
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
+         * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise an exception will be thrown.
          * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post On write access: As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators
+         * referring to `*this` are invalidated. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the element position or any
+         * elements after that are invalidated).
          * @attention This const overload does **not** return a proxy object, but a real `std::string` (by-value)!
          *
          * @assert{
@@ -1056,16 +1063,16 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::string at(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
+                          "Info key too long!: max. size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             // get the length of the value associated with key
             int valuelen, flag;
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
             // check whether the key really exists
-            if (flag == 0) {
+            if (!static_cast<bool>(flag)) {
                 // key doesn't exist
                 throw std::out_of_range("The specified key does not exist!");
             }
@@ -1076,7 +1083,7 @@ namespace mpicxx {
         }
         /**
          * @brief Access the value associated with the given @p key.
-         * @details Returns a proxy class which is used to distinguish between read and write accesses.
+         * @details Returns a proxy class which is used to distinguish between read and write access.
          *
          * `operator[]` is non-const because it inserts the @p key if it doesn't exist. If this behavior is undesirable or if the container
          * is const, `at()` may be used.
@@ -1090,11 +1097,14 @@ namespace mpicxx {
          * @endcode
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p key **must** include a null-terminator.
+         * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @post On write access: all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post On write access: As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators
+         * referring to `*this` are invalidated. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the element position or any
+         * elements after that are invalidated).
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value!
+         * this object's internal value! Changes can **only** be made through the proxy's `string_proxy::operator=()`.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1115,9 +1125,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] string_proxy operator[](detail::string auto&& key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "Info key too long!: max. size: %i, provided size (with the null-terminator): %u",
+                          "Info key too long!: max. size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // create proxy object and forward key
@@ -1132,10 +1142,13 @@ namespace mpicxx {
          * denoting whether the insertion took place
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre **Both** @p key **and** @p value **must** include a null-terminator.
+         * @pre **Both** @p key **and** @p value **must** include the null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the inserted element position or any
+         * elements after that are invalidated).
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1150,12 +1163,12 @@ namespace mpicxx {
          * }
          */
         std::pair<iterator, bool> insert(const std::string_view key, const std::string_view value) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key to long!: max size: %i, provided size (including the null-terminator): %u",
+                          "Info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
             MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                          "Info value to long!: max size: %i, provided size (including the null-terminator): %u",
+                          "Info value too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
             // check if key already exists
@@ -1168,7 +1181,8 @@ namespace mpicxx {
             return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
-         * @brief Inserts elements from range [first, last) if the info object does not already contain an element with an equivalent key.
+         * @brief Inserts elements from range [@p first, @p last) if the info object does not already contain an element with an
+         * equivalent key.
          * @details If multiple elements in the range have the same key, the **first** occurrence determines the value.
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element in the range
@@ -1177,10 +1191,13 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
-         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post If an assertion took place, all iterators before **any** insertion point remain valid, all other iterators are invalidated.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted element position
+         * or any elements after that are invalidated).
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1195,8 +1212,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         void insert(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
+            MPICXX_ASSERT(first <= last, "'first' must be less or equal than 'last'.");
 
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
@@ -1204,10 +1221,10 @@ namespace mpicxx {
                 const auto& [key, value] = *first;
 
                 MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                              "Info key to long!: max size: %i, provided size (including the null-terminator): %u",
+                              "Info key too long!: max size: %i, provided size (including the null-terminator): %u",
                               MPI_MAX_INFO_KEY, key.size() + 1);
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                              "Info value to long!: max size: %i, provided size (including the null-terminator): %u",
+                              "Info value too long!: max size: %i, provided size (including the null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
                 // check if key already exists
@@ -1227,7 +1244,10 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include a null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted element position
+         * or any elements after that are invalidated).
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1249,10 +1269,13 @@ namespace mpicxx {
          * denoting whether the insertion (`true`) or the assignment (`false`) took place
          *
          * @pre `*this` **may not** be in the moved-from state.
-         * @pre **Both** @p key **and** @p value **must** include a null-terminator.
+         * @pre **Both** @p key **and** @p value **must** include the null-terminator.
          * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the inserted element position
+         * or any elements after that are invalidated).
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1267,12 +1290,12 @@ namespace mpicxx {
          * }
          */
         std::pair<iterator, bool> insert_or_assign(const std::string_view key, const std::string_view value) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                          "Info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
             MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                          "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                          "Info value too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
             // check whether an insertion or assignment will take place
@@ -1283,7 +1306,7 @@ namespace mpicxx {
             return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
-         * @brief Inserts or assigns elements from range [first, last) to this info object.
+         * @brief Inserts or assigns elements from range [@p first, @p last) to this info object.
          * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element in the range
@@ -1292,10 +1315,13 @@ namespace mpicxx {
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
-         * @pre All @p keys and @p values **must** include a null-terminator.
+         * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post If an assertion took place, all iterators before **any** insertion point remain valid, all other iterators are invalidated.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted element position
+         * or any elements after that are invalidated).
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1309,8 +1335,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         void insert_or_assign(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
-            MPICXX_ASSERT(first <= last, "first must be less or equal than last.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
+            MPICXX_ASSERT(first <= last, "'first' must be less or equal than 'last'.");
 
             // insert or assign every element in the range [first, last)
             for (; first != last; ++first) {
@@ -1318,10 +1344,10 @@ namespace mpicxx {
                 const auto [key, value] = *first;
 
                 MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                              "Info key to long!: max size: %u, provided size (including null-terminator): %u",
+                              "Info key too long!: max size: %i, provided size (including null-terminator): %u",
                               MPI_MAX_INFO_KEY, key.size() + 1);
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                              "Info value to long!: max size: %u, provided size (including null-terminator): %u",
+                              "Info value too long!: max size: %i, provided size (including null-terminator): %u",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
                 // insert or assign [key, value]-pair
@@ -1337,7 +1363,10 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include a null-terminator.
          * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post If an assertion took place, all iterators before the insertion point remain valid, all other iterators are invalidated.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted element position
+         * or any elements after that are invalidated).
          *
          * @assert{
          * If called with a moved-from object. \n
