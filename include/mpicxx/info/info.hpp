@@ -1969,9 +1969,10 @@ namespace mpicxx {
         }
         /**
          * @brief Specializes the `std::swap` algorithm for info objects. Swaps the contents of @p lhs and @p rhs.
-         * @details Does not invoke any move, copy or swap operations on individual elements.
-         * @param[inout] lhs the info object whose contents to swap with @p rhs
-         * @param[inout] rhs the info object whose contents to swap with @p lhs
+         * @details Calls `lhs.swap(rhs)`. \n
+         * Does not invoke any move, copy or swap operations on individual elements.
+         * @param[inout] lhs the info object whose contents to swap
+         * @param[inout] rhs the info object whose contents to swap
          *
          * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa).
          * @post All iterators remain valid, but now refer to the other info object.
@@ -1980,14 +1981,20 @@ namespace mpicxx {
         /**
          * @brief Erases all elements that satisfy the predicate @p pred from the info object.
          * @details The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
-         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. Therefore (to be compliant with
-         * the standard) at first all keys of the [key, value]-pairs, which should be deleted, are saved in a `std::vector<std::string>>`.
-         * In a second step all [key, value]-pairs with a key contained in the vector are deleted.
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. \n
+         * Therefore (to be compliant with the standard) this function performs two steps:
+         * 1. Save all keys, for which the corresponding [key, value]-pair satisfies the predicate @p pred, in a
+         * [`std::vector<std::string>>`](https://en.cppreference.com/w/cpp/container/vector).
+         * 2. Delete all [key, value]-pairs in the info object @p c with a key contained in the previously created vector.
          * @tparam Pred a valid predicate which accepts a `value_type` and returns a `bool`
          * @param[inout] c info object from which to erase
          * @param[in] pred predicate that returns `true` if the element should be erased
          *
-         * @pre The info object @p c **may not** be in the moved-from state.
+         * @pre @p c **may not** be in the moved-from state.
+         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to @p c
+         * are invalidated. \n
+         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first erased element or any
+         * elements after that are invalidated).
          *
          * @assert{ If called with a moved-from object. }
          *
@@ -2000,9 +2007,9 @@ namespace mpicxx {
          */
         template <typename Pred>
         friend void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, value_type> {
-            MPICXX_ASSERT(c.info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(c.info_ != MPI_INFO_NULL, "c is in the \"moved-from\" state");
 
-            info::size_type size = c.size();
+            size_type size = c.size();
             char key[MPI_MAX_INFO_KEY];
 
             std::vector<std::string> keys_to_delete;
@@ -2017,11 +2024,11 @@ namespace mpicxx {
                 std::string value(valuelen, ' ');
                 MPI_Info_get(c.info_, key, valuelen, value.data(), &flag);
                 // create [key, value]-pair as std::pair
-                info::value_type key_value_pair = std::make_pair(std::string(key), std::move(value));
+                value_type key_value_pair = std::make_pair(std::string(key), std::move(value));
 
                 // check whether the predicate holds
                 if (pred(key_value_pair)) {
-                    // the predicate evaluates to true -> remember key for deletion
+                    // the predicate evaluates to true -> remember key for erasure
                     keys_to_delete.emplace_back(std::move(key_value_pair.first));
                 }
             }
@@ -2037,7 +2044,7 @@ namespace mpicxx {
         //                                            additional functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Returns a `std::vector` containing all keys of this info object.
+         * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all keys of this info object.
          * @return all keys of this info object
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -2050,7 +2057,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> keys() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
 
             // create vector which will hold all keys
             const size_type size = this->size();
@@ -2066,7 +2073,7 @@ namespace mpicxx {
             return keys;
         }
         /**
-         * @brief Returns a `std::vector` containing all values of this info object.
+         * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all values of this info object.
          * @return all values of this info object
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -2081,7 +2088,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> values() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
 
             // create vector which will hold all values
             const size_type size = this->size();
@@ -2108,12 +2115,13 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Get the underlying *MPI_Info* object.
-         * @return the *MPI_Info* object wrapped in this info object
+         * @return the *MPI_Info* object wrapped in this mpicxx::info object
          */
         [[nodiscard]] MPI_Info get() const noexcept { return info_; }
         /**
-         * @brief Returns whether the underlying *MPI_Info* object gets automatically freed upon construction.
-         * @return destructor calls *MPI_Info_free* only if @ref freeable() const noexcept returns `true`
+         * @brief Returns whether the underlying *MPI_Info* object gets automatically freed upon destruction, i.e. the destructor
+         * calls *MPI_Info_free*.
+         * @return `true` if *MPI_Info_free* gets called upon destruction, `false` otherwise
          */
         [[nodiscard]] bool freeable() const noexcept { return is_freeable_; }
 
