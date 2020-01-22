@@ -16,7 +16,7 @@ namespace mpicxx::detail {
      * @tparam T
      */
     template <typename T>
-    concept string = std::is_constructible_v<std::string, T>;
+    concept string = std::is_constructible_v<std::string, T>; // TODO 2020-01-22 18:07 marcel: is_constructible_v<std::string_view, T> ???
 
 }
 
