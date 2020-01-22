@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2020-01-20
+ * @date 2020-01-22
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -1689,9 +1689,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] size_type count(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             return static_cast<size_type>(this->contains(key));
@@ -1719,9 +1719,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] iterator find(const std::string_view key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
@@ -1750,9 +1750,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_iterator find(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
@@ -1778,9 +1778,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] bool contains(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
@@ -1813,9 +1813,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<iterator, iterator> equal_range(const std::string_view key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
@@ -1855,9 +1855,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state);
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Searched info key too long!: max size: %i, provided size (with null-terminator): %u",
+                          "Searched info key too long!: max size: %i, provided size (including the null-terminator): %u",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             const size_type size = this->size();
