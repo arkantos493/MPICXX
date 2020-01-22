@@ -32,7 +32,6 @@
 
 
 // TODO 2020-01-22 16:25 marcel: consistency elements <-> [key, value]-pair, punctuation
-// TODO 2020-01-22 17:01 marcel: check for [in], [out], [inout]
 // TODO 2020-01-22 19:26 marcel: remaining tests
 namespace mpicxx {
     /**
@@ -64,7 +63,7 @@ namespace mpicxx {
             /**
              * @brief On write access, add the provided @p value and saved key to the referred to info object.
              * @details Creates a new [key, value]-pair if the key doesn't already exist, otherwise overwrites the existing @p value.
-             * @param value the value associated with key
+             * @param[in] value the value associated with key
              *
              * @pre @p value **must** include the null-terminator.
              * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
@@ -120,8 +119,8 @@ namespace mpicxx {
             /**
              * @brief Convenient overload to be able to directly print a string_proxy object.
              * @details Calls @ref operator std::string() const to get the value that should be printed.
-             * @param out the output stream to write on
-             * @param rhs the string_proxy object
+             * @param[inout] out the output stream to write on
+             * @param[in] rhs the string_proxy object
              * @return the output stream
              *
              * @calls{
@@ -388,7 +387,7 @@ namespace mpicxx {
              * @details This iterator and @p rhs iterator may not necessarily have the same constness. \n
              * It holds: `it2 - it1 ==` [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(it1, it2)`
              * @tparam is_rhs_const determines whether the @p rhs iterator is const or not
-             * @param rhs the end iterator
+             * @param[in] rhs the end iterator
              * @return number of elements between this iterator and the @p rhs iterator
              *
              * @pre This iterator and @p rhs iterator have to point to the same info object.
@@ -692,8 +691,8 @@ namespace mpicxx {
         }
         /**
          * @brief Wrap a *MPI_Info* object in an info object.
-         * @param other the *MPI_Info* object
-         * @param is_freeable mark whether the *MPI_Info* object wrapped in this info object should be automatically
+         * @param[in] other the *MPI_Info* object
+         * @param[in] is_freeable mark whether the *MPI_Info* object wrapped in this info object should be automatically
          * freed at the end of its lifetime
          *
          * @post The newly constructed object is in a valid state iff @p other was in a valid state (i.e. **not** *MPI_INFO_NULL*).
@@ -792,7 +791,7 @@ namespace mpicxx {
         /**
          * @brief Replaces the contents with those identified by initializer list @p ilist.
          * @details If multiple elements in the range share the same key, the **last** occurrence determines the value.
-         * @param ilist initializer list to initialize the elements of this info object with
+         * @param[in] ilist initializer list to initialize the elements of this info object with
          * @return `*this`
          *
          * @pre All @p keys and @p values **must** include the null-terminator.
@@ -2182,8 +2181,8 @@ namespace mpicxx {
     private:
         /*
          * @brief Finds the position of the given @p key in this info object.
-         * @param key the @p key to find
-         * @param size the current size of this info object
+         * @param[in] key the @p key to find
+         * @param[in] size the current size of this info object
          * @return the position of the @p key or @p size if the @p key does not exist in this info object
          *
          * @attention No assertions are performed because this function is only callable from within this class and
@@ -2209,7 +2208,7 @@ namespace mpicxx {
 
         /*
          * @brief Tests whether the given @p key already exists in this info object.
-         * @param key the @p key to check for
+         * @param[in] key the @p key to check for
          * @return `true` if the @p key already exists, `false` otherwise
          *
          * @attention No assertions are performed because this function is only callable from within this class and
