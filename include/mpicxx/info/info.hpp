@@ -33,6 +33,7 @@
 
 // TODO 2020-01-22 16:25 marcel: consistency elements <-> [key, value]-pair, punctuation
 // TODO 2020-01-22 19:26 marcel: remaining tests
+// TODO 2020-01-24 18:57 marcel: moved-from state
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
@@ -718,7 +719,10 @@ namespace mpicxx {
          *
          * @assert{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
          */
-        constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) { }
+        constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) {
+            MPICXX_ASSERT(!(other == MPI_INFO_NULL && is_freeable == true), "MPI_INFO_NULL can't be marked freeable!"); // TODO 2020-01-24 18:58 marcel:
+            MPICXX_ASSERT(!(other == MPI_INFO_ENV && is_freeable == true), "MPI_INFO_ENV can't be marked freeable!");
+        }
         /**
          * @brief Destructs the info object.
          * @details Only calls *MPI_Info_free* if:
