@@ -757,11 +757,11 @@ namespace mpicxx {
          * @param[in] rhs another info object to use as data source
          * @return `*this`
          *
-         * @pre @p rhs **may not** be in the moved-from state.
+         * @pre @p rhs **must not** be in the moved-from state.
          * @post The assigned to info object is in a valid state.
          * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If @p rhs is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);                       // at most once
@@ -769,7 +769,7 @@ namespace mpicxx {
          * }
          */
         info& operator=(const info& rhs) {
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "Copying a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "'rhs' is in the moved-from state!");
 
             // check against self-assignment
             if (this != std::addressof(rhs)) {
@@ -790,7 +790,7 @@ namespace mpicxx {
          * @param[in] rhs another info object to use as data source
          * @return `*this`
          *
-         * @post The assigned to object is in a valid state iff @p rhs was in a valid state.
+         * @post The assigned to info object is in a valid state iff @p rhs was in a valid state.
          * @post @p rhs is now in the moved-from state.
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
          *
@@ -813,8 +813,8 @@ namespace mpicxx {
         }
         /**
          * @brief Replaces the contents with those identified by initializer list @p ilist.
-         * @details If multiple elements in the range share the same key, the **last** occurrence determines the value.
-         * @param[in] ilist initializer list to initialize the elements of this info object with
+         * @details If multiple [key, value]-pairs in the range share the same key, the **last** occurrence determines the final value.
+         * @param[in] ilist initializer list to initialize the [key, value]-pairs of the info object with
          * @return `*this`
          *
          * @pre All @p keys and @p values **must** include the null-terminator.
