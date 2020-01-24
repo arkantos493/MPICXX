@@ -1,7 +1,7 @@
 /**
  * @file assert.hpp
  * @author Marcel Breyer
- * @date 2019-11-24
+ * @date 2020-01-24
  *
  * @brief Provides a more verbose assert alternative.
  *
@@ -64,8 +64,12 @@ namespace mpicxx::utility {
      */
     template <typename... Args>
     inline void check(const bool cond, const char* cond_str, const source_location& loc, const char* msg, const Args... args) {
-        int rank;
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        int rank = 0;
+        int is_initialized = 0;
+        MPI_Initialized(&is_initialized);
+        if (static_cast<bool>(is_initialized)) {
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        }
         // only print on "master" rank
         if (!cond && rank == 0) {
             std::cerr << "Assertion '" << cond_str << "' failed\n"
@@ -76,11 +80,10 @@ namespace mpicxx::utility {
             std::cerr << std::endl;
             // call MPI_Abort only if we are currently in the MPI environment
             // i.e. MPI_Init has already been called, but MPI_Finalize not
-            int is_initialized = 0;
             MPI_Initialized(&is_initialized);
             int is_finalized = 0;
             MPI_Finalized(&is_finalized);
-            if (is_initialized != 0 && is_finalized == 0) {
+            if (static_cast<bool>(is_initialized) && static_cast<bool>(is_finalized)) {
                 // we are currently in an active MPI environment
                 // -> call MPI_Abort
                 MPI_Abort(MPI_COMM_WORLD, 1);
