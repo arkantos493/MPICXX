@@ -819,8 +819,8 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre All @p keys and @p values **must** include the null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
+         * @pre The length of **any** key (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_VAL*.
          * @post The assigned to info object is in a valid state.
          *
          * @assert{ If any key or value exceed their size limit. }
