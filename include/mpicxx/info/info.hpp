@@ -524,17 +524,17 @@ namespace mpicxx {
 
     public:
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                              alias definitions                                             //
+        //                                                member types                                                //
         // ---------------------------------------------------------------------------------------------------------- //
-        /// The type of the keys of the info object class.
+        /// The type of a key.
         using key_type = std::string;
-        /// The type of the value of the info object class.
+        /// The type of a value associated with a key.
         using mapped_type = std::string;
-        /// The value type saved in the info object class.
+        /// The type of a [key, value]-pair.
         using value_type = std::pair<const key_type, mapped_type>;
-        /// The type used for every function which returns a value associated with an info objects size.
+        /// Unsigned integer type.
         using size_type = std::size_t;
-        /// The type used for the difference calculation of two pointers pointing to info objects.
+        /// Signed integer type.
         using difference_type = std::ptrdiff_t;
         /// The type of value_type used as a reference.
         using reference = value_type&;
