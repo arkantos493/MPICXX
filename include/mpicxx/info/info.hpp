@@ -558,8 +558,25 @@ namespace mpicxx {
         //                                             static data member                                             //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Static member that holds all environment information contained in *MPI_INFO_ENV*.
-         * @details **No** *MPI_Info_free* gets called upon destruction.
+         * @brief Static member that holds all execution environment information defined in *MPI_INFO_ENV*.
+         * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) predefined keys of *MPI_INFO_ENV*
+         * are:
+         *
+         *  key         | description
+         * :----------- | :-------------------------------------------------------------------------------------------------------------- |
+         * command      | name of program executed                                                                                        |
+         * argv         | space separated arguments to command                                                                            |
+         * maxprocs     | maximum number of MPI processes to start (e.g. "1024")                                                          |
+         * soft         | allowed values for number of processors                                                                         |
+         * host         | hostname                                                                                                        |
+         * arch         | architecture name                                                                                               |
+         * wdir         | working directory of the MPI process                                                                            |
+         * file         | value is the name of a file in which additional information is specified                                        |
+         * thread_level | requested level of thread support, if requested before the program started execution (e.g. "MPI_THREAD_SINGLE”) |
+         *
+         * Note: The contents of *MPI_INFO_ENV* are implementation defined, i.e. not all of the predefined keys have to be defined.
+         *
+         * @attention **No** *MPI_Info_free* gets called upon destruction (doing so would result in a MPI runtime failure).
          */
         static const info env;
 
