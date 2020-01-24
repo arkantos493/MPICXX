@@ -2263,6 +2263,7 @@ namespace mpicxx {
 
             return values;
         }
+        // TODO 2020-01-24 17:45 marcel: static getter for MPI_MAX_INFO_KEY, MPI_MAX_INFO_VAL !
 
 
         // ---------------------------------------------------------------------------------------------------------- //
