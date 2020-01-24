@@ -1029,37 +1029,37 @@ namespace mpicxx {
         //                                                  capacity                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Checks if this info object has no elements, i.e. whether `begin() == end()`.
-         * @return `true` if this info object is empty, `false` otherwise
+         * @brief Checks if the info object has no [key, value]-pairs, i.e. whether `begin() == end()`.
+         * @return `true` if the info object is empty, `false` otherwise
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
         [[nodiscard]] bool empty() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
 
             return this->size() == 0;
         }
         /**
-         * @brief Returns the number of [key, value]-pairs in this info object, i.e.
+         * @brief Returns the number of [key, value]-pairs in the info object, i.e.
          * [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(begin(), end())`.
-         * @return the number of [key, value]-pairs in this info object
+         * @return the number of [key, value]-pairs in the info object
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
         [[nodiscard]] size_type size() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Calling with a \"moved-from\" object is not supported.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
 
             int nkeys;
             MPI_Info_get_nkeys(info_, &nkeys);
@@ -1076,7 +1076,7 @@ namespace mpicxx {
          * (https://en.cppreference.com/w/cpp/types/numeric_limits).
          * At runtime, the size of the info object may be limited to a value smaller than max_size() by the amount of RAM available.
          */
-        [[nodiscard]] size_type max_size() const noexcept {
+        [[nodiscard]] static size_type max_size() {
             return std::numeric_limits<difference_type>::max();
         }
 
