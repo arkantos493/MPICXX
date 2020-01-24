@@ -847,102 +847,182 @@ namespace mpicxx {
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Returns an @ref iterator to the first element of this info object.
-         * @details If the info object is empty, the returned @ref iterator will be equal to end().
-         * @return iterator to the first element
+         * @brief Returns an @ref iterator to the first [key, value]-pair of the info object.
+         * @details If the info object is empty, the returned @ref iterator will be equal to @ref end().
+         * @return iterator to the first [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
-        [[nodiscard]] iterator begin() { return iterator(info_, 0); }
+        [[nodiscard]] iterator begin() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return iterator(info_, 0);
+        }
         /**
-         * @brief Returns an @ref iterator to the element following the last element of this info object.
+         * @brief Returns an @ref iterator to the element following the last [key, value]-pair of the info object.
          * @details This element acts as a placeholder; attempting to access it results in **undefined behavior**.
-         * @return @ref iterator to the element following the last element
+         * @return @ref iterator to the element following the last [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
+         * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
-        [[nodiscard]] iterator end() { return iterator(info_, this->size()); }
+        [[nodiscard]] iterator end() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return iterator(info_, this->size());
+        }
         /**
-         * @brief Returns a @ref const_iterator to the first element of this info object.
-         * @details If the info object is empty, the returned @ref const_iterator will be equal to cend().
-         * @return @ref const_iterator to the first element
+         * @brief Returns a @ref const_iterator to the first [key, value]-pair of the info object.
+         * @details If the info object is empty, the returned @ref const_iterator will be equal to @ref cend().
+         * @return @ref const_iterator to the first [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
-        [[nodiscard]] const_iterator begin() const { return const_iterator(info_, 0); }
+        [[nodiscard]] const_iterator begin() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return const_iterator(info_, 0);
+        }
         /**
-         * @brief Returns a @ref const_iterator to the element following the last element of this info object.
+         * @brief Returns a @ref const_iterator to the element following the last [key, value]-pair of the info object.
          * @details This element acts as a placeholder; attempting to access it results in **undefined behavior**.
-         * @return @ref const_iterator to the element following the last element
+         * @return @ref const_iterator to the element following the last [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
+         * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
-        [[nodiscard]] const_iterator end() const { return const_iterator(info_, this->size()); }
+        [[nodiscard]] const_iterator end() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return const_iterator(info_, this->size());
+        }
         /**
          * @copydoc begin() const
          */
-        [[nodiscard]] const_iterator cbegin() const { return const_iterator(info_, 0); }
+        [[nodiscard]] const_iterator cbegin() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return const_iterator(info_, 0);
+        }
         /**
          * @copydoc end() const
          */
-        [[nodiscard]] const_iterator cend() const { return const_iterator(info_, this->size()); }
+        [[nodiscard]] const_iterator cend() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return const_iterator(info_, this->size());
+        }
 
         /**
-         * @brief Returns a @ref reverse_iterator to the first element of the reversed info object.
-         * @details It corresponds to the last element of the non-reversed info object.
-         * If the info object is empty, the returned @ref reverse_iterator will be equal to rend().
-         * @return @ref reverse_iterator to the first element
+         * @brief Returns a @ref reverse_iterator to the first [key, value]-pair of the reversed info object.
+         * @details It corresponds to the last [key, value]-pair of the non-reversed info object.
+         * If the info object is empty, the returned @ref reverse_iterator will be equal to @ref rend().
+         * @return @ref reverse_iterator to the first [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
+         * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
-        [[nodiscard]] reverse_iterator rbegin() { return std::make_reverse_iterator(this->end()); }
+        [[nodiscard]] reverse_iterator rbegin() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return std::make_reverse_iterator(this->end());
+        }
         /**
-         * @brief Returns a @ref reverse_iterator to the element following the last element of the reversed info object.
-         * @details It corresponds to the element preceding the first element of the non-reversed info object.
+         * @brief Returns a @ref reverse_iterator to the element following the last [key, value]-pair of the reversed info object.
+         * @details It corresponds to the element preceding the first [key, value]-pair of the non-reversed info object.
          * This element acts as a placeholder, attempting to access it results in **undefined behavior**.
-         * @return @ref reverse_iterator to the element following the last element
+         * @return @ref reverse_iterator to the element following the last [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
-        [[nodiscard]] reverse_iterator rend() { return std::make_reverse_iterator(this->begin()); }
+        [[nodiscard]] reverse_iterator rend() {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return std::make_reverse_iterator(this->begin());
+        }
         /**
-         * @brief Returns a @ref const_reverse_iterator to the first element of the reversed info object.
-         * @details It corresponds to the last element of the non-reversed info object.
-         * If the info object is empty, the returned @ref const_reverse_iterator will be equal to crend().
-         * @return @ref const_reverse_iterator to the element following the last element
+         * @brief Returns a @ref const_reverse_iterator to the first [key, value]-pair of the reversed info object.
+         * @details It corresponds to the last [key, value]-pair of the non-reversed info object.
+         * If the info object is empty, the returned @ref const_reverse_iterator will be equal to @ref crend().
+         * @return @ref const_reverse_iterator to the first [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
-         * @code int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
+         * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
          * For additionally called *MPI* functions see the @ref info_iterator documentation.
          * }
          */
-        [[nodiscard]] const_reverse_iterator rbegin() const { return std::make_reverse_iterator(this->cend()); }
+        [[nodiscard]] const_reverse_iterator rbegin() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return std::make_reverse_iterator(this->cend());
+        }
         /**
-         * @brief Returns a @ref const_reverse_iterator to the element following the last element of the reversed info object.
-         * @details It corresponds to the element preceding the first element of the non-reversed info object.
+         * @brief Returns a @ref const_reverse_iterator to the element following the last [key, value]-pair of the reversed info object.
+         * @details It corresponds to the element preceding the first [key, value]-pair of the non-reversed info object.
          * This element acts as a placeholder, attempting to access it results in **undefined behavior**.
-         * @return @ref const_reverse_iterator to the element following the last element
+         * @return @ref const_reverse_iterator to the element following the last [key, value]-pair
+         *
+         * @pre `*this` **must not** be in the moved-from state.
+         *
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
          */
-        [[nodiscard]] const_reverse_iterator rend() const { return std::make_reverse_iterator(this->cbegin()); }
+        [[nodiscard]] const_reverse_iterator rend() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return std::make_reverse_iterator(this->cbegin());
+        }
         /**
          * @copydoc rbegin() const
          */
-        [[nodiscard]] const_reverse_iterator crbegin() const { return std::make_reverse_iterator(this->cend()); }
+        [[nodiscard]] const_reverse_iterator crbegin() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return std::make_reverse_iterator(this->cend());
+        }
         /**
          * @copydoc rend() const
          */
-        [[nodiscard]] const_reverse_iterator crend() const { return std::make_reverse_iterator(this->cbegin()); }
+        [[nodiscard]] const_reverse_iterator crend() const {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            return std::make_reverse_iterator(this->cbegin());
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
