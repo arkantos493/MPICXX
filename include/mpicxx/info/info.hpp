@@ -169,30 +169,31 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) difference type to identify the
-             * distance between iterators.
+             * distance between two iterators.
              */
             using difference_type = std::ptrdiff_t;
             /**
              * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) value type that can be obtained
              * by dereferencing the iterator.
-             * @details In case of a non-const iterator, the value will be returned by a @ref info::string_proxy object to allow changing
-             * its value. \n
+             * @details In case of a non-const iterator, the value will be returned by a @ref info::proxy object to allow changing
+             * its value.
+             *
              * In case of a const_iterator, the value will directly be returned as `const std::string` because changing the
              * value is impossible by definition.
              */
             using value_type = std::conditional_t<is_const,
                                                   std::pair<const std::string, const std::string>,
-                                                  std::pair<const std::string, string_proxy>>;
+                                                  std::pair<const std::string, proxy>>;
             /**
-             * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) pointer type to the elements
-             * iterated over.
+             * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) pointer type to the
+             * [key, value]-pair iterated over.
              * @details Because it is not possible to simply return value_type* (dangling pointer to a local object),
              * it is necessary to wrap value_type in a `std::unique_ptr`.
              */
             using pointer = std::unique_ptr<value_type>;
             /**
              * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) reference type
-             * (**not** meaningful because operator*() and operator->() has to return **by-value** (using a string_proxy for write access)).
+             * (**not** meaningful because operator*() and operator->() has to return **by-value** (using a proxy for write access)).
              */
             using reference = value_type;
             /// [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) iterator category.
@@ -206,10 +207,10 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Construct a new iterator.
-             * @param[inout] wrapped_info pointer to the iterated over *MPI_Info* object
+             * @param[inout] info pointer to the iterated over *MPI_Info* object
              * @param[in] pos the iterator's start position
              */
-            info_iterator(MPI_Info wrapped_info, const difference_type pos) : info_(wrapped_info), pos_(pos) { }
+            info_iterator(MPI_Info info, const difference_type pos) : info_(info), pos_(pos) { }
             /**
              * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
@@ -239,19 +240,19 @@ namespace mpicxx {
             //                                            relational operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
-             * @brief Perform the respective comparison operation on this iterator and the given @p rhs one.
-             * @details This iterator and @p rhs iterator may not necessarily have the same constness.
+             * @brief Perform the respective comparison operation on the iterator and the given @p rhs one.
+             * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
              * @tparam is_rhs_const
              * @param[in] rhs the other iterator
-             * @return the comparison result
+             * @return boolean comparison result
              *
-             * @pre This iterator and @p rhs iterator have to point to the same info object.
+             * @pre The iterators `*this` and @p rhs iterator **must** point to the same info object.
              *
-             * @assert{ If the two iterators don't point to the same info object. }
+             * @assert{ If the iterators `*this` and `rhs` don't point to the same info object. }
              */
             template <bool is_rhs_const>
             bool operator==(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ == rhs.pos_;
             }
@@ -260,7 +261,7 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator!=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ != rhs.info_ || pos_ != rhs.pos_;
             }
@@ -269,7 +270,7 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator<(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ < rhs.pos_;
             }
@@ -278,7 +279,7 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator>(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ > rhs.pos_;
             }
@@ -287,7 +288,7 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator<=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ <= rhs.pos_;
             }
@@ -296,7 +297,7 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator>=(const info_iterator<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ >= rhs.pos_;
             }
@@ -306,8 +307,8 @@ namespace mpicxx {
             //                                            modifying operations                                            //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
-             * @brief Move this iterator one position forward.
-             * @return the modified iterator referring to the new position
+             * @brief Move the iterator one position forward.
+             * @return modified iterator pointing to the new position
              */
             info_iterator& operator++() {
                 ++pos_;
@@ -315,7 +316,7 @@ namespace mpicxx {
             }
             /**
              * @brief Move the iterator one position forward and return the old iterator.
-             * @return an iterator referring to the old position
+             * @return iterator pointing to the old position
              */
             info_iterator operator++(int) {
                 info_iterator tmp{*this};
@@ -325,7 +326,7 @@ namespace mpicxx {
             /**
              * @brief Move this iterator @p inc steps forward.
              * @param[in] inc number of steps
-             * @return the modified iterator referring to the new position
+             * @return modified iterator pointing to the new position
              */
             info_iterator& operator+=(const difference_type inc) {
                 pos_ += inc;
@@ -333,23 +334,23 @@ namespace mpicxx {
             }
             /**
              * @brief Move the iterator @p inc steps forward.
-             * @param[in] it copy of the old iterator
+             * @param[in] it the iterator to increment
              * @param[in] inc number of steps
-             * @return the new iterator referring to the new position
+             * @return new iterator pointing to the new position
              */
             friend info_iterator operator+(info_iterator it, const difference_type inc) {
                 it.pos_ += inc;
                 return it;
             }
             /**
-             * @copydoc info_iterator::operator+(info_iterator, const difference_type)
+             * @copydoc operator+(info_iterator, const difference_type)
              */
             friend info_iterator operator+(const difference_type inc, info_iterator it) {
                 return it + inc;
             }
             /**
-             * @brief Move this iterator one position backward.
-             * @return the modified iterator referring to the new position
+             * @brief Move the iterator one position backward.
+             * @return modified iterator pointing to the new position
              */
             info_iterator& operator--() {
                 --pos_;
@@ -357,7 +358,7 @@ namespace mpicxx {
             }
             /**
              * @brief Move the iterator one position backward and return the old iterator.
-             * @return an iterator referring to the old position
+             * @return iterator pointing to the old position
              */
             info_iterator operator--(int) {
                 info_iterator tmp{*this};
@@ -365,9 +366,9 @@ namespace mpicxx {
                 return tmp;
             }
             /**
-             * @brief Move this iterator @p inc steps backward.
+             * @brief Move the iterator @p inc steps backward.
              * @param[in] inc number of steps
-             * @return the modified iterator referring to the new position
+             * @return modified iterator pointing to the new position
              */
             info_iterator& operator-=(const difference_type inc) {
                 pos_ -= inc;
@@ -375,9 +376,9 @@ namespace mpicxx {
             }
             /**
              * @brief Move the iterator @p inc steps backward.
-             * @param[in] it copy of the old iterator
+             * @param[in] it the iterator to decrement
              * @param[in] inc number of steps
-             * @return the new iterator referring to the new position
+             * @return new iterator pointing to the new position
              */
             friend info_iterator operator-(info_iterator it, const difference_type inc) {
                 it.pos_ -= inc;
@@ -389,20 +390,21 @@ namespace mpicxx {
             //                                            distance calculation                                            //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
-             * @brief Calculate the distance between this iterator and the given @p rhs one.
-             * @details This iterator and @p rhs iterator may not necessarily have the same constness. \n
+             * @brief Calculate the distance between the iterator and the given @p rhs one.
+             * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
+             *
              * It holds: `it2 - it1 ==` [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(it1, it2)`
-             * @tparam is_rhs_const determines whether the @p rhs iterator is const or not
+             * @tparam is_rhs_const
              * @param[in] rhs the end iterator
-             * @return number of elements between this iterator and the @p rhs iterator
+             * @return number of [key, value]-pairs between the iterators `*this` and  @p rhs
              *
-             * @pre This iterator and @p rhs iterator have to point to the same info object.
+             * @pre The iterators `*this` and @p rhs iterator **must** point to the same info object.
              *
-             * @assert{ If the two iterators don't point to the same info object. }
+             * @assert{ If the iterators `*this` and `rhs` don't point to the same info object. }
              */
             template <bool is_rhs_const>
             difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
-                MPICXX_ASSERT(info_ == rhs.info_, "The two iterators don't refer to the same info object!");
+                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return pos_ - rhs.pos_;
             }
@@ -415,33 +417,34 @@ namespace mpicxx {
              * @brief Get the [key, value]-pair at the current iterator position + @p n.
              * @details If the current iterator is a const_iterator, the returned type is a
              * [`std::pair<const std::string, const std::string>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. everything gets
-             * returned **by-value** and can't by changed. \n
+             * returned **by-value** and can't by changed.
+             *
              * If the current iterator is a non-const iterator, the returned type is a
-             * [`std::pair<const std::string, string_proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. even though the
-             * [key, value]-pair gets returned **by-value**, someone can change the value through the string_proxy class.
-             * @param[in] n the requested offset of this iterator
+             * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. even though the
+             * [key, value]-pair gets returned **by-value**, the value can be changed through the @ref proxy.
+             * @param[in] n the requested offset of the iterator
              * @return the [key, value]-pair
              *
-             * @pre The referred to info object **may not** be in the moved-from state.
+             * @pre The referred to info object **must not** be in the moved-from state.
              * @pre The position denoted by the current iterator position + @p n **must** be in the half-open
              * interval [0, nkeys), where `nkeys` ist the size of the referred to info object.
              *
              * @assert{
-             * If called while referring to a moved-from object. \n
-             * If trying to access an out-of-bounds position.
+             * If the referred to info object is in the moved-from state. \n
+             * If attempting an illegal dereferencing.
              * }
              *
              * @calls_ref{
-             * @code
+             * @code{.cpp}
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
              * @endcode
              * const_iterator: \n
-             * @code
+             * @code{.cpp}
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
              * @endcode
              * iterator: \n
-             * for access operations see @ref string_proxy
+             * For access operations see @ref proxy.
              * }
              */
             reference operator[](const int n) const {
@@ -450,9 +453,9 @@ namespace mpicxx {
                 int nkeys;
                 MPI_Info_get_nkeys(info_, &nkeys);
 #endif
-                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Accessing an element of a \"moved-from\" object is not supported.");
+                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of a info object in the moved-from state!");
                 MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < nkeys,
-                              "Requested an illegal out-of-bounds access! Legal interval: [0, %i), requested position: %i",
+                              "'*this' not dereferenceable (legal interval: [0, %u], requested position: %i)!",
                               nkeys, pos_ + n);
 
                 // get the requested key (with an offset of n)
@@ -474,41 +477,42 @@ namespace mpicxx {
                     return std::make_pair(std::string(key), std::move(value));
                 } else {
                     // this is currently a non-const iterator
-                    // -> create a string_proxy object and return that as value in place of a `std::string` to allow changing the value
+                    // -> create a proxy object and return that as value in place of a `std::string` to allow changing the value
 
-                    return std::make_pair(std::string(key), string_proxy(info_, key));
+                    return std::make_pair(std::string(key), proxy(info_, key));
                 }
             }
             /**
              * @brief Get the [key, value]-pair at the current iterator position.
              * @details If the current iterator is a const_iterator, the returned type is a
              * [`std::pair<const std::string, const std::string>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. everything gets
-             * returned **by-value** and can't by changed. \n
+             * returned **by-value** and can't by changed.
+             *
              * If the current iterator is a non-const iterator, the returned type is a
-             * [`std::pair<const std::string, string_proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. even though the
-             * [key, value]-pair gets returned **by-value**, someone can change the value through the string_proxy class.
+             * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. even though the
+             * [key, value]-pair gets returned **by-value**, the value can be changed through the @ref proxy
              * @return the [key, value]-pair
              *
-             * @pre The referred to info object **may not** be in the moved-from state.
+             * @pre The referred to info object **must not** be in the moved-from state.
              * @pre The position denoted by the current iterator position **must** be in the half-open
              * interval [0, nkeys), where `nkeys` ist the size of the referred to info object.
              *
              * @assert{
-             * If called while referring to a moved-from object. \n
-             * If trying to access an out-of-bounds position.
+             * If the referred to info object is in the moved-from state. \n
+             * If attempting an illegal dereferencing.
              * }
              *
              * @calls_ref{
-             * @code
+             * @code{.cpp}
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
              * @endcode
              * const_iterator: \n
-             * @code
+             * @code{.cpp}
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
              * @endcode
              * iterator: \n
-             * for access operations see @ref string_proxy
+             * For access operations see @ref proxy.
              * }
              */
             reference operator*() const {
@@ -524,7 +528,7 @@ namespace mpicxx {
 
         private:
             MPI_Info info_;
-            int pos_;
+            difference_type pos_;
         };
 
 
