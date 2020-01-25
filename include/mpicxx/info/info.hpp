@@ -1116,7 +1116,7 @@ namespace mpicxx {
          * @pre The @p key **must** already exist, otherwise a
          * [`std::out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) exception will be thrown.
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value! Changes can **only** be made through the proxy's `string_proxy::operator=()`.
+         * this object's internal value! Changes can **only** be made through the proxy's `proxy::operator=()`.
          *
          * @assert{
          * If `*this` is in the moved-from state. \n
@@ -1129,10 +1129,10 @@ namespace mpicxx {
          * @code{.cpp}
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
          * @endcode
-         * For additionally called *MPI* functions see the @ref string_proxy documentation.
+         * For additionally called *MPI* functions see the @ref proxy documentation.
          * }
          */
-        [[nodiscard]] string_proxy at(detail::string auto&& key) {
+        [[nodiscard]] proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "Info key too long!: max. size: %i, provided size (including the null-terminator): %u",
@@ -1144,7 +1144,7 @@ namespace mpicxx {
                 throw std::out_of_range("The specified key does not exist!");
             }
             // create proxy object and forward key
-            return string_proxy(info_, std::forward<decltype(key)>(key));
+            return proxy(info_, std::forward<decltype(key)>(key));
         }
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
@@ -1235,7 +1235,7 @@ namespace mpicxx {
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the insertion point remain valid, all other
          * iterators are invalidated.
          * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value! Changes can **only** be made through the proxy's `string_proxy::operator=()`.
+         * this object's internal value! Changes can **only** be made through the proxy's `proxy::operator=()`.
          *
          * @assert{
          * If called with a moved-from object. \n
@@ -1243,17 +1243,17 @@ namespace mpicxx {
          * }
          *
          * @calls_ref{
-         * For additionally called *MPI* functions see the @ref string_proxy documentation.
+         * For additionally called *MPI* functions see the @ref proxy documentation.
          * }
          */
-        [[nodiscard]] string_proxy operator[](detail::string auto&& key) {
+        [[nodiscard]] proxy operator[](detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // create proxy object and forward key
-            return string_proxy(info_, std::forward<decltype(key)>(key));
+            return proxy(info_, std::forward<decltype(key)>(key));
         }
 
         /**
