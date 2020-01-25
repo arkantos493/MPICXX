@@ -2242,12 +2242,12 @@ namespace mpicxx {
         //                                            additional functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all keys of this info object.
-         * @return all keys of this info object
+         * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all keys of the info object.
+         * @return all keys of the info object
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
@@ -2255,7 +2255,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> keys() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
 
             // create vector which will hold all keys
             const size_type size = this->size();
@@ -2271,12 +2271,12 @@ namespace mpicxx {
             return keys;
         }
         /**
-         * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all values of this info object.
-         * @return all values of this info object
+         * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all values of the info object.
+         * @return all values of the info object
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
@@ -2286,7 +2286,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> values() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
 
             // create vector which will hold all values
             const size_type size = this->size();
