@@ -2077,9 +2077,9 @@ namespace mpicxx {
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are equal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs **may not** be in the moved-from state.
+         * @pre @p lhs and @p rhs **must not** be in the moved-from state.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `lhs` or `rhs` are in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
@@ -2089,8 +2089,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "lhs is in the \"moved-from\" state");
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "rhs is in the \"moved-from\" state");
+            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "'lhs' is in the moved-from state!");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "'rhs' is in the moved-from state!");
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
@@ -2145,9 +2145,9 @@ namespace mpicxx {
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are inequal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs **may not** be in the moved-from state.
+         * @pre @p lhs and @p rhs **must not** be in the moved-from state.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `lhs` or `rhs` are in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
@@ -2157,14 +2157,16 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "lhs is in the \"moved-from\" state");
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "rhs is in the \"moved-from\" state");
+            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "'lhs' is in the moved-from state!");
+            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "'rhs' is in the moved-from state!");
 
             return !(lhs == rhs);
         }
         /**
-         * @brief Specializes the `std::swap` algorithm for info objects. Swaps the contents of @p lhs and @p rhs.
-         * @details Calls `lhs.swap(rhs)`. \n
+         * @brief Specializes the [`std::swap`](https://en.cppreference.com/w/cpp/algorithm/swap) algorithm for info objects.
+         * Swaps the contents of @p lhs and @p rhs.
+         * @details Calls `lhs.swap(rhs)`.
+         *
          * Does not invoke any move, copy or swap operations on individual elements.
          * @param[inout] lhs the info object whose contents to swap
          * @param[inout] rhs the info object whose contents to swap
@@ -2174,9 +2176,10 @@ namespace mpicxx {
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
         /**
-         * @brief Erases all elements that satisfy the predicate @p pred from the info object.
+         * @brief Erases all [key, value]-pairs that satisfy the predicate @p pred from the info object.
          * @details The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
-         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. \n
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made.
+         *
          * Therefore (to be compliant with the standard) this function performs two steps:
          * 1. Save all keys, for which the corresponding [key, value]-pair satisfies the predicate @p pred, in a
          * [`std::vector<std::string>>`](https://en.cppreference.com/w/cpp/container/vector).
@@ -2185,13 +2188,13 @@ namespace mpicxx {
          * @param[inout] c info object from which to erase
          * @param[in] pred predicate that returns `true` if the element should be erased
          *
-         * @pre @p c **may not** be in the moved-from state.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to @p c
+         * @pre @p c **must not** be in the moved-from state.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to @p c
          * are invalidated. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first erased element or any
-         * elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first point of erase remain valid, all
+         * other iterators are invalidated.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `c` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly `c.size()` times
@@ -2202,7 +2205,7 @@ namespace mpicxx {
          */
         template <typename Pred>
         friend void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, value_type> {
-            MPICXX_ASSERT(c.info_ != MPI_INFO_NULL, "c is in the \"moved-from\" state");
+            MPICXX_ASSERT(c.info_ != MPI_INFO_NULL, "'c' is in the moved-from state!");
 
             size_type size = c.size();
             char key[MPI_MAX_INFO_KEY];
