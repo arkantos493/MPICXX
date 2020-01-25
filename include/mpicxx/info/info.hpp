@@ -2306,7 +2306,16 @@ namespace mpicxx {
 
             return values;
         }
-        // TODO 2020-01-24 17:45 marcel: static getter for MPI_MAX_INFO_KEY, MPI_MAX_INFO_VAL !
+        /**
+         * @brief Returns the maximum possible key size of any [key, value]-pair.
+         * @return the maximum key size (= *MPI_MAX_INFO_KEY*)
+         */
+        [[nodiscard]] static consteval size_type max_key_size() { return static_cast<size_type>(MPI_MAX_INFO_KEY); }
+        /**
+         * @brief Returns the maximum possible value size of any [key, value]-pair.
+         * @return the maximum value size (= *MPI_MAX_INFO_VAL*)
+         */
+        [[nodiscard]] static consteval size_type max_value_size() { return static_cast<size_type>(MPI_MAX_INFO_VAL); }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
