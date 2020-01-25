@@ -45,30 +45,31 @@ namespace mpicxx {
     class info {
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                             string proxy class                                             //
+        //                                                 proxy class                                                //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief A proxy class for a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) object to distinguish between
-         * a read or write access.
-         * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string_view) on a read access.\n
-         * Can be printed directly through an @ref operator<<(std::ostream&, const string_proxy&) overload.
+         * @brief A proxy class for @ref info::at(detail::string auto&&), @ref info::at(const std::string_view) const and
+         * @ref info::operator[](detail::string auto&&) to distinguish between read and write accesses.
+         * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string_view) on a read access.
+         *
+         * Can be printed directly through an @ref operator<<(std::ostream&, const proxy&) overload.
          */
-        class string_proxy {
+        class proxy {
         public:
             /**
              * @brief Construct a new proxy object.
-             * @param[in] ptr pointer to the parent info object
-             * @param[in] key the provided key (must meet the requirements of the detail::string concept)
+             * @param[in] info pointer to the parent info object
+             * @param[in] key the provided @p key (must meet the requirements of the detail::string concept)
              */
-            string_proxy(MPI_Info ptr, detail::string auto&& key) : ptr_(ptr), key_(std::forward<decltype(key)>(key)) { }
+            proxy(MPI_Info info, detail::string auto&& key) : info_(info), key_(std::forward<decltype(key)>(key)) { }
 
             /**
-             * @brief On write access, add the provided @p value and saved key to the referred to info object.
+             * @brief On write access, add the provided @p value and saved key to the info object.
              * @details Creates a new [key, value]-pair if the key doesn't already exist, otherwise overwrites the existing @p value.
-             * @param[in] value the value associated with key
+             * @param[in] value the @p value associated with key
              *
              * @pre @p value **must** include the null-terminator.
-             * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
+             * @pre The @p value's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_VAL*.
              *
              * @assert{ If @p value exceeds its size limit. }
              *
@@ -78,10 +79,10 @@ namespace mpicxx {
              */
             void operator=(const std::string_view value) {
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                              "Info value too long!: max. size: %i, provided size (with the null-terminator): %u",
+                              "Info value too long (max. size: %i, provided size (with the null-terminator): %u)!",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
-                MPI_Info_set(ptr_, key_.data(), value.data());
+                MPI_Info_set(info_, key_.data(), value.data());
             }
 
             /**
@@ -91,7 +92,7 @@ namespace mpicxx {
              * @return the value associated with key
              *
              * @attention This function returns the associated value *by-value*, i.e. changing the returned
-             * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) **won't** alter this object's internal value!
+             * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) **won't** alter the info object's internal value!
              * @attention Because inserting an empty string `""` is not allowed, a `" "` string is inserted instead, if the key does not
              * already exist.
              *
@@ -104,25 +105,28 @@ namespace mpicxx {
             operator std::string() const {
                 // get the length of the value
                 int valuelen, flag;
-                MPI_Info_get_valuelen(ptr_, key_.data(), &valuelen, &flag);
+                MPI_Info_get_valuelen(info_, key_.data(), &valuelen, &flag);
 
                 if (!static_cast<bool>(flag)) {
-                    // the key doesn't exist yet -> add a new [key, value]-pair and return a `std::string` consisting of only one whitespace
-                    MPI_Info_set(ptr_, key_.data(), " ");
-                    return std::string(" ");
+                    // the key doesn't exist yet
+                    // -> add a new [key, value]-pair and return a `std::string` consisting of only one whitespace
+                    std::string value(" ");
+                    MPI_Info_set(info_, key_.data(), value.data());
+                    return value;
                 }
 
                 // key exists -> get the associated value
                 std::string value(valuelen, ' ');
-                MPI_Info_get(ptr_, key_.data(), valuelen, value.data(), &flag);
+                MPI_Info_get(info_, key_.data(), valuelen, value.data(), &flag);
                 return value;
             }
 
             /**
-             * @brief Convenient overload to be able to directly print a string_proxy object.
-             * @details Calls @ref operator std::string() const to get the value that should be printed.
+             * @brief Convenience overload to be able to directly print a proxy object.
+             * @details Calls @ref operator std::string() const to get the value that should be printed, i.e. if key doesn't exist yet, a
+             * new [key, value]-pair will be inserted into the info object.
              * @param[inout] out the output stream to write on
-             * @param[in] rhs the string_proxy object
+             * @param[in] rhs the proxy object
              * @return the output stream
              *
              * @calls{
@@ -131,13 +135,13 @@ namespace mpicxx {
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
              * }
              */
-            friend std::ostream& operator<<(std::ostream& out, const string_proxy& rhs) {
+            friend std::ostream& operator<<(std::ostream& out, const proxy& rhs) {
                 out << static_cast<std::string>(rhs.operator std::string());
                 return out;
             }
 
         private:
-            MPI_Info ptr_;
+            MPI_Info info_;
             const std::string key_;
         };
 
