@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2020-01-22
+ * @date 2020-01-25
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -1264,7 +1264,7 @@ namespace mpicxx {
          * @pre The @p key's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_VAL*.
          * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
-         * are invalidated, if an insertion took place. \n
+         * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the insertion point remain valid, all other
          * iterators are invalidated.
          *
@@ -1331,7 +1331,7 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         void insert(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(first <= last, "'first' must be less or equal than 'last'!");
+            MPICXX_ASSERT(first <= last, "Iterator 'first' must be less or equal than iterator 'last'!");
 
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
@@ -1378,26 +1378,30 @@ namespace mpicxx {
          * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most 'ilist.size()' times
          * }
          */
-        void insert(std::initializer_list<value_type> ilist) { this->insert(ilist.begin(), ilist.end()); }
+        void insert(std::initializer_list<value_type> ilist) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            this->insert(ilist.begin(), ilist.end());
+        }
 
         /**
-         * @brief Insert or assign the given [key, value]-pair to this info object.
-         * @param[in] key element @p key to insert
-         * @param[in] value element @p value to insert
-         * @return a pair consisting of an iterator to the inserted or assigned element and a `bool`
+         * @brief Insert or assign the given [key, value]-pair to the info object.
+         * @param[in] key @p key of the [**key**, value]-pair to insert
+         * @param[in] value @p value of the [key, **value**]-pair to insert
+         * @return a pair consisting of an iterator to the inserted or assigned [key, value]-pair and a `bool`
          * denoting whether the insertion (`true`) or the assignment (`false`) took place
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @pre **Both** @p key **and** @p value **must** include the null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @pre The @p value's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * @pre The @p key's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The @p value's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_VAL*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the inserted element position
-         * or any elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the insertion point remain valid, all other
+         * iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p key or @p value exceed their size limit.
          * }
          *
@@ -1409,12 +1413,12 @@ namespace mpicxx {
          * }
          */
         std::pair<iterator, bool> insert_or_assign(const std::string_view key, const std::string_view value) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "Info key too long!: max size: %i, provided size (including the null-terminator): %u",
+                          "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, key.size() + 1);
             MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                          "Info value too long!: max size: %i, provided size (including the null-terminator): %u",
+                          "Info value too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
             // check whether an insertion or assignment will take place
@@ -1425,25 +1429,25 @@ namespace mpicxx {
             return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
-         * @brief Inserts or assigns elements from range [@p first, @p last) to this info object.
-         * @details If multiple elements in the range have the same key, the **last** occurrence determines the value.
+         * @brief Inserts or assigns [key, value]-pairs from range [@p first, @p last) to the info object.
+         * @details If multiple [key, value]-pairs in the range have the same key, the **last** occurrence determines the final value.
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
-         * @param[in] first iterator to the first element in the range
-         * @param[in] last iterator one-past the last element in the range
+         * @param[in] first iterator to the first [key, value]-pair in the range
+         * @param[in] last iterator one-past the last [key, value]-pair in the range
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          * @pre All @p keys and @p values **must** include the null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
-         * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted element position
-         * or any elements after that are invalidated).
+         * @pre The length of **any** key (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_VAL*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place. \n
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first insertion point remain valid, all
+         * other iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p first and @p last don't denote a valid range. \n
          * If any key or value exceed their size limit.
          * }
@@ -1454,8 +1458,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         void insert_or_assign(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
-            MPICXX_ASSERT(first <= last, "'first' must be less or equal than 'last'.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT(first <= last, "Iterator 'first' must be less or equal than iterator 'last'!");
 
             // insert or assign every element in the range [first, last)
             for (; first != last; ++first) {
@@ -1463,10 +1467,10 @@ namespace mpicxx {
                 const auto [key, value] = *first;
 
                 MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                              "Info key too long!: max size: %i, provided size (including null-terminator): %u",
+                              "Info key too long (max. size: %i, provided size (including null-terminator): %u)!",
                               MPI_MAX_INFO_KEY, key.size() + 1);
                 MPICXX_ASSERT(value.size() < MPI_MAX_INFO_VAL,
-                              "Info value too long!: max size: %i, provided size (including null-terminator): %u",
+                              "Info value too long (max. size: %i, provided size (including null-terminator): %u)!",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
                 // insert or assign [key, value]-pair
@@ -1474,21 +1478,22 @@ namespace mpicxx {
             }
         }
         /**
-         * @brief Inserts or assigns elements from the initializer list @p ilist to this info object.
-         * @details If multiple elements in the initializer list have the same key, the **last** occurrence determines the value.
+         * @brief Inserts or assigns [key, value]-pairs from the initializer list @p ilist to the info object.
+         * @details If multiple [key, value]-pairs in the initializer list have the same key, the **last** occurrence determines the final
+         * value.
          * @param[in] ilist initializer list to insert or assign the [key, value]-pairs from
          *
-         * @pre `*this` **may not** be in the moved-from state.
-         * @pre All @p keys and @p values **must** include a null-terminator.
-         * @pre The length of **any** key (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @pre The length of **any** value (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_VAL*.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
-         * are invalidated, if an insertion took place (i.e. the returned `bool` is `true`). \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted element position
-         * or any elements after that are invalidated).
+         * @pre `*this` **must not** be in the moved-from state.
+         * @pre All @p keys and @p values **must** include the null-terminator.
+         * @pre The length of **any** key (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_VAL*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an insertion took place. \n
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first insertion point remain valid, all
+         * other iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If any key or value exceed their size limit.
          * }
          *
@@ -1496,16 +1501,20 @@ namespace mpicxx {
          * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly 'ilist.size()' times
          * }
          */
-        void insert_or_assign(std::initializer_list<value_type> ilist) { this->insert_or_assign(ilist.begin(), ilist.end()); }
+        void insert_or_assign(std::initializer_list<value_type> ilist) {
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+
+            this->insert_or_assign(ilist.begin(), ilist.end());
+        }
 
         /**
-         * @brief Erase all elements from the info object.
+         * @brief Erase all [key, value]-pairs from the info object.
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @post The info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`.
          * @post Invalidates **all** iterators referring to `*this`.
          *
-         * @assert{ If called with a moved-from object. }
+         * @assert{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
@@ -1514,7 +1523,7 @@ namespace mpicxx {
          * }
          */
         void clear() {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
 
             const size_type size = this->size();
             char key[MPI_MAX_INFO_KEY];
@@ -1527,21 +1536,24 @@ namespace mpicxx {
 
         /**
          * @brief Removes the [key, value]-pair at @p pos.
+         * @details The iterator @p pos must be valid and **dereferenceable**. Thus the @ref end() iterator (which is valid, but is
+         * not dereferencable) cannot be used as a value for @p pos.
          * @param[in] pos iterator to the [key, value]-pair to remove
-         * @return iterator to the erased position
+         * @return iterator following the removed [key, value]-pair (= position of @p pos prior to removal); \n
+         * if @p pos refers to the last [key, value]-pair, then the @ref end() iterator is returned
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @pre @p pos **must** refer to `*this` info object.
          * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * are invalidated. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the erased element or any
-         * elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the point of erase remain valid, all other
+         * iterators are invalidated.
          *
          * @assert{
          * If called with a moved-from object. \n
          * If @p pos does not refer to `*this` info object. \n
-         * If trying to dereference an out-of-bounds iterator.
+         * If attempting an illegal dereferencing.
          * }
          *
          * @calls{
@@ -1550,10 +1562,10 @@ namespace mpicxx {
          * }
          */
         iterator erase(const_iterator pos) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
-            MPICXX_ASSERT(pos.info_ == info_, "The given iterator must refer to the same info object as *this.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT(pos.info_ == info_, "Iterator 'pos' must refer to the same info object as '*this'!");
             MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
-                          "The iterator requested an illegal out-of-bounds access! Legal interval: [0, %u), requested position: %i",
+                          "Iterator 'pos' not dereferenceable (legal range: [0, %u), requested position: %i)!",
                           this->size(), pos.pos_);
 
             char key[MPI_MAX_INFO_KEY];
@@ -1562,32 +1574,37 @@ namespace mpicxx {
             return iterator(info_, pos.pos_);
         }
         /**
-         * @brief Removes the [key, value]-pairs in the range [@p first, @p last).
-         * @details [first, last) must be a valid range in `*this`. \n
+         * @brief Removes all [key, value]-pairs in the range [@p first, @p last).
+         * @details [@p first, @p last) must be a valid range in `*this`. The iterator @p first does not need to be dereferenceable if
+         * `first == last`: erasing an empty range is a no-op.
+         *
          * The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
-         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. \n
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made.
+         *
          * Therefore (to be compliant with the standard) this function performs two steps:
          * 1. Save all keys of the [key, value]-pairs contained in [@p first, @p last) in a
          * [`std::vector<std::string>>`](https://en.cppreference.com/w/cpp/container/vector).
          * 2. Delete all [key, value]-pairs in the info object @p c with a key contained in the previously created vector.
-         * @param[in] first iterator to the first element in the range
-         * @param[in] last iterator one-past the last element in the range
-         * @return iterator following the last removed element (= position of @p first before any erasure took place)
+         * @param[in] first iterator to the first [key, value]-pair in the range
+         * @param[in] last iterator one-past the last [key, value]-pair in the range
+         * @return iterator following the last removed [key, value]-pair (= position of @p first prior to any removal); \n
+         * if `last == end()` prior to removal, then the updated @ref end() iterator is returned; \n
+         * if [@p first, @p last) is an empty range, then @p last is returned
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p first and @p last **must** refer to `*this` info object
-         * @pre The position denoted by @p first **must** be in the half-open interval [0, `this->size()`).
-         * @pre The position denoted by @p last **must** be in the half-open interval [0, `this->size()`).
+         * @pre The position denoted by @p first **must** be in the interval [0, `this->size()`].
+         * @pre The position denoted by @p last **must** be in the interval [0, `this->size()`].
          * @pre @p first **must** be less or equal than @p last.
          * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * are invalidated. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first erased element or any
-         * elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first point of erase remain valid, all
+         * other iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p first or @p last does not refer to `*this` info object. \n
-         * If trying to dereference an out-of-bounds iterator. \n
+         * If attempting an illegal dereferencing. \n
          * If @p first is greater than @p last.
          * }
          *
@@ -1597,16 +1614,16 @@ namespace mpicxx {
          * }
          */
         iterator erase(const_iterator first, const_iterator last) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
-            MPICXX_ASSERT(first.info_ == info_, "The iterator 'first' must refer to the same info object as *this.");
-            MPICXX_ASSERT(last.info_ == info_, "The iterator 'last' must refer to the same info object as *this.");
-            MPICXX_ASSERT(first.pos_ >= 0 && first.pos_ < static_cast<int>(this->size()),
-                          "'first' requested an illegal out-of-bounds access! Legal interval: [0, %u), requested position: %i",
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT(first.info_ == info_, "Iterator 'first' must refer to the same info object as '*this'!");
+            MPICXX_ASSERT(last.info_ == info_, "Iterator 'last' must refer to the same info object as '*this'!");
+            MPICXX_ASSERT(first.pos_ >= 0 && first.pos_ <= static_cast<int>(this->size()),
+                          "Iterator 'first' not dereferenceable (legal interval: [0, %u], requested position: %i)!",
                           this->size(), first.pos_);
             MPICXX_ASSERT(last.pos_ >= 0 && last.pos_ <= static_cast<int>(this->size()),
-                          "'last' requested an illegal out-of-bounds access! Legal interval: [0, %u], requested position: %i",
+                          "Iterator 'last' not dereferenceable (legal interval: [0, %u], requested position: %i)!",
                           this->size(), last.pos_);
-            MPICXX_ASSERT(first <= last, "'first' must be less or equal than 'last'.");
+            MPICXX_ASSERT(first <= last, "Iterator 'first' must be less or equal than iterator 'last'!");
 
             const difference_type count = last - first;
             char key[MPI_MAX_INFO_KEY];
@@ -1631,16 +1648,16 @@ namespace mpicxx {
          * @param[in] key key value of the [key, value]-pair to remove
          * @return number of elements removed (either 0 or 1)
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
-         * are invalidated, if an erasure took place. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the erased element or any
-         * elements after that are invalidated).
+         * @pre The @p key's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * are invalidated, if an erasure took place (i.e. the returned `size_type` is `1`). \n
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the point of erase remain valid, all other
+         * iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -1650,9 +1667,9 @@ namespace mpicxx {
          * }
          */
         size_type erase(const std::string_view key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "The key to be erased is too long!: max size: %i, provided size (including the null-terminator): %u",
+                          "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             // check if key does exist
@@ -1665,8 +1682,8 @@ namespace mpicxx {
         }
 
         /**
-         * @brief Exchanges the contents of this info object with those of @p other.
-         * @details Does not invoke any move, copy, or swap operations on individual elements.
+         * @brief Exchanges the contents of the info object with those of @p other.
+         * @details Does not invoke any move, copy, or swap operations on individual [key, value]-pairs.
          * @param[inout] other info object to exchange the contents with
          *
          * @post `*this` is in a valid state iff @p other was in a valid state (and vice versa).
@@ -1679,22 +1696,22 @@ namespace mpicxx {
         }
 
         /**
-         * @brief Removes the [key, value]-apir at @p pos and returns it.
+         * @brief Removes the [key, value]-pair at @p pos and returns it.
          * @param[in] pos iterator to the [key, value]-pair to remove
          * @return the extracted [key, value]-pair
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @pre @p pos **must** refer to `*this` info object.
          * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * are invalidated. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the erased element or any
-         * elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the point of extraction remain valid, all other
+         * iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p pos does not refer to `*this` info object. \n
-         * If trying to dereference an out-of-bounds iterator.
+         * If attempting an illegal dereferencing.
          * }
          *
          * @calls{
@@ -1705,10 +1722,10 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] value_type extract(const_iterator pos) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
-            MPICXX_ASSERT(pos.info_ == info_, "The iterator must refer to the same info object as *this.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT(pos.info_ == info_, "Iterator 'pos' must refer to the same info object as '*this'!");
             MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
-                          "The iterator requested an illegal out-of-bounds access! Legal interval: [0, %u), requested position: %i",
+                          "Iterator 'pos' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
                           this->size(), pos.pos_);
 
             // get [key, value]-pair pointed to by pos
@@ -1722,19 +1739,19 @@ namespace mpicxx {
          * @brief Removes the [key, value]-pair (if one exists) with the key equivalent to @p key and returns the removed [key, value]-pair.
          * @details Returns a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) holding the removed [key, value]-pair
          * if the @p key exists, [`std::nullopt`](https://en.cppreference.com/w/cpp/utility/optional/nullopt) otherwise.
-         * @param[in] key the key to extract
+         * @param[in] key the @p key to extract
          * @return the extracted [key, value]-pair
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **must not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
-         * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * @pre The @p key's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * are invalidated, if an extraction took place. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the extracted element or any
-         * elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the point of extraction remain valid, all other
+         * iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -1745,9 +1762,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::optional<value_type> extract(const std::string_view key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
-                          "The key to be erased is too long!: max size: %i, provided size (including the null-terminator): %u",
+                          "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
             // check if key really exists
@@ -1768,24 +1785,27 @@ namespace mpicxx {
 
         /**
          * @brief Attempts to extract each [key, value]-pair in @p source and insert it into `*this`.
-         * @details If there is a [key, value]-pair in `*this` with key equivalent to an element from @p source, than the element is not
-         * extracted from @p source. \n
-         * Directly returns if a "self-extraction" is attempted. \n
+         * @details If there is a [key, value]-pair in `*this` with key equivalent to an [key, value]-pair from @p source, than the
+         * [key, value]-pair is not extracted from @p source.
+         *
+         * Directly returns if a "self-extraction" is attempted.
+         *
          * The [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) only guarantees that the number of a
-         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made. \n
-         * Therefore (to be compliant with the standard) this function performs two steps:
+         * given key does not change **as long as** no call to *MPI_Info_set* or *MPI_Info_delete* is made.
+         *
+         * * Therefore (to be compliant with the standard) this function performs two steps:
          * 1. Save all keys of the [key, value]-pairs that will be extracted in a
          * [`std::vector<std::string>>`](https://en.cppreference.com/w/cpp/container/vector). Add the respective [key, value]-pairs to
          * `*this`.
          * 2. Delete all [key, value]-pairs in @p source with a key contained in the previously created vector.
          * @param[inout] source the info object to transfer the [key, value]-pairs from
          *
-         * @pre `*this` **may not** be in the moved-from state.
-         * @pre @p source **may not** be in the moved-from state.
-         * @post As of the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         * @pre `*this` **must not** be in the moved-from state.
+         * @pre @p source **must not** be in the moved-from state.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * and @p source are invalidated, if a transfer of [key, value]-pairs took place. \n
-         * Specific MPI implementations **may** differ in this regard (i.e. only iterators referring to the first inserted/extracted element
-         * or any elements after that are invalidated).
+         * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first point of insertion/extraction remain
+         * valid, all other iterators are invalidated.
          *
          * @assert{ If `*this` or @p source are in the moved-from state. }
          *
@@ -1798,8 +1818,8 @@ namespace mpicxx {
          * }
          */
         void merge(info& source) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
-            MPICXX_ASSERT(source.info_ != MPI_INFO_NULL, "source is in the \"moved-from\" state.");
+            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT(source.info_ != MPI_INFO_NULL, "'source' is in the moved-from state!");
 
             // do nothing if a "self-merge" is attempted
             if (this == std::addressof(source)) return;
