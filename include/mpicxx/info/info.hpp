@@ -31,10 +31,12 @@
 #include <mpicxx/utility/concepts.hpp>
 
 
-// TODO 2020-01-22 16:25 marcel: consistency elements <-> [key, value]-pair, punctuation
 // TODO 2020-01-22 19:26 marcel: remaining tests
 // TODO 2020-01-24 18:57 marcel: moved-from state
 // TODO 2020-01-24 20:23 marcel: check code examples
+// TODO 2020-01-25 18:58 marcel: "calls" with iterators
+// TODO 2020-01-25 18:58 marcel: documentation returns by-value!
+// TODO 2020-01-25 18:59 marcel: assertions on every function or only once (if that calls another function)
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
