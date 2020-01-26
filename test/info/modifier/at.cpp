@@ -1,7 +1,7 @@
 /**
  * @file at.cpp
  * @author Marcel Breyer
- * @date 2019-12-18
+ * @date 2020-01-26
  *
  * @brief Test cases for the @ref mpicxx::info implementation.
  *
@@ -79,11 +79,24 @@ TEST(ModifierTest, MovedFromAt) {
 TEST(ModifierTest, AtOutOfRangeException) {
     // create emtpy info and const info objects
     mpicxx::info info;
-    const mpicxx::info const_info;
+    try {
+        info.at("key");
+        FAIL() << "expected std::out_of_range exception";
+    } catch(const std::out_of_range& e) {
+        EXPECT_STREQ(e.what(), "key doesn't exist!");
+    } catch(...) {
+        FAIL() << "expected std::out_of_range exception";
+    }
 
-    // try accessing a non-existing key
-    ASSERT_THROW(info.at("key"), std::out_of_range);
-    ASSERT_THROW(const_info.at("key"), std::out_of_range);
+    const mpicxx::info const_info;
+    try {
+        const_info.at("key_2");
+        FAIL() << "expected std::out_of_range exception";
+    } catch(const std::out_of_range& e) {
+        EXPECT_STREQ(e.what(), "key_2 doesn't exist!");
+    } catch(...) {
+        FAIL() << "expected std::out_of_range exception";
+    }
 }
 
 TEST(ModifierTest, AtIllegalArguments) {
