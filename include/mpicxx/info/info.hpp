@@ -33,10 +33,6 @@
 
 // TODO 2020-01-22 19:26 marcel: remaining tests
 // TODO 2020-01-24 18:57 marcel: moved-from state
-// TODO 2020-01-24 20:23 marcel: check code examples
-// TODO 2020-01-25 18:58 marcel: "calls" with iterators
-// TODO 2020-01-25 18:58 marcel: documentation returns by-value!
-// TODO 2020-01-25 18:59 marcel: assertions on every function or only once (if that calls another function)
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
@@ -418,12 +414,11 @@ namespace mpicxx {
             /**
              * @brief Get the [key, value]-pair at the current iterator position + @p n.
              * @details If the current iterator is a const_iterator, the returned type is a
-             * [`std::pair<const std::string, const std::string>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. everything gets
-             * returned **by-value** and can't by changed.
+             * [`std::pair<const std::string, const std::string>`](https://en.cppreference.com/w/cpp/utility/pair).
              *
              * If the current iterator is a non-const iterator, the returned type is a
-             * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. even though the
-             * [key, value]-pair gets returned **by-value**, the value can be changed through the @ref proxy.
+             * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. the [key, value]-pair's value
+             * can be changed through the proxy object.
              * @param[in] n the requested offset of the iterator
              * @return the [key, value]-pair
              *
@@ -440,13 +435,13 @@ namespace mpicxx {
              * @code{.cpp}
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
              * @endcode
-             * const_iterator: \n
+             * `const_iterator` (alias for an `info_iterator<true>`): \n
              * @code{.cpp}
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
              * @endcode
-             * iterator: \n
-             * For access operations see @ref proxy.
+             * `iterator` (alias for an `info_iterator<false>`): \n
+             * For *MPI* functions called while using a proxy see the @ref proxy documentation.
              * }
              */
             reference operator[](const difference_type n) const {
@@ -482,12 +477,11 @@ namespace mpicxx {
             /**
              * @brief Get the [key, value]-pair at the current iterator position.
              * @details If the current iterator is a const_iterator, the returned type is a
-             * [`std::pair<const std::string, const std::string>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. everything gets
-             * returned **by-value** and can't by changed.
+             * [`std::pair<const std::string, const std::string>`](https://en.cppreference.com/w/cpp/utility/pair).
              *
              * If the current iterator is a non-const iterator, the returned type is a
-             * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. even though the
-             * [key, value]-pair gets returned **by-value**, the value can be changed through the @ref proxy
+             * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. the [key, value]-pair's value
+             * can be changed through the proxy object.
              * @return the [key, value]-pair
              *
              * @pre The referred to info object **must not** be in the moved-from state.
@@ -503,13 +497,13 @@ namespace mpicxx {
              * @code{.cpp}
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
              * @endcode
-             * const_iterator: \n
+             * `const_iterator` (alias for an `info_iterator<true>`): \n
              * @code{.cpp}
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
              * @endcode
-             * iterator: \n
-             * For access operations see @ref proxy.
+             * `iterator` (alias for an `info_iterator<false>`): \n
+             * For *MPI* functions called while using a proxy see the @ref proxy documentation.
              * }
              */
             reference operator*() const {
@@ -871,7 +865,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
          */
         [[nodiscard]] iterator begin() {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -889,7 +883,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For additionally called *MPI* functions see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] iterator end() {
@@ -906,7 +900,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
          */
         [[nodiscard]] const_iterator begin() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -924,7 +918,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For additionally called *MPI* functions see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] const_iterator end() const {
@@ -961,7 +955,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For additionally called *MPI* functions see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] reverse_iterator rbegin() {
@@ -979,7 +973,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
          */
         [[nodiscard]] reverse_iterator rend() {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -998,7 +992,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For additionally called *MPI* functions see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
          * }
          */
         [[nodiscard]] const_reverse_iterator rbegin() const {
@@ -1016,7 +1010,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For additionally called *MPI* functions see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
          */
         [[nodiscard]] const_reverse_iterator rend() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -1110,14 +1104,17 @@ namespace mpicxx {
          * @code{.cpp}
          * mpicxx::info obj = { {"key", "foo"} };
          * try {
-         *     obj.at("key") = "bar";               // write access
-         *     std::string val = obj.at("key");     // read access: returns a proxy object, which is immediately casted to a std::string
+         *     obj.at("key") = "bar";                   // write access
+         *     std::string str_val = obj.at("key");     // read access: returns a proxy object, which is immediately casted to a std::string
+         *     str_val = "baz";                         // changing str_val will (obviously) not change the value of obj.at("key")
          *
-         *     val = "baz";                         // changing val won't alter obj.at("key") !!!
+         *     // same as: obj.at("key") = "baz";
+         *     auto val = obj.at("key");                // read access: returns a proxy object
+         *     val = "baz";                             // write access: now obj.at("key") will return "baz"
          *
-         *     obj.at("key_2") = "foo";             // will throw
+         *     obj.at("key_2") = "baz";                 // will throw
          * } catch (const std::out_of_range& e) {
-         *     std::cerr << e.what() << std::endl;
+         *     std::cerr << e.what() << std::endl;      // prints: "key_2 doesn't exist!"
          * }
          * @endcode
          *
@@ -1126,8 +1123,6 @@ namespace mpicxx {
          * @pre The @p key's length (including the null-terminator) **must not** be greater than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise a
          * [`std::out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) exception will be thrown.
-         * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value! Changes can **only** be made through the proxy's `proxy::operator=()`.
          *
          * @assert{
          * If `*this` is in the moved-from state. \n
@@ -1140,7 +1135,7 @@ namespace mpicxx {
          * @code{.cpp}
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
          * @endcode
-         * For additionally called *MPI* functions see the @ref proxy documentation.
+         * For *MPI* functions called while using a proxy see the @ref proxy documentation.
          * }
          */
         proxy at(detail::string auto&& key) {
@@ -1164,16 +1159,18 @@ namespace mpicxx {
          *
          * Example:
          * @code{.cpp}
-         * mpicxx::info obj = { {"key", "foo"} };
+         * const mpicxx::info obj = { {"key", "foo"} };
          * try {
-         *     obj.at("key") = "bar";               // write access
-         *     std::string val = obj.at("key");     // read access: directly returns a std::string
+         *     obj.at("key") = "bar";                      // write access: modifying a temporary is nonsensical
+         *     std::string str_val = obj.at("key");        // read access: directly returns a std::string
+         *     str_val = "baz";                            // changing str_val will (obviously) not change the value of obj.at("key")
          *
-         *     val = "baz";                         // changing val won't alter obj.at("key") !!!
+         *     auto val = obj.at("key");                   // read access: directly returns a std::string
+         *     val = "baz";                                // typeof val is std::string -> changing val will not change the value of obj.at("key)"
          *
-         *     obj.at("key_2") = "foo";             // will throw
+         *     std::string throw_val = obj.at("key_2");    // will throw
          * } catch (const std::out_of_range& e) {
-         *     std::cerr << e.what() << std::endl;
+         *     std::cerr << e.what() << std::endl;         // prints: "key_2 doesn't exist!"
          * }
          * @endcode
          *
@@ -1183,7 +1180,7 @@ namespace mpicxx {
          * @pre The @p key **must** already exist, otherwise a
          * [`std::out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) exception will be thrown.
          * @attention This const overload does **not** return a proxy object but a
-         * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) (by-value)!
+         * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)!
          *
          * @assert{
          * If `*this` is in the moved-from state. \n
@@ -1229,13 +1226,15 @@ namespace mpicxx {
          * @code{.cpp}
          * mpicxx::info obj = { {"key", "foo"} };
          *
-         * obj["key"] = "bar";               // write access
-         * std::string val = obj["key"];     // read access: returns a proxy object, which is immediately casted to a std::string
+         * obj["key"] = "bar";                 // write access
+         * std::string str_val = obj["key"];   // read access: returns a proxy object, which is immediately casted to a std::string
+         * str_val = "baz";                    // changing val won't alter obj["key"] !!!
          *
-         * val = "baz";                      // changing val won't alter obj["key"] !!!
+         * // same as: obj["key"] = "baz";
+         * auto val = obj["key"];              // read access: returns a proxy object
+         * val = "baz";                        // write access: now obj["key"] will return "baz"
          *
-         * obj["key_2"] = "foo";             // inserts a new [key, value]-pair in obj
-         *
+         * obj["key_2"] = "baz";               // inserts a new [key, value]-pair in obj
          * @endcode
          *
          * @pre `*this` **may not** be in the moved-from state.
@@ -1243,18 +1242,17 @@ namespace mpicxx {
          * @pre The @p key's length (including the null-terminator) **may not** be greater than *MPI_MAX_INFO_KEY*.
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this` are
          * invalidated, if an insertion took place. \n
+         * invalidated, if an insertion took place. \n
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the insertion point remain valid, all other
          * iterators are invalidated.
-         * @attention The proxy returns the associated value *by-value*, i.e. changing the returned value won't alter
-         * this object's internal value! Changes can **only** be made through the proxy's `proxy::operator=()`.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
          *
          * @calls_ref{
-         * For additionally called *MPI* functions see the @ref proxy documentation.
+         * For *MPI* functions called while using a proxy see the @ref proxy documentation.
          * }
          */
         proxy operator[](detail::string auto&& key) {
@@ -1566,7 +1564,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert{
-         * If called with a moved-from object. \n
+         * If `*this` is in the moved-from state. \n
          * If @p pos does not refer to `*this` info object. \n
          * If attempting an illegal dereferencing.
          * }
@@ -2212,10 +2210,10 @@ namespace mpicxx {
          * @assert{ If `c` is in the moved-from state. }
          *
          * @calls{
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly `c.size()` times
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly `c.size()` times
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly `c.size()` times
-         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most `c.size()` times
+         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly 'c.size()' times
+         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly 'c.size()' times
+         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly 'c.size()' times
+         * int MPI_Info_delete(MPI_Info info, const char *key);                                         // at most 'c.size()' times
          * }
          */
         template <typename Pred>
