@@ -3,9 +3,11 @@
  * @author Marcel Breyer
  * @date 2020-01-26
  *
- * @brief Implements a wrapper class around the MPI info object.
+ * @brief Implements a wrapper class around the *MPI_Info* object.
  *
- * The @ref mpicxx::info class interface is inspired by the `std::map` interface.
+ * The @ref mpicxx::info class interface is inspired by the
+ * [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map) and
+ * [`std::map`](https://en.cppreference.com/w/cpp/container/map) interface.
  */
 
 #ifndef MPICXX_INFO_HPP
@@ -32,7 +34,7 @@
 
 
 // TODO 2020-01-22 19:26 marcel: remaining tests
-// TODO 2020-01-24 18:57 marcel: moved-from state
+// TODO 2020-01-26 19:35 marcel: usage example
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
