@@ -1092,7 +1092,7 @@ namespace mpicxx {
          * (https://en.cppreference.com/w/cpp/types/numeric_limits).
          * At runtime, the size of the info object may be limited to a value smaller than max_size() by the amount of RAM available.
          */
-        [[nodiscard]] static size_type max_size() {
+        [[nodiscard]] static constexpr size_type max_size() {
             return std::numeric_limits<difference_type>::max();
         }
 
@@ -2325,12 +2325,12 @@ namespace mpicxx {
          * @brief Returns the maximum possible key size of any [key, value]-pair.
          * @return the maximum key size (= *MPI_MAX_INFO_KEY*)
          */
-        [[nodiscard]] static consteval size_type max_key_size() { return static_cast<size_type>(MPI_MAX_INFO_KEY); }
+        [[nodiscard]] static constexpr size_type max_key_size() { return static_cast<size_type>(MPI_MAX_INFO_KEY); }
         /**
          * @brief Returns the maximum possible value size of any [key, value]-pair.
          * @return the maximum value size (= *MPI_MAX_INFO_VAL*)
          */
-        [[nodiscard]] static consteval size_type max_value_size() { return static_cast<size_type>(MPI_MAX_INFO_VAL); }
+        [[nodiscard]] static constexpr size_type max_value_size() { return static_cast<size_type>(MPI_MAX_INFO_VAL); }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
