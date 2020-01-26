@@ -1143,7 +1143,7 @@ namespace mpicxx {
          * For additionally called *MPI* functions see the @ref proxy documentation.
          * }
          */
-        [[nodiscard]] proxy at(detail::string auto&& key) {
+        proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
@@ -1152,7 +1152,7 @@ namespace mpicxx {
             // check whether the key really exists
             if (!this->key_exists(key)) {
                 // key doesn't exist
-                throw std::out_of_range("The specified key does not exist!");
+                throw std::out_of_range(std::string(std::forward<decltype(key)>(key)) + std::string(" doesn't exist!"));
             }
             // create proxy object and forward key
             return proxy(info_, std::forward<decltype(key)>(key));
@@ -1197,7 +1197,7 @@ namespace mpicxx {
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
          * }
          */
-        [[nodiscard]] std::string at(const std::string_view key) const {
+        std::string at(const std::string_view key) const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
             MPICXX_ASSERT(key.size() < MPI_MAX_INFO_KEY,
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
@@ -1209,7 +1209,7 @@ namespace mpicxx {
             // check whether the key really exists
             if (!static_cast<bool>(flag)) {
                 // key doesn't exist
-                throw std::out_of_range("The specified key does not exist!");
+                throw std::out_of_range(std::string(std::forward<decltype(key)>(key)) + std::string(" doesn't exist!"));
             }
             // get the value associated with key
             std::string value(valuelen, ' ');
@@ -1257,7 +1257,7 @@ namespace mpicxx {
          * For additionally called *MPI* functions see the @ref proxy documentation.
          * }
          */
-        [[nodiscard]] proxy operator[](detail::string auto&& key) {
+        proxy operator[](detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
