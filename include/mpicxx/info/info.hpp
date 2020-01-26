@@ -1,7 +1,7 @@
 /**
  * @file info.hpp
  * @author Marcel Breyer
- * @date 2020-01-25
+ * @date 2020-01-26
  *
  * @brief Implements a wrapper class around the MPI info object.
  *
@@ -449,16 +449,11 @@ namespace mpicxx {
              * For access operations see @ref proxy.
              * }
              */
-            reference operator[](const int n) const {
-                // calculate size if in debug mode to assert an out-of-bounds access
-#ifndef NDEBUG
-                int nkeys;
-                MPI_Info_get_nkeys(info_, &nkeys);
-#endif
-                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of a info object in the moved-from state!");
-                MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < nkeys,
-                              "'*this' not dereferenceable (legal interval: [0, %u], requested position: %i)!",
-                              nkeys, pos_ + n);
+            reference operator[](const difference_type n) const {
+                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < static_cast<difference_type>(info(info_, false).size()),
+                              "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
+                              info(info_, false).size(), pos_ + n);
 
                 // get the requested key (with an offset of n)
                 char key[MPI_MAX_INFO_KEY];
@@ -518,12 +513,22 @@ namespace mpicxx {
              * }
              */
             reference operator*() const {
+                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT(pos_ >= 0 && pos_ < static_cast<difference_type>(info(info_, false).size()),
+                              "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
+                              info(info_, false).size(), pos_);
+
                 return this->operator[](0);
             }
             /**
              * @copydoc operator*()
              */
             pointer operator->() const {
+                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT(pos_ >= 0 && pos_ < static_cast<difference_type>(info(info_, false).size()),
+                              "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
+                              info(info_, false).size(), pos_);
+
                 return std::make_unique<value_type>(this->operator[](0));
             }
 
@@ -731,8 +736,8 @@ namespace mpicxx {
          * @assert{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
          */
         constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) {
-            MPICXX_ASSERT(!(other == MPI_INFO_NULL && is_freeable == true), "MPI_INFO_NULL can't be marked freeable!"); // TODO 2020-01-24 18:58 marcel:
-            MPICXX_ASSERT(!(other == MPI_INFO_ENV && is_freeable == true), "MPI_INFO_ENV can't be marked freeable!");
+            MPICXX_ASSERT(!(other == MPI_INFO_NULL && is_freeable == true), "'MPI_INFO_NULL' can't be marked freeable!");
+            MPICXX_ASSERT(!(other == MPI_INFO_ENV && is_freeable == true), "'MPI_INFO_ENV' can't be marked freeable!");
         }
         /**
          * @brief Destructs the info object.
@@ -1141,7 +1146,7 @@ namespace mpicxx {
         [[nodiscard]] proxy at(detail::string auto&& key) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "*this is in the \"moved-from\" state.");
             MPICXX_ASSERT(std::string_view(key).size() < MPI_MAX_INFO_KEY,
-                          "Info key too long!: max. size: %i, provided size (including the null-terminator): %u",
+                          "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
             // check whether the key really exists
