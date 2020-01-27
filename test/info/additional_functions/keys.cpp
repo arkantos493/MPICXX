@@ -5,11 +5,11 @@
  *
  * @brief Test cases for the @ref mpicxx::info::keys() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name | test case description                  |
- * |:---------------|:---------------------------------------|
- * | NoKeys         | empty info object                      |
- * | Keys           | info object with keys                  |
- * | MovedFromKeys  | info object is in the moved-from state |
+ * | test case name | test case description                            |
+ * |:---------------|:-------------------------------------------------|
+ * | NoKeys         | empty info object                                |
+ * | Keys           | info object with [key, value]-pairs              |
+ * | MovedFromKeys  | info object in the moved-from state (death test) |
  */
 
 #include <vector>
@@ -45,7 +45,7 @@ TEST(NonMemberFunctionTest, Keys) {
     // create vector containing all keys (to compare against)
     std::vector<std::string> correct_keys = { "key1", "key2", "key3", "key4" };
 
-    // get keys in the info object
+    // get all keys in the info object
     std::vector<std::string> keys = info.keys();
 
     // compare keys
@@ -62,5 +62,5 @@ TEST(NonMemberFunctionDeathTest, MovedFromKeys) {
     mpicxx::info dummy(std::move(info));
 
     // calling key() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.keys(), "");      // -> should assert
+    ASSERT_DEATH(info.keys(), "");
 }

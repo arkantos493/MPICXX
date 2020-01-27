@@ -33,7 +33,7 @@ set(TEST_SOURCES
 #        non-member_functions/erase_if.cpp
 
         additional_functions/keys.cpp
-#        additional_functions/values.cpp
+        additional_functions/values.cpp
 #        additional_functions/max_key_size.cpp
 #        additional_functions/max_value_size.cpp
 

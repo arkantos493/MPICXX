@@ -1,11 +1,15 @@
 /**
- * @file values.cpp
+ * @file info/additional_functions/values.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2020-01-27
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `values` member function provided for a mpicxx::info object.
+ * @brief Test cases for the @ref mpicxx::info::values() const member function provided by the @ref mpicxx::info class.
+ * * @details Testsuite: *NonMemberFunctionTest*
+ * | test case name   | test case description                            |
+ * |:-----------------|:-------------------------------------------------|
+ * | NoValues         | empty info object                                |
+ * | Values           | info object with [key, value]-pairs              |
+ * | MovedFromValues  | info object in the moved-from state (death test) |
  */
 
 #include <vector>
@@ -17,16 +21,16 @@
 
 
 TEST(NonMemberFunctionTest, NoValues) {
-    // create info object and add various keys
+    // create empty info object
     mpicxx::info info;
 
-    // no [key, value]-pairs have been added yet so the vector should be empty
+// vector of values should be empty
     std::vector<std::string> values = info.values();
     EXPECT_TRUE(values.empty());
 }
 
 TEST(NonMemberFunctionTest, Values) {
-    // create info object and add various [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -38,10 +42,10 @@ TEST(NonMemberFunctionTest, Values) {
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 4);
 
-    // create vector containing all values
+    // create vector containing all values (to compare against)
     std::vector<std::string> correct_values = { "value1", "value2", "value3", "value4" };
 
-    // get values in this info object
+    // get all values in the info object
     std::vector<std::string> values = info.values();
 
     // compare values
@@ -52,11 +56,11 @@ TEST(NonMemberFunctionTest, Values) {
     }
 }
 
-TEST(NonMemberFunctionTest, MovedFromValues) {
-    // create info object and set it to the "moved-from" state
+TEST(NonMemberFunctionDeathTest, MovedFromValues) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const auto values = info.values();       // -> should assert
+    // calling value() on an info object in the moved-from state is illegal
+    ASSERT_DEATH(info.values(), "");
 }
