@@ -1,0 +1,8 @@
+/**
+ * @dir test/info/additional_functions
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the additional member functions provided by the
+ * @ref mpicxx::info class.
+ */

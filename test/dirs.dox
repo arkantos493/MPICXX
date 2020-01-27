@@ -1,0 +1,26 @@
+/**
+ * @dir test
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the mpicxx library.
+ * @attention Gtest's death tests are only enabled if `-DENABLE_DEATH_TESTS=ON` (default: `OFF`) was set during cmake
+ * configuration. The reason is that gtest's `fork()` call inside death tests currently doesn't work with MPI.
+ */
+
+
+/**
+ * @dir test/info
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::info implementation.
+ */
+
+/**
+ * @dir test/utility
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the utility functions.
+ */
