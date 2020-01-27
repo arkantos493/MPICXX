@@ -1,5 +1,5 @@
 /**
- * @file operator[].cpp
+ * @file info/modifier/array_subscript_operator.cpp
  * @author Marcel Breyer
  * @date 2019-12-18
  *

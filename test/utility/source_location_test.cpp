@@ -3,8 +3,8 @@
  * @author Marcel Breyer
  * @date 2019-11-20
  *
- * @brief Test cases for the (maybe custom) @ref mpicxx::source_location implementation.
  */
+// * @brief Test cases for the (maybe custom) @ref mpicxx::source_location implementation.
 
 #include <gtest/gtest.h>
 
