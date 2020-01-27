@@ -109,7 +109,7 @@ namespace mpicxx {
 
                 if (!static_cast<bool>(flag)) {
                     // the key doesn't exist yet
-                    // -> add a new [key, value]-pair and return a `std::string` consisting of only one whitespace
+                    // -> add a new [key, value]-pair and return a std::string consisting of only one whitespace
                     std::string value(" ");
                     MPI_Info_set(info_, key_.data(), value.data());
                     return value;
@@ -158,7 +158,7 @@ namespace mpicxx {
          */
         template <bool is_const>
         class info_iterator {
-            // needed to be able to construct a const_iterator from a iterator
+            // needed to be able to construct a const_iterator from an iterator
             template <bool>
             friend class info_iterator;
             // info class can now directly access the pos member
@@ -452,27 +452,27 @@ namespace mpicxx {
                               "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
                               info(info_, false).size(), pos_ + n);
 
-                // get the requested key (with an offset of n)
+                // get the key (with an offset of n)
                 char key[MPI_MAX_INFO_KEY];
                 MPI_Info_get_nthkey(info_, pos_ + n, key);
 
                 if constexpr (is_const) {
                     // this is currently a const_iterator
-                    // -> retrieve the value associated to the key
+                    // -> retrieve the value associated with the key
 
-                    // get the length of the value associated with the current key
+                    // get the length of the value associated with the key
                     int valuelen, flag;
                     MPI_Info_get_valuelen(info_, key, &valuelen, &flag);
 
-                    // get the value associated with the current key
+                    // get the value associated with the key
                     std::string value(valuelen, ' ');
                     MPI_Info_get(info_, key, valuelen, value.data(), &flag);
 
                     return std::make_pair(std::string(key), std::move(value));
                 } else {
                     // this is currently a non-const iterator
-                    // -> create a proxy object and return that as value in place of a `std::string` to allow changing the value
-
+                    // -> create a proxy object and return it as value instead of a std::string
+                    // (allows changing the value in the info object)
                     return std::make_pair(std::string(key), proxy(info_, key));
                 }
             }
@@ -607,7 +607,7 @@ namespace mpicxx {
          * }
          */
         info() : is_freeable_(true) {
-            // initialize empty info object
+            // initialize an empty info object
             MPI_Info_create(&info_);
         }
         /**
@@ -683,8 +683,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIter>
         info(InputIter first, InputIter last) : info() {
-            // default construct this info object via the default constructor
-            // add all given pairs
+            // default construct the info object via the default constructor
+            // add all [key, value]-pairs
             this->insert_or_assign(first, last);
         }
         /**
@@ -715,8 +715,8 @@ namespace mpicxx {
          * }
          */
         info(std::initializer_list<value_type> init) : info() {
-            // default construct this info object via the default constructor
-            // add all given pairs
+            // default construct the info object via the default constructor
+            // add all [key, value]-pairs
             this->insert_or_assign(init);
         }
         /**
@@ -754,6 +754,7 @@ namespace mpicxx {
          * }
          */
         ~info() {
+            // destroy info object if necessary
             if (is_freeable_ && info_ != MPI_INFO_NULL) {
                 MPI_Info_free(&info_);
             }
@@ -818,7 +819,7 @@ namespace mpicxx {
             // transfer ownership
             info_ = std::move(rhs.info_);
             is_freeable_ = std::move(rhs.is_freeable_);
-            // set moved from object to the moved-from state
+            // set rhs to the moved-from state
             rhs.info_ = MPI_INFO_NULL;
             rhs.is_freeable_ = false;
             return *this;
@@ -847,9 +848,9 @@ namespace mpicxx {
             if (is_freeable_ && info_ != MPI_INFO_NULL) {
                 MPI_Info_free(&info_);
             }
-            // recreate this info object
+            // recreate the info object
             MPI_Info_create(&info_);
-            // assign all elements in ilist to this info object
+            // add all [key, value]-pairs
             this->insert_or_assign(ilist);
             return *this;
         }
@@ -1146,7 +1147,7 @@ namespace mpicxx {
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, std::string_view(key).size() + 1);
 
-            // check whether the key really exists
+            // check whether the key exists
             if (!this->key_exists(key)) {
                 // key doesn't exist
                 throw std::out_of_range(std::string(std::forward<decltype(key)>(key)) + std::string(" doesn't exist!"));
@@ -1205,7 +1206,7 @@ namespace mpicxx {
             // get the length of the value associated with key
             int valuelen, flag;
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
-            // check whether the key really exists
+            // check whether the key exists
             if (!static_cast<bool>(flag)) {
                 // key doesn't exist
                 throw std::out_of_range(std::string(std::forward<decltype(key)>(key)) + std::string(" doesn't exist!"));
@@ -1304,13 +1305,13 @@ namespace mpicxx {
                           "Info value too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_VAL, value.size() + 1);
 
-            // check if key already exists
+            // check whether the key exists
             const bool key_already_exists = this->key_exists(key);
             if (!key_already_exists) {
                 // key doesn't exist -> add new [key, value]-pair
                 MPI_Info_set(info_, key.data(), value.data());
             }
-            // search position of the key and return iterator
+            // search position of the key and return an iterator
             return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
@@ -1360,9 +1361,9 @@ namespace mpicxx {
                               "Info value too long (max. size: %i, provided size (including the null-terminator): %u)!",
                               MPI_MAX_INFO_VAL, value.size() + 1);
 
-                // check if key already exists
+                // check whether the key exists
                 if (!this->key_exists(key)) {
-                    // key doesn't exist yet -> add new [key, value]-pair
+                    // key doesn't exist -> add new [key, value]-pair
                     MPI_Info_set(info_, key.data(), value.data());
                 }
             }
@@ -1440,7 +1441,7 @@ namespace mpicxx {
             const bool key_already_exists = this->key_exists(key);
             // updated (i.e. insert or assign) the [key, value]-pair
             MPI_Info_set(info_, key.data(), value.data());
-            // search position of the key and return iterator
+            // search position of the key and return an iterator
             return std::make_pair(iterator(info_, this->find_pos(key, this->size())), !key_already_exists);
         }
         /**
@@ -1650,7 +1651,7 @@ namespace mpicxx {
                 keys_to_delete[i] = key;
             }
 
-            // delete all requested [key, value]-pairs
+            // delete all saved [key, value]-pairs
             for (const auto& str : keys_to_delete) {
                 MPI_Info_delete(info_, str.data());
             }
@@ -1687,7 +1688,7 @@ namespace mpicxx {
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
-            // check if key does exist
+            // check whether the key exists
             if (this->key_exists(key)) {
                 // key exists -> delete the [key, value]-pair
                 MPI_Info_delete(info_, key.data());
@@ -1782,15 +1783,15 @@ namespace mpicxx {
                           "Info key too long (max. size: %i, provided size (including the null-terminator): %u)!",
                           MPI_MAX_INFO_KEY, key.size() + 1);
 
-            // check if key really exists
+            // check whether the key exists
             int valuelen, flag;
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
             if (static_cast<bool>(flag)) {
-                // key exists -> delete the [key, value]-pair and return it
+                // key exists -> delete the [key, value]-pair and return an iterator
                 // get the value associated with the given key
                 std::string value(valuelen, ' ');
                 MPI_Info_get(info_, key.data(), valuelen, value.data(), &flag);
-                // delete the [key, value]-pair from this info object
+                // delete the [key, value]-pair from the info object
                 MPI_Info_delete(info_, key.data());
                 // return the extracted [key, value]-pair
                 return std::make_optional<value_type>(std::make_pair(std::string(key), std::move(value)));
@@ -2028,10 +2029,10 @@ namespace mpicxx {
             const size_type size = this->size();
             const size_type pos = this->find_pos(key, size);
             if (pos != size) {
-                // found key in this info object
+                // found key in the info object
                 return std::make_pair(iterator(info_, pos), iterator(info_, pos + 1));
             } else {
-                // the key is not in this info object
+                // the key is not in the info object
                 return std::make_pair(iterator(info_, size), iterator(info_, size));
             }
         }
@@ -2073,10 +2074,10 @@ namespace mpicxx {
             const size_type size = this->size();
             const size_type pos = this->find_pos(key, size);
             if (pos != size) {
-                // found key in this info object
+                // found key in the info object
                 return std::make_pair(const_iterator(info_, pos), const_iterator(info_, pos + 1));
             } else {
-                // the key is not in this info object
+                // the key is not in the info object
                 return std::make_pair(const_iterator(info_, size), const_iterator(info_, size));
             }
         }
@@ -2145,7 +2146,7 @@ namespace mpicxx {
                 delete[] lhs_value;
                 delete[] rhs_value;
                 if (!are_values_equal) {
-                    // values compare inequal -> info objects can't be equal
+                    // values compare inequal -> info objects can't cmopare equal
                     return false;
                 }
             }
@@ -2236,7 +2237,7 @@ namespace mpicxx {
                 MPI_Info_get_valuelen(c.info_, key, &valuelen, &flag);
                 std::string value(valuelen, ' ');
                 MPI_Info_get(c.info_, key, valuelen, value.data(), &flag);
-                // create [key, value]-pair as std::pair
+                // create [key, value]-pair as a std::pair
                 value_type key_value_pair = std::make_pair(std::string(key), std::move(value));
 
                 // check whether the predicate holds
@@ -2246,7 +2247,7 @@ namespace mpicxx {
                 }
             }
 
-            // delete all [key, value]-pairs for which pred returns true
+            // delete all [key, value]-pairs for which the predicate returns true
             for (const auto& str : keys_to_delete) {
                 MPI_Info_delete(c.info_, str.data());
             }
@@ -2351,9 +2352,9 @@ namespace mpicxx {
 
     private:
         /*
-         * @brief Finds the position of the given @p key in this info object.
+         * @brief Finds the position of the given @p key in the info object.
          * @param[in] key the @p key to find
-         * @param[in] size the current size of this info object
+         * @param[in] size the current size of the info object
          * @return the position of the @p key or @p size if the @p key does not exist in this info object
          *
          * @attention No assertions are performed because this function is only callable from within this class and
@@ -2378,7 +2379,7 @@ namespace mpicxx {
         }
 
         /*
-         * @brief Tests whether the given @p key already exists in this info object.
+         * @brief Tests whether the given @p key already exists in the info object.
          * @param[in] key the @p key to check for
          * @return `true` if the @p key already exists, `false` otherwise
          *
