@@ -9,6 +9,15 @@ int main(int argc, char** argv) {
     // Filter out Google Test arguments
     ::testing::InitGoogleTest(&argc, argv);
 
+    // Enabled death tests only if explicitly requested (broken with MPI)
+    // -> normally disable them
+    if (ENABLE_DEATH_TESTING == 0) {
+        std::cout << "Disabled death tests" << std::endl;
+        ::testing::GTEST_FLAG(filter) = "-*DeathTest.*";
+    } else {
+        std::cout << "Enabled death tests" << std::endl;
+    }
+
     // Initialize MPI
     MPI_Init(&argc, &argv);
 
