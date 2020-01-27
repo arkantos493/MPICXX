@@ -107,6 +107,9 @@ if (ENABLE_TESTS)
     add_subdirectory(test)
 endif (ENABLE_TESTS)
 
+if (ENABLE_DEATH_TESTS)
+    message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
+endif(ENABLE_DEATH_TESTS)
 
 # enable coverage reports using coveralls
 if (ENABLE_COVERALLS_REPORT)
@@ -115,7 +118,7 @@ if (ENABLE_COVERALLS_REPORT)
     include(Coveralls)
     coveralls_turn_on_coverage()
     # TODO: test if coverage reports work
-    file(GLOB_RECURSE COVERAGE_SRCS "${PROJECT_SOURCE_DIR}/inlcude/mpicxx(*.hpp)")
+    file(GLOB_RECURSE COVERAGE_SRCS "${PROJECT_SOURCE_DIR}/include/mpicxx(*.hpp)")
     coveralls_setup("${COVERAGE_SRCS}" ON
                     "${PROJECT_SOURCE_DIR}/cmake/modules/")
 endif(ENABLE_COVERALLS_REPORT)
