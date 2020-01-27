@@ -12,6 +12,8 @@ include(CMakeDependentOption)
 option(ENABLE_TESTS "Generate tests" OFF)
 cmake_dependent_option(ENABLE_COVERALLS_REPORT "Generate coveralls data" OFF 
                        "ENABLE_TESTS" OFF)
+cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
+                       "ENABLE_TESTS" OFF)
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
 
@@ -53,7 +55,7 @@ target_include_directories(
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
 # set important compiler flags
-add_compile_options(-Wall -Wextra -pedantic -fconcepts)
+add_compile_options(-Wall -Wextra -pedantic)
 
 # set targets to install
 install(TARGETS ${PROJECT_NAME}
@@ -113,7 +115,7 @@ if (ENABLE_COVERALLS_REPORT)
     include(Coveralls)
     coveralls_turn_on_coverage()
     # TODO: test if coverage reports work
-    file(GLOB_RECURSE COVERAGE_SRCS "${PROJECT_SOURCE_DIR}/inlcude/mpicxx(*.hpp")
+    file(GLOB_RECURSE COVERAGE_SRCS "${PROJECT_SOURCE_DIR}/inlcude/mpicxx(*.hpp)")
     coveralls_setup("${COVERAGE_SRCS}" ON
                     "${PROJECT_SOURCE_DIR}/cmake/modules/")
 endif(ENABLE_COVERALLS_REPORT)
