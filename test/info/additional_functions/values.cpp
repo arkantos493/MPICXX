@@ -4,7 +4,7 @@
  * @date 2020-01-27
  *
  * @brief Test cases for the @ref mpicxx::info::values() const member function provided by the @ref mpicxx::info class.
- * * @details Testsuite: *NonMemberFunctionTest*
+ * @details Testsuite: *NonMemberFunctionTest*
  * | test case name   | test case description                            |
  * |:-----------------|:-------------------------------------------------|
  * | NoValues         | empty info object                                |
