@@ -83,7 +83,7 @@ namespace mpicxx::utility {
             MPI_Initialized(&is_initialized);
             int is_finalized = 0;
             MPI_Finalized(&is_finalized);
-            if (static_cast<bool>(is_initialized) && static_cast<bool>(is_finalized)) {
+            if (static_cast<bool>(is_initialized) && !static_cast<bool>(is_finalized)) {
                 // we are currently in an active MPI environment
                 // -> call MPI_Abort
                 MPI_Abort(MPI_COMM_WORLD, 1);
