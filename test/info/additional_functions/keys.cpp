@@ -1,11 +1,15 @@
 /**
- * @file keys.cpp
+ * @file info/additional_functions/keys.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2010-01-27
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `keys` member function provided for a mpicxx::info object.
+ * @brief Test cases for the @ref mpicxx::info::keys() const member function provided by the @ref mpicxx::info class.
+ * @details Testsuite: *NonMemberFunctionTest*
+ * | test case name | test case description                  |
+ * |:---------------|:---------------------------------------|
+ * | NoKeys         | empty info object                      |
+ * | Keys           | info object with keys                  |
+ * | MovedFromKeys  | info object is in the moved-from state |
  */
 
 #include <vector>
@@ -17,16 +21,16 @@
 
 
 TEST(NonMemberFunctionTest, NoKeys) {
-    // create info object and add various keys
+    // create empty info object
     mpicxx::info info;
 
-    // no [key, value]-pairs have been added yet so the vector should be empty
+    // vector of keys should be empty
     std::vector<std::string> keys = info.keys();
     EXPECT_TRUE(keys.empty());
 }
 
 TEST(NonMemberFunctionTest, Keys) {
-    // create info object and add various [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -38,10 +42,10 @@ TEST(NonMemberFunctionTest, Keys) {
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 4);
 
-    // create vector containing all keys
+    // create vector containing all keys (to compare against)
     std::vector<std::string> correct_keys = { "key1", "key2", "key3", "key4" };
 
-    // get keys in this info object
+    // get keys in the info object
     std::vector<std::string> keys = info.keys();
 
     // compare keys
@@ -52,11 +56,11 @@ TEST(NonMemberFunctionTest, Keys) {
     }
 }
 
-TEST(NonMemberFunctionTest, MovedFromKeys) {
-    // create info object and set it to the "moved-from" state
+TEST(NonMemberFunctionDeathTest, MovedFromKeys) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const auto keys = info.keys();       // -> should assert
+    // calling key() on an info object in the moved-from state is illegal
+    ASSERT_DEATH(info.keys(), "");      // -> should assert
 }
