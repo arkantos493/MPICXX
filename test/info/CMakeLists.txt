@@ -34,8 +34,8 @@ set(TEST_SOURCES
 
         additional_functions/keys.cpp
         additional_functions/values.cpp
-#        additional_functions/max_key_size.cpp
-#        additional_functions/max_value_size.cpp
+        additional_functions/max_key_size.cpp
+        additional_functions/max_value_size.cpp
 
 #        info_iterator_test.cpp
 #        info_modifier_test.cpp
