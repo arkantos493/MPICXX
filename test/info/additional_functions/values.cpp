@@ -24,7 +24,7 @@ TEST(NonMemberFunctionTest, NoValues) {
     // create empty info object
     mpicxx::info info;
 
-// vector of values should be empty
+    // vector of values should be empty
     std::vector<std::string> values = info.values();
     EXPECT_TRUE(values.empty());
 }
