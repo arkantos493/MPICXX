@@ -1,11 +1,15 @@
 /**
- * @file size.cpp
+ * @file info/capacity/size.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2020-01-29
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `size` member function of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::size() const member function provided by the @ref mpicxx::info class.
+ * @details Testsuite: *CapacityTest*
+ * | test case name | test case description                            |
+ * |:---------------|:-------------------------------------------------|
+ * | SizeZero       | empty info object                                |
+ * | SizeNonZero    | non empty info object                            |
+ * | MovedFromSize  | info object in the moved-from state (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -23,7 +27,7 @@ TEST(CapacityTest, SizeZero) {
 }
 
 TEST(CapacityTest, SizeNonZero) {
-    // create info object and add element
+    // create info object
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
 
@@ -44,11 +48,12 @@ TEST(CapacityTest, SizeNonZero) {
     EXPECT_EQ(info.size(), 0);
 }
 
-TEST(CapacityTest, MovedFromSize) {
-    // create info object and set it to the "moved-from" state
+TEST(CapacityDeathTest, MovedFromSize) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const mpicxx::info::size_type size = info.size();       // -> should assert
+    // calling size() on an info object in the moved-from state is illegal
+    [[maybe_unused]] mpicxx::info::size_type size;
+    ASSERT_DEATH(size = info.size(), "");
 }

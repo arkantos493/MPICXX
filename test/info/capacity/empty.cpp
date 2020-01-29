@@ -1,11 +1,15 @@
 /**
- * @file empty.cpp
+ * @file info/capacity/empty.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2020-01-29
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `empty` member function of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::empty() const member function provided by the @ref mpicxx::info class.
+ * @details Testsuite: *CapacityTest*
+ * | test case name | test case description                            |
+ * |:---------------|:-------------------------------------------------|
+ * | Empty          | empty info object                                |
+ * | NonEmpty       | non empty info object                            |
+ * | MovedFromEmpty | info object in the moved-from state (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -22,8 +26,8 @@ TEST(CapacityTest, Empty) {
     EXPECT_TRUE(info.empty());
 }
 
-TEST(CapacityTest, NotEmpty) {
-    // create info object and add element
+TEST(CapacityTest, NonEmpty) {
+    // create info object
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
 
@@ -44,11 +48,11 @@ TEST(CapacityTest, NotEmpty) {
     EXPECT_TRUE(info.empty());
 }
 
-TEST(CapacityTest, MovedFromEmpty) {
-    // create info object and set it to the "moved-from" state
+TEST(CapacityDeathTest, MovedFromEmpty) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const bool is_empty = info.empty();       // -> should assert
+    // calling empty() on an info object in the moved-from state is illegal
+    ASSERT_DEATH(info.empty(), "");
 }

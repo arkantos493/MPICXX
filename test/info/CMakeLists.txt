@@ -13,10 +13,10 @@ set(TEST_SOURCES
         assignment/move_assignment.cpp
         assignment/initializer_list_assignment.cpp
 
-#        capacity/empty.cpp
-#        capacity/size.cpp
-#        capacity/max_size.cpp
-#
+        capacity/empty.cpp
+        capacity/size.cpp
+        capacity/max_size.cpp
+
 #        modifier/at.cpp
 #        modifier/array_subscript_operator.cpp
 #        modifier/clear.cpp
