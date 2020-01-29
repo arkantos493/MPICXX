@@ -1,11 +1,13 @@
 /**
- * @file env.cpp
+ * @file info/env.cpp
  * @author Marcel Breyer
- * @date 2019-12-19
+ * @date 2020-01-29
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the mpicxx::info::env object encapsulating the *MPI_INFO_ENV* information.
+ * @brief Test cases for the @ref mpicxx::info::env static const info object provided by the @ref mpicxx::info class.
+ * @details Testsuite: *InfoEnvTest*
+ * | test case name | test case description                 |
+ * |:---------------|:--------------------------------------|
+ * | InfoEnv        | check elements against *MPI_INFO_ENV* |
  */
 
 #include <gtest/gtest.h>
