@@ -1,11 +1,18 @@
 /**
- * @file move_assignment.cpp
+ * @file info/assignment/move_assignment.cpp
  * @author Marcel Breyer
- * @date 2019-12-18
+ * @date 2020-01-29
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the move assignment operator of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::operator=(info&&) member function provided by the @ref mpicxx::info class.
+ * @details Testsuite: *AssignmentTest*
+ * | test case name                 | test case description                                                            |
+ * |:-------------------------------|:---------------------------------------------------------------------------------|
+ * | MoveAssignValidToValid         | `info1 = std::move(info2);`                                                      |
+ * | MoveAssignMovedFromToValid     | `info1 = std::move(info2); // where info2 is in the moved-from state`            |
+ * | MoveAssignValidToMovedFrom     | `info1 = std::move(info2); // where info1 is in the moved-from state`            |
+ * | MoveAssignMovedFromToMovedFrom | `info1 = std::move(info2); // where info1 and info2 are in the moved-from state` |
+ * | MoveAssignToNonFreeable        | non-freeable info object should be freeable now                                  |
+ * | MoveAssignFromNonFreeable      | info object should be non-freeable (because the copied-from was non-freeable)    |
  */
 
 #include <gtest/gtest.h>
@@ -15,56 +22,57 @@
 
 
 TEST(AssignmentTest, MoveAssignValidToValid) {
-    // create empty info objects and add one element each
-    mpicxx::info info_1;
-    MPI_Info_set(info_1.get(), "key1", "value1");
-    mpicxx::info info_2;
-    MPI_Info_set(info_2.get(), "key2", "value2");
+    // create first info object
+    mpicxx::info valid_1;
+    MPI_Info_set(valid_1.get(), "key1", "value1");
+    // create second info object
+    mpicxx::info valid_2;
+    MPI_Info_set(valid_2.get(), "key2", "value2");
 
-    // perform assignment
-    info_1 = std::move(info_2);
+    // perform move assignment
+    valid_1 = std::move(valid_2);
 
-    // info_2 should now be in the "moved-from" state
-    EXPECT_EQ(info_2.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(info_2.freeable());
-    // info_1 should be in a valid state containing one [key, value]-pair
+    // info_2 should now be in the moved-from state
+    EXPECT_EQ(valid_2.get(), MPI_INFO_NULL);
+
+    // info_1 should be in a valid state containing ["key2", "value2"]
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
-    MPI_Info_get_nkeys(info_1.get(), &nkeys);
+    MPI_Info_get_nkeys(valid_1.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
-    MPI_Info_get(info_1.get(), "key2", 6, value, &flag);
+    MPI_Info_get(valid_1.get(), "key2", 6, value, &flag);
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value2");
 }
 
 TEST(AssignmentTest, MoveAssignMovedFromToValid) {
-    // create empty info objects and set them to the "moved-from" state
+    // create first info object and move-construct second info object from it
     mpicxx::info moved_from;
     mpicxx::info valid(std::move(moved_from));
 
-    // perform assignment
+    // perform move assignment
     valid = std::move(moved_from);
 
-    // now both info objects should be in the "moved-from" state
+    // now both info objects should be in the moved-from state
     EXPECT_EQ(valid.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(valid.freeable());
     EXPECT_EQ(moved_from.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(moved_from.freeable());
 }
 
 TEST(AssignmentTest, MoveAssignValidToMovedFrom) {
-    // create empty info objects and set them to the "moved-from" state
+    // create first info object and set it to the moved-from state
     mpicxx::info moved_from;
-    mpicxx::info valid(std::move(moved_from));
+    mpicxx::info dummy(std::move(moved_from));
+    // create second info object
+    mpicxx::info valid;
     MPI_Info_set(valid.get(), "key", "value");
 
-    // perform assignment
+    // perform move assignment
     moved_from = std::move(valid);
 
     // valid should now be in the "moved-from" state
     EXPECT_EQ(valid.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(valid.freeable());
-    // moved_from should now be in a valid state containing one [key, value]-pair
+
+    // moved_from should now be in a valid state containing only ["key2", "value2"]
     ASSERT_NE(moved_from.get(), MPI_INFO_NULL);
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
@@ -76,29 +84,27 @@ TEST(AssignmentTest, MoveAssignValidToMovedFrom) {
 }
 
 TEST(AssignmentTest, MoveAssignMovedFromToMovedFrom) {
-    // create empty info objects and set them to the "moved-from" state
+    // create empty info objects and set them to the moved-from state
     mpicxx::info moved_from_1;
     mpicxx::info dummy_1(std::move(moved_from_1));
     mpicxx::info moved_from_2;
     mpicxx::info dummy_2(std::move(moved_from_2));
 
-    // perform assignment
+    // perform move assignment
     moved_from_1 = std::move(moved_from_2);
 
-    // now both info objects should still be in the "moved-from" state
+    // now both info objects should still be in the moved-from state
     EXPECT_EQ(moved_from_1.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(moved_from_1.freeable());
     EXPECT_EQ(moved_from_2.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(moved_from_2.freeable());
 }
 
-TEST(AssignmentTest, MoveNonFreeable) {
+TEST(AssignmentTest, MoveAssignToNonFreeable) {
     // create empty info object
     mpicxx::info info;
-    // create non-freable info object
+    // create non-freeable info object
     mpicxx::info non_freeable(MPI_INFO_ENV, false);
 
-    // perform assignment
+    // perform move assignment
     non_freeable = std::move(info);
 
     // non_freeable should now be freeable and empty
@@ -107,9 +113,29 @@ TEST(AssignmentTest, MoveNonFreeable) {
     EXPECT_EQ(nkeys, 0);
     EXPECT_TRUE(non_freeable.freeable());
 
-    // info should be in the "moved-from" state
+    // info should be in the moved-from state
     EXPECT_EQ(info.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(info.freeable());
 
     // -> if non_freeable would have been freed, the MPI runtime would crash
+}
+
+TEST(AssignmentTest, MoveAssignFromNonFreeable) {
+    // create empty info object
+    mpicxx::info info;
+    // create non-freeable info object
+    mpicxx::info non_freeable(MPI_INFO_ENV, false);
+
+    // perform move assignment
+    info = std::move(non_freeable);
+
+    // info shouldn't be empty anymore and marked as non-freeable (as non_freeable was)
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    EXPECT_NE(nkeys, 0);
+    EXPECT_FALSE(info.freeable());
+
+    // non_freeable should be in the moved-from state
+    EXPECT_EQ(non_freeable.get(), MPI_INFO_NULL);
+
+    // -> if info would have been freed, the MPI runtime would crash
 }

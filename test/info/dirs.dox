@@ -6,3 +6,11 @@
  * @brief This directory contains all test cases for the additional member functions provided by the
  * @ref mpicxx::info class.
  */
+
+/**
+ * @dir test/info/assignment
+ * @author Marcel Breyer
+ * @date 2020-01-29
+ *
+ * @brief This directory contains all test cases for the assignment operations provided by the @ref mpicxx::info class.
+ */

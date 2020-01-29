@@ -8,11 +8,11 @@ set(TEST_SOURCES
 #        construction_and_destruction/iterator_range_construction.cpp
 #        construction_and_destruction/initializer_list_construction.cpp
 #        construction_and_destruction/mpi_info_construction.cpp
-#
-#        assignment/copy_assignment.cpp
-#        assignment/move_assignment.cpp
-#        assignment/initializer_list_assignment.cpp
-#
+
+        assignment/copy_assignment.cpp
+        assignment/move_assignment.cpp
+        assignment/initializer_list_assignment.cpp
+
 #        capacity/empty.cpp
 #        capacity/size.cpp
 #        capacity/max_size.cpp
