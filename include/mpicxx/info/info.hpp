@@ -825,7 +825,8 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Replaces the contents with those identified by initializer list @p ilist.
+         * @brief Replaces the contents with those identified by the
+         * [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist.
          * @details If multiple [key, value]-pairs in the range share the same key, the **last** occurrence determines the final value.
          * @param[in] ilist initializer list to initialize the [key, value]-pairs of the info object with
          * @return `*this`
@@ -850,6 +851,7 @@ namespace mpicxx {
             }
             // recreate the info object
             MPI_Info_create(&info_);
+            is_freeable_ = true;
             // add all [key, value]-pairs
             this->insert_or_assign(ilist);
             return *this;
