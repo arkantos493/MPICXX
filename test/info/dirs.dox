@@ -15,11 +15,21 @@
  * @brief This directory contains all test cases for the assignment operations provided by the @ref mpicxx::info class.
  */
 
- /**
-  * @dir test/info/capacity
-  * @author Marcel Breyer
-  * @date 2020-01-29
-  *
-  * @brief This directory contains all test cases for the capacity member function provided by the @ref mpicxx::info
-  * class.
-  */
+/**
+ * @dir test/info/capacity
+ * @author Marcel Breyer
+ * @date 2020-01-29
+ *
+ * @brief This directory contains all test cases for the capacity member function provided by the @ref mpicxx::info
+ * class.
+ */
+
+
+
+/**
+ * @dir test/info/non-member_functions
+ * @author Marcel Breyer
+ * @date 2020-01-30
+ *
+ * @brief This directory contains all test cases for the non-member function provided by the @ref mpicxx::info class.
+ */

@@ -1,11 +1,15 @@
 /**
  * @file info/non-member_functions/swap.cpp
  * @author Marcel Breyer
- * @date 2019-12-16
+ * @date 2020-01-30
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `swap` non-member function of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::swap(info&, info&) function provided by the @ref mpicxx::info class.
+ * @details Testsuite: *NonMemberFunctionTest*
+ * | test case name            | test case description                                              |
+ * |:--------------------------|:-------------------------------------------------------------------|
+ * | SwapValidAndValid         | swap two info objects                                              |
+ * | SwapValidAndMovedFrom     | swap two info objects where one of them is in the moved-from state |
+ * | SwapMovedFromAndMovedFrom | swap two info objects where both are in the moved-from state       |
  */
 
 #include <gtest/gtest.h>
@@ -23,7 +27,8 @@ TEST(NonMemberFunctionTest, SwapValidAndValid) {
     MPI_Info_set(info_2.get(), "key3", "value3");
 
     // swap both info objects
-    std::swap(info_1, info_2);
+    using std::swap;
+    swap(info_1, info_2);
 
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
@@ -46,22 +51,23 @@ TEST(NonMemberFunctionTest, SwapValidAndValid) {
 }
 
 TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
-    // create two info objects and add [key, value]-pairs to one and set the other to the "moved-from" state
+    // create two info objects and add [key, value]-pairs to one and set the other to the moved-from state
     mpicxx::info info_1;
     MPI_Info_set(info_1.get(), "key", "value");
     mpicxx::info info_2(std::move(info_1));
 
     // swap both info objects
-    std::swap(info_1, info_2);
+    using std::swap;
+    swap(info_1, info_2);
 
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
 
-    // check info_2 object -> now in the "moved-from" state
+    // check info_2 -> now in the moved-from state
     EXPECT_EQ(info_2.get(), MPI_INFO_NULL);
     EXPECT_FALSE(info_2.freeable());
 
-    // check info_1 object
+    // check info_1
     MPI_Info_get_nkeys(info_1.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
     MPI_Info_get(info_1.get(), "key", 6, value, &flag);
@@ -70,13 +76,14 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
     EXPECT_TRUE(info_1.freeable());
 
     // swap both info objects back
-    std::swap(info_1, info_2);
+    using std::swap;
+    swap(info_1, info_2);
 
-    // check info_1 object -> now in the "moved-from" state
+    // check info_1 -> now in the moved-from state
     EXPECT_EQ(info_1.get(), MPI_INFO_NULL);
     EXPECT_FALSE(info_1.freeable());
 
-    // check info_2 object
+    // check info_2
     MPI_Info_get_nkeys(info_2.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
     MPI_Info_get(info_2.get(), "key", 6, value, &flag);
@@ -86,18 +93,17 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
 }
 
 TEST(NonMemberFunctionTest, SwapMovedFromAndMovedFrom) {
-    // create two empty info objects and set them to the "moved-from" state
-    mpicxx::info info_1;
-    mpicxx::info dummy_1(std::move(info_1));
-    mpicxx::info info_2;
-    mpicxx::info dummy_2(std::move(info_2));
+    // create two info objects and set them to the moved-from state
+    mpicxx::info moved_from_1;
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info moved_from_2;
+    mpicxx::info dummy_2(std::move(moved_from_2));
 
-    // swap both "moved-from" info objects
-    std::swap(info_1, info_2);
+    // swap both moved-from info objects
+    using std::swap;
+    swap(moved_from_1, moved_from_2);
 
-    // both are still in the "moved-from" state
-    EXPECT_EQ(info_1.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(info_1.freeable());
-    EXPECT_EQ(info_2.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(info_2.freeable());
+    // both are still in the moved-from state
+    EXPECT_EQ(moved_from_1.get(), MPI_INFO_NULL);
+    EXPECT_EQ(moved_from_2.get(), MPI_INFO_NULL);
 }

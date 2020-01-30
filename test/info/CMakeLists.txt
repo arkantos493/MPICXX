@@ -27,10 +27,10 @@ set(TEST_SOURCES
 #        lookup/contains.cpp
 #        lookup/equal_range.cpp
 #
-#        non-member_functions/equality.cpp
-#        non-member_functions/inequality.cpp
-#        non-member_functions/swap.cpp
-#        non-member_functions/erase_if.cpp
+        non-member_functions/equality.cpp
+        non-member_functions/inequality.cpp
+        non-member_functions/swap.cpp
+        non-member_functions/erase_if.cpp
 
         additional_functions/keys.cpp
         additional_functions/values.cpp
