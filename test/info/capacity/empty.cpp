@@ -54,5 +54,6 @@ TEST(CapacityDeathTest, MovedFromEmpty) {
     mpicxx::info dummy(std::move(info));
 
     // calling empty() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.empty(), "");
+    [[maybe_unused]] bool empty;
+    ASSERT_DEATH(empty = info.empty(), "");
 }
