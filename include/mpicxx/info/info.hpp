@@ -205,6 +205,7 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
+            info_iterator() : info_(MPI_INFO_NULL), pos_(0) { } // TODO 2020-01-30 20:53 marcel: default constructor for iterators?
             /**
              * @brief Construct a new iterator.
              * @param[inout] info pointer to the iterated over *MPI_Info* object
