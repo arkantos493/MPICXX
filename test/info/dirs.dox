@@ -20,16 +20,24 @@
  * @author Marcel Breyer
  * @date 2020-01-29
  *
- * @brief This directory contains all test cases for the capacity member function provided by the @ref mpicxx::info
+ * @brief This directory contains all test cases for the capacity member functions provided by the @ref mpicxx::info
  * class.
  */
 
 
 
 /**
+ * @dir test/info/lookup
+ * @author Marcel Breyer
+ * @date 2020-01-30
+ *
+ * @brief This directory contains all test cases for the lookup member functions provided by the @ref mpicxx::info class.
+ */
+
+/**
  * @dir test/info/non-member_functions
  * @author Marcel Breyer
  * @date 2020-01-30
  *
- * @brief This directory contains all test cases for the non-member function provided by the @ref mpicxx::info class.
+ * @brief This directory contains all test cases for the non-member functions provided by the @ref mpicxx::info class.
  */

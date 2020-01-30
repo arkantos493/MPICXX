@@ -1,11 +1,16 @@
 /**
- * @file count.cpp
+ * @file info/lookup/count.cpp
  * @author Marcel Breyer
- * @date 2019-12-19
+ * @date 2020-01-30
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `count` member function of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::count(const std::string_view) const const member function provided by the @ref mpicxx::info
+ * class.
+ * @details Testsuite: *LookupTest*
+ * | test case name   | test case description                            |
+ * |:-----------------|:-------------------------------------------------|
+ * | CountExisting    | count existing keys                              |
+ * | CountNonExisting | count non-existing key                           |
+ * | MovedFromCount   | info object in the moved-from state (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -15,30 +20,31 @@
 
 
 TEST(LookupTest, CountExisting) {
-    // create empty info object and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
 
-    // try finding the keys
+    // try counting the keys
     EXPECT_EQ(info.count("key1"), 1);
     EXPECT_EQ(info.count("key2"), 1);
 }
 
 TEST(LookupTest, CountNonExisting) {
-    // create empty info object and add [key, value]-pairs
+    // create info object and add [key, value]-pair
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
 
-    // try finding non-existing key
+    // try counting non-existing key
     EXPECT_EQ(info.count("key2"), 0);
 }
 
-TEST(LookupTest, MovedFromCount) {
-    // create info object and set it to the "moved-from" state
+TEST(LookupDeathTest, MovedFromCount) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const int count = info.count("key");       // -> should assert
+    // calling count() on an info object in the moved-from state is illegal
+    [[maybe_unused]] int count;
+    ASSERT_DEATH(count = info.count("key"), "");
 }

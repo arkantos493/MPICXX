@@ -21,12 +21,12 @@ set(TEST_SOURCES
 #        modifier/array_subscript_operator.cpp
 #        modifier/clear.cpp
 #        modifier/swap.cpp
-#
-#        lookup/count.cpp
-#        lookup/find.cpp
-#        lookup/contains.cpp
-#        lookup/equal_range.cpp
-#
+
+        lookup/count.cpp
+        lookup/find.cpp
+        lookup/contains.cpp
+        lookup/equal_range.cpp
+
         non-member_functions/equality.cpp
         non-member_functions/inequality.cpp
         non-member_functions/swap.cpp

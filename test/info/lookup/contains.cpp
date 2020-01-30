@@ -1,11 +1,16 @@
 /**
- * @file contains.cpp
+ * @file info/lookup/contains.cpp
  * @author Marcel Breyer
- * @date 2019-12-19
+ * @date 2020-01-30
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `contains` member function of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::contains(const std::string_view) const const member function provided by the
+ * @ref mpicxx::info class.
+ * @details Testsuite: *LookupTest*
+ * | test case name      | test case description                            |
+ * |:--------------------|:-------------------------------------------------|
+ * | ContainsExisting    | check for existing keys                          |
+ * | ContainsNonExisting | check for non-existing key                       |
+ * | MovedFromContains   | info object in the moved-from state (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -15,30 +20,31 @@
 
 
 TEST(LookupTest, ContainsExisting) {
-    // create empty info object and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
 
-    // try finding the keys
+    // check for the existence of the keys
     EXPECT_TRUE(info.contains("key1"));
     EXPECT_TRUE(info.contains("key2"));
 }
 
 TEST(LookupTest, ContainsNonExisting) {
-    // create empty info object and add [key, value]-pairs
+    // create info object and add [key, value]-pair
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
 
-    // try finding non-existing key
+    // check for the existence of the key
     EXPECT_FALSE(info.contains("key2"));
 }
 
-TEST(LookupTest, MovedFromContains) {
-    // create info object and set it to the "moved-from" state
+TEST(LookupDeathTest, MovedFromContains) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const bool contains = info.contains("key");       // -> should assert
+    // calling contains() on an info object in the moved-from state is illegal
+    [[maybe_unused]] bool contains;
+    ASSERT_DEATH(contains = info.contains("key"), "");
 }
