@@ -50,7 +50,7 @@ TEST(AssignmentTest, CopyAssignValidToValid) {
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value2");
 
-    // be sure that info_1 is really a deep-copy
+    // be sure that info_1 really is a deep-copy
     // -> add element to info_1 and be sure that info_2 still has only one [key, value]-pair
     MPI_Info_set(valid_1.get(), "key3", "value3");
     MPI_Info_get_nkeys(valid_2.get(), &nkeys);
@@ -127,7 +127,7 @@ TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value");
 
-    // be sure that info_1 is really a deep-copy
+    // be sure that info_1 really is a deep-copy
     // -> add element to info_1 and be sure that info_2 still has only one [key, value]-pair
     MPI_Info_set(moved_from.get(), "key2", "value2");
     MPI_Info_get_nkeys(valid.get(), &nkeys);
