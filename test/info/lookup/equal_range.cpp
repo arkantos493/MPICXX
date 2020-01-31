@@ -1,19 +1,21 @@
 /**
  * @file info/lookup/equal_range.cpp
  * @author Marcel Breyer
- * @date 2020-01-30
+ * @date 2020-01-31
  *
  * @brief Test cases for the @ref mpicxx::info::equal_range(const std::string_view) const const member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *LookupTest*
- * | test case name                   | test case description                                  |
- * |:---------------------------------|:-------------------------------------------------------|
- * | EqualRangeExisting               | find key in info object                                |
- * | ConstEqualRangeExisting          | find key in const info object                          |
- * | EqualRangeNonExisting            | find non-existing key in info object                   |
- * | ConstEqualRangeNonExisting       | find non-existing key in const info object             |
- * | MovedFromEqualRangeExisting      | info object in the moved-from state (death test)       |
- * | MovedFromConstEqualRangeExisting | const info object in the moved-from state (death test) |
+ * | test case name                   | test case description                                        |
+ * |:---------------------------------|:-------------------------------------------------------------|
+ * | EqualRangeExisting               | find key in info object                                      |
+ * | ConstEqualRangeExisting          | find key in const info object                                |
+ * | EqualRangeNonExisting            | find non-existing key in info object                         |
+ * | ConstEqualRangeNonExisting       | find non-existing key in const info object                   |
+ * | MovedFromEqualRangeExisting      | info object in the moved-from state (death test)             |
+ * | MovedFromConstEqualRangeExisting | const info object in the moved-from state (death test)       |
+ * | EqualRangeWithIllegalKey         | try to find an illegal key in info object (death test)       |
+ * | ConstEqualRangeWithIllegalKey    | try to find an illegal key in const info object (death test) |
  */
 
 #include <string>
@@ -91,16 +93,6 @@ TEST(LookupTest, ConstEqualRangeNonExisting) {
     EXPECT_EQ(it_pair.first, it_pair.second);
 }
 
-TEST(LookupTest, MovedFromEqualRange) {
-    // create info object and set it to the "moved-from" state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
-
-    // call to empty from a "moved-from" info object is invalid
-//    [[maybe_unused]] const auto range = info.equal_range("key");       // -> should assert
-}
-
-
 TEST(LookupDeathTest, MovedFromEqualRange) {
     // create info object and set it to the moved-from state
     mpicxx::info info;
@@ -108,7 +100,7 @@ TEST(LookupDeathTest, MovedFromEqualRange) {
 
     // calling equal_range() on an info object in the moved-from state is illegal
     [[maybe_unused]] std::pair<mpicxx::info::iterator, mpicxx::info::iterator> it_pair;
-    ASSERT_DEATH(it_pair = info.equal_range("key"), "");
+    ASSERT_DEATH( it_pair = info.equal_range("key") , "");
 }
 
 TEST(LookupDeathTest, MovedFromConstEqualRange) {
@@ -117,8 +109,26 @@ TEST(LookupDeathTest, MovedFromConstEqualRange) {
 
     // calling equal_range() const on an info object in the moved-from state is illegal
     [[maybe_unused]] std::pair<mpicxx::info::const_iterator, mpicxx::info::const_iterator> it_pair;
-    ASSERT_DEATH(it_pair = info.equal_range("key"), "");
+    ASSERT_DEATH( it_pair = info.equal_range("key") , "");
 }
 
 
+TEST(LookupDeathTest, EqualRangeWithIllegalKey) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
 
+    // try to find an illegal key
+    [[maybe_unused]] std::pair<mpicxx::info::iterator, mpicxx::info::iterator> it_pair;
+    ASSERT_DEATH( it_pair = info.equal_range(key) , "");
+}
+
+TEST(LookupDeathTest, ConstEqualRangeWithIllegalKey) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+
+    // try to find an illegal key
+    [[maybe_unused]] std::pair<mpicxx::info::const_iterator, mpicxx::info::const_iterator> it_pair;
+    ASSERT_DEATH( it_pair = info.equal_range(key) , "");
+}

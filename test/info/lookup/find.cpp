@@ -1,19 +1,21 @@
 /**
  * @file info/lookup/find.cpp
  * @author Marcel Breyer
- * @date 2020-01-30
+ * @date 2020-01-31
  *
  * @brief Test cases for the @ref mpicxx::info::find(const std::string_view) const const member function provided by the @ref mpicxx::info
  * class.
  * @details Testsuite: *LookupTest*
- * | test case name       | test case description                                  |
- * |:---------------------|:-------------------------------------------------------|
- * | FindExisting         | find key in info object                                |
- * | ConstFindExisting    | find key in const info object                          |
- * | FindNonExisting      | find non-existing key in info object                   |
- * | ConstFindNonExisting | find non-existing key in const info object             |
- * | MovedFromFind        | info object in the moved-from state (death test)       |
- * | MovedFromConstFind   | const info object in the moved-from state (death test) |
+ * | test case name          | test case description                                        |
+ * |:------------------------|:-------------------------------------------------------------|
+ * | FindExisting            | find key in info object                                      |
+ * | ConstFindExisting       | find key in const info object                                |
+ * | FindNonExisting         | find non-existing key in info object                         |
+ * | ConstFindNonExisting    | find non-existing key in const info object                   |
+ * | MovedFromFind           | info object in the moved-from state (death test)             |
+ * | MovedFromConstFind      | const info object in the moved-from state (death test)       |
+ * | FindWithIllegalKey      | try to find an illegal key in info object (death test)       |
+ * | ConstFindWithIllegalKey | try to find an illegal key in const info object (death test) |
  */
 
 #include <string>
@@ -86,7 +88,7 @@ TEST(LookupDeathTest, MovedFromFind) {
 
     // calling find() on an info object in the moved-from state is illegal
     [[maybe_unused]] mpicxx::info::iterator it;
-    ASSERT_DEATH(it = info.find("key"), "");
+    ASSERT_DEATH( it = info.find("key") , "");
 }
 
 TEST(LookupDeathTest, MovedFromConstFind) {
@@ -95,5 +97,25 @@ TEST(LookupDeathTest, MovedFromConstFind) {
 
     // calling find() const on an info object in the moved-from state is illegal
     [[maybe_unused]] mpicxx::info::const_iterator it;
-    ASSERT_DEATH(it = info.find("key"), "");
+    ASSERT_DEATH( it = info.find("key") , "");
+}
+
+TEST(LookupDeathTest, FindWithIllegalKey) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+
+    // try to find an illegal key
+    [[maybe_unused]] mpicxx::info::iterator it;
+    ASSERT_DEATH( it = info.find(key) , "");
+}
+
+TEST(LookupDeathTest, ConstFindWithIllegalKey) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+
+    // try to find an illegal key
+    [[maybe_unused]] mpicxx::info::const_iterator it;
+    ASSERT_DEATH( it = info.find(key) , "");
 }

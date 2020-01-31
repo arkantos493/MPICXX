@@ -1,17 +1,20 @@
 /**
  * @file info/lookup/count.cpp
  * @author Marcel Breyer
- * @date 2020-01-30
+ * @date 2020-01-31
  *
  * @brief Test cases for the @ref mpicxx::info::count(const std::string_view) const const member function provided by the @ref mpicxx::info
  * class.
  * @details Testsuite: *LookupTest*
- * | test case name   | test case description                            |
- * |:-----------------|:-------------------------------------------------|
- * | CountExisting    | count existing keys                              |
- * | CountNonExisting | count non-existing key                           |
- * | MovedFromCount   | info object in the moved-from state (death test) |
+ * | test case name      | test case description                            |
+ * |:--------------------|:-------------------------------------------------|
+ * | CountExisting       | count existing keys                              |
+ * | CountNonExisting    | count non-existing key                           |
+ * | MovedFromCount      | info object in the moved-from state (death test) |
+ * | CountWithIllegalKey | try to count an illegal key (death test)         |
  */
+
+#include <string>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
@@ -46,5 +49,15 @@ TEST(LookupDeathTest, MovedFromCount) {
 
     // calling count() on an info object in the moved-from state is illegal
     [[maybe_unused]] int count;
-    ASSERT_DEATH(count = info.count("key"), "");
+    ASSERT_DEATH( count = info.count("key") , "");
+}
+
+TEST(LookupDeathTest, CountWithIllegalKey) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+
+    // try to count an illegal key
+    [[maybe_unused]] int count;
+    ASSERT_DEATH( count = info.count(key) , "");
 }

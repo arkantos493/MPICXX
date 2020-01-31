@@ -5,12 +5,16 @@
  *
  * @brief Test cases for the @ref mpicxx::info::info(InputIter, InputIter) member function provided by the  @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description                              |
- * |:---------------------------------|:---------------------------------------------------|
- * | IteratorRangeConstruction        | construct info object from an iterator range       |
- * | EmptyIteratorRangeConstruction   | construct info object from an empty iterator range |
- * | InvalidIteratorRangeConstruction | illegal iterator range (death test)                |
+ * | test case name                   | test case description                                               |
+ * |:---------------------------------|:--------------------------------------------------------------------|
+ * | IteratorRangeConstruction        | construct info object from an iterator range                        |
+ * | EmptyIteratorRangeConstruction   | construct info object from an empty iterator range                  |
+ * | InvalidIteratorRangeConstruction | illegal iterator range (death test)                                 |
+ * | IteratorRangeIllegalKeyOrValue   | try to construct info object from an illegal key/value (death test) |
  */
+
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -21,7 +25,7 @@
 
 TEST(ConstructionTest, IteratorRangeConstruction) {
     // create vector with all [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> key_value_pairs;
+    std::vector<std::pair<const std::string, std::string>> key_value_pairs;
     key_value_pairs.emplace_back("key1", "value1");
     key_value_pairs.emplace_back("key2", "value2");
     key_value_pairs.emplace_back("key1", "value1_override");
@@ -56,7 +60,7 @@ TEST(ConstructionTest, IteratorRangeConstruction) {
 
 TEST(ConstructionTest, EmptyIteratorRangeConstruction) {
     // create empty vector
-    std::vector<std::pair<std::string, std::string>> key_value_pairs;
+    std::vector<std::pair<const std::string, std::string>> key_value_pairs;
 
     // construct an info object from an empty iterator range
     mpicxx::info info(key_value_pairs.begin(), key_value_pairs.end());
@@ -72,10 +76,29 @@ TEST(ConstructionTest, EmptyIteratorRangeConstruction) {
 
 TEST(ConstructionDeathTest, InvalidIteratorRangeConstruction) {
     // create vector with all [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> key_value_pairs;
+    std::vector<std::pair<const std::string, std::string>> key_value_pairs;
     key_value_pairs.emplace_back("key1", "value1");
 
     // iterator range construction where first > last is illegal
     ASSERT_DEATH(mpicxx::info info(key_value_pairs.end(), key_value_pairs.begin()), "");
 
+}
+
+TEST(ConstructionDeathTest, IteratorRangeIllegalKeyOrValue) {
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+    std::string value(MPI_MAX_INFO_VAL, ' ');
+
+    std::vector<std::pair<const std::string, std::string>> vec;
+    vec.emplace_back(std::make_pair(key, "value"));
+    vec.emplace_back(std::make_pair("", "value"));
+    vec.emplace_back(std::make_pair("key", value));
+    vec.emplace_back(std::make_pair("key", ""));
+
+    // create info object from iterator range with illegal key
+    ASSERT_DEATH( mpicxx::info info(vec.begin(), vec.begin() + 1) , "");
+    ASSERT_DEATH( mpicxx::info info(vec.begin() + 1, vec.begin() + 2) , "");
+
+    // create info object from iterator range with illegal value
+    ASSERT_DEATH( mpicxx::info info(vec.begin() + 2, vec.begin() + 3) , "");
+    ASSERT_DEATH( mpicxx::info info(vec.begin() + 3, vec.end()) , "");
 }

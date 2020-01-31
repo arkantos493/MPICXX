@@ -6,11 +6,15 @@
  * @brief Test cases for the @ref mpicxx::info::info(std::initializer_list<value_type>) member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description |
- * |:---------------------------------|:----------------------|
- * | InitializerListConstruction      | construct info object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) |
+ * | test case name                   | test case description                                               |
+ * |:---------------------------------|:--------------------------------------------------------------------|
+ * | InitializerListConstruction      | construct info object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)       |
  * | EmptyInitializerListConstruction | construct empty info object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) |
+ * | InitializerListIllegalKeyOrValue | try to construct info object from an illegal key/value (death test) |
  */
+
+#include <string>
+#include <utility>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
@@ -60,4 +64,17 @@ TEST(ConstructionTest, EmptyInitializerListConstruction) {
 
     // an info object constructed from an initializer_list is always freeable
     EXPECT_TRUE(info.freeable());
+}
+
+TEST(ConstructionDeathTest, InitializerListIllegalKeyOrValue) {
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+    std::string value(MPI_MAX_INFO_VAL, ' ');
+
+    // create info object from initializer list with illegal key
+    ASSERT_DEATH( mpicxx::info info({ { key, "value" } }) , "");
+    ASSERT_DEATH( mpicxx::info info({ { "", "value" } }) , "");
+
+    // create info object from initializer list with illegal value
+    ASSERT_DEATH( mpicxx::info info({ { "key", value } }) , "");
+    ASSERT_DEATH( mpicxx::info info({ { "key", "" } }) , "");
 }

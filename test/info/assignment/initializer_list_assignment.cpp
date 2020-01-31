@@ -6,12 +6,16 @@
  * @brief Test cases for the @ref mpicxx::info::operator=(const std::initializer_list<value_type>) member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
- * | test case name                     | test case description                                                                  |
- * |:-----------------------------------|:---------------------------------------------------------------------------------------|
- * | AssignInitializerListToValid       | assign all elements of the initializer list to the info object                         |
- * | AssignInitializerListToMovedFrom   | assign all elements of the initializer list to the info object in the moved-from state |
- * | AssignInitializerListToNonFreeable | assign all elements of the initializer list to the non-freeable info object            |
+ * | test case name                         | test case description                                                                  |
+ * |:---------------------------------------|:---------------------------------------------------------------------------------------|
+ * | AssignInitializerListToValid           | assign all elements of the initializer list to the info object                         |
+ * | AssignInitializerListToMovedFrom       | assign all elements of the initializer list to the info object in the moved-from state |
+ * | AssignInitializerListToNonFreeable     | assign all elements of the initializer list to the non-freeable info object            |
+ * | AssignInitializerListIllegalKeyOrValue | try to assign an illegal key/value to the info object (death test)                     |
  */
+
+#include <string>
+#include <utility>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
@@ -95,4 +99,19 @@ TEST(AssignmentTest, AssignInitializerListToNonFreeable) {
     MPI_Info_get(info.get(), "key2", 6, value, &flag);
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value2");
+}
+
+TEST(AssignmentDeathTest, AssignInitializerListIllegalKeyOrValue) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+    std::string value(MPI_MAX_INFO_VAL, ' ');
+
+    // assign initializer list with illegal key
+    ASSERT_DEATH( (info = { { key, "value" } }) , "");
+    ASSERT_DEATH( (info = { { "", "value" } }) , "");
+
+    // assign initializer list with illegal value
+    ASSERT_DEATH( (info = { { "key", value } }) , "");
+    ASSERT_DEATH( (info = { { "key", "" } }) , "");
 }
