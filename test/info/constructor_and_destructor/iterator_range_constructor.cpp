@@ -80,7 +80,7 @@ TEST(ConstructionDeathTest, InvalidIteratorRangeConstruction) {
     key_value_pairs.emplace_back("key1", "value1");
 
     // iterator range construction where first > last is illegal
-    ASSERT_DEATH(mpicxx::info info(key_value_pairs.end(), key_value_pairs.begin()), "");
+    ASSERT_DEATH( mpicxx::info info(key_value_pairs.end(), key_value_pairs.begin()) , "");
 
 }
 

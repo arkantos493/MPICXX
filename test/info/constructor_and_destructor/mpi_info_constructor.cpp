@@ -79,12 +79,12 @@ TEST(ConstructionDeathTest, MPIConstructFromInvalidObject) {
     MPI_Info info_null_ptr = MPI_INFO_NULL;
     // construct an info object using a MPI_Info object
     {
-        ASSERT_DEATH(mpicxx::info info(info_null_ptr, true), "");
+        ASSERT_DEATH( mpicxx::info info(info_null_ptr, true) , "");
     }
 
     MPI_Info info_env_ptr = MPI_INFO_ENV;
     // construct an info object using a MPI_Info object
     {
-        ASSERT_DEATH(mpicxx::info info(info_env_ptr, true), "");
+        ASSERT_DEATH( mpicxx::info info(info_env_ptr, true) , "");
     }
 }

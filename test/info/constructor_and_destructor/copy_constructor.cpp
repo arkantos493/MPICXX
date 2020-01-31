@@ -67,7 +67,7 @@ TEST(ConstructionDeathTest, CopyConstructFromMovedFromObject) {
     mpicxx::info dummy(std::move(moved_from));
 
     // copy construction where other is in the moved-from state is illegal
-    ASSERT_DEATH(mpicxx::info info(moved_from), "");
+    ASSERT_DEATH( mpicxx::info info(moved_from) , "");
 }
 
 TEST(ConstructionTest, CopyConstructFromNonFreeable) {

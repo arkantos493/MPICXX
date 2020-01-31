@@ -94,7 +94,7 @@ TEST(AssignmentDeathTest, CopyAssignMovedFromToValid) {
     mpicxx::info valid(std::move(moved_from));
 
     // copy assignment where rhs is in the moved-from state is illegal
-    ASSERT_DEATH(valid = moved_from, "");
+    ASSERT_DEATH( valid = moved_from , "");
 }
 
 TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
@@ -142,7 +142,7 @@ TEST(AssignmentDeathTest, CopyAssignMovedFromToMovedFrom) {
     mpicxx::info dummy_2(std::move(moved_from_2));
 
     // copy assignment where rhs is in the moved-from state is illegal
-    ASSERT_DEATH(moved_from_1 = moved_from_2, "");
+    ASSERT_DEATH( moved_from_1 = moved_from_2 , "");
 }
 
 TEST(AssignmentTest, CopySelfAssignment) {
