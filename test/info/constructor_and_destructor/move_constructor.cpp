@@ -5,11 +5,11 @@
  *
  * @brief Test cases for the @ref mpicxx::info::info(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description                                                                |
- * |:---------------------------------|:-------------------------------------------------------------------------------------|
- * | MoveConstructFromValidObject     | `mpicxx::info info1(info2);`                                                         |
- * | MoveConstructFromMovedFromObject | `mpicxx::info info1(info2); // where info2 is in the moved-from state` (death test)` |
- * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable)        |
+ * | test case name                   | test case description                                                         |
+ * |:---------------------------------|:------------------------------------------------------------------------------|
+ * | MoveConstructFromValidObject     | `mpicxx::info info1(info2);`                                                  |
+ * | MoveConstructFromMovedFromObject | `mpicxx::info info1(info2); // where info2 is in the moved-from state`        |
+ * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable) |
  */
 
 #include <gtest/gtest.h>
