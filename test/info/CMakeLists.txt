@@ -2,12 +2,12 @@
 set(TEST_SOURCES
         env.cpp
 
-#        construction_and_destruction/default_construction.cpp
-#        construction_and_destruction/copy_construction.cpp
-#        construction_and_destruction/move_construction.cpp
-#        construction_and_destruction/iterator_range_construction.cpp
-#        construction_and_destruction/initializer_list_construction.cpp
-#        construction_and_destruction/mpi_info_construction.cpp
+        constructor_and_destructor/default_constructor.cpp
+        constructor_and_destructor/copy_constructor.cpp
+        constructor_and_destructor/move_constructor.cpp
+        constructor_and_destructor/iterator_range_constructor.cpp
+        constructor_and_destructor/initializer_list_constructor.cpp
+        constructor_and_destructor/mpi_info_constructor.cpp
 
         assignment/copy_assignment.cpp
         assignment/move_assignment.cpp

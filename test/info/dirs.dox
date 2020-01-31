@@ -24,7 +24,14 @@
  * class.
  */
 
-
+/**
+ * @dir test/info/constructor_and_destructor
+ * @author Marcel Breyer
+ * @date 2020-01-31
+ *
+ * @brief This directory contains all test cases for the constructors and the destructor provided by the
+ * @ref mpicxx::info class.
+ */
 
 /**
  * @dir test/info/lookup
