@@ -38,7 +38,17 @@
  * @author Marcel Breyer
  * @date 2020-01-30
  *
- * @brief This directory contains all test cases for the lookup member functions provided by the @ref mpicxx::info class.
+ * @brief This directory contains all test cases for the lookup member functions provided by the @ref mpicxx::info
+ * class.
+ */
+
+/**
+ * @dir test/info/modifier
+ * @author Marcel Breyer
+ * @date 2020-02-02
+ *
+ * @brief This directory contains all test cases for the modifying member functions provided by the @ref mpicxx::info
+ * class.
  */
 
 /**

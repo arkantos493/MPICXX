@@ -1,14 +1,26 @@
 /**
- * @file at.cpp
+ * @file info/modifier/at.cpp
  * @author Marcel Breyer
- * @date 2020-01-26
+ * @date 2020-02-02
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `at` member-function of a mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::at(detail::string auto&&) and @ref mpicxx::info::at(const std::string_view) const member
+ * functions provided by the @ref mpicxx::info class.
+ * @details Testsuite: *ModifierTest*
+ * | test case name             | test case description                                         |
+ * |:---------------------------|:--------------------------------------------------------------|
+ * | AtRead                     | read [key, value]-pairs                                       |
+ * | ConstAtRead                | read [key, value]-pairs (const info object)                   |
+ * | AtWrite                    | overwrite already existing [key, value]-pair                  |
+ * | MovedFromAt                | info object in the moved-from state (death test)              |
+ * | MovedFromConstAt           | const info object in the moved-from state (death test)        |
+ * | AtOutOfRangeException      | try to access a non-existing key                              |
+ * | ConstAtOutOfRangeException | try to access a non-existing key (const info object)          |
+ * | AtWithIllegalKey           | try to access an illegal key (death test)                     |
+ * | ConstAtWithIllegalKey      | try to access an illegal key (const info object) (death test) |
  */
 
 #include <stdexcept>
+#include <string>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
@@ -17,42 +29,42 @@
 
 
 TEST(ModifierTest, AtRead) {
-    // create info object and add element
+    // create info object
     mpicxx::info info;
-    MPI_Info_set(info.get(), "key1", "value1");
+    MPI_Info_set(info.get(), "key", "value");
 
     // read existing value
-    const std::string value1 = info.at("key1");
+    const std::string value = info.at("key");
 
-    // check if value1 is correct and nothing was added
-    EXPECT_STREQ(value1.c_str(), "value1");
+    // check if value is correct and nothing was added
+    EXPECT_STREQ(value.c_str(), "value");
     int nkeys;
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
 }
 
-TEST(ModifierTest, AtConstRead) {
-    // create info object and add element
+TEST(ModifierTest, ConstAtRead) {
+    // create const info object
     const mpicxx::info info;
-    MPI_Info_set(info.get(), "key1", "value1");
+    MPI_Info_set(info.get(), "key", "value");
 
     // read existing value
-    const std::string value1 = info.at("key1");
+    const std::string value = info.at("key");
 
-    // check if value1 is correct and nothing was added
-    EXPECT_STREQ(value1.c_str(), "value1");
+    // check if value is correct and nothing was added
+    EXPECT_STREQ(value.c_str(), "value");
     int nkeys;
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
 }
 
 TEST(ModifierTest, AtWrite) {
-    // create info object and add element
+    // create info object
     mpicxx::info info;
-    MPI_Info_set(info.get(), "key1", "value1");
+    MPI_Info_set(info.get(), "key", "value");
 
     // override already existing value
-    info["key1"] = "value1_override";
+    info["key"] = "value_override";
 
     // check that no new [key, value]-pair has been added
     int nkeys;
@@ -62,22 +74,30 @@ TEST(ModifierTest, AtWrite) {
     // check if values has been changed successfully
     int flag;
     char value[MPI_MAX_INFO_VAL];
-    MPI_Info_get(info.get(), "key1", 15, value, &flag);
+    MPI_Info_get(info.get(), "key", 14, value, &flag);
     EXPECT_TRUE(static_cast<bool>(flag));
-    EXPECT_STREQ(value, "value1_override");
+    EXPECT_STREQ(value, "value_override");
 }
 
-TEST(ModifierTest, MovedFromAt) {
-    // create emtpy info and const info objects and set them to the "moved-from" state
+TEST(ModifierDeathTest, MovedFromAt) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // try adding [key, value]-pair to an object in the "moved-from" state
-//    info.at("key");       // -> should assert
+    // calling at() on an info object in the moved-from state is illegal
+    ASSERT_DEATH(info.at("key"), "");
+}
+
+TEST(ModifierDeathTest, MovedFromConstAt) {
+    // create const info object and set it to the moved-from state
+    const mpicxx::info info(MPI_INFO_NULL, false);
+
+    // calling at() on an info object in the moved-from state is illegal
+    ASSERT_DEATH(info.at("key"), "");
 }
 
 TEST(ModifierTest, AtOutOfRangeException) {
-    // create emtpy info and const info objects
+    // create emtpy info
     mpicxx::info info;
     try {
         info.at("key");
@@ -87,7 +107,10 @@ TEST(ModifierTest, AtOutOfRangeException) {
     } catch(...) {
         FAIL() << "expected std::out_of_range exception";
     }
+}
 
+TEST(ModifierTest, ConstAtOutOfRangeException) {
+    // create const emtpy info
     const mpicxx::info const_info;
     try {
         const_info.at("key_2");
@@ -99,13 +122,22 @@ TEST(ModifierTest, AtOutOfRangeException) {
     }
 }
 
-TEST(ModifierTest, AtIllegalArguments) {
-    // create emtpy info and const info objects
+TEST(ModifierDeathTest, AtWithIllegalKey) {
+    // create info object
     mpicxx::info info;
-    const mpicxx::info const_info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
 
-    // try adding a [key, value]-pair with a key that is too long
-    const std::string long_key(MPI_MAX_INFO_KEY, 'x');
-//    info.at(long_key) = "value";       // -> should assert
-//    const_info.at(long_key);           // -> should assert
+    // try accessing illegal keys
+    ASSERT_DEATH( info.at(key) , "");
+    ASSERT_DEATH( info.at("") , "");
+}
+
+TEST(ModifierDeathTest, ConstAtWithIllegalKey) {
+    // create const info object
+    const mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+
+    // try accessing illegal keys
+    ASSERT_DEATH( info.at(key) , "");
+    ASSERT_DEATH( info.at("") , "");
 }

@@ -17,8 +17,8 @@ set(TEST_SOURCES
         capacity/size.cpp
         capacity/max_size.cpp
 
-#        modifier/at.cpp
-#        modifier/array_subscript_operator.cpp
+        modifier/at.cpp
+        modifier/array_subscript_operator.cpp
 #        modifier/clear.cpp
 #        modifier/swap.cpp
 
