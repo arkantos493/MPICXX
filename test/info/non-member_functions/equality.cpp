@@ -111,5 +111,5 @@ TEST(NonMemberFunctionDeathTest, MovedFromEquality) {
     [[maybe_unused]] bool comp;
     ASSERT_DEATH(comp = moved_from_1 == valid_1, "");
     ASSERT_DEATH(comp = moved_from_2 == valid_2, "");
-    ASSERT_DEATH(comp = moved_from_1 == valid_2, "");
+    ASSERT_DEATH(comp = moved_from_1 == moved_from_2, "");
 }
