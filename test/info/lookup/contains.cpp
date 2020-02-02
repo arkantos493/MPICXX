@@ -60,4 +60,5 @@ TEST(LookupDeathTest, ContainsWithIllegalKey) {
     // try to check for the existence of an illegal key
     [[maybe_unused]] bool contains;
     ASSERT_DEATH( contains = info.contains(key) , "");
+    ASSERT_DEATH( contains = info.contains("") , "");
 }

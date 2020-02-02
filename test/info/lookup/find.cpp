@@ -3,7 +3,8 @@
  * @author Marcel Breyer
  * @date 2020-01-31
  *
- * @brief Test cases for the @ref mpicxx::info::find(const std::string_view) const member function provided by the @ref mpicxx::info
+ * @brief Test cases for the @ref mpicxx::info::find(const std::string_view) and @ref mpicxx::info::find(const std::string_view) const
+ * member functions provided by the @ref mpicxx::info
  * class.
  * @details Testsuite: *LookupTest*
  * | test case name          | test case description                                        |
@@ -108,6 +109,7 @@ TEST(LookupDeathTest, FindWithIllegalKey) {
     // try to find an illegal key
     [[maybe_unused]] mpicxx::info::iterator it;
     ASSERT_DEATH( it = info.find(key) , "");
+    ASSERT_DEATH( it = info.find("") , "");
 }
 
 TEST(LookupDeathTest, ConstFindWithIllegalKey) {
@@ -118,4 +120,5 @@ TEST(LookupDeathTest, ConstFindWithIllegalKey) {
     // try to find an illegal key
     [[maybe_unused]] mpicxx::info::const_iterator it;
     ASSERT_DEATH( it = info.find(key) , "");
+    ASSERT_DEATH( it = info.find("") , "");
 }

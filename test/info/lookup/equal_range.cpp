@@ -3,8 +3,8 @@
  * @author Marcel Breyer
  * @date 2020-01-31
  *
- * @brief Test cases for the @ref mpicxx::info::equal_range(const std::string_view) const member function provided by the
- * @ref mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::equal_range(const std::string_view) and
+ * @ref mpicxx::info::equal_range(const std::string_view) const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *LookupTest*
  * | test case name                   | test case description                                        |
  * |:---------------------------------|:-------------------------------------------------------------|
@@ -121,6 +121,7 @@ TEST(LookupDeathTest, EqualRangeWithIllegalKey) {
     // try to find an illegal key
     [[maybe_unused]] std::pair<mpicxx::info::iterator, mpicxx::info::iterator> it_pair;
     ASSERT_DEATH( it_pair = info.equal_range(key) , "");
+    ASSERT_DEATH( it_pair = info.equal_range("") , "");
 }
 
 TEST(LookupDeathTest, ConstEqualRangeWithIllegalKey) {
@@ -131,4 +132,5 @@ TEST(LookupDeathTest, ConstEqualRangeWithIllegalKey) {
     // try to find an illegal key
     [[maybe_unused]] std::pair<mpicxx::info::const_iterator, mpicxx::info::const_iterator> it_pair;
     ASSERT_DEATH( it_pair = info.equal_range(key) , "");
+    ASSERT_DEATH( it_pair = info.equal_range("") , "");
 }

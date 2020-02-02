@@ -60,4 +60,5 @@ TEST(LookupDeathTest, CountWithIllegalKey) {
     // try to count an illegal key
     [[maybe_unused]] int count;
     ASSERT_DEATH( count = info.count(key) , "");
+    ASSERT_DEATH( count = info.count("") , "");
 }
