@@ -1,11 +1,14 @@
 /**
- * @file clear.cpp
+ * @file info/modifier/clear.cpp
  * @author Marcel Breyer
- * @date 2019-12-19
+ * @date 2020-02-02
  *
- * @brief Test cases for the @ref mpicxx::info implementation.
- *
- * This file provides test cases for the `clear` member function of the mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::clear() member function provided by the @ref mpicxx::info class.
+ * @details Testsuite: *ModifierTest*
+ * | test case name | test case description                            |
+ * |:---------------|:-------------------------------------------------|
+ * | Clear          | remove all [key, value]-pairs from info object   |
+ * | MovedFromClear | info object in the moved-from state (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -15,21 +18,21 @@
 
 
 TEST(ModifierTest, Clear) {
-    // create empty info object and add [key, value]-pairs
+    // create info object
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
     MPI_Info_set(info.get(), "key3", "value3");
 
-    // size should be 4
+    // size should be three
     int nkeys;
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 3);
 
-    // try clearing info object
+    // clear info object
     info.clear();
 
-    // now the size should be 0
+    // now the info object should be empty
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 0);
 
@@ -39,11 +42,11 @@ TEST(ModifierTest, Clear) {
     EXPECT_EQ(nkeys, 0);
 }
 
-TEST(ModifierTest, MovedFromClear) {
-    // create info object and set it to the "moved-from" state
+TEST(ModifierDeathTest, MovedFromClear) {
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info dummy(std::move(info));
 
-    // call to empty from a "moved-from" info object is invalid
-//    info.clear();       // -> should assert
+    // calling clear() on an info object in the moved-from state is illegal
+    ASSERT_DEATH(info.clear(), "");
 }

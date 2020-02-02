@@ -19,8 +19,9 @@ set(TEST_SOURCES
 
         modifier/at.cpp
         modifier/array_subscript_operator.cpp
-#        modifier/clear.cpp
-#        modifier/swap.cpp
+        modifier/clear.cpp
+        modifier/merge.cpp
+        modifier/swap.cpp
 
         lookup/count.cpp
         lookup/find.cpp
