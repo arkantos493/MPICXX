@@ -3,7 +3,7 @@
  * @author Marcel Breyer
  * @date 2020-01-31
  *
- * @brief Test cases for the @ref mpicxx::info::contains(const std::string_view) const const member function provided by the
+ * @brief Test cases for the @ref mpicxx::info::contains(const std::string_view) const member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *LookupTest*
  * | test case name         | test case description                                         |
