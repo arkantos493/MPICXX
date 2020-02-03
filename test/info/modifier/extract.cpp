@@ -37,7 +37,7 @@ TEST(ModifierTest, ExtractByIterator) {
     mpicxx::info::const_iterator it = info.begin() + 1;
     std::pair<const std::string, std::string> key_value_pair = info.extract(it);
 
-    // the info object should now contain only two elements
+    // the info object should now contain only two [key, value]-pairs
     int nkeys;
     MPI_Info_get_nkeys(info.get(), &nkeys);
     EXPECT_EQ(nkeys, 2);
@@ -81,7 +81,7 @@ TEST(ModifierDeathTest, ExtractByIteratorNotDereferenceable) {
 }
 
 TEST(ModifierDeathTest, MovedFromExtractByIterator) {
-// create info object and set it to the moved-from state
+    // create info object and set it to the moved-from state
     mpicxx::info info;
     mpicxx::info::const_iterator it = info.begin();
     mpicxx::info dummy(std::move(info));
