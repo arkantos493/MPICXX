@@ -59,7 +59,7 @@ TEST(ModifierTest, InsertByKeyValuePair) {
     EXPECT_STREQ(static_cast<std::string>(it_2.first->second).c_str(), "value2");
 
     // insert [key, value]-pair
-    auto it_3 = info.insert("key2", "value2");
+    auto it_3 = info.insert("key2", "value2_override");
 
     // the info object should contain only two [key, value]-pairs
     MPI_Info_get_nkeys(info.get(), &nkeys);
