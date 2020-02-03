@@ -22,6 +22,7 @@ set(TEST_SOURCES
         modifier/clear.cpp
         modifier/erase.cpp
         modifier/extract.cpp
+        modifier/insert.cpp
         modifier/merge.cpp
         modifier/swap.cpp
 
