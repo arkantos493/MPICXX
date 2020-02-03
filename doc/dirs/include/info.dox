@@ -1,0 +1,7 @@
+/**
+ * @dir include/mpicxx/info
+ * @author Marcel Breyer
+ * @date 2020-02-03
+ *
+ * @brief This directory contains all headers for the @ref mpicxx::info class provided by the mpicxx library.
+ */

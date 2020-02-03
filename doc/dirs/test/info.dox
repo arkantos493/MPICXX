@@ -1,4 +1,14 @@
 /**
+ * @dir test/info
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::info implementation.
+ */
+
+
+
+/**
  * @dir test/info/additional_functions
  * @author Marcel Breyer
  * @date 2020-01-27
@@ -35,7 +45,7 @@
 
 /**
  * @dir test/info/iterators
- * @autor Marcel Breyer
+ * @author Marcel Breyer
  * @date 2020-02-03
  *
  * @brief This directory contains all test cases for the iterators provided by the @ref mpicxx::info class.
