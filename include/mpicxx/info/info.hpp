@@ -157,10 +157,10 @@ namespace mpicxx {
          * @tparam is_const if `true` a const_iterator is instantiated, otherwise a non-const iterator
          */
         template <bool is_const>
-        class info_iterator {
+        class iterator_impl {
             // needed to be able to construct a const_iterator from an iterator
             template <bool>
-            friend class info_iterator;
+            friend class iterator_impl;
             // info class can now directly access the pos member
             friend class info;
         public:
@@ -205,20 +205,20 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
-            info_iterator() : info_(MPI_INFO_NULL), pos_(0) { } // TODO 2020-01-30 20:53 marcel: default constructor for iterators?
+            iterator_impl() : info_(MPI_INFO_NULL), pos_(0) { } // TODO 2020-01-30 20:53 marcel: default constructor for iterators?
             /**
              * @brief Construct a new iterator.
              * @param[inout] info pointer to the iterated over *MPI_Info* object
              * @param[in] pos the iterator's start position
              */
-            info_iterator(MPI_Info info, const difference_type pos) : info_(info), pos_(pos) { }
+            iterator_impl(MPI_Info info, const difference_type pos) : info_(info), pos_(pos) { }
             /**
              * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
              * @param[in] other the copied iterator
              */
             template <bool is_const_iterator> requires is_const
-            info_iterator(const info_iterator<is_const_iterator>& other) : info_(other.info_), pos_(other.pos_) { }
+            iterator_impl(const iterator_impl<is_const_iterator>& other) : info_(other.info_), pos_(other.pos_) { }
 
 
             // ---------------------------------------------------------------------------------------------------------- //
@@ -230,7 +230,7 @@ namespace mpicxx {
              * @param[in] rhs the copied iterator
              */
             template <bool is_const_iterator>
-            info_iterator& operator=(const info_iterator<is_const_iterator>& rhs) requires is_const {
+            iterator_impl& operator=(const iterator_impl<is_const_iterator>& rhs) requires is_const {
                 info_ = rhs.info_;
                 pos_ = rhs.pos_;
                 return *this;
@@ -252,7 +252,7 @@ namespace mpicxx {
              * @assert{ If the iterators `*this` and `rhs` don't point to the same info object. }
              */
             template <bool is_rhs_const>
-            bool operator==(const info_iterator<is_rhs_const>& rhs) const {
+            bool operator==(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ == rhs.pos_;
@@ -261,7 +261,7 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator!=(const info_iterator<is_rhs_const>& rhs) const {
+            bool operator!=(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ != rhs.info_ || pos_ != rhs.pos_;
@@ -270,7 +270,7 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator<(const info_iterator<is_rhs_const>& rhs) const {
+            bool operator<(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ < rhs.pos_;
@@ -279,7 +279,7 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator>(const info_iterator<is_rhs_const>& rhs) const {
+            bool operator>(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ > rhs.pos_;
@@ -288,7 +288,7 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator<=(const info_iterator<is_rhs_const>& rhs) const {
+            bool operator<=(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ <= rhs.pos_;
@@ -297,7 +297,7 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator>=(const info_iterator<is_rhs_const>& rhs) const {
+            bool operator>=(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return info_ == rhs.info_ && pos_ >= rhs.pos_;
@@ -311,7 +311,7 @@ namespace mpicxx {
              * @brief Move the iterator one position forward.
              * @return modified iterator pointing to the new position
              */
-            info_iterator& operator++() {
+            iterator_impl& operator++() {
                 ++pos_;
                 return *this;
             }
@@ -319,8 +319,8 @@ namespace mpicxx {
              * @brief Move the iterator one position forward and return the old iterator.
              * @return iterator pointing to the old position
              */
-            info_iterator operator++(int) {
-                info_iterator tmp{*this};
+            iterator_impl operator++(int) {
+                iterator_impl tmp{*this};
                 operator++();
                 return tmp;
             }
@@ -329,7 +329,7 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return modified iterator pointing to the new position
              */
-            info_iterator& operator+=(const difference_type inc) {
+            iterator_impl& operator+=(const difference_type inc) {
                 pos_ += inc;
                 return *this;
             }
@@ -339,21 +339,21 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return new iterator pointing to the new position
              */
-            friend info_iterator operator+(info_iterator it, const difference_type inc) {
+            friend iterator_impl operator+(iterator_impl it, const difference_type inc) {
                 it.pos_ += inc;
                 return it;
             }
             /**
-             * @copydoc operator+(info_iterator, const difference_type)
+             * @copydoc operator+(iterator_impl, const difference_type)
              */
-            friend info_iterator operator+(const difference_type inc, info_iterator it) {
+            friend iterator_impl operator+(const difference_type inc, iterator_impl it) {
                 return it + inc;
             }
             /**
              * @brief Move the iterator one position backward.
              * @return modified iterator pointing to the new position
              */
-            info_iterator& operator--() {
+            iterator_impl& operator--() {
                 --pos_;
                 return *this;
             }
@@ -361,8 +361,8 @@ namespace mpicxx {
              * @brief Move the iterator one position backward and return the old iterator.
              * @return iterator pointing to the old position
              */
-            info_iterator operator--(int) {
-                info_iterator tmp{*this};
+            iterator_impl operator--(int) {
+                iterator_impl tmp{*this};
                 operator--();
                 return tmp;
             }
@@ -371,7 +371,7 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return modified iterator pointing to the new position
              */
-            info_iterator& operator-=(const difference_type inc) {
+            iterator_impl& operator-=(const difference_type inc) {
                 pos_ -= inc;
                 return *this;
             }
@@ -381,7 +381,7 @@ namespace mpicxx {
              * @param[in] inc number of steps
              * @return new iterator pointing to the new position
              */
-            friend info_iterator operator-(info_iterator it, const difference_type inc) {
+            friend iterator_impl operator-(iterator_impl it, const difference_type inc) {
                 it.pos_ -= inc;
                 return it;
             }
@@ -404,7 +404,7 @@ namespace mpicxx {
              * @assert{ If the iterators `*this` and `rhs` don't point to the same info object. }
              */
             template <bool is_rhs_const>
-            difference_type operator-(const info_iterator<is_rhs_const>& rhs) {
+            difference_type operator-(const iterator_impl<is_rhs_const>& rhs) {
                 MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
 
                 return pos_ - rhs.pos_;
@@ -438,12 +438,12 @@ namespace mpicxx {
              * @code{.cpp}
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
              * @endcode
-             * `const_iterator` (alias for an `info_iterator<true>`): \n
+             * `const_iterator` (alias for an `iterator_impl<true>`): \n
              * @code{.cpp}
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
              * @endcode
-             * `iterator` (alias for an `info_iterator<false>`): \n
+             * `iterator` (alias for an `iterator_impl<false>`): \n
              * For *MPI* functions called while using a proxy see the @ref proxy documentation.
              * }
              */
@@ -500,12 +500,12 @@ namespace mpicxx {
              * @code{.cpp}
              * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly once
              * @endcode
-             * `const_iterator` (alias for an `info_iterator<true>`): \n
+             * `const_iterator` (alias for an `iterator_impl<true>`): \n
              * @code{.cpp}
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // exactly once
              * @endcode
-             * `iterator` (alias for an `info_iterator<false>`): \n
+             * `iterator` (alias for an `iterator_impl<false>`): \n
              * For *MPI* functions called while using a proxy see the @ref proxy documentation.
              * }
              */
@@ -558,10 +558,10 @@ namespace mpicxx {
         using pointer = value_type*;
         /// The type of value_type used as a const pointer.
         using const_pointer = const value_type*;
-        /// Alias for an iterator using the `info_iterator` template class with `is_const` set to `false`.
-        using iterator = info_iterator<false>;
-        /// Alias for a const_iterator using the `info_iterator` template class with `is_const` set to `true`.
-        using const_iterator = info_iterator<true>;
+        /// Alias for an iterator using the `iterator_impl` template class with `is_const` set to `false`.
+        using iterator = iterator_impl<false>;
+        /// Alias for a const_iterator using the `iterator_impl` template class with `is_const` set to `true`.
+        using const_iterator = iterator_impl<true>;
         /// Alias for a reverse_iterator using [`std::reverse_iterator`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator).
         using reverse_iterator = std::reverse_iterator<iterator>;
         /// Alias for a const_reverse_iterator using [`std::reverse_iterator`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator).
@@ -871,7 +871,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] iterator begin() {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -889,7 +889,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref iterator_impl documentation.
          * }
          */
         [[nodiscard]] iterator end() {
@@ -906,7 +906,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] const_iterator begin() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -924,7 +924,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref iterator_impl documentation.
          * }
          */
         [[nodiscard]] const_iterator end() const {
@@ -961,7 +961,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref iterator_impl documentation.
          * }
          */
         [[nodiscard]] reverse_iterator rbegin() {
@@ -979,7 +979,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] reverse_iterator rend() {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
@@ -998,7 +998,7 @@ namespace mpicxx {
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
-         * For *MPI* functions called while using an iterator see the @ref info_iterator documentation.
+         * For *MPI* functions called while using an iterator see the @ref iterator_impl documentation.
          * }
          */
         [[nodiscard]] const_reverse_iterator rbegin() const {
@@ -1016,7 +1016,7 @@ namespace mpicxx {
          *
          * @assert{ If `*this` is in the moved-from state. }
          *
-         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref info_iterator documentation. }
+         * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] const_reverse_iterator rend() const {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
