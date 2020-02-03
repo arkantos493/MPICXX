@@ -20,6 +20,7 @@ set(TEST_SOURCES
         modifier/at.cpp
         modifier/array_subscript_operator.cpp
         modifier/clear.cpp
+        modifier/erase.cpp
         modifier/extract.cpp
         modifier/merge.cpp
         modifier/swap.cpp
