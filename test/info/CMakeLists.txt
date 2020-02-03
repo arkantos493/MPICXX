@@ -13,6 +13,11 @@ set(TEST_SOURCES
         assignment/move_assignment.cpp
         assignment/initializer_list_assignment.cpp
 
+        iterators/iterator.cpp
+        iterators/const_iterator.cpp
+        iterators/reverse_iterator.cpp
+        iterators/const_reverse_iterator.cpp
+
         capacity/empty.cpp
         capacity/size.cpp
         capacity/max_size.cpp
@@ -41,9 +46,6 @@ set(TEST_SOURCES
         additional_functions/values.cpp
         additional_functions/max_key_size.cpp
         additional_functions/max_value_size.cpp
-
-#        info_iterator_test.cpp
-#        info_modifier_test.cpp
 )
 
 # create google test with MPI support
