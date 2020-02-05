@@ -1,7 +1,7 @@
 /**
  * @file assert.hpp
  * @author Marcel Breyer
- * @date 2020-01-24
+ * @date 2020-02-05
  *
  * @brief Provides a more verbose assert alternative.
  *
@@ -40,7 +40,7 @@
 #include <mpicxx/utility/source_location.hpp>
 
 
-namespace mpicxx::utility {
+namespace mpicxx::detail {
     /**
      * @brief This function gets called by the @ref MPICXX_ASSERT macro and does the actual assertion checking.
      *
