@@ -28,6 +28,7 @@
  *
  * In addition this @ref MPICXX_ASSERT calls ``MPI_Abort`` if the assertion is called within a MPI environment.
  */
+ // TODO 2020-02-05 21:35 marcel: correct comments
 
 #ifndef MPICXX_ASSERT_HPP
 #define MPICXX_ASSERT_HPP
@@ -107,10 +108,24 @@ namespace mpicxx::detail {
  * @param msg the custom assert message
  * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
  */
-#ifdef NDEBUG
+#ifdef NDEBUG // TODO 2020-02-05 21:33 marcel: remove
 #define MPICXX_ASSERT(cond, msg, ...)
 #else
-#define MPICXX_ASSERT(cond, msg, ...) mpicxx::utility::check(cond, #cond, mpicxx::utility::source_location::current(), msg, ##__VA_ARGS__)
+#define MPICXX_ASSERT(cond, msg, ...) mpicxx::detail::check(cond, #cond, mpicxx::detail::source_location::current(), msg, ##__VA_ARGS__)
+#endif
+
+#if ASSERTION_LEVEL == 0            // ASSERTION_LEVEL == NONE
+#define MPICXX_ASSERT_PRE(cond, msg, ...)
+#define MPICXX_ASSERT_INV(cond, msg, ...)
+#elif ASSERTION_LEVEL == 1          // ASSERTION_LEVEL == ALL (PRECONDITION and INVARIANT)
+#define MPICXX_ASSERT_PRE(cond, msg, ...) mpicxx::detail::check(cond, #cond, mpicxx::detail::source_location::current(), msg, ##__VA_ARGS__)
+#define MPICXX_ASSERT_INV(cond, msg, ...) mpicxx::detail::check(cond, #cond, mpicxx::detail::source_location::current(), msg, ##__VA_ARGS__)
+#elif ASSERTION_LEVEL == 2          // ASSERTION_LEVEL == PRECONDITION (only)
+#define MPICXX_ASSERT_PRE(cond, msg, ...) mpicxx::detail::check(cond, #cond, mpicxx::detail::source_location::current(), msg, ##__VA_ARGS__)
+#define MPICXX_ASSERT_INV(cond, msg, ...)
+#elif ASSERTION_LEVEL == 3          // ASSERTION_LEVEL == INVARIANTS (only)
+#define MPICXX_ASSERT_PRE(cond, msg, ...)
+#define MPICXX_ASSERT_INV(cond, msg, ...) mpicxx::detail::check(cond, #cond, mpicxx::detail::source_location::current(), msg, ##__VA_ARGS__)
 #endif
 
 #endif // MPICXX_ASSERT_HPP

@@ -16,6 +16,16 @@ cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not supp
                        "ENABLE_TESTS" OFF)
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
+# set assertion level
+set(assertion_levels NONE ALL PRECONDITION INVARIANT)
+set(ASSERTION_LEVEL NONE CACHE STRING "The level of assertion performed.")
+set_property(CACHE ASSERTION_LEVEL PROPERTY STRINGS ${assertion_levels})
+if (NOT ASSERTION_LEVEL IN_LIST assertion_levels)
+    message(FATAL_ERROR "ASSERTION_LEVEL must be one of ${assertion_levels} but is ${ASSERTION_LEVEL}")
+else ()
+    message(STATUS "The assertion level is ${ASSERTION_LEVEL}")
+endif (NOT ASSERTION_LEVEL IN_LIST assertion_levels)
+list(FIND assertion_levels ${ASSERTION_LEVEL} mapped_assertion_level)
 
 # add custom cmake modules path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -37,7 +47,7 @@ endif (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # create header-only (interface) library
 add_library(${PROJECT_NAME} INTERFACE)
-
+target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_LEVEL=${mapped_assertion_level})
 
 # find MPI and add it to the library target
 find_package(MPI REQUIRED)
