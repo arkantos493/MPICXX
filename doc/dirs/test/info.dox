@@ -76,3 +76,14 @@
  *
  * @brief This directory contains all test cases for the non-member functions provided by the @ref mpicxx::info class.
  */
+
+
+
+/**
+ * @dir test/info/iterators/iterator_impl
+ * @author
+ * @date 2020-02-04
+ *
+ * @brief This directory contains all test cases for the iterator implementation provided by the @ref mpicxx::info
+ * class.
+ */
