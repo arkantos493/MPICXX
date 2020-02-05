@@ -18,6 +18,8 @@ set(TEST_SOURCES
         iterators/reverse_iterator.cpp
         iterators/const_reverse_iterator.cpp
 
+        iterators/iterator_impl/relational.cpp
+
         capacity/empty.cpp
         capacity/size.cpp
         capacity/max_size.cpp
