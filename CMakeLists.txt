@@ -73,7 +73,6 @@ foreach(category ${ASSERTION_CATEGORY})
     endif ()
 endforeach()
 
-return()
 # add custom cmake modules path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
