@@ -46,11 +46,11 @@ compile_commands.json
 CTestTestfile.cmake
 build
 
+
 ### GoogleTest ###
 googletest-build/
 googletest-download/
 googletest-src/
-
 
 ### Docu ###
 xml_doxygen/
@@ -58,9 +58,12 @@ rst_doxyrest/
 html/
 doxyrest/
 html_doxygen/
-
+dirs/
 
 ### CLion ###
 .idea/
+
+### config.hpp ###
+config.hpp
 
 # End of https://www.gitignore.io/api/c++,cmake
