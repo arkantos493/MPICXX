@@ -16,16 +16,55 @@ cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not supp
                        "ENABLE_TESTS" OFF)
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
-# set assertion level
-set(assertion_levels NONE ALL PRECONDITION INVARIANT)
-set(ASSERTION_LEVEL NONE CACHE STRING "The level of assertion performed.")
-set_property(CACHE ASSERTION_LEVEL PROPERTY STRINGS ${assertion_levels})
-if (NOT ASSERTION_LEVEL IN_LIST assertion_levels)
-    message(FATAL_ERROR "ASSERTION_LEVEL must be one of ${assertion_levels} but is ${ASSERTION_LEVEL}")
-else ()
-    message(STATUS "The assertion level is ${ASSERTION_LEVEL}")
-endif (NOT ASSERTION_LEVEL IN_LIST assertion_levels)
-list(FIND assertion_levels ${ASSERTION_LEVEL} mapped_assertion_level)
+
+# set assertion category
+set(possible_assertion_categories PRECONDITION SANITY NONE ALL)
+set(ASSERTION_CATEGORY NONE CACHE STRING "The active assertion categories.")
+set_property(CACHE ASSERTION_CATEGORY PROPERTY STRINGS ${possible_assertion_categories})
+set(active_assertion_categories 0)
+set(length 0)
+# assertion_category holds all provided assertion categories
+set(assertion_category)
+list(APPEND assertion_category ${ASSERTION_CATEGORY})
+list(LENGTH assertion_category length)
+
+# if ALL or NONE is specified they have to be the only categories!
+if (NONE IN_LIST assertion_category AND length GREATER 1)
+    message(FATAL_ERROR "If NONE is present it must be the only option!")
+endif()
+if (ALL IN_LIST assertion_category AND length GREATER 1)
+    message(FATAL_ERROR "If ALL is present it must be the only option!")
+endif()
+
+# iterate over all provided categories
+foreach(category ${ASSERTION_CATEGORY})
+    # the category must be one of the predefined
+    if (NOT ${category} IN_LIST possible_assertion_categories)
+        message(FATAL_ERROR "ASSERTION_CATEGORY must only include ${possible_assertion_categories} but includes ${category}")
+    else ()
+        message(STATUS "Enabled assertion category: ${category}")
+        # interpret "active_assertion_categories" as bit set and set the respective bit
+        # ALL          -> set all bits
+        # NONE         -> set no bit
+        # PRECONDITION -> set 1st bit
+        # SANITY       -> set 2nd bit
+        if (${category} STREQUAL ALL)
+            list(LENGTH possible_assertion_categories length)
+            math(EXPR length "${length} - 3")
+            if (length GREATER_EQUAL 0)
+                foreach (i RANGE ${length})
+                    math(EXPR active_assertion_categories "${active_assertion_categories} + (1 << ${i})")
+                endforeach ()
+            endif ()
+        elseif (${category} STREQUAL NONE)
+            set(active_assertion_categories 0)
+        else()
+            list(FIND possible_assertion_categories ${category} idx)
+            math(EXPR active_assertion_categories "${active_assertion_categories} + (1 << ${idx})")
+        endif()
+    endif ()
+endforeach()
+
 
 # add custom cmake modules path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -47,7 +86,7 @@ endif (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # create header-only (interface) library
 add_library(${PROJECT_NAME} INTERFACE)
-target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_LEVEL=${mapped_assertion_level})
+target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_CATEGORIES=${active_assertion_categories})
 
 # find MPI and add it to the library target
 find_package(MPI REQUIRED)
