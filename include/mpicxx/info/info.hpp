@@ -1,7 +1,7 @@
 /**
- * @file info.hpp
+ * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-02-08
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -29,8 +29,8 @@
 
 #include <mpi.h>
 
-#include <mpicxx/utility/assert.hpp>
-#include <mpicxx/utility/concepts.hpp>
+#include <mpicxx/detail/assert.hpp>
+#include <mpicxx/detail/concepts.hpp>
 
 
 // TODO 2020-01-22 19:26 marcel: remaining tests
