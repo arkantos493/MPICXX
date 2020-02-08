@@ -66,6 +66,13 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
 # set important compiler flags
 add_compile_options(-Wall -Wextra -pedantic)
+if (NOT (active_assertion_categories EQUAL 0))
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        # using Clang or GCC
+        message(STATUS "Enabled '-rdynamic' linker flag for better stack traces in assertions")
+        add_link_options(-rdynamic)
+    endif()
+endif ()
 
 # set targets to install
 install(TARGETS ${PROJECT_NAME}
