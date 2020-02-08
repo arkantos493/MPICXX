@@ -1,5 +1,5 @@
 /**
- * @file detail/source_location.hpp
+ * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
  * @date 2020-02-08
  *
