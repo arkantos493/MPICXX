@@ -1,0 +1,8 @@
+/**
+ * @dir include/mpicxx/detail
+ * @author Marcel Breyer
+ * @date 2020-02-08
+ *
+ * @brief This directory contains all headers that provide helper classes or functions which are not meant to be used in
+ * the public interface.
+ */
