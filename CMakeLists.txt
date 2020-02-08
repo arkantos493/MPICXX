@@ -25,6 +25,10 @@ option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 set(possible_assertion_categories PRECONDITION SANITY NONE ALL)
 set(ASSERTION_CATEGORY NONE CACHE STRING "The active assertion categories.")
 set_property(CACHE ASSERTION_CATEGORY PROPERTY STRINGS ${possible_assertion_categories})
+if (ENABLE_DEATH_TESTS)
+    message(WARNING "Enabled all assertion categories because death tests are enabled.")
+    set(ASSERTION_CATEGORY ALL)
+endif ()
 set(active_assertion_categories 0)
 set(length 0)
 # assertion_category holds all provided assertion categories
@@ -69,7 +73,7 @@ foreach(category ${ASSERTION_CATEGORY})
     endif ()
 endforeach()
 
-
+return()
 # add custom cmake modules path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
