@@ -100,6 +100,9 @@ find_package(MPI REQUIRED)
 target_include_directories(${PROJECT_NAME} INTERFACE ${MPI_CXX_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} INTERFACE MPI::MPI_CXX)
 
+# fmt
+find_package(fmt)
+target_link_libraries(${PROJECT_NAME} INTERFACE fmt::fmt)
 
 # set include directories
 target_include_directories(
@@ -112,6 +115,8 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
 # set important compiler flags
 add_compile_options(-Wall -Wextra -pedantic)
+#add_compile_options(-ffunction-sections -fdata-sections) # TODO: test
+#add_link_options(–gc-sections)
 if (NOT (active_assertion_categories EQUAL 0))
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC

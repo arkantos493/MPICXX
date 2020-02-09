@@ -54,11 +54,12 @@
 #ifndef MPICXX_ASSERT_HPP
 #define MPICXX_ASSERT_HPP
 
-#include <cstdio>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include <mpi.h>
+#include <fmt/format.h>
 
 #include <mpicxx/detail/source_location.hpp>
 
@@ -79,7 +80,7 @@ namespace mpicxx::detail {
      */
     template <typename... Args>
     inline void check(const bool cond, const char* cond_str, const char* assertion_category, const source_location& loc,
-            const char* msg, const Args... args) {
+            const char* msg, Args&&... args) {
         // check if the assertion holds
         if (!cond) {
             std::stringstream ss;
@@ -94,10 +95,7 @@ namespace mpicxx::detail {
                << "  @ line " << loc.line() << "\n\n";
 
             // TODO 2020-02-07 22:24 marcel: change to std::format as soon as possible
-            int size = std::snprintf(nullptr, 0, msg, args...);
-            std::string buffer(size, ' ');
-            std::snprintf(buffer.data(), size + 1, msg, args...);
-            ss << buffer << "\n\n";
+            ss << fmt::format(msg, std::forward<Args>(args)...) << "\n\n";
 
             // write stacktrace into the string stream
             loc.stack_trace(ss);

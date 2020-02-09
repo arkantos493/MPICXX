@@ -14,7 +14,8 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 - GCC trunk (10.0.0)
 - [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
 - cmake (minimum required 3.5)
-- Doxygen and Sphinx (for documentation only)
+- Doxygen (for documentation only)
+- [fmt formatting library](https://github.com/fmtlib/fmt)
 
 ### Installing
 
@@ -26,7 +27,7 @@ mkdir build && cd build
 cmake [options] ..
 make -j $(nproc)
 ```
-Supported options are:
+Supported options are: TODO
 - `-DCMAKE_BUILD_TYPE=Debug/Release/...`
 - `CMAKE_INSTALL_PREFIX=...`: set the installation path
 - `-DENABLE_TESTS=ON/OFF`: uses the googletest framework (which gets automatically installed if this option is turned on) to enable the target `test`
@@ -64,4 +65,4 @@ Coming later...
 
 ## License
 
-This project is licensed under the LGPL License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
