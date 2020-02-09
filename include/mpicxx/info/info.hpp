@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-08
+ * @date 2020-02-09
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -205,17 +205,26 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
-            iterator_impl() : info_(MPI_INFO_NULL), pos_(0) { } // TODO 2020-01-30 20:53 marcel: default constructor for iterators?
+            /**
+             * @brief Default construct a new iterator.
+             *
+             * @post The iterator is **singular**.
+             */
+            iterator_impl() : info_(nullptr), pos_(0) { }
             /**
              * @brief Construct a new iterator.
              * @param[inout] info pointer to the iterated over *MPI_Info* object
              * @param[in] pos the iterator's start position
+             *
+             * @post The iterator is **not singular**.
              */
             iterator_impl(MPI_Info info, const difference_type pos) : info_(info), pos_(pos) { }
             /**
              * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
              * @param[in] other the copied iterator
+             *
+             * @post The iterator is not singular if and only if @p other is not singular.
              */
             template <bool is_const_iterator> requires is_const
             iterator_impl(const iterator_impl<is_const_iterator>& other) : info_(other.info_), pos_(other.pos_) { }
@@ -228,6 +237,8 @@ namespace mpicxx {
              * @brief Special copy assignment operator: defined to be able to assign a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
              * @param[in] rhs the copied iterator
+             *
+             * @post The iterator is not singular if and only if @p rhs is not singular.
              */
             template <bool is_const_iterator>
             iterator_impl& operator=(const iterator_impl<is_const_iterator>& rhs) requires is_const {
@@ -236,24 +247,27 @@ namespace mpicxx {
                 return *this;
             }
 
-
+            // TODO 2020-02-09 20:54 marcel: TESTS and DOCUMENTATION !!!!
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            relational operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Perform the respective comparison operation on the iterator and the given @p rhs one.
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
-             * @tparam is_rhs_const
+             * @tparam rhs_const
              * @param[in] rhs the other iterator
              * @return boolean comparison result
              *
-             * @pre The iterators `*this` and @p rhs iterator **must** point to the same info object.
-             *
-             * @assert{ If the iterators `*this` and `rhs` don't point to the same info object. }
+             * @assert_sanity{
+             * If `*this` or @p rhs is a singular iterator. \n
+             * If `*this` and @p rhs don't refer to the same info object.
+             * }
              */
-            template <bool is_rhs_const>
-            bool operator==(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+            template <bool rhs_const>
+            bool operator==(const iterator_impl<rhs_const>& rhs) const {
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ == rhs.pos_;
             }
@@ -262,7 +276,9 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator!=(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ != rhs.info_ || pos_ != rhs.pos_;
             }
@@ -271,7 +287,9 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator<(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ < rhs.pos_;
             }
@@ -280,7 +298,9 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator>(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ > rhs.pos_;
             }
@@ -289,7 +309,9 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator<=(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ <= rhs.pos_;
             }
@@ -298,7 +320,9 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             bool operator>=(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ >= rhs.pos_;
             }
@@ -312,6 +336,8 @@ namespace mpicxx {
              * @return modified iterator pointing to the new position
              */
             iterator_impl& operator++() {
+                MPICXX_ASSERT_SANITY(this->incrementable(), "Attempt to increment a {} iterator!", this->state());
+
                 ++pos_;
                 return *this;
             }
@@ -320,6 +346,8 @@ namespace mpicxx {
              * @return iterator pointing to the old position
              */
             iterator_impl operator++(int) {
+                MPICXX_ASSERT_SANITY(this->incrementable(), "Attempt to increment a {} iterator!", this->state());
+
                 iterator_impl tmp{*this};
                 operator++();
                 return tmp;
@@ -330,6 +358,9 @@ namespace mpicxx {
              * @return modified iterator pointing to the new position
              */
             iterator_impl& operator+=(const difference_type inc) {
+                MPICXX_ASSERT_SANITY(this->advanceable(inc),
+                        "Attempt to advance a {} iterator {} steps, which falls outside its valid range!", this->state(), inc);
+
                 pos_ += inc;
                 return *this;
             }
@@ -340,6 +371,9 @@ namespace mpicxx {
              * @return new iterator pointing to the new position
              */
             friend iterator_impl operator+(iterator_impl it, const difference_type inc) {
+                MPICXX_ASSERT_SANITY(it.advanceable(inc),
+                        "Attempt to advance a {} iterator {} steps, which falls outside its valid range!", it.state(), inc);
+
                 it.pos_ += inc;
                 return it;
             }
@@ -347,6 +381,9 @@ namespace mpicxx {
              * @copydoc operator+(iterator_impl, const difference_type)
              */
             friend iterator_impl operator+(const difference_type inc, iterator_impl it) {
+                MPICXX_ASSERT_SANITY(it.advanceable(inc),
+                        "Attempt to advance a {} iterator {} steps, which falls outside its valid range!", it.state(), inc);
+
                 return it + inc;
             }
             /**
@@ -354,6 +391,8 @@ namespace mpicxx {
              * @return modified iterator pointing to the new position
              */
             iterator_impl& operator--() {
+                MPICXX_ASSERT_SANITY(this->decrementable(), "Attempt to decrement a {} iterator!", this->state());
+
                 --pos_;
                 return *this;
             }
@@ -362,6 +401,8 @@ namespace mpicxx {
              * @return iterator pointing to the old position
              */
             iterator_impl operator--(int) {
+                MPICXX_ASSERT_SANITY(this->decrementable(), "Attempt to decrement a {} iterator!", this->state());
+
                 iterator_impl tmp{*this};
                 operator--();
                 return tmp;
@@ -372,6 +413,9 @@ namespace mpicxx {
              * @return modified iterator pointing to the new position
              */
             iterator_impl& operator-=(const difference_type inc) {
+                MPICXX_ASSERT_SANITY(this->advanceable(-inc),
+                        "Attempt to retreat a {} iterator {} steps, which falls outside its valid range!", this->state(), inc);
+
                 pos_ -= inc;
                 return *this;
             }
@@ -382,6 +426,9 @@ namespace mpicxx {
              * @return new iterator pointing to the new position
              */
             friend iterator_impl operator-(iterator_impl it, const difference_type inc) {
+                MPICXX_ASSERT_SANITY(it.advanceable(-inc),
+                        "Attempt to retreat a {} iterator {} steps, which falls outside its valid range!", it.state(), inc);
+
                 it.pos_ -= inc;
                 return it;
             }
@@ -405,7 +452,10 @@ namespace mpicxx {
              */
             template <bool is_rhs_const>
             difference_type operator-(const iterator_impl<is_rhs_const>& rhs) {
-                MPICXX_ASSERT(info_ == rhs.info_, "Iterators '*this' and 'rhs' don't refer to the same info object!");
+                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
+                        this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs),
+                        "Attempt to compute the different between two iterators from different sequences!");
 
                 return pos_ - rhs.pos_;
             }
@@ -448,10 +498,11 @@ namespace mpicxx {
              * }
              */
             reference operator[](const difference_type n) const {
-                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of an info object in the moved-from state!");
-                MPICXX_ASSERT((pos_ + n) >= 0 && (pos_ + n) < static_cast<difference_type>(info(info_, false).size()),
-                              "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
-                              info(info_, false).size(), pos_ + n);
+                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
+                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT_PRECONDITION(this->advanceable(n) && this->advanceable(n + 1),
+                        "Attempt to subscript a {} iterator {} step from its current position, which falls outside its dereferenceable range.",
+                        this->state());
 
                 // get the key (with an offset of n)
                 char key[MPI_MAX_INFO_KEY];
@@ -510,10 +561,9 @@ namespace mpicxx {
              * }
              */
             reference operator*() const {
-                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of an info object in the moved-from state!");
-                MPICXX_ASSERT(pos_ >= 0 && pos_ < static_cast<difference_type>(info(info_, false).size()),
-                              "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
-                              info(info_, false).size(), pos_);
+                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
+                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT_PRECONDITION(this->dereferenceable(), "Attempt to dereference a {} iterator!", this->state());
 
                 return this->operator[](0);
             }
@@ -521,16 +571,69 @@ namespace mpicxx {
              * @copydoc operator*()
              */
             pointer operator->() const {
-                MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Tried to access a [key, value]-pair of an info object in the moved-from state!");
-                MPICXX_ASSERT(pos_ >= 0 && pos_ < static_cast<difference_type>(info(info_, false).size()),
-                              "'*this' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
-                              info(info_, false).size(), pos_);
+                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
+                                           "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT_PRECONDITION(this->dereferenceable(), "Attempt to dereference a {} iterator!", this->state());
 
                 return std::make_unique<value_type>(this->operator[](0));
             }
 
 
         private:
+            difference_type info_size() const {
+                int nkeys = 0;
+                MPI_Info_get_nkeys(info_, &nkeys);
+                return static_cast<difference_type>(nkeys);
+            }
+
+            bool singular() const {
+                return info_ == nullptr;
+            }
+            template <bool rhs_const>
+            bool comparable(const iterator_impl<rhs_const>& rhs) const {
+                return !this->singular() && !rhs.singular() && info_ == rhs.info_;
+            }
+            bool past_the_end() const {
+                return pos_ >= this->info_size();
+            }
+            bool start_of_sequence() const {
+                return pos_ == 0;
+            }
+            bool incrementable() const {
+                return !this->singular() && !this->past_the_end();
+            }
+            bool decrementable() const {
+                return !this->singular() && !this->start_of_sequence();
+            }
+            bool advanceable(const difference_type n) const {
+                if (this->singular()) {
+                    return false;
+                }
+                if (n > 0) {
+                    return pos_ + n <= this->info_size();
+                } else {
+                    return pos_ + n >= 0;
+                }
+            }
+            bool dereferenceable() const {
+                return !this->singular() && !this->past_the_end() && pos_ >= 0;
+            }
+            bool info_moved_from() const {
+                return info_ == MPI_INFO_NULL;
+            }
+
+            std::string state() const {
+                if (this->singular()) {
+                    return std::string("singular");
+                } else if (this->past_the_end()) {
+                    return std::string("past-the-end");
+                } else if (this->start_of_sequence()) {
+                    return std::string("dereferenceable (start-of-sequence)");
+                } else {
+                    return std::string("dereferenceable");
+                }
+            }
+
             MPI_Info info_;
             difference_type pos_;
         };
