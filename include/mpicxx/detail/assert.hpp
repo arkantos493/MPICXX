@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-02-08
+ * @date 2020-02-09
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into four categories:
@@ -180,7 +180,7 @@ namespace mpicxx::detail {
  */
 #if CHECK_BIT(ASSERTION_CATEGORIES, 1) == 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
 #else
 #define MPICXX_ASSERT_SANITY(cond, msg, ...)
 #endif
