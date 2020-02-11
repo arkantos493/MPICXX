@@ -18,6 +18,7 @@ set(TEST_SOURCES
         iterators/reverse_iterator.cpp
         iterators/const_reverse_iterator.cpp
 
+        iterators/iterator_impl/distance.cpp
         iterators/iterator_impl/modifier.cpp
         iterators/iterator_impl/relational.cpp
 

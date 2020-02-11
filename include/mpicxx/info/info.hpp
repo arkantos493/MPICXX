@@ -517,20 +517,24 @@ namespace mpicxx {
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
              *
              * It holds: `it2 - it1 ==` [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(it1, it2)`
-             * @tparam is_rhs_const
+             * @tparam rhs_const
              * @param[in] rhs the end iterator
-             * @return number of [key, value]-pairs between the iterators `*this` and  @p rhs
+             * @return number of [key, value]-pairs between the iterators `*this` and  @p rhs (`[[nodiscard]]`)
              *
-             * @pre The iterators `*this` and @p rhs iterator **must** point to the same info object.
-             *
-             * @assert{ If the iterators `*this` and `rhs` don't point to the same info object. }
+             * @assert_sanity{
+             * If `*this` or @p rhs is a singular iterator. \n
+             * If `*this` or @p rhs refers to an info object in the moved-from state. \n
+             * If `*this` and @p rhs don't refer to the same info object.
+             * }
              */
-            template <bool is_rhs_const>
-            difference_type operator-(const iterator_impl<is_rhs_const>& rhs) {
+            template <bool rhs_const>
+            [[nodiscard]] difference_type operator-(const iterator_impl<rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
-                        this->state(), rhs.state());
-                MPICXX_ASSERT_SANITY(this->comparable(rhs),
-                        "Attempt to compute the different between two iterators from different sequences!");
+                                     this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
+                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return pos_ - rhs.pos_;
             }
