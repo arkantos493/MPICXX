@@ -28,7 +28,7 @@
 
 
 TEST(IteratorImplTest, PreIncrementValid) {
-    // create info objects and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -70,7 +70,7 @@ TEST(IteratorImplDeathTest, PreIncrementInvalid) {
 
 
 TEST(IteratorImplTest, PostIncrementValid) {
-    // create info objects and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -114,7 +114,7 @@ TEST(IteratorImplDeathTest, PostIncrementInvalid) {
 
 
 TEST(IteratorImplTest, AdvanceValid) {
-    // create info objects and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -212,7 +212,7 @@ TEST(IteratorImplDeathTest, AdvanceInvalid) {
 
 
 TEST(IteratorImplTest, PreDecrementValid) {
-    // create info objects and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -254,7 +254,7 @@ TEST(IteratorImplDeathTest, PreDecrementInvalid) {
 
 
 TEST(IteratorImplTest, PostDecrementValid) {
-    // create info objects and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
@@ -298,7 +298,7 @@ TEST(IteratorImplDeathTest, PostDecrementInvalid) {
 
 
 TEST(IteratorImplTest, RetreatValid) {
-    // create info objects and add [key, value]-pairs
+    // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
     MPI_Info_set(info.get(), "key2", "value2");
