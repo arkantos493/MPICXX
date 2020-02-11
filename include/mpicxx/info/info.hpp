@@ -237,9 +237,30 @@ namespace mpicxx {
             //                                            assignment operator                                             //
             // ---------------------------------------------------------------------------------------------------------- //
             /**
+             * @brief Copy assignment operator. Replace the contents with a copy of the contents of @p other.
+             * @param[in] rhs another iterator to use as data source
+             * @return `*this`
+             *
+             * @post `*this` is not singular if and only if @p rhs is not singular.
+             *
+             * @assert_sanity{
+             * If @p rhs is a singular iterator. \n
+             * If @p rhs refers to an info object in the moved-from state.
+             * }
+             */
+            iterator_impl& operator=(const iterator_impl& rhs) {
+                MPICXX_ASSERT_SANITY(!rhs.singular() && !rhs.info_moved_from(),
+                                     "Attempt to assign a {} iterator{} to a {} iterator{}!",
+                                     rhs.state(), rhs.info_state(), this->state(), this->info_state());
+
+                info_ = rhs.info_;
+                pos_ = rhs.pos_;
+                return *this;
+            }
+            /**
              * @brief Special copy assignment operator: defined to be able to assign a non-const iterator to a const_iterator.
-             * @tparam rhs_const
-             * @param[in] rhs the copied iterator
+             * @param[in] rhs another iterator to use as data source
+             * @return `*this`
              *
              * @post `*this` is not singular if and only if @p rhs is not singular.
              *
@@ -249,15 +270,18 @@ namespace mpicxx {
              * }
              */
             template <bool rhs_const>
-            iterator_impl& operator=(const iterator_impl<rhs_const>& rhs) requires is_const {
+            iterator_impl& operator=(const iterator_impl<rhs_const>& rhs) {
+                static_assert(is_const || !rhs_const, "Attempt to assign a const_iterator to a non-const iterator!");
+
                 MPICXX_ASSERT_SANITY(!rhs.singular() && !rhs.info_moved_from(),
-                        "Attempt to assign a {} iterator{} to a {} iterator{}!",
-                        rhs.state(), rhs.info_state(), this->state(), this->info_state());
+                                     "Attempt to assign a {} iterator{} to a {} iterator{}!",
+                                     rhs.state(), rhs.info_state(), this->state(), this->info_state());
 
                 info_ = rhs.info_;
                 pos_ = rhs.pos_;
                 return *this;
             }
+
 
             // TODO 2020-02-09 20:54 marcel: TESTS and DOCUMENTATION !!!!
             // ---------------------------------------------------------------------------------------------------------- //
