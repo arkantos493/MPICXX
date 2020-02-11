@@ -211,26 +211,60 @@ namespace mpicxx {
             /**
              * @brief Default construct a new iterator.
              *
-             * @post The iterator is **singular**.
+             * @post `*this` is **singular**.
              */
             iterator_impl() : info_(nullptr), pos_(0) { }
             /**
-             * @brief Construct a new iterator.
-             * @param[inout] info pointer to the iterated over *MPI_Info* object
-             * @param[in] pos the iterator's start position
+             * @brief Construct a new iterator referring to @p info at position @p pos.
+             * @param[inout] info pointer to the referred to *MPI_Info* object
+             * @param[in] pos the iterator's current position
              *
-             * @post The iterator is **not singular**.
+             * @post `*this` is **not singular**.
+             *
+             * @assert_sanity{
+             * If @p info is in the moved-from state.
+             * }
              */
-            iterator_impl(MPI_Info_ref info, const difference_type pos) : info_(&info), pos_(pos) { }
+            iterator_impl(MPI_Info_ref info, const difference_type pos) : info_(&info), pos_(pos) {
+                MPICXX_ASSERT_SANITY(!this->info_moved_from(),
+                                     "Attempt to create an iterator from an info object in the moved-from state!");
+            }
             /**
-             * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
-             * @tparam is_const_iterator
+             * @brief Copy constructor. Constructs the info object with a copy of the contents of @p other.
+             * @param[in] other iterator to use as data source
+             *
+             * @post `*this` is not singular if and only if @p other is not singular.
+             *
+             * @assert_sanity{
+             * If @p other is a singular iterator. \n
+             * If @p other refers to an info object in the moved-from state.
+             * }
+             */
+            iterator_impl(const iterator_impl& other) : info_(other.info_), pos_(other.pos_) {
+                MPICXX_ASSERT_SANITY(!other.singular() && !other.info_moved_from(),
+                                     "Attempt to create an iterator from a {} iterator{}!",
+                                     other.state(), other.info_state());
+            }
+            /**
+             * @brief Special copy constructor. Convert a non-const iterator to a const_iterator.
+             * @tparam other_const
              * @param[in] other the copied iterator
              *
-             * @post The iterator is not singular if and only if @p other is not singular.
+             * @post `*this` is not singular if and only if @p other is not singular.
+             *
+             * @assert_sanity{
+             * If @p other is a singular iterator. \n
+             * If @p other refers to an info object in the moved-from state.
+             * }
              */
-            template <bool is_const_iterator> requires is_const
-            iterator_impl(const iterator_impl<is_const_iterator>& other) : info_(other.info_), pos_(other.pos_) { }
+            template <bool other_const>
+            iterator_impl(const iterator_impl<other_const>& other) : info_(other.info_), pos_(other.pos_) {
+                static_assert(is_const || !other_const, "Attempt to assign a const_iterator to a non-const iterator!");
+
+                MPICXX_ASSERT_SANITY(!other.singular() && !other.info_moved_from(),
+                                     "Attempt to create an iterator from a {} iterator{}!",
+                                     other.state(), other.info_state());
+            }
 
 
             // ---------------------------------------------------------------------------------------------------------- //
