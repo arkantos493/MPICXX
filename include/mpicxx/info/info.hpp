@@ -356,9 +356,15 @@ namespace mpicxx {
             /**
              * @brief Move the iterator one position forward.
              * @return modified iterator pointing to the new position
+             *
+             * @assert_sanity{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` is a past-the-end iterator.
+             * }
              */
             iterator_impl& operator++() {
-                MPICXX_ASSERT_SANITY(this->incrementable(), "Attempt to increment a {} iterator!", this->state());
+                MPICXX_ASSERT_SANITY(this->incrementable(), "Attempt to increment a {} iterator{}!", this->state(), this->info_state());
 
                 ++pos_;
                 return *this;
@@ -366,9 +372,15 @@ namespace mpicxx {
             /**
              * @brief Move the iterator one position forward and return the old iterator.
              * @return iterator pointing to the old position
+             *
+             * @assert_sanity{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` is a past-the-end iterator.
+             * }
              */
             iterator_impl operator++(int) {
-                MPICXX_ASSERT_SANITY(this->incrementable(), "Attempt to increment a {} iterator!", this->state());
+                MPICXX_ASSERT_SANITY(this->incrementable(), "Attempt to increment a {} iterator{}!", this->state(), this->info_state());
 
                 iterator_impl tmp{*this};
                 operator++();
@@ -376,12 +388,19 @@ namespace mpicxx {
             }
             /**
              * @brief Move this iterator @p inc steps forward.
-             * @param[in] inc number of steps
+             * @param[in] inc number of steps (@p inc may be negative)
              * @return modified iterator pointing to the new position
+             *
+             * @assert_sanity{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this + inc` falls outside the valid range.
+             * }
              */
             iterator_impl& operator+=(const difference_type inc) {
                 MPICXX_ASSERT_SANITY(this->advanceable(inc),
-                        "Attempt to advance a {} iterator {} steps, which falls outside its valid range!", this->state(), inc);
+                        "Attempt to advance a {} iterator{} {} steps, which falls outside its valid range!",
+                        this->state(), this->info_state(), inc);
 
                 pos_ += inc;
                 return *this;
@@ -389,12 +408,19 @@ namespace mpicxx {
             /**
              * @brief Move the iterator @p inc steps forward.
              * @param[in] it the iterator to increment
-             * @param[in] inc number of steps
-             * @return new iterator pointing to the new position
+             * @param[in] inc number of steps (@p inc may be negative)
+             * @return new iterator pointing to the new position (`[[nodiscard]]`)
+             *
+             * @assert_sanity{
+             * If `it` is a singular iterator. \n
+             * If `it` refers to an info object in the moved-from state. \n
+             * If `it + inc` falls outside the valid range.
+             * }
              */
-            friend iterator_impl operator+(iterator_impl it, const difference_type inc) {
+            [[nodiscard("Did you mean 'operator+='?")]] friend iterator_impl operator+(iterator_impl it, const difference_type inc) {
                 MPICXX_ASSERT_SANITY(it.advanceable(inc),
-                        "Attempt to advance a {} iterator {} steps, which falls outside its valid range!", it.state(), inc);
+                        "Attempt to advance a {} iterator{} {} steps, which falls outside its valid range!",
+                        it.state(), it.info_state(), inc);
 
                 it.pos_ += inc;
                 return it;
@@ -402,18 +428,25 @@ namespace mpicxx {
             /**
              * @copydoc operator+(iterator_impl, const difference_type)
              */
-            friend iterator_impl operator+(const difference_type inc, iterator_impl it) {
+            [[nodiscard("Did you mean 'operator+='?")]] friend iterator_impl operator+(const difference_type inc, iterator_impl it) {
                 MPICXX_ASSERT_SANITY(it.advanceable(inc),
-                        "Attempt to advance a {} iterator {} steps, which falls outside its valid range!", it.state(), inc);
+                        "Attempt to advance a {} iterator{} {} steps, which falls outside its valid range!",
+                        it.state(), it.info_state(), inc);
 
                 return it + inc;
             }
             /**
              * @brief Move the iterator one position backward.
              * @return modified iterator pointing to the new position
+             *
+             * @assert_sanity{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` is a start-of-sequence iterator.
+             * }
              */
             iterator_impl& operator--() {
-                MPICXX_ASSERT_SANITY(this->decrementable(), "Attempt to decrement a {} iterator!", this->state());
+                MPICXX_ASSERT_SANITY(this->decrementable(), "Attempt to decrement a {} iterator{}!", this->state(), this->info_state());
 
                 --pos_;
                 return *this;
@@ -421,9 +454,15 @@ namespace mpicxx {
             /**
              * @brief Move the iterator one position backward and return the old iterator.
              * @return iterator pointing to the old position
+             *
+             * @assert_sanity{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` is a start-of-sequence iterator.
+             * }
              */
             iterator_impl operator--(int) {
-                MPICXX_ASSERT_SANITY(this->decrementable(), "Attempt to decrement a {} iterator!", this->state());
+                MPICXX_ASSERT_SANITY(this->decrementable(), "Attempt to decrement a {} iterator{}!", this->state(), this->info_state());
 
                 iterator_impl tmp{*this};
                 operator--();
@@ -431,12 +470,19 @@ namespace mpicxx {
             }
             /**
              * @brief Move the iterator @p inc steps backward.
-             * @param[in] inc number of steps
+             * @param[in] inc number of steps (@p inc may be negative)
              * @return modified iterator pointing to the new position
+             *
+             * @assert_sanity{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` is a start-of-sequence iterator.
+             * }
              */
             iterator_impl& operator-=(const difference_type inc) {
                 MPICXX_ASSERT_SANITY(this->advanceable(-inc),
-                        "Attempt to retreat a {} iterator {} steps, which falls outside its valid range!", this->state(), inc);
+                        "Attempt to retreat a {} iterator{} {} steps, which falls outside its valid range!",
+                        this->state(), this->info_state(), inc);
 
                 pos_ -= inc;
                 return *this;
@@ -444,12 +490,19 @@ namespace mpicxx {
             /**
              * @brief Move the iterator @p inc steps backward.
              * @param[in] it the iterator to decrement
-             * @param[in] inc number of steps
-             * @return new iterator pointing to the new position
+             * @param[in] inc number of steps (@p inc may be negative)
+             * @return new iterator pointing to the new position (`[[nodiscard]]`)
+             *
+             * @assert_sanity{
+             * If `it` is a singular iterator. \n
+             * If `it` refers to an info object in the moved-from state. \n
+             * If `it - inc` falls outside the valid range.
+             * }
              */
-            friend iterator_impl operator-(iterator_impl it, const difference_type inc) {
+            [[nodiscard("Did you mean 'operator-='?")]] friend iterator_impl operator-(iterator_impl it, const difference_type inc) {
                 MPICXX_ASSERT_SANITY(it.advanceable(-inc),
-                        "Attempt to retreat a {} iterator {} steps, which falls outside its valid range!", it.state(), inc);
+                        "Attempt to retreat a {} iterator{} {} steps, which falls outside its valid range!",
+                        it.state(), it.info_state(), inc);
 
                 it.pos_ -= inc;
                 return it;
