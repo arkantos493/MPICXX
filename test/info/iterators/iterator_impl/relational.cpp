@@ -1,9 +1,9 @@
 /**
  * @file info/iterators/iterator_impl/relational.cpp
  * @author Marcel Breyer
- * @date 2020-02-10
+ * @date 2020-02-11
  *
- * @brief Test cases for the relational operations if the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
+ * @brief Test cases for the relational operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *IteratorImplTest*
  * | test case name                      | test case description                                            |
  * |:------------------------------------|:-----------------------------------------------------------------|
@@ -59,13 +59,27 @@ TEST(IteratorImplDeathTest, EqualityInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
+    // create iterators referring to moved-from info objects
+    mpicxx::info moved_from_1;
+    mpicxx::info moved_from_2;
+    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
+    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info dummy_2(std::move(moved_from_2));
+
+    [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
-    EXPECT_DEATH(sit_1 == sit_2, "");
-    EXPECT_DEATH(sit_1 == info_1.begin(), "");
-    EXPECT_DEATH(info_1.begin() == sit_1, "");
+    EXPECT_DEATH( comp = sit_1 == sit_2 , "");
+    EXPECT_DEATH( comp = sit_1 == info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() == sit_1 , "");
+
+    // comparisons with iterators referring to info objects in the moved-from state are not permitted
+    EXPECT_DEATH( comp = moved_from_it_1 == moved_from_it_2 , "");
+    EXPECT_DEATH( comp = moved_from_it_1 == info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() == moved_from_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
-    EXPECT_DEATH(info_1.begin() == info_2.end(), "");
+    EXPECT_DEATH( comp = info_1.begin() == info_2.end() , "");
 }
 
 
@@ -100,13 +114,27 @@ TEST(IteratorImplDeathTest, InequalityInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
+    // create iterators referring to moved-from info objects
+    mpicxx::info moved_from_1;
+    mpicxx::info moved_from_2;
+    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
+    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info dummy_2(std::move(moved_from_2));
+
+    [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
-    EXPECT_DEATH(sit_1 != sit_2, "");
-    EXPECT_DEATH(sit_1 != info_1.begin(), "");
-    EXPECT_DEATH(info_1.begin() != sit_1, "");
+    EXPECT_DEATH( comp = sit_1 != sit_2 , "");
+    EXPECT_DEATH( comp = sit_1 != info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() != sit_1 , "");
+
+    // comparisons with iterators referring to info objects in the moved-from state are not permitted
+    EXPECT_DEATH( comp = moved_from_it_1 != moved_from_it_2 , "");
+    EXPECT_DEATH( comp = moved_from_it_1 != info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() != moved_from_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
-    EXPECT_DEATH(info_1.begin() != info_2.end(), "");
+    EXPECT_DEATH( comp = info_1.begin() != info_2.end() , "");
 }
 
 
@@ -141,13 +169,27 @@ TEST(IteratorImplDeathTest, LessThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
+    // create iterators referring to moved-from info objects
+    mpicxx::info moved_from_1;
+    mpicxx::info moved_from_2;
+    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
+    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info dummy_2(std::move(moved_from_2));
+
+    [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
-    EXPECT_DEATH(sit_1 < sit_2, "");
-    EXPECT_DEATH(sit_1 < info_1.begin(), "");
-    EXPECT_DEATH(info_1.begin() < sit_1, "");
+    EXPECT_DEATH( comp = sit_1 < sit_2 , "");
+    EXPECT_DEATH( comp = sit_1 < info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() < sit_1 , "");
+
+    // comparisons with iterators referring to info objects in the moved-from state are not permitted
+    EXPECT_DEATH( comp = moved_from_it_1 < moved_from_it_2 , "");
+    EXPECT_DEATH( comp = moved_from_it_1 < info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() < moved_from_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
-    EXPECT_DEATH(info_1.begin() < info_2.end(), "");
+    EXPECT_DEATH( comp = info_1.begin() < info_2.end() , "");
 }
 
 
@@ -182,13 +224,27 @@ TEST(IteratorImplDeathTest, GreaterThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
+    // create iterators referring to moved-from info objects
+    mpicxx::info moved_from_1;
+    mpicxx::info moved_from_2;
+    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
+    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info dummy_2(std::move(moved_from_2));
+
+    [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
-    EXPECT_DEATH(sit_1 > sit_2, "");
-    EXPECT_DEATH(sit_1 > info_1.begin(), "");
-    EXPECT_DEATH(info_1.begin() > sit_1, "");
+    EXPECT_DEATH( comp = sit_1 > sit_2 , "");
+    EXPECT_DEATH( comp = sit_1 > info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() > sit_1 , "");
+
+    // comparisons with iterators referring to info objects in the moved-from state are not permitted
+    EXPECT_DEATH( comp = moved_from_it_1 > moved_from_it_2 , "");
+    EXPECT_DEATH( comp = moved_from_it_1 > info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() > moved_from_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
-    EXPECT_DEATH(info_1.begin() > info_2.end(), "");
+    EXPECT_DEATH( comp = info_1.begin() > info_2.end() , "");
 }
 
 
@@ -223,13 +279,27 @@ TEST(IteratorImplDeathTest, LessOrEqualThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
+    // create iterators referring to moved-from info objects
+    mpicxx::info moved_from_1;
+    mpicxx::info moved_from_2;
+    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
+    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info dummy_2(std::move(moved_from_2));
+
+    [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
-    EXPECT_DEATH(sit_1 <= sit_2, "");
-    EXPECT_DEATH(sit_1 <= info_1.begin(), "");
-    EXPECT_DEATH(info_1.begin() <= sit_1, "");
+    EXPECT_DEATH( comp = sit_1 <= sit_2 , "");
+    EXPECT_DEATH( comp = sit_1 <= info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() <= sit_1 , "");
+
+    // comparisons with iterators referring to info objects in the moved-from state are not permitted
+    EXPECT_DEATH( comp = moved_from_it_1 <= moved_from_it_2 , "");
+    EXPECT_DEATH( comp = moved_from_it_1 <= info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() <= moved_from_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
-    EXPECT_DEATH(info_1.begin() <= info_2.end(), "");
+    EXPECT_DEATH( comp = info_1.begin() <= info_2.end() , "");
 }
 
 
@@ -264,13 +334,27 @@ TEST(IteratorImplDeathTest, GreaterOrEqualThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
+    // create iterators referring to moved-from info objects
+    mpicxx::info moved_from_1;
+    mpicxx::info moved_from_2;
+    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
+    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
+    mpicxx::info dummy_1(std::move(moved_from_1));
+    mpicxx::info dummy_2(std::move(moved_from_2));
+
+    [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
-    EXPECT_DEATH(sit_1 >= sit_2, "");
-    EXPECT_DEATH(sit_1 >= info_1.begin(), "");
-    EXPECT_DEATH(info_1.begin() >= sit_1, "");
+    EXPECT_DEATH( comp = sit_1 >= sit_2 , "");
+    EXPECT_DEATH( comp = sit_1 >= info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() >= sit_1 , "");
+
+    // comparisons with iterators referring to info objects in the moved-from state are not permitted
+    EXPECT_DEATH( comp = moved_from_it_1 >= moved_from_it_2 , "");
+    EXPECT_DEATH( comp = moved_from_it_1 >= info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() >= moved_from_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
-    EXPECT_DEATH(info_1.begin() >= info_2.end(), "");
+    EXPECT_DEATH( comp = info_1.begin() >= info_2.end() , "");
 }
 
 

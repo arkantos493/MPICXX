@@ -259,17 +259,21 @@ namespace mpicxx {
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
              * @tparam rhs_const
              * @param[in] rhs the other iterator
-             * @return boolean comparison result
+             * @return boolean comparison result (`[[nodiscard]]`)
              *
              * @assert_sanity{
              * If `*this` or @p rhs is a singular iterator. \n
+             * If `*this` or @p rhs refers to an info object in the moved-from state. \n
              * If `*this` and @p rhs don't refer to the same info object.
              * }
              */
             template <bool rhs_const>
-            bool operator==(const iterator_impl<rhs_const>& rhs) const {
+            [[nodiscard]] bool operator==(const iterator_impl<rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
-                        this->state(), rhs.state());
+                                     this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                        "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                        this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ == rhs.pos_;
@@ -278,9 +282,12 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator!=(const iterator_impl<is_rhs_const>& rhs) const {
+            [[nodiscard]] bool operator!=(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
                         this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ != rhs.info_ || pos_ != rhs.pos_;
@@ -289,9 +296,12 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator<(const iterator_impl<is_rhs_const>& rhs) const {
+            [[nodiscard]] bool operator<(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
                         this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ < rhs.pos_;
@@ -300,9 +310,12 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator>(const iterator_impl<is_rhs_const>& rhs) const {
+            [[nodiscard]] bool operator>(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
                         this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ > rhs.pos_;
@@ -311,9 +324,12 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator<=(const iterator_impl<is_rhs_const>& rhs) const {
+            [[nodiscard]] bool operator<=(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
                         this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ <= rhs.pos_;
@@ -322,9 +338,12 @@ namespace mpicxx {
              * @copydoc operator==()
              */
             template <bool is_rhs_const>
-            bool operator>=(const iterator_impl<is_rhs_const>& rhs) const {
+            [[nodiscard]] bool operator>=(const iterator_impl<is_rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
                         this->state(), rhs.state());
+                MPICXX_ASSERT_SANITY(!this->info_moved_from() && !rhs.info_moved_from(),
+                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
                 return info_ == rhs.info_ && pos_ >= rhs.pos_;
@@ -584,6 +603,9 @@ namespace mpicxx {
 
         private:
             difference_type info_size() const {
+                if (this->singular() || this->info_moved_from()) {
+                    return 0;
+                }
                 int nkeys = 0;
                 MPI_Info_get_nkeys(*info_, &nkeys);
                 return static_cast<difference_type>(nkeys);
@@ -591,6 +613,9 @@ namespace mpicxx {
 
             bool singular() const {
                 return info_ == nullptr;
+            }
+            bool info_moved_from() const {
+                return info_ != nullptr && *info_ == MPI_INFO_NULL;
             }
             template <bool rhs_const>
             bool comparable(const iterator_impl<rhs_const>& rhs) const {
@@ -603,26 +628,22 @@ namespace mpicxx {
                 return pos_ == 0;
             }
             bool incrementable() const {
-                return !this->singular() && !this->past_the_end();
+                return !this->singular() && !this->info_moved_from() && !this->past_the_end();
             }
             bool decrementable() const {
-                return !this->singular() && !this->start_of_sequence();
+                return !this->singular() && !this->info_moved_from() && !this->start_of_sequence();
             }
             bool advanceable(const difference_type n) const {
-                if (this->singular()) {
+                if (this->singular() || this->info_moved_from()) {
                     return false;
-                }
-                if (n > 0) {
+                } else if (n > 0) {
                     return pos_ + n <= this->info_size();
                 } else {
                     return pos_ + n >= 0;
                 }
             }
             bool dereferenceable() const {
-                return !this->singular() && !this->past_the_end() && pos_ >= 0;
-            }
-            bool info_moved_from() const {
-                return info_ == MPI_INFO_NULL;
+                return !this->singular() && !this->info_moved_from() && !this->past_the_end() && pos_ >= 0;
             }
 
             std::string state() const {
@@ -634,6 +655,13 @@ namespace mpicxx {
                     return std::string("dereferenceable (start-of-sequence)");
                 } else {
                     return std::string("dereferenceable");
+                }
+            }
+            std::string info_state() const {
+                if (this->info_moved_from()) {
+                    return std::string(" (referring to an info object in the moved-from state)");
+                } else {
+                    return std::string();
                 }
             }
 
