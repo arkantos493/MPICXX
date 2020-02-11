@@ -238,13 +238,22 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             /**
              * @brief Special copy assignment operator: defined to be able to assign a non-const iterator to a const_iterator.
-             * @tparam is_const_iterator
+             * @tparam rhs_const
              * @param[in] rhs the copied iterator
              *
-             * @post The iterator is not singular if and only if @p rhs is not singular.
+             * @post `*this` is not singular if and only if @p rhs is not singular.
+             *
+             * @assert_sanity{
+             * If @p rhs is a singular iterator. \n
+             * If @p rhs refers to an info object in the moved-from state.
+             * }
              */
-            template <bool is_const_iterator>
-            iterator_impl& operator=(const iterator_impl<is_const_iterator>& rhs) requires is_const {
+            template <bool rhs_const>
+            iterator_impl& operator=(const iterator_impl<rhs_const>& rhs) requires is_const {
+                MPICXX_ASSERT_SANITY(!rhs.singular() && !rhs.info_moved_from(),
+                        "Attempt to assign a {} iterator{} to a {} iterator{}!",
+                        rhs.state(), rhs.info_state(), this->state(), this->info_state());
+
                 info_ = rhs.info_;
                 pos_ = rhs.pos_;
                 return *this;
