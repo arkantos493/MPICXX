@@ -258,7 +258,8 @@ namespace mpicxx {
                 return *this;
             }
             /**
-             * @brief Special copy assignment operator: defined to be able to assign a non-const iterator to a const_iterator.
+             * @brief Special copy assignment operator. Assign a non-const iterator to a const_iterator.
+             * @tparam rhs_const
              * @param[in] rhs another iterator to use as data source
              * @return `*this`
              *
