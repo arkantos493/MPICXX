@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-09
+ * @date 2020-02-11
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -201,7 +201,10 @@ namespace mpicxx {
             /// [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) iterator concept (for C++20 concepts)
             using iterator_concept = std::random_access_iterator_tag;
 
-
+            /// pointer type to the referred to info object (pointer to const if `is_const` is `true`)
+            using MPI_Info_ptr = std::conditional_t<is_const, const MPI_Info*, MPI_Info*>;
+            /// reference type to the referred to info object (reference to const if `is_const` is `true`)
+            using MPI_Info_ref = std::conditional_t<is_const, const MPI_Info&, MPI_Info&>;
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
@@ -218,7 +221,7 @@ namespace mpicxx {
              *
              * @post The iterator is **not singular**.
              */
-            iterator_impl(MPI_Info info, const difference_type pos) : info_(info), pos_(pos) { }
+            iterator_impl(MPI_Info_ref info, const difference_type pos) : info_(&info), pos_(pos) { }
             /**
              * @brief Special copy constructor: defined to be able to convert a non-const iterator to a const_iterator.
              * @tparam is_const_iterator
@@ -506,7 +509,7 @@ namespace mpicxx {
 
                 // get the key (with an offset of n)
                 char key[MPI_MAX_INFO_KEY];
-                MPI_Info_get_nthkey(info_, pos_ + n, key);
+                MPI_Info_get_nthkey(*info_, pos_ + n, key);
 
                 if constexpr (is_const) {
                     // this is currently a const_iterator
@@ -514,18 +517,18 @@ namespace mpicxx {
 
                     // get the length of the value associated with the key
                     int valuelen, flag;
-                    MPI_Info_get_valuelen(info_, key, &valuelen, &flag);
+                    MPI_Info_get_valuelen(*info_, key, &valuelen, &flag);
 
                     // get the value associated with the key
                     std::string value(valuelen, ' ');
-                    MPI_Info_get(info_, key, valuelen, value.data(), &flag);
+                    MPI_Info_get(*info_, key, valuelen, value.data(), &flag);
 
                     return std::make_pair(std::string(key), std::move(value));
                 } else {
                     // this is currently a non-const iterator
                     // -> create a proxy object and return it as value instead of a std::string
                     // (allows changing the value in the info object)
-                    return std::make_pair(std::string(key), proxy(info_, key));
+                    return std::make_pair(std::string(key), proxy(*info_, key));
                 }
             }
             /**
@@ -582,7 +585,7 @@ namespace mpicxx {
         private:
             difference_type info_size() const {
                 int nkeys = 0;
-                MPI_Info_get_nkeys(info_, &nkeys);
+                MPI_Info_get_nkeys(*info_, &nkeys);
                 return static_cast<difference_type>(nkeys);
             }
 
@@ -634,7 +637,7 @@ namespace mpicxx {
                 }
             }
 
-            MPI_Info info_;
+            MPI_Info_ptr info_;
             difference_type pos_;
         };
 
@@ -1684,7 +1687,7 @@ namespace mpicxx {
          */
         iterator erase(const_iterator pos) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(pos.info_ == info_, "Iterator 'pos' must refer to the same info object as '*this'!");
+            MPICXX_ASSERT(*pos.info_ == info_, "Iterator 'pos' must refer to the same info object as '*this'!");
             MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
                           "Iterator 'pos' not dereferenceable (legal range: [0, %u), requested position: %i)!",
                           this->size(), pos.pos_);
@@ -1736,8 +1739,8 @@ namespace mpicxx {
          */
         iterator erase(const_iterator first, const_iterator last) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(first.info_ == info_, "Iterator 'first' must refer to the same info object as '*this'!");
-            MPICXX_ASSERT(last.info_ == info_, "Iterator 'last' must refer to the same info object as '*this'!");
+            MPICXX_ASSERT(*first.info_ == info_, "Iterator 'first' must refer to the same info object as '*this'!");
+            MPICXX_ASSERT(*last.info_ == info_, "Iterator 'last' must refer to the same info object as '*this'!");
             MPICXX_ASSERT(first.pos_ >= 0 && first.pos_ <= static_cast<int>(this->size()),
                           "Iterator 'first' not dereferenceable (legal interval: [0, %u], requested position: %i)!",
                           this->size(), first.pos_);
@@ -1844,7 +1847,7 @@ namespace mpicxx {
          */
         [[nodiscard]] value_type extract(const_iterator pos) {
             MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(pos.info_ == info_, "Iterator 'pos' must refer to the same info object as '*this'!");
+            MPICXX_ASSERT(*pos.info_ == info_, "Iterator 'pos' must refer to the same info object as '*this'!");
             MPICXX_ASSERT(pos.pos_ >= 0 && pos.pos_ < static_cast<int>(this->size()),
                           "Iterator 'pos' not dereferenceable (legal interval: [0, %u), requested position: %i)!",
                           this->size(), pos.pos_);
