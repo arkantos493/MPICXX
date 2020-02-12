@@ -324,7 +324,6 @@ namespace mpicxx {
             }
 
 
-            // TODO 2020-02-09 20:54 marcel: TESTS and DOCUMENTATION !!!!
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            relational operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
@@ -652,7 +651,7 @@ namespace mpicxx {
              * For *MPI* functions called while using a proxy see the @ref proxy documentation.
              * }
              */
-            reference operator[](const difference_type n) const {
+            [[nodiscard]] reference operator[](const difference_type n) const {
                 MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_moved_from(), "Attempt to subscript a {} iterator{}!",
                         this->state(), this->info_state());
                 MPICXX_ASSERT_PRECONDITION(this->advanceable(n) && this->advanceable(n + 1),
@@ -717,7 +716,7 @@ namespace mpicxx {
              * For *MPI* functions called while using a proxy see the @ref proxy documentation.
              * }
              */
-            reference operator*() const {
+            [[nodiscard]] reference operator*() const {
                 MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_moved_from() && this->dereferenceable(),
                         "Attempt to dereference a {} iterator{}!", this->state(), this->info_state());
 
@@ -726,7 +725,7 @@ namespace mpicxx {
             /**
              * @copydoc operator*()
              */
-            pointer operator->() const {
+            [[nodiscard]] pointer operator->() const {
                 MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_moved_from() && this->dereferenceable(),
                         "Attempt to dereference a {} iterator{}!", this->state(), this->info_state());
 
