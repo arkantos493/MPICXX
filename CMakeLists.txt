@@ -21,19 +21,19 @@ cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not supp
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
 
-# set assertion category
+# set assertion categories
 set(possible_assertion_categories PRECONDITION SANITY NONE ALL)
-set(ASSERTION_CATEGORY NONE CACHE STRING "The active assertion categories.")
-set_property(CACHE ASSERTION_CATEGORY PROPERTY STRINGS ${possible_assertion_categories})
+set(ASSERTION_CATEGORIES NONE CACHE STRING "The active assertion categories.")
+set_property(CACHE ASSERTION_CATEGORIES PROPERTY STRINGS ${possible_assertion_categories})
 if (ENABLE_DEATH_TESTS)
     message(WARNING "Enabled all assertion categories because death tests are enabled.")
-    set(ASSERTION_CATEGORY ALL)
+    set(ASSERTION_CATEGORIES ALL)
 endif ()
 set(active_assertion_categories 0)
 set(length 0)
 # assertion_category holds all provided assertion categories
 set(assertion_category)
-list(APPEND assertion_category ${ASSERTION_CATEGORY})
+list(APPEND assertion_category ${ASSERTION_CATEGORIES})
 list(LENGTH assertion_category length)
 
 # if ALL or NONE is specified they have to be the only categories!
@@ -45,10 +45,10 @@ if (ALL IN_LIST assertion_category AND length GREATER 1)
 endif()
 
 # iterate over all provided categories
-foreach(category ${ASSERTION_CATEGORY})
+foreach(category ${ASSERTION_CATEGORIES})
     # the category must be one of the predefined
     if (NOT ${category} IN_LIST possible_assertion_categories)
-        message(FATAL_ERROR "ASSERTION_CATEGORY must only include ${possible_assertion_categories} but includes ${category}")
+        message(FATAL_ERROR "ASSERTION_CATEGORIES must only include ${possible_assertion_categories} but includes ${category}")
     else ()
         message(STATUS "Enabled assertion category: ${category}")
         # interpret "active_assertion_categories" as bit set and set the respective bit
@@ -88,6 +88,10 @@ if (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(FATAL_ERROR "In order to use coveralls reports please change the build type to debug")
 endif (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+# warn if assertions are used in a Release build
+if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${active_assertion_categories} GREATER 0)
+    message(WARNING "Build type Release with active assertions: this may negatively impact performance!")
+endif ()
 
 ### based on http://dominikberner.ch/cmake-interface-lib/ ###
 
@@ -101,7 +105,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${MPI_CXX_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} INTERFACE MPI::MPI_CXX)
 
 # fmt
-find_package(fmt)
+find_package(fmt REQUIRED)
 target_link_libraries(${PROJECT_NAME} INTERFACE fmt::fmt)
 
 # set include directories
@@ -113,10 +117,14 @@ target_include_directories(
 # set needed compiler dependencies
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
-# set important compiler flags
-add_compile_options(-Wall -Wextra -pedantic)
-#add_compile_options(-ffunction-sections -fdata-sections) # TODO: test
-#add_link_options(–gc-sections)
+# set general compiler flags
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # using Clang or GCC
+    message(STATUS "Enabled '-Wall Wextra -pedantic' compiler flags to catch more potential errors")
+    add_compile_options(-Wall -Wextra -pedantic)
+endif()
+
+# set compiler linker flag for better stack traces
 if (NOT (active_assertion_categories EQUAL 0))
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC
