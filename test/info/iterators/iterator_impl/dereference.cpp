@@ -18,7 +18,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorImplDeathTest, DereferenceValid) {
+TEST(IteratorImplTest, DereferenceValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -63,20 +63,20 @@ TEST(IteratorImplDeathTest, DereferenceValid) {
         // check if the retrieved [key, value]-pair is correct and can be changed
         mpicxx::info::iterator it = info.begin();
         EXPECT_STREQ(it->first.c_str(), "key1");
-        EXPECT_STREQ(static_cast<std::string>(it->second).c_str(), "value1");
-        it->second = "value1_override";
         EXPECT_STREQ(static_cast<std::string>(it->second).c_str(), "value1_override");
+        it->second = "value1";
+        EXPECT_STREQ(static_cast<std::string>(it->second).c_str(), "value1");
 
         // check if the internal value changed
         char value[MPI_MAX_INFO_VAL];
         int flag;
         MPI_Info_get(info.get(), "key1", 15, value, &flag);
         EXPECT_TRUE(static_cast<bool>(flag));
-        EXPECT_STREQ(value, "value1_override");
+        EXPECT_STREQ(value, "value1");
     }
 }
 
-TEST(IteratorImplDeathTest, ConstDereferenceValid) {
+TEST(IteratorImplTest, ConstDereferenceValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
