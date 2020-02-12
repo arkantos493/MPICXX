@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-11
+ * @date 2020-02-12
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -219,15 +219,21 @@ namespace mpicxx {
              * @param[inout] info pointer to the referred to *MPI_Info* object
              * @param[in] pos the iterator's current position
              *
-             * @post `*this` is **not singular**.
+             * @post `*this` is not singular if and only if @p info is not the `nullptr`.
              *
              * @assert_sanity{
-             * If @p info is in the moved-from state.
+             * If @p info is a `nullptr`. \n
+             * If @p info is in the moved-from state. \n
+             * If @p pos falls outside the valid range.
              * }
              */
             iterator_impl(MPI_Info_ref info, const difference_type pos) : info_(&info), pos_(pos) {
+                MPICXX_ASSERT_SANITY(!this->singular(),
+                        "Attempt to explicitly create a singular iterator!");
                 MPICXX_ASSERT_SANITY(!this->info_moved_from(),
-                                     "Attempt to create an iterator from an info object in the moved-from state!");
+                        "Attempt to create an iterator from an info object in the moved-from state!");
+                MPICXX_ASSERT_SANITY(pos_ >= 0 && pos <= this->info_size(),
+                        "Attempt to create an iterator referring to {}, which falls outside its valid range!!", pos);
             }
             /**
              * @brief Copy constructor. Constructs the info object with a copy of the contents of @p other.
@@ -991,7 +997,7 @@ namespace mpicxx {
          *
          * @assert{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
          */
-        constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) {
+        constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) { // TODO 2020-02-12 14:36 marcel: check other param
             MPICXX_ASSERT(!(other == MPI_INFO_NULL && is_freeable == true), "'MPI_INFO_NULL' can't be marked freeable!");
             MPICXX_ASSERT(!(other == MPI_INFO_ENV && is_freeable == true), "'MPI_INFO_ENV' can't be marked freeable!");
         }
@@ -2602,7 +2608,8 @@ namespace mpicxx {
          * @brief Get the underlying *MPI_Info* object.
          * @return the *MPI_Info* object wrapped in this mpicxx::info object
          */
-        [[nodiscard]] MPI_Info get() const noexcept { return info_; }
+        [[nodiscard]] const MPI_Info& get() const noexcept { return info_; } // TODO 2020-02-12 14:39 marcel: test
+        [[nodiscard]] MPI_Info& get() noexcept { return info_; } // TODO 2020-02-12 14:39 marcel: test
         /**
          * @brief Returns whether the underlying *MPI_Info* object gets automatically freed upon destruction, i.e. the destructor
          * calls *MPI_Info_free*.
