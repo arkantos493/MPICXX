@@ -75,7 +75,7 @@ TEST(IteratorImplTest, CopyConstructValid) {
     EXPECT_TRUE(const_it_copy_2 == const_it);
 }
 
-TEST(IteratorImplTest, CopyConstructInvalid) {
+TEST(IteratorImplDeathTest, CopyConstructInvalid) {
     // create info object
     mpicxx::info moved_from;
     mpicxx::info::iterator moved_from_it = moved_from.begin();
