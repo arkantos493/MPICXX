@@ -734,6 +734,11 @@ namespace mpicxx {
 
 
         private:
+#if ASSERTION_CATEGORIES > 0  // this member functions are only used if assertions are active
+            /*
+             * @brief Calculate the size of the referred to info object.
+             * @details If `*this` is a singular iterator or the referred to info object is in the moved-from state, the size is 0.
+             */
             difference_type info_size() const {
                 if (this->singular() || this->info_moved_from()) {
                     return 0;
@@ -742,29 +747,69 @@ namespace mpicxx {
                 MPI_Info_get_nkeys(*info_, &nkeys);
                 return static_cast<difference_type>(nkeys);
             }
-
+            /*
+             * @brief Checks whether `*this` is a singular iterator.
+             */
             bool singular() const {
                 return info_ == nullptr;
             }
+            /*
+             * @brief Check whether `*this` refers to an info object in the moved-from state
+             * @details A singular iterator **does not** count as iterator referring to an info object in the moved-from state.
+             */
             bool info_moved_from() const {
                 return info_ != nullptr && *info_ == MPI_INFO_NULL;
             }
+            /*
+             * @brief Checks whether `*this` and @p rhs can be compared to each other.
+             * @details Two iterators are comparable if and only if they are not singular and they refer to the same info object, which is
+             * not in the moved-from state.
+             */
             template <bool rhs_const>
             bool comparable(const iterator_impl<rhs_const>& rhs) const {
                 return !this->singular() && !rhs.singular() && info_ == rhs.info_;
             }
+            /*
+             * @brief Checks whether `*this` is a past-the-end iterator (e.g. an iterator obtained by calling @ref mpicxx::info::end()).
+             */
             bool past_the_end() const {
                 return pos_ >= this->info_size();
             }
+            /*
+             * @brief Checks whether `*this` is a start-of-sequnence iterator (e.g. an iterator obtained by calling
+             * @ref mpicxx::info::begin()).
+             */
             bool start_of_sequence() const {
                 return pos_ == 0;
             }
+            /*
+             * @brief Checks whether `*this` can be incremented.
+             * @details An iterator can be incremented if and only if it is **not**:
+             * - a singular iterator
+             * - referring to an info object in the moved-from state
+             * - a past-the-end iterator
+             */
             bool incrementable() const {
                 return !this->singular() && !this->info_moved_from() && !this->past_the_end();
             }
+            /*
+             * @brief Checks whether `*this` can be decremented.
+             * @details An iterator can be decremented if and only if it is **not**:
+             * - a singular iterator
+             * - referring to an info object in the moved-from state
+             * - a start-of-sequence iterator
+             */
             bool decrementable() const {
                 return !this->singular() && !this->info_moved_from() && !this->start_of_sequence();
             }
+            /*
+             * @brief Checks whether `*this` can be advanced.
+             * @details An iterator can be advanced if and only if:
+             * - it is **not** a singular iterator
+             * - it is **not** referring to an info object in the moved-from state
+             * - the current position + @p **does not** fall outside its valid range
+             * @param n the number of advance steps (@p n may be negative)
+             */
             bool advanceable(const difference_type n) const {
                 if (this->singular() || this->info_moved_from()) {
                     return false;
@@ -774,10 +819,20 @@ namespace mpicxx {
                     return pos_ + n >= 0;
                 }
             }
+            /*
+             * @brief Checks whether `*this` can be safely dereferenced.
+             * @details An iterator can be dereferenced if and only if it is **not**:
+             * - a singular iterator
+             * - referring to an info object in the moved-from state
+             * - a past-the-end iterator
+             * - a before-begin iterator
+             */
             bool dereferenceable() const {
                 return !this->singular() && !this->info_moved_from() && !this->past_the_end() && pos_ >= 0;
             }
-
+            /*
+             * @brief Returns a std::string describing the current state of `*this`.
+             */
             std::string state() const {
                 if (this->singular()) {
                     return std::string("singular");
@@ -791,6 +846,9 @@ namespace mpicxx {
                     return std::string("dereferenceable");
                 }
             }
+            /*
+             * @brief Returns a std::string describing whether the referred to info object is in the moved-from state.
+             */
             std::string info_state() const {
                 if (this->info_moved_from()) {
                     return std::string(" (referring to an info object in the moved-from state)");
@@ -798,6 +856,7 @@ namespace mpicxx {
                     return std::string();
                 }
             }
+#endif
 
             MPI_Info_ptr info_;
             difference_type pos_;
