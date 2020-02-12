@@ -625,16 +625,18 @@ namespace mpicxx {
              * If the current iterator is a non-const iterator, the returned type is a
              * [`std::pair<const std::string, proxy>`](https://en.cppreference.com/w/cpp/utility/pair), i.e. the [key, value]-pair's value
              * can be changed through the proxy object.
-             * @param[in] n the requested offset of the iterator
+             * @param[in] n the requested offset of the iterator (@p n may be negative)
              * @return the [key, value]-pair
              *
-             * @pre The referred to info object **must not** be in the moved-from state.
-             * @pre The position denoted by the current iterator position + @p n **must** be in the half-open
-             * interval [0, nkeys), where `nkeys` ist the size of the referred to info object.
+             * @pre `*this` **must not** be a singular iterator.
+             * @pre `*this` **must not** refer to an info object in the moved-from state.
+             * @pre `*this` **must** be dereferencable, i.e. the position denoted by the current iterator + @p n must be in the
+             * half-open interval [0, nkeys), where `nkeys` ist the size of the referred to info object.
              *
-             * @assert{
-             * If the referred to info object is in the moved-from state. \n
-             * If attempting an illegal dereferencing.
+             * @assert_precondition{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` can't be dereferenced.
              * }
              *
              * @calls_ref{
@@ -651,11 +653,11 @@ namespace mpicxx {
              * }
              */
             reference operator[](const difference_type n) const {
-                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
-                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_moved_from(), "Attempt to subscript a {} iterator{}!",
+                        this->state(), this->info_state());
                 MPICXX_ASSERT_PRECONDITION(this->advanceable(n) && this->advanceable(n + 1),
                         "Attempt to subscript a {} iterator {} step from its current position, which falls outside its dereferenceable range.",
-                        this->state());
+                        this->state(), n);
 
                 // get the key (with an offset of n)
                 char key[MPI_MAX_INFO_KEY];
@@ -691,13 +693,15 @@ namespace mpicxx {
              * can be changed through the proxy object.
              * @return the [key, value]-pair
              *
-             * @pre The referred to info object **must not** be in the moved-from state.
-             * @pre The position denoted by the current iterator position **must** be in the half-open
-             * interval [0, nkeys), where `nkeys` ist the size of the referred to info object.
+             * @pre `*this` **must not** be a singular iterator.
+             * @pre `*this` **must not** refer to an info object in the moved-from state.
+             * @pre `*this` **must** be dereferencable, i.e. the position denoted by the current iteratormust be in the half-open interval
+             * [0, nkeys), where `nkeys` ist the size of the referred to info object.
              *
-             * @assert{
-             * If the referred to info object is in the moved-from state. \n
-             * If attempting an illegal dereferencing.
+             * @assert_precondition{
+             * If `*this` is a singular iterator. \n
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If `*this` can't be dereferenced.
              * }
              *
              * @calls_ref{
@@ -714,9 +718,8 @@ namespace mpicxx {
              * }
              */
             reference operator*() const {
-                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
-                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
-                MPICXX_ASSERT_PRECONDITION(this->dereferenceable(), "Attempt to dereference a {} iterator!", this->state());
+                MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_moved_from() && this->dereferenceable(),
+                        "Attempt to dereference a {} iterator{}!", this->state(), this->info_state());
 
                 return this->operator[](0);
             }
@@ -724,9 +727,8 @@ namespace mpicxx {
              * @copydoc operator*()
              */
             pointer operator->() const {
-                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
-                                           "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
-                MPICXX_ASSERT_PRECONDITION(this->dereferenceable(), "Attempt to dereference a {} iterator!", this->state());
+                MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_moved_from() && this->dereferenceable(),
+                        "Attempt to dereference a {} iterator{}!", this->state(), this->info_state());
 
                 return std::make_unique<value_type>(this->operator[](0));
             }
@@ -782,6 +784,8 @@ namespace mpicxx {
                     return std::string("singular");
                 } else if (this->past_the_end()) {
                     return std::string("past-the-end");
+                } else if (pos_ < 0) {
+                    return std::string("before-begin");
                 } else if (this->start_of_sequence()) {
                     return std::string("dereferenceable (start-of-sequence)");
                 } else {
