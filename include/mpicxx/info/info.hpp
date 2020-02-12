@@ -154,11 +154,23 @@ namespace mpicxx {
          * @details The standard reverse_iterator and const_reverse_iterator are provided
          * in terms of [`std::reverse_iterator<iterator>`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator) and
          * [`std::reverse_iterator<const_iterator>`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator) respectively.
+         *
+         * All necessary functions for a [*random access iterator*](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) are
+         * implemented.
+         *
+         * Each iterator can be in one of three possible states:
+         * 1. singular iterator (the iterator is currently not attached to any info object)
+         * 2. iterator referring to an info object in the moved-from state
+         * 3. valid
+         *
+         * The presence of 1\. and 2\. can be checked using assertions if the assertion categories *SANITY* and *PRECONDITION* are activated
+         * during the cmake configuration step.
+         *
          * @tparam is_const if `true` a const_iterator is instantiated, otherwise a non-const iterator
          */
         template <bool is_const>
         class iterator_impl {
-            // needed to be able to construct a const_iterator from an iterator
+            // be able to construct a const_iterator from an iterator
             template <bool>
             friend class iterator_impl;
             // info class can now directly access the pos member
