@@ -1,7 +1,7 @@
 /**
  * @file info/iterators/iterator_impl/assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-11
+ * @date 2020-02-12
  *
  * @brief Test cases for the assignment operator of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *IteratorImplTest*
@@ -10,7 +10,6 @@
  * | AssignmentValid   | assign a valid iterator to another one                 |
  * | AssignmentInvalid | assign an invalid iterator to another one (death test) |
  */
-
 
 #include <gtest/gtest.h>
 #include <mpi.h>
