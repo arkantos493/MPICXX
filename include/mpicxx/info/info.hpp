@@ -273,7 +273,7 @@ namespace mpicxx {
             iterator_impl() : info_(nullptr), pos_(0) { }
             /**
              * @brief Construct a new iterator referring to @p info at position @p pos.
-             * @param[inout] info pointer to the referred to *MPI_Info* object
+             * @param[inout] info the referred to *MPI_Info* object
              * @param[in] pos the iterator's current position
              *
              * @post `*this` is not singular if and only if @p info is not the `nullptr`.
@@ -811,7 +811,7 @@ namespace mpicxx {
                 return info_ == nullptr;
             }
             /*
-             * @brief Check whether `*this` refers to an info object in the moved-from state
+             * @brief Check whether `*this` refers to an info object in the moved-from state.
              * @details A singular iterator **does not** count as iterator referring to an info object in the moved-from state.
              */
             bool info_moved_from() const {
