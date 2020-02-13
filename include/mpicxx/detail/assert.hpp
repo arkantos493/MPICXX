@@ -1,18 +1,16 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-02-09
+ * @date 2020-02-13
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
- * @details The asserts are currently separated into four categories:
- * - *NONE*: **no** assertions are enabled at all (default)
- * - *ALL*: enables **all** assertions
- * - *PRECONDITION*: assertions that check preconditions, i.e. conditions that **must** hold for the function to complete successfully
- * - *SANITY*: assertions that check if the parameters make sense in the current context, but which are **not required** for the function to
- * complete successfully (e.g. increment of a past-the-end iterator)
+ * @details The asserts are currently separated into three levels:
+ * - **0**: **no** assertions are enabled (default)
+ * - **1**: assertions that check preconditions, i.e. conditions that **must** hold for the function to complete successfully
+ * - **2**: additionally to the assertions of level 1, assertions that check if the parameters make sense in the current context, but which
+ * are **not required** for the function to complete successfully (e.g. increment of a past-the-end iterator), are added
  *
- * During cmake's configuration step, it is possible to disable/enable only a subset of these assertions
- * (via the `-DASSERTION_CATEGORY` option).
+ * During cmake's configuration step, it is possible to enable a specific assertion level using the ´-DASSERTION_LEVEL´ option.
  *
  * Old assertion syntax and example output:
  * @code
@@ -25,7 +23,7 @@
  * New assertion syntax and example output:
  * @code
  * MPICXX_ASSERT_PRECONDITION(n > 0, "Parameter can't be negative! : n = %i", n);
- * // alternatives: MPICXX_ASSERT_SANITY
+ * // alternative: MPICXX_ASSERT_SANITY
  *
  *
  * Precondition assertion 'n > 0' failed on rank 1
@@ -45,7 +43,7 @@
  *   #1    ./output.s: _start() [+0x2]
  * @endcode
  * For a meaningful stack trace to be printed the linker flag `-rdynamic` ([*GCC*](https://gcc.gnu.org/) and
- * [*clang*](https://clang.llvm.org/)) is added if and only if **any** assertion category is used during cmake's configuration.
+ * [*clang*](https://clang.llvm.org/)) is added if and only if the ASSERTION_LEVEL is greater than 0.
  * [*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/) currently doesn't print a stack trace at all.
  *
  * In addition the assertions call ``MPI_Abort`` if the assertion is executed within an active MPI environment.
@@ -137,16 +135,15 @@ namespace mpicxx::detail {
 #endif
 
 
-#define CHECK_BIT(var,pos) ( (var >> pos) & 1 )
-
-// ASSERTION_CATEGORIES interpreted as bit set
-// bit at position 0 set -> enable PRECONDITION assertion macro
-// bit at position 1 set -> enable SANITY assertion macro
+// ASSERTION_LEVEL
+// 0 -> no assertions
+// 1 -> only PRECONDITION assertions
+// 2 -> PRECONDITION and SANITY assertions
 
 /**
  * @def MPICXX_ASSERT_PRECONDITION
- * @brief Defines the @ref MPICXX_ASSERT_PRECONDITION macro if and only if it was explicitly selected (or implicitly via *ALL*) during
- * cmake's configuration step, otherwise this macro expands to `nop`.
+ * @brief Defines the @ref MPICXX_ASSERT_PRECONDITION macro if and only if the *ASSERTION_LEVEL*, as selected during cmake's configuration
+ * step, is greater than 0.
  * @details This macro is responsible for all precondition checks. If a precondition of a function isn't met, the respective function isn't
  * guaranteed to finish successfully.
  *
@@ -156,7 +153,7 @@ namespace mpicxx::detail {
  * @param msg the custom assert message
  * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
  */
-#if CHECK_BIT(ASSERTION_CATEGORIES, 0) == 1
+#if ASSERTION_LEVEL > 0
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...) \
         mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
 #else
@@ -165,8 +162,8 @@ namespace mpicxx::detail {
 
 /**
  * @def MPICXX_ASSERT_SANITY
- * @brief Defines the @ref MPICXX_ASSERT_SANITY macro if and only if it was explicitly selected (or implicitly via *ALL*) during
- * cmake's configuration step, otherwise this macro expands to `nop`.
+ * @brief Defines the @ref MPICXX_ASSERT_SANITY macro if and only if the *ASSERTION_LEVEL*, as selected during cmake's configuration step,
+ * is greater than 1.
  * @details This macro is responsible for all sanity checks. If a sanity check isn't successful, the respective function can still complete,
  * but the executed code wasn't necessarily meaningful.
  *
@@ -176,7 +173,7 @@ namespace mpicxx::detail {
  * @param msg the custom assert message
  * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
  */
-#if CHECK_BIT(ASSERTION_CATEGORIES, 1) == 1
+#if ASSERTION_LEVEL > 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \
         mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
 #else

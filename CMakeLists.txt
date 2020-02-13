@@ -21,57 +21,20 @@ cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not supp
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
 
-# set assertion categories
-set(possible_assertion_categories PRECONDITION SANITY NONE ALL)
-set(ASSERTION_CATEGORIES NONE CACHE STRING "The active assertion categories.")
-set_property(CACHE ASSERTION_CATEGORIES PROPERTY STRINGS ${possible_assertion_categories})
+# set assertion level
+set(max_assertion_level 2)
+set(ASSERTION_LEVEL 0 CACHE STRING "The active assertion level.")
 if (ENABLE_DEATH_TESTS)
     message(WARNING "Enabled all assertion categories because death tests are enabled.")
-    set(ASSERTION_CATEGORIES ALL)
-endif ()
-set(active_assertion_categories 0)
-set(length 0)
-# assertion_category holds all provided assertion categories
-set(assertion_category)
-list(APPEND assertion_category ${ASSERTION_CATEGORIES})
-list(LENGTH assertion_category length)
+    set(ASSERTION_LEVEL ${max_assertion_level})
+endif (ENABLE_DEATH_TESTS)
 
-# if ALL or NONE is specified they have to be the only categories!
-if (NONE IN_LIST assertion_category AND length GREATER 1)
-    message(FATAL_ERROR "If NONE is present it must be the only option!")
-endif()
-if (ALL IN_LIST assertion_category AND length GREATER 1)
-    message(FATAL_ERROR "If ALL is present it must be the only option!")
-endif()
+# check if assertion level is valid
+if (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
+    message(FATAL_ERROR "ASSERTION_LEVEL must be an integer in the range: 0-${max_assertion_level}")
+endif (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
+message(STATUS "ASSERTION_LEVEL: ${ASSERTION_LEVEL}")
 
-# iterate over all provided categories
-foreach(category ${ASSERTION_CATEGORIES})
-    # the category must be one of the predefined
-    if (NOT ${category} IN_LIST possible_assertion_categories)
-        message(FATAL_ERROR "ASSERTION_CATEGORIES must only include ${possible_assertion_categories} but includes ${category}")
-    else ()
-        message(STATUS "Enabled assertion category: ${category}")
-        # interpret "active_assertion_categories" as bit set and set the respective bit
-        # ALL          -> set all bits
-        # NONE         -> set no bit
-        # PRECONDITION -> set 1st bit
-        # SANITY       -> set 2nd bit
-        if (${category} STREQUAL ALL)
-            list(LENGTH possible_assertion_categories length)
-            math(EXPR length "${length} - 3")
-            if (length GREATER_EQUAL 0)
-                foreach (i RANGE ${length})
-                    math(EXPR active_assertion_categories "${active_assertion_categories} + (1 << ${i})")
-                endforeach ()
-            endif ()
-        elseif (${category} STREQUAL NONE)
-            set(active_assertion_categories 0)
-        else()
-            list(FIND possible_assertion_categories ${category} idx)
-            math(EXPR active_assertion_categories "${active_assertion_categories} + (1 << ${idx})")
-        endif()
-    endif ()
-endforeach()
 
 # add custom cmake modules path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -89,7 +52,7 @@ if (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # warn if assertions are used in a Release build
-if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${active_assertion_categories} GREATER 0)
+if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${ASSERTION_LEVEL} GREATER 0)
     message(WARNING "Build type Release with active assertions: this may negatively impact performance!")
 endif ()
 
@@ -97,7 +60,7 @@ endif ()
 
 # create header-only (interface) library
 add_library(${PROJECT_NAME} INTERFACE)
-target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_CATEGORIES=${active_assertion_categories})
+target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_LEVEL=${ASSERTION_LEVEL})
 
 # find MPI and add it to the library target
 find_package(MPI REQUIRED)

@@ -746,7 +746,7 @@ namespace mpicxx {
 
 
         private:
-#if ASSERTION_CATEGORIES > 0  // this member functions are only used if assertions are active
+#if ASSERTION_LEVEL > 0  // this member functions are only used if assertions are active
             /*
              * @brief Calculate the size of the referred to info object.
              * @details If `*this` is a singular iterator or the referred to info object is in the moved-from state, the size is 0.
