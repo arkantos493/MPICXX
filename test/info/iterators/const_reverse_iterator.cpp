@@ -1,5 +1,5 @@
 /**
- * @file info/iterators/const_iterator.cpp
+ * @file info/iterators/const_reverse_iterator.cpp
  * @author Marcel Breyer
  * @date 2020-02-03
  *
