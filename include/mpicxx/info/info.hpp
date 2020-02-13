@@ -52,7 +52,7 @@ namespace mpicxx {
          * @ref info::operator[](detail::string auto&&) to distinguish between read and write accesses.
          * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string_view) on a read access.
          *
-         * Can be printed directly through an @ref operator<<(std::ostream&, const proxy&) overload.
+         * Can be printed through an @ref operator<<(std::ostream&, const proxy&) overload.
          */
         class proxy { // TODO 2020-02-13 21:30 marcel: copy/move constructor/assignment???
             /// pointer type to the referred to info object
@@ -73,7 +73,7 @@ namespace mpicxx {
             proxy(MPI_Info_ref info, detail::string auto&& key) : info_(&info), key_(std::forward<decltype(key)>(key)) {
                 MPICXX_ASSERT_SANITY(!this->info_moved_from(),
                         "Attempt to create a proxy from an info object in the moved-from state!");
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(key_, MPI_MAX_INFO_KEY),
+                MPICXX_ASSERT_SANITY(this->legal_size(key_, MPI_MAX_INFO_KEY),
                         "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key_.size(), MPI_MAX_INFO_KEY);
             }
 
