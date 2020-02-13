@@ -1,10 +1,10 @@
 /**
- * @file info/iterators/iterator_impl/constructor.cpp
+ * @file test/info/iterators/iterator_impl/constructor.cpp
  * @author Marcel Breyer
- * @date 2020-02-12
+ * @date 2020-02-13
  *
  * @brief Test cases for the constructors of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
- * @details Testsuite: *IteratorImplTest*
+ * @details Testsuite: *InfoIteratorImplTest*
  * | test case name                 | test case description                                                                  |
  * |:-------------------------------|:---------------------------------------------------------------------------------------|
  * | DefaultConstruct               | default construct a singular iterator (death test)                                     |
@@ -20,7 +20,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorImplDeathTest, DefaultConstruct) {
+TEST(InfoIteratorImplDeathTest, DefaultConstruct) {
     // default construct iterator
     mpicxx::info::iterator it;
 
@@ -29,7 +29,7 @@ TEST(IteratorImplDeathTest, DefaultConstruct) {
 }
 
 
-TEST(IteratorImplTest, ConstructFromInfoObjectValid) {
+TEST(InfoIteratorImplTest, ConstructFromInfoObjectValid) {
     // create info object
     mpicxx::info info;
 
@@ -39,7 +39,7 @@ TEST(IteratorImplTest, ConstructFromInfoObjectValid) {
     EXPECT_TRUE(it == info.begin());
 }
 
-TEST(IteratorImplDeathTest, ConstructFromInfoObjectInvalid) {
+TEST(InfoIteratorImplDeathTest, ConstructFromInfoObjectInvalid) {
     // create info object
     mpicxx::info moved_from;
     mpicxx::info info(std::move(moved_from));
@@ -56,7 +56,7 @@ TEST(IteratorImplDeathTest, ConstructFromInfoObjectInvalid) {
 }
 
 
-TEST(IteratorImplTest, CopyConstructValid) {
+TEST(InfoIteratorImplTest, CopyConstructValid) {
     // create info object
     mpicxx::info info;
     const mpicxx::info const_info;
@@ -75,7 +75,7 @@ TEST(IteratorImplTest, CopyConstructValid) {
     EXPECT_TRUE(const_it_copy_2 == const_it);
 }
 
-TEST(IteratorImplDeathTest, CopyConstructInvalid) {
+TEST(InfoIteratorImplDeathTest, CopyConstructInvalid) {
     // create info object
     mpicxx::info moved_from;
     mpicxx::info::iterator moved_from_it = moved_from.begin();

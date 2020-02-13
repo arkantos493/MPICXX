@@ -1,10 +1,10 @@
 /**
- * @file info/iterators/iterator_impl/assignment.cpp
+ * @file test/info/iterators/iterator_impl/assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-12
+ * @date 2020-02-13
  *
  * @brief Test cases for the assignment operator of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
- * @details Testsuite: *IteratorImplTest*
+ * @details Testsuite: *InfoIteratorImplTest*
  * | test case name    | test case description                                  |
  * |:------------------|:-------------------------------------------------------|
  * | AssignmentValid   | assign a valid iterator to another one                 |
@@ -17,7 +17,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorImplTest, AssignmentValid) {
+TEST(InfoIteratorImplTest, AssignmentValid) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -51,7 +51,7 @@ TEST(IteratorImplTest, AssignmentValid) {
     EXPECT_TRUE(moved_from_it == info_2.begin());
 }
 
-TEST(IteratorImplDeathTest, AssignmentInvalid) {
+TEST(InfoIteratorImplDeathTest, AssignmentInvalid) {
     // create info object
     mpicxx::info info;
     mpicxx::info::iterator it = info.begin();

@@ -1,10 +1,10 @@
 /**
- * @file info/iterators/iterator_impl/relational.cpp
+ * @file test/info/iterators/iterator_impl/relational.cpp
  * @author Marcel Breyer
  * @date 2020-02-11
  *
  * @brief Test cases for the relational operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
- * @details Testsuite: *IteratorImplTest*
+ * @details Testsuite: *InfoIteratorImplTest*
  * | test case name                      | test case description                                            |
  * |:------------------------------------|:-----------------------------------------------------------------|
  * | EqualityValidComparison             | compare two valid iterators for equality                         |
@@ -28,7 +28,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorImplTest, EqualityValidComparison) {
+TEST(InfoIteratorImplTest, EqualityValidComparison) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -50,7 +50,7 @@ TEST(IteratorImplTest, EqualityValidComparison) {
     EXPECT_TRUE(info_2.end() - 1 == info_2.begin() + 1);
 }
 
-TEST(IteratorImplDeathTest, EqualityInvalidComparison) {
+TEST(InfoIteratorImplDeathTest, EqualityInvalidComparison) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -83,7 +83,7 @@ TEST(IteratorImplDeathTest, EqualityInvalidComparison) {
 }
 
 
-TEST(IteratorImplTest, InequalityValidComparison) {
+TEST(InfoIteratorImplTest, InequalityValidComparison) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -105,7 +105,7 @@ TEST(IteratorImplTest, InequalityValidComparison) {
     EXPECT_FALSE(info_2.end() - 1 != info_2.begin() + 1);
 }
 
-TEST(IteratorImplDeathTest, InequalityInvalidComparison) {
+TEST(InfoIteratorImplDeathTest, InequalityInvalidComparison) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -138,7 +138,7 @@ TEST(IteratorImplDeathTest, InequalityInvalidComparison) {
 }
 
 
-TEST(IteratorImplTest, LessThanValidComparison) {
+TEST(InfoIteratorImplTest, LessThanValidComparison) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -160,7 +160,7 @@ TEST(IteratorImplTest, LessThanValidComparison) {
     EXPECT_FALSE(info_2.end() - 1 < info_2.begin() + 1);
 }
 
-TEST(IteratorImplDeathTest, LessThanInvalidComparison) {
+TEST(InfoIteratorImplDeathTest, LessThanInvalidComparison) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -193,7 +193,7 @@ TEST(IteratorImplDeathTest, LessThanInvalidComparison) {
 }
 
 
-TEST(IteratorImplTest, GreaterThanValidComparison) {
+TEST(InfoIteratorImplTest, GreaterThanValidComparison) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -215,7 +215,7 @@ TEST(IteratorImplTest, GreaterThanValidComparison) {
     EXPECT_FALSE(info_2.end() - 1 > info_2.begin() + 1);
 }
 
-TEST(IteratorImplDeathTest, GreaterThanInvalidComparison) {
+TEST(InfoIteratorImplDeathTest, GreaterThanInvalidComparison) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -248,7 +248,7 @@ TEST(IteratorImplDeathTest, GreaterThanInvalidComparison) {
 }
 
 
-TEST(IteratorImplTest, LessOrEqualThanValidComparison) {
+TEST(InfoIteratorImplTest, LessOrEqualThanValidComparison) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -270,7 +270,7 @@ TEST(IteratorImplTest, LessOrEqualThanValidComparison) {
     EXPECT_TRUE(info_2.end() - 1 <= info_2.begin() + 1);
 }
 
-TEST(IteratorImplDeathTest, LessOrEqualThanInvalidComparison) {
+TEST(InfoIteratorImplDeathTest, LessOrEqualThanInvalidComparison) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -303,7 +303,7 @@ TEST(IteratorImplDeathTest, LessOrEqualThanInvalidComparison) {
 }
 
 
-TEST(IteratorImplTest, GreaterOrEqualThanValidComparison) {
+TEST(InfoIteratorImplTest, GreaterOrEqualThanValidComparison) {
     // create info objects and add [key, value]-pairs
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -325,7 +325,7 @@ TEST(IteratorImplTest, GreaterOrEqualThanValidComparison) {
     EXPECT_TRUE(info_2.end() - 1 >= info_2.begin() + 1);
 }
 
-TEST(IteratorImplDeathTest, GreaterOrEqualThanInvalidComparison) {
+TEST(InfoIteratorImplDeathTest, GreaterOrEqualThanInvalidComparison) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
@@ -358,7 +358,7 @@ TEST(IteratorImplDeathTest, GreaterOrEqualThanInvalidComparison) {
 }
 
 
-TEST(IteratorImplTest,CompareConstAndNonConst) {
+TEST(InfoIteratorImplTest,CompareConstAndNonConst) {
     // create empty info object
     mpicxx::info info;
 

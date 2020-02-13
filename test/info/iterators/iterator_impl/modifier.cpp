@@ -1,10 +1,10 @@
 /**
- * @file info/iterators/iterator_impl/modifier.cpp
+ * @file test/info/iterators/iterator_impl/modifier.cpp
  * @author Marcel Breyer
  * @date 2020-02-11
  *
  * @brief Test cases for the modifying operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
- * @details Testsuite: *IteratorImplTest*
+ * @details Testsuite: *InfoIteratorImplTest*
  * | test case name       | test case description                                                |
  * |:---------------------|:---------------------------------------------------------------------|
  * | PreIncrementValid    | increment a valid iterator: `++it;`                                  |
@@ -27,7 +27,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorImplTest, PreIncrementValid) {
+TEST(InfoIteratorImplTest, PreIncrementValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -46,7 +46,7 @@ TEST(IteratorImplTest, PreIncrementValid) {
     EXPECT_TRUE(++const_it == info.begin() + 2);
 }
 
-TEST(IteratorImplDeathTest, PreIncrementInvalid) {
+TEST(InfoIteratorImplDeathTest, PreIncrementInvalid) {
     // create info object
     mpicxx::info info;
 
@@ -69,7 +69,7 @@ TEST(IteratorImplDeathTest, PreIncrementInvalid) {
 }
 
 
-TEST(IteratorImplTest, PostIncrementValid) {
+TEST(InfoIteratorImplTest, PostIncrementValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -90,7 +90,7 @@ TEST(IteratorImplTest, PostIncrementValid) {
     EXPECT_TRUE(const_it == info.begin() + 2);
 }
 
-TEST(IteratorImplDeathTest, PostIncrementInvalid) {
+TEST(InfoIteratorImplDeathTest, PostIncrementInvalid) {
     // create info object
     mpicxx::info info;
 
@@ -113,7 +113,7 @@ TEST(IteratorImplDeathTest, PostIncrementInvalid) {
 }
 
 
-TEST(IteratorImplTest, AdvanceValid) {
+TEST(InfoIteratorImplTest, AdvanceValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -178,7 +178,7 @@ TEST(IteratorImplTest, AdvanceValid) {
     }
 }
 
-TEST(IteratorImplDeathTest, AdvanceInvalid) {
+TEST(InfoIteratorImplDeathTest, AdvanceInvalid) {
     // create info object
     mpicxx::info info;
 
@@ -211,7 +211,7 @@ TEST(IteratorImplDeathTest, AdvanceInvalid) {
 }
 
 
-TEST(IteratorImplTest, PreDecrementValid) {
+TEST(InfoIteratorImplTest, PreDecrementValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -230,7 +230,7 @@ TEST(IteratorImplTest, PreDecrementValid) {
     EXPECT_TRUE(--const_it == info.begin());
 }
 
-TEST(IteratorImplDeathTest, PreDecrementInvalid) {
+TEST(InfoIteratorImplDeathTest, PreDecrementInvalid) {
     // create info object
     mpicxx::info info;
 
@@ -253,7 +253,7 @@ TEST(IteratorImplDeathTest, PreDecrementInvalid) {
 }
 
 
-TEST(IteratorImplTest, PostDecrementValid) {
+TEST(InfoIteratorImplTest, PostDecrementValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -274,7 +274,7 @@ TEST(IteratorImplTest, PostDecrementValid) {
     EXPECT_TRUE(const_it == info.begin());
 }
 
-TEST(IteratorImplDeathTest, PostDecrementInvalid) {
+TEST(InfoIteratorImplDeathTest, PostDecrementInvalid) {
     // create info object
     mpicxx::info info;
 
@@ -297,7 +297,7 @@ TEST(IteratorImplDeathTest, PostDecrementInvalid) {
 }
 
 
-TEST(IteratorImplTest, RetreatValid) {
+TEST(InfoIteratorImplTest, RetreatValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -343,7 +343,7 @@ TEST(IteratorImplTest, RetreatValid) {
     }
 }
 
-TEST(IteratorImplDeathTest, RetreatInvalid) {
+TEST(InfoIteratorImplDeathTest, RetreatInvalid) {
     // create info object
     mpicxx::info info;
 

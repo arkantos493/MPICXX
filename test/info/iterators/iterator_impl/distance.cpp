@@ -1,10 +1,10 @@
 /**
- * @file info/iterators/iterator_impl/distance.cpp
+ * @file test/info/iterators/iterator_impl/distance.cpp
  * @author Marcel Breyer
- * @date 2020-02-11
+ * @date 2020-02-13
  *
  * @brief Test cases for the distance calculation of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
- * @details Testsuite: *IteratorImplTest*
+ * @details Testsuite: *InfoIteratorImplTest*
  * | test case name  | test case description                                             |
  * |:----------------|:------------------------------------------------------------------|
  * | DistanceValid   | calculate the distance between two valid iterators                |
@@ -18,7 +18,7 @@
 #include <mpicxx/info/info.hpp>
 
 
-TEST(IteratorImplTest, DistanceValid) {
+TEST(InfoIteratorImplTest, DistanceValid) {
     // create info object and add [key, value]-pairs
     mpicxx::info info;
     MPI_Info_set(info.get(), "key1", "value1");
@@ -32,7 +32,7 @@ TEST(IteratorImplTest, DistanceValid) {
     EXPECT_EQ(info.end() - info.end(), 0);
 }
 
-TEST(IteratorImplDeathTest, DistanceInvalid) {
+TEST(InfoIteratorImplDeathTest, DistanceInvalid) {
     // create info objects
     mpicxx::info info_1;
     mpicxx::info info_2;
