@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-12
+ * @date 2020-02-13
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -54,14 +54,29 @@ namespace mpicxx {
          *
          * Can be printed directly through an @ref operator<<(std::ostream&, const proxy&) overload.
          */
-        class proxy {
+        class proxy { // TODO 2020-02-13 21:30 marcel: copy/move constructor/assignment???
+            /// pointer type to the referred to info object
+            using MPI_Info_ptr = MPI_Info*;
+            /// reference type to the referred to info object
+            using MPI_Info_ref = MPI_Info&;
+
         public:
             /**
              * @brief Construct a new proxy object.
-             * @param[in] info pointer to the parent info object
-             * @param[in] key the provided @p key (must meet the requirements of the detail::string concept)
+             * @param[in] info the referred to *MPI_Info* object
+             * @param[in] key the provided @p key (must meet the requirements of the @p detail::string concept)
+             *
+             * @assert_sanity{
+             * If @p info is in the moved-from state. \n
+             * If @p key exceeds its size limit.
+             * }
              */
-            proxy(MPI_Info info, detail::string auto&& key) : info_(info), key_(std::forward<decltype(key)>(key)) { }
+            proxy(MPI_Info_ref info, detail::string auto&& key) : info_(&info), key_(std::forward<decltype(key)>(key)) {
+                MPICXX_ASSERT_SANITY(!this->info_moved_from(),
+                        "Attempt to create a proxy from an info object in the moved-from state!");
+                MPICXX_ASSERT_PRECONDITION(this->legal_size(key_, MPI_MAX_INFO_KEY),
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key_.size(), MPI_MAX_INFO_KEY);
+            }
 
             /**
              * @brief On write access, add the provided @p value and saved key to the info object.
@@ -71,30 +86,36 @@ namespace mpicxx {
              * @pre @p value **must** include the null-terminator.
              * @pre The @p value's length **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
              *
-             * @assert{ If @p value exceeds its size limit. }
+             * @assert_precondition{
+             * If `*this` refers to an info object in the moved-from state. \n
+             * If @p value exceeds its size limit.
+             * }
              *
              * @calls{
              * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly once
              * }
              */
             void operator=(const std::string_view value) {
-                MPICXX_ASSERT(0 < value.size() && value.size() < MPI_MAX_INFO_VAL,
-                              "Illegal info value: 0 < %u < %i (MPI_MAX_INFO_VAL)",
-                              value.size(), MPI_MAX_INFO_VAL);
+                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
+                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+                MPICXX_ASSERT_PRECONDITION(this->legal_size(value, MPI_MAX_INFO_VAL),
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
 
-                MPI_Info_set(info_, key_.data(), value.data());
+                MPI_Info_set(*info_, key_.data(), value.data());
             }
 
             /**
-             * @brief On read access return the value associated with the saved key.
+             * @brief On read access, return the value associated with the saved key.
              * @details If the key doesn't exist yet, it will be inserted with a string consisting only of one whitespace as value,
              * also returning a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)`(" ")`.
-             * @return the value associated with key
+             * @return the value associated with key (`[[nodiscard]]`)
              *
              * @attention This function returns the associated value *by-value*, i.e. changing the returned
              * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) **won't** alter the info object's internal value!
              * @attention Because inserting an empty string `""` is not allowed, a `" "` string is inserted instead, if the key does not
              * already exist.
+             *
+             * @assert_precondition{ If `*this` refers to an info object in the moved-from state. }
              *
              * @calls{
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
@@ -102,22 +123,25 @@ namespace mpicxx {
              * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);      // at most once
              * }
              */
-            operator std::string() const {
+            [[nodiscard]] operator std::string() const {
+                MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
+                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+
                 // get the length of the value
                 int valuelen, flag;
-                MPI_Info_get_valuelen(info_, key_.data(), &valuelen, &flag);
+                MPI_Info_get_valuelen(*info_, key_.data(), &valuelen, &flag);
 
                 if (!static_cast<bool>(flag)) {
                     // the key doesn't exist yet
                     // -> add a new [key, value]-pair and return a std::string consisting of only one whitespace
                     std::string value(" ");
-                    MPI_Info_set(info_, key_.data(), value.data());
+                    MPI_Info_set(*info_, key_.data(), value.data());
                     return value;
                 }
 
                 // key exists -> get the associated value
                 std::string value(valuelen, ' ');
-                MPI_Info_get(info_, key_.data(), valuelen, value.data(), &flag);
+                MPI_Info_get(*info_, key_.data(), valuelen, value.data(), &flag);
                 return value;
             }
 
@@ -129,6 +153,8 @@ namespace mpicxx {
              * @param[in] rhs the proxy object
              * @return the output stream
              *
+             * @assert_precondition{ If `*this` refers to an info object in the moved-from state. }
+             *
              * @calls{
              * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);         // exactly once
              * int MPI_Info_set(MPI_Info info, const char *key, const char *value);                         // at most once
@@ -136,12 +162,31 @@ namespace mpicxx {
              * }
              */
             friend std::ostream& operator<<(std::ostream& out, const proxy& rhs) {
+                MPICXX_ASSERT_PRECONDITION(!rhs.info_moved_from(),
+                        "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
+
                 out << static_cast<std::string>(rhs.operator std::string());
                 return out;
             }
 
         private:
-            MPI_Info info_;
+#if ASSERTION_LEVEL > 0
+            /*
+             * @brief Check whether `*this` refers to an info object in the moved-from state.
+             */
+            bool info_moved_from() const {
+                return *info_ == MPI_INFO_NULL;
+            }
+            /*
+             * @brief Check whether @p val has a legal size.
+             * @details @p val has a legal size if it is greater than zero and less then @p max_size.
+             */
+            bool legal_size(const std::string_view val, const int max_size) {
+                return 0 < val.size() && static_cast<int>(val.size()) < max_size;
+            }
+#endif
+
+            MPI_Info_ptr info_;
             const std::string key_;
         };
 
