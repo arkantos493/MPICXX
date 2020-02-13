@@ -59,7 +59,6 @@ namespace mpicxx {
             using MPI_Info_ptr = MPI_Info*;
             /// reference type to the referred to info object
             using MPI_Info_ref = MPI_Info&;
-
         public:
             /**
              * @brief Construct a new proxy object.
@@ -220,6 +219,11 @@ namespace mpicxx {
             friend class iterator_impl;
             // info class can now directly access the pos member
             friend class info;
+
+            // pointer type to the referred to info object (pointer to const if `is_const` is `true`)
+            using MPI_Info_ptr = std::conditional_t<is_const, const MPI_Info*, MPI_Info*>;
+            // reference type to the referred to info object (reference to const if `is_const` is `true`)
+            using MPI_Info_ref = std::conditional_t<is_const, const MPI_Info&, MPI_Info&>;
         public:
             // ---------------------------------------------------------------------------------------------------------- //
             //                                         iterator_traits definitions                                        //
@@ -258,10 +262,6 @@ namespace mpicxx {
             /// [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) iterator concept (for C++20 concepts)
             using iterator_concept = std::random_access_iterator_tag;
 
-            /// pointer type to the referred to info object (pointer to const if `is_const` is `true`)
-            using MPI_Info_ptr = std::conditional_t<is_const, const MPI_Info*, MPI_Info*>;
-            /// reference type to the referred to info object (reference to const if `is_const` is `true`)
-            using MPI_Info_ref = std::conditional_t<is_const, const MPI_Info&, MPI_Info&>;
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
