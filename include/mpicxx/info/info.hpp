@@ -2320,7 +2320,7 @@ namespace mpicxx {
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
-         * @assert{
+         * @assert_precondition{
          * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
@@ -2331,10 +2331,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] size_type count(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(0 < key.size() && key.size() < MPI_MAX_INFO_KEY,
-                          "Illegal info key: 0 < %u < %i (MPI_MAX_INFO_KEY)",
-                          key.size(), MPI_MAX_INFO_KEY);
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             return static_cast<size_type>(this->contains(key));
         }
@@ -2349,7 +2348,7 @@ namespace mpicxx {
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
-         * @assert{
+         * @assert_precondition{
          * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
@@ -2360,10 +2359,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] iterator find(const std::string_view key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(0 < key.size() && key.size() < MPI_MAX_INFO_KEY,
-                          "Illegal info key: 0 < %u < %i (MPI_MAX_INFO_KEY)",
-                          key.size(), MPI_MAX_INFO_KEY);
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
             return iterator(info_, this->find_pos(key, size));
@@ -2379,7 +2377,7 @@ namespace mpicxx {
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
-         * @assert{
+         * @assert_precondition{
          * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
@@ -2390,10 +2388,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_iterator find(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(0 < key.size() && key.size() < MPI_MAX_INFO_KEY,
-                          "Illegal info key: 0 < %u < %i (MPI_MAX_INFO_KEY)",
-                          key.size(), MPI_MAX_INFO_KEY);
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
             return const_iterator(info_, this->find_pos(key, size));
@@ -2407,7 +2404,7 @@ namespace mpicxx {
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
-         * @assert{
+         * @assert_precondition{
          * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
@@ -2418,10 +2415,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] bool contains(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(0 < key.size() && key.size() < MPI_MAX_INFO_KEY,
-                          "Illegal info key: 0 < %u < %i (MPI_MAX_INFO_KEY)",
-                          key.size(), MPI_MAX_INFO_KEY);
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
             return this->find_pos(key, size) != size;
@@ -2444,7 +2440,7 @@ namespace mpicxx {
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
-         * @assert{
+         * @assert_precondition{
          * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
@@ -2455,10 +2451,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<iterator, iterator> equal_range(const std::string_view key) {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(0 < key.size() && key.size() < MPI_MAX_INFO_KEY,
-                          "Illegal info key: 0 < %u < %i (MPI_MAX_INFO_KEY)",
-                          key.size(), MPI_MAX_INFO_KEY);
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
             const size_type pos = this->find_pos(key, size);
@@ -2489,7 +2484,7 @@ namespace mpicxx {
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
-         * @assert{
+         * @assert_precondition{
          * If `*this` is in the moved-from state. \n
          * If @p key exceeds its size limit.
          * }
@@ -2500,10 +2495,9 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const std::string_view key) const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
-            MPICXX_ASSERT(0 < key.size() && key.size() < MPI_MAX_INFO_KEY,
-                          "Illegal info key: 0 < %u < %i (MPI_MAX_INFO_KEY)",
-                          key.size(), MPI_MAX_INFO_KEY);
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
             const size_type pos = this->find_pos(key, size);

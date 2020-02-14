@@ -1,7 +1,7 @@
 /**
- * @file info/lookup/count.cpp
+ * @file test/info/lookup/count.cpp
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::count(const std::string_view) const member function provided by the @ref mpicxx::info
  * class.

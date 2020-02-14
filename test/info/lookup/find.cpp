@@ -1,7 +1,7 @@
 /**
- * @file info/lookup/find.cpp
+ * @file test/info/lookup/find.cpp
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::find(const std::string_view) and @ref mpicxx::info::find(const std::string_view) const
  * member functions provided by the @ref mpicxx::info

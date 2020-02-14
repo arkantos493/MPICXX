@@ -1,7 +1,7 @@
 /**
- * @file info/lookup/equal_range.cpp
+ * @file test/info/lookup/equal_range.cpp
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::equal_range(const std::string_view) and
  * @ref mpicxx::info::equal_range(const std::string_view) const member function provided by the @ref mpicxx::info class.
