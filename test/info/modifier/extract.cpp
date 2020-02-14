@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/extract.cpp
+ * @file test/info/modifier/extract.cpp
  * @author Marcel Breyer
- * @date 2020-02-02
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::extract(const_iterator) and @ref mpicxx::info::extract(const std::string_view) member
  * functions provided by the @ref mpicxx::info class.

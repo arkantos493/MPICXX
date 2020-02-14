@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/clear.cpp
+ * @file test/info/modifier/clear.cpp
  * @author Marcel Breyer
- * @date 2020-02-02
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::clear() member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
@@ -48,5 +48,5 @@ TEST(ModifierDeathTest, MovedFromClear) {
     mpicxx::info dummy(std::move(info));
 
     // calling clear() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.clear(), "");
+    ASSERT_DEATH( info.clear() , "");
 }

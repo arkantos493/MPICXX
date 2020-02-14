@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/erase.cpp
+ * @file test/info/modifier/erase.cpp
  * @author Marcel Breyer
- * @date 2020-02-03
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::erase(const_iterator), @ref mpicxx::info::erase(const_iterator, const_iterator)
  * and @ref mpicxx::info::erase(const std::string_view) member functions provided by the @ref mpicxx::info class.
@@ -77,7 +77,7 @@ TEST(ModifierDeathTest, EraseByIllegalIterator) {
 
     // erasing a [key, value]-pair using an iterator which refers to another info object is illegal
     mpicxx::info::const_iterator it = info_2.begin();
-    ASSERT_DEATH(info_1.erase(it), "");
+    ASSERT_DEATH( info_1.erase(it) , "");
 }
 
 TEST(ModifierDeathTest, EraseByIteratorNotDereferenceable) {
@@ -86,7 +86,7 @@ TEST(ModifierDeathTest, EraseByIteratorNotDereferenceable) {
     MPI_Info_set(info.get(), "key", "value");
 
     // erasing a [key, value]-pair using the past-the-end iterator is illegal
-    ASSERT_DEATH(info.erase(info.end()), "");
+    ASSERT_DEATH( info.erase(info.end()) , "");
 }
 
 TEST(ModifierDeathTest, MovedFromEraseByIterator) {
@@ -96,7 +96,7 @@ TEST(ModifierDeathTest, MovedFromEraseByIterator) {
     mpicxx::info dummy(std::move(info));
 
     // calling erase() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.erase(it), "");
+    ASSERT_DEATH( info.erase(it) , "");
 }
 
 
@@ -145,11 +145,11 @@ TEST(ModifierDeathTest, EraseByIllegalIteratorRange) {
     // erasing a [key, value]-pair using an iterator which refers to another info object is illegal
     mpicxx::info::const_iterator it_1 = info_1.begin();
     mpicxx::info::const_iterator it_2 = info_2.begin();
-    ASSERT_DEATH(info_1.erase(it_1, it_2), "");
-    ASSERT_DEATH(info_1.erase(it_2, it_1), "");
+    ASSERT_DEATH( info_1.erase(it_1, it_2) , "");
+    ASSERT_DEATH( info_1.erase(it_2, it_1) , "");
 
     // erasing the range [last, first) is illegal
-    ASSERT_DEATH(info_1.erase(info_1.end(), info_1.begin()), "");
+    ASSERT_DEATH( info_1.erase(info_1.end() , info_1.begin()), "");
 }
 
 TEST(ModifierDeathTest, EraseByIteratorRangeNotDereferenceable) {
@@ -158,8 +158,8 @@ TEST(ModifierDeathTest, EraseByIteratorRangeNotDereferenceable) {
     MPI_Info_set(info.get(), "key", "value");
 
     // erasing a [key, value]-pair using the past-the-end iterator is illegal
-    ASSERT_DEATH(info.erase(info.end(), info.end() + 1), "");
-    ASSERT_DEATH(info.erase(info.end() + 1, info.end()), "");
+    ASSERT_DEATH( info.erase(info.end(), info.end() + 1) , "");
+    ASSERT_DEATH( info.erase(info.end() + 1, info.end()) , "");
 }
 
 TEST(ModifierDeathTest, MovedFromEraseByIteratorRange) {
@@ -169,7 +169,7 @@ TEST(ModifierDeathTest, MovedFromEraseByIteratorRange) {
     mpicxx::info dummy(std::move(info));
 
     // calling erase() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.erase(it, it), "");
+    ASSERT_DEATH( info.erase(it, it) , "");
 }
 
 
@@ -217,8 +217,8 @@ TEST(ModifierDeathTest, EraseByIllegalKey) {
     std::string key(MPI_MAX_INFO_KEY, ' ');
 
     // try accessing illegal keys
-    ASSERT_DEATH(info.erase(key), "");
-    ASSERT_DEATH(info.erase(""), "");
+    ASSERT_DEATH( info.erase(key) , "");
+    ASSERT_DEATH( info.erase("") , "");
 }
 
 TEST(ModifierDeathTest, MovedFromEraseByKey) {
@@ -227,5 +227,5 @@ TEST(ModifierDeathTest, MovedFromEraseByKey) {
     mpicxx::info dummy(std::move(info));
 
     // calling erase() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.erase("key"), "");
+    ASSERT_DEATH( info.erase("key") , "");
 }

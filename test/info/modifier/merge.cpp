@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/merge.cpp
+ * @file test/info/modifier/merge.cpp
  * @author Marcel Breyer
- * @date 2020-02-02
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::merge(info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
@@ -12,6 +12,7 @@
  * | MergeNonEmptyAndEmpty    | merge two info objects (where `source` is empty)              |
  * | MergeEmptyAndNonEmpty    | merge two info objects (where `*this` is empty)               |
  * | MovedFromMerge           | info object in the moved-from state (death test)              |
+ * | SelfMerge                | perform merge with itself (death test)                        |
  */
 
 #include <gtest/gtest.h>
@@ -143,7 +144,15 @@ TEST(ModifierDeathTest, MovedFromMerge) {
     mpicxx::info dummy(std::move(moved_from_2));
 
     // calling merge() on/with an info object in the moved-from state is illegal
-    ASSERT_DEATH(moved_from_1.merge(valid), "");
-    ASSERT_DEATH(valid.merge(moved_from_2), "");
-    ASSERT_DEATH(moved_from_1.merge(moved_from_2), "");
+    ASSERT_DEATH( moved_from_1.merge(valid) , "");
+    ASSERT_DEATH( valid.merge(moved_from_2) , "");
+    ASSERT_DEATH( moved_from_1.merge(moved_from_2) , "");
+}
+
+TEST(ModifierDeathTest, SelfMerge) {
+    // create info object
+    mpicxx::info info;
+
+    // perform "self merge"
+    info.merge(info);
 }

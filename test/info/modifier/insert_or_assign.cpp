@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/insert_or_assign.cpp
+ * @file test/info/modifier/insert_or_assign.cpp
  * @author Marcel Breyer
- * @date 2020-02-03
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::insert_or_assign(const std::string_view, const std::string_view),
  * @ref mpicxx::info::insert_or_assign(InputIt, InputIt) and @ref mpicxx::info::insert_or_assign(std::initializer_list<value_type>) member
@@ -77,12 +77,12 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalKeyOrValue) {
     std::string value(MPI_MAX_INFO_VAL, ' ');
 
     // try accessing illegal keys
-    ASSERT_DEATH(info.insert_or_assign(key, "value"), "");
-    ASSERT_DEATH(info.insert_or_assign("", "value"), "");
+    ASSERT_DEATH( info.insert_or_assign(key, "value") , "");
+    ASSERT_DEATH( info.insert_or_assign("", "value") , "");
 
     // try accessing illegal value
-    ASSERT_DEATH(info.insert_or_assign("key", value), "");
-    ASSERT_DEATH(info.insert_or_assign("key", ""), "");
+    ASSERT_DEATH( info.insert_or_assign("key", value) , "");
+    ASSERT_DEATH( info.insert_or_assign("key", "") , "");
 }
 
 TEST(ModifierDeathTest, MovedFromInsertOrAssignByKeyValuePair) {
@@ -91,7 +91,7 @@ TEST(ModifierDeathTest, MovedFromInsertOrAssignByKeyValuePair) {
     mpicxx::info dummy(std::move(info));
 
     // calling insert_or_assign() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.insert_or_assign("key", "value"), "");
+    ASSERT_DEATH( info.insert_or_assign("key", "value") , "");
 }
 
 
@@ -135,7 +135,7 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalIteratorRange) {
     std::vector<mpicxx::info::value_type> vec = { { "key", "value" } };
 
     // try inserting or assigning with illegal iterator range
-    ASSERT_DEATH(info.insert_or_assign(vec.end(), vec.begin()), "");
+    ASSERT_DEATH( info.insert_or_assign(vec.end(), vec.begin()) , "");
 }
 
 TEST(ModifierDeathTest, InsertOrAssignByIllegalIteratorRangeKeyOrValue) {
@@ -149,12 +149,12 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalIteratorRangeKeyOrValue) {
                                                   { "key", value }, { "key", ""   } };
 
     // try accessing illegal keys
-    ASSERT_DEATH(info.insert_or_assign(vec.begin(), vec.begin() + 1), "");
-    ASSERT_DEATH(info.insert_or_assign(vec.begin() + 1, vec.begin() + 2), "");
+    ASSERT_DEATH( info.insert_or_assign(vec.begin(), vec.begin() + 1) , "");
+    ASSERT_DEATH( info.insert_or_assign(vec.begin() + 1, vec.begin() + 2) , "");
 
     // try accessing illegal value
-    ASSERT_DEATH(info.insert_or_assign(vec.begin() + 2, vec.begin() + 3), "");
-    ASSERT_DEATH(info.insert_or_assign(vec.begin() + 3, vec.end()), "");
+    ASSERT_DEATH( info.insert_or_assign(vec.begin() + 2, vec.begin() + 3) , "");
+    ASSERT_DEATH( info.insert_or_assign(vec.begin() + 3, vec.end()) , "");
 }
 
 TEST(ModifierDeathTest, MovedFromInsertOrAssignByIteratorRange) {
@@ -166,7 +166,7 @@ TEST(ModifierDeathTest, MovedFromInsertOrAssignByIteratorRange) {
     std::vector<mpicxx::info::value_type> vec = { { "key", "value" } };
 
     // calling insert_or_assign() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.insert_or_assign(vec.begin(), vec.end()), "");
+    ASSERT_DEATH( info.insert_or_assign(vec.begin(), vec.end()) , "");
 }
 
 
@@ -203,12 +203,12 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalInitializerListKeyOrValue) {
     std::string value(MPI_MAX_INFO_VAL, ' ');
 
     // try accessing illegal keys
-    ASSERT_DEATH(info.insert_or_assign({ { key, "value" } }), "");
-    ASSERT_DEATH(info.insert_or_assign({ { "", "value" }  }), "");
+    ASSERT_DEATH( info.insert_or_assign({ { key, "value" } }) , "");
+    ASSERT_DEATH( info.insert_or_assign({ { "", "value" }  }) , "");
 
     // try accessing illegal value
-    ASSERT_DEATH(info.insert_or_assign({ { "key", value } }), "");
-    ASSERT_DEATH(info.insert_or_assign({ { "key", ""   }  }), "");
+    ASSERT_DEATH( info.insert_or_assign({ { "key", value } }) , "");
+    ASSERT_DEATH( info.insert_or_assign({ { "key", ""   }  }) , "");
 }
 
 TEST(ModifierDeathTest, MovedFromInsertOrAssignByInitializerList) {
@@ -217,5 +217,5 @@ TEST(ModifierDeathTest, MovedFromInsertOrAssignByInitializerList) {
     mpicxx::info dummy(std::move(info));
 
     // calling insert_or_assign() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.insert_or_assign({ { "key", "value" } }), "");
+    ASSERT_DEATH( info.insert_or_assign({ { "key", "value" } }) , "");
 }

@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/array_subscript_operator.cpp
+ * @file test/info/modifier/array_subscript_operator.cpp
  * @author Marcel Breyer
- * @date 2020-02-02
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::operator[](detail::string auto&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*

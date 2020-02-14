@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/at.cpp
+ * @file test/info/modifier/at.cpp
  * @author Marcel Breyer
- * @date 2020-02-02
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::at(detail::string auto&&) and @ref mpicxx::info::at(const std::string_view) const member
  * functions provided by the @ref mpicxx::info class.
@@ -85,7 +85,7 @@ TEST(ModifierDeathTest, MovedFromAt) {
     mpicxx::info dummy(std::move(info));
 
     // calling at() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.at("key"), "");
+    ASSERT_DEATH( info.at("key") , "");
 }
 
 TEST(ModifierDeathTest, MovedFromConstAt) {
@@ -93,7 +93,7 @@ TEST(ModifierDeathTest, MovedFromConstAt) {
     const mpicxx::info info(MPI_INFO_NULL, false);
 
     // calling at() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.at("key"), "");
+    ASSERT_DEATH( info.at("key") , "");
 }
 
 TEST(ModifierTest, AtOutOfRangeException) {

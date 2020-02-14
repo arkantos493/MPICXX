@@ -1,7 +1,7 @@
 /**
- * @file info/modifier/swap.cpp
+ * @file test/info/modifier/swap.cpp
  * @author Marcel Breyer
- * @date 2020-02-02
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::swap(info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
