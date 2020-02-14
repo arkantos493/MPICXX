@@ -1497,7 +1497,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] bool empty() const {
-            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
 
             return this->size() == 0;
         }
@@ -1515,7 +1515,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] size_type size() const {
-            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
 
             int nkeys;
             MPI_Info_get_nkeys(info_, &nkeys);
