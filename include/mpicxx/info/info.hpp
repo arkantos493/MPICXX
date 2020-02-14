@@ -1061,8 +1061,10 @@ namespace mpicxx {
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
          *
-         * @assert_precondition{ If any key or value exceed their size limit. }
-         * @assert_sanity{ If @p first and @p last don't denote a valid range. }
+         * @assert_precondition{
+         * If any key or value exceed their size limit. \n
+         * If @p first and @p last don't denote a valid range.
+         * }
          *
          * @calls{
          * int MPI_Info_create(MPI_Info *info);                                         // exactly once
