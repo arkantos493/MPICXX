@@ -1004,14 +1004,14 @@ namespace mpicxx {
          * @post The newly constructed info object is in a valid state.
          * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
          *
-         * @assert{ If @p other is in the moved-from state. }
+         * @assert_precondition{ If @p other is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);      // exactly once
          * }
          */
         info(const info& other) : is_freeable_(true) {
-            MPICXX_ASSERT(other.info_ != MPI_INFO_NULL, "'other' is in the moved-from state!");
+            MPICXX_ASSERT(!other.moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
 
             MPI_Info_dup(other.info_, &info_);
         }
@@ -1023,8 +1023,12 @@ namespace mpicxx {
          * @post The newly constructed info object is in a valid state iff @p other was in a valid state.
          * @post @p other is now in the moved-from state.
          * @post All iterators referring to @p other remain valid, but now refer to `*this`.
+         *
+         * @assert_sanity{ If @p other is in the moved-from state. }
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
+            MPICXX_ASSERT(!this->moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
+
             // set other to the moved-from state
             other.info_ = MPI_INFO_NULL;
             other.is_freeable_ = false;
@@ -1056,10 +1060,8 @@ namespace mpicxx {
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
          *
-         * @assert{
-         * If @p first and @p last don't denote a valid range. \n
-         * If any key or value exceed their size limit.
-         * }
+         * @assert_precondition{ If any key or value exceed their size limit. }
+         * @assert_sanity{ If @p first and @p last don't denote a valid range. }
          *
          * @calls{
          * int MPI_Info_create(MPI_Info *info);                                         // exactly once
@@ -1092,7 +1094,7 @@ namespace mpicxx {
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
          * @post The newly constructed info object is in a valid state.
          *
-         * @assert{ If any key or value exceed their size limit. }
+         * @assert_precondition{ If any key or value exceed their size limit. }
          *
          * @calls{
          * int MPI_Info_create(MPI_Info *info);                                         // exactly once
@@ -1113,34 +1115,44 @@ namespace mpicxx {
          * @post The newly constructed info object is in a valid state iff @p other was in a valid state (i.e. was **not** *MPI_INFO_NULL*).
          * @attention If @p is_freeable is set to `false`, **the user** has to ensure that the *MPI_Info* object @p other gets properly
          * freed (via a call to *MPI_Info_free*) at the end of its lifetime.
+         * @attention Changing the underlying *MPI_Info* object **does not** change the value of `*this`!:
+         * @code{.cpp}
+         * MPI_Info mpi_info;
+         * MPI_Info_create(&mpi_info);
          *
-         * @assert{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
+         * mpicxx::info info (mpi_info, true);
+         *
+         * mpi_info = MPI_INFO_NULL;    // <- does not change the value of 'info'!
+         * @endcode
+         *
+         * @assert_sanity{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
          */
-        constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) { // TODO 2020-02-12 14:36 marcel: check other param
-            MPICXX_ASSERT(!(other == MPI_INFO_NULL && is_freeable == true), "'MPI_INFO_NULL' can't be marked freeable!");
-            MPICXX_ASSERT(!(other == MPI_INFO_ENV && is_freeable == true), "'MPI_INFO_ENV' can't be marked freeable!");
+        constexpr info(MPI_Info other, const bool is_freeable) noexcept : info_(other), is_freeable_(is_freeable) {
+            MPICXX_ASSERT_SANITY(!(other == MPI_INFO_NULL && is_freeable == true), "'MPI_INFO_NULL' shouldn't be marked as freeable!");
+            MPICXX_ASSERT_SANITY(!(other == MPI_INFO_ENV && is_freeable == true), "'MPI_INFO_ENV' shouldn't be marked as freeable!");
         }
         /**
          * @brief Destructs the info object.
-         * @details Only calls *MPI_Info_free* if:
-         *      - The info object is marked freeable. Only objects created through @ref info(MPI_Info, const bool) can be marked as
-         *        non-freeable (or info objects which are moved-from such objects). \n
-         *        For example info::env is **non-freeable** due to the fact that the MPI runtime system would crash if
-         *        *MPI_Info_free* is called with *MPI_INFO_ENV*.
-         *      - The info object ist **not** in the moved-from state.
+         * @details Calls *MPI_Info_free* if and only if the info object is marked freeable. Only objects created through
+         * @ref mpicxx::info(MPI_Info, const bool) can be marked as non-freeable (or info objects which are moved-from such objects). \n
+         * For example @ref mpicxx::info::env is **non-freeable** due to the fact that the MPI runtime system would crash if *MPI_Info_free*
+         * is called with *MPI_INFO_ENV*.
          *
-         * If any of these conditions are **not** fulfilled, no free function will be called (because doing so is unnecessary and would lead
-         * to a crash of the MPI runtime system).
-         *
+         * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* **must** be made.
          * @post Invalidates **all** iterators referring to `*this`.
+         *
+         * @assert_precondition{ If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV*. }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
          * }
          */
         ~info() {
-            // destroy info object if necessary
-            if (is_freeable_ && info_ != MPI_INFO_NULL) {
+            // destroy info object if marked as freeable
+            if (is_freeable_) {
+                MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
+                MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
+
                 MPI_Info_free(&info_);
             }
         }
@@ -2782,6 +2794,11 @@ namespace mpicxx {
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
             return static_cast<bool>(flag);
         }
+#if ASSERTION_LEVEL > 0
+        bool moved_from() const {
+            return info_ == MPI_INFO_NULL;
+        }
+#endif
 
         MPI_Info info_;
         bool is_freeable_;

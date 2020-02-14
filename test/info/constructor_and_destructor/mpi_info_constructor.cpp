@@ -1,7 +1,7 @@
 /**
- * @file info/constructor_and_destructor/mpi_info_constructor.cpp
+ * @file test/info/constructor_and_destructor/mpi_info_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::info(MPI_Info, const bool) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
@@ -41,6 +41,11 @@ TEST(ConstructionTest, MPIConstructFromFreeableObject) {
 
         // should be freeable
         EXPECT_TRUE(info.freeable());
+
+        // changing the underlying MPI_Info object DOESN'T change the mpicxx::info object
+        info_ptr = MPI_INFO_ENV;
+        MPI_Info_get_nkeys(info.get(), &nkeys);
+        EXPECT_EQ(nkeys, 1);
     }
 
     // -> no call to MPI_Info_free necessary!

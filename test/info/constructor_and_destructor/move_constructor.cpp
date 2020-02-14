@@ -1,15 +1,15 @@
 /**
  * @file info/constructor_and_destructor/move_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-01-27
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::info(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description                                                         |
- * |:---------------------------------|:------------------------------------------------------------------------------|
- * | MoveConstructFromValidObject     | `mpicxx::info info1(info2);`                                                  |
- * | MoveConstructFromMovedFromObject | `mpicxx::info info1(info2); // where info2 is in the moved-from state`        |
- * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable) |
+ * | test case name                   | test case description                                                               |
+ * |:---------------------------------|:------------------------------------------------------------------------------------|
+ * | MoveConstructFromValidObject     | `mpicxx::info info1(info2);`                                                        |
+ * | MoveConstructFromMovedFromObject | `mpicxx::info info1(info2); // where info2 is in the moved-from state` (death test) |
+ * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable)       |
  */
 
 #include <gtest/gtest.h>
@@ -50,19 +50,13 @@ TEST(ConstructionTest, MoveConstructFromValidObject) {
     EXPECT_EQ(moved_from.get(), MPI_INFO_NULL);
 }
 
-TEST(ConstructionTest, MoveConstructFromMovedFromObject) {
+TEST(ConstructionDeathTest, MoveConstructFromMovedFromObject) {
     // create info object and set it to the moved-from state
     mpicxx::info moved_from;
     mpicxx::info dummy(std::move(moved_from));
 
     // create an new info object by invoking the move constructor
-    mpicxx::info info_move(std::move(moved_from));
-
-    // check if info_move is in the moved-from state
-    EXPECT_EQ(info_move.get(), MPI_INFO_NULL);
-
-    // be sure moved_from is still in the moved-from state
-    EXPECT_EQ(moved_from.get(), MPI_INFO_NULL);
+    EXPECT_DEATH( mpicxx::info info_move(std::move(moved_from)) , "");
 }
 
 TEST(ConstructionTest, MoveConstructFromNonFreeable) {
