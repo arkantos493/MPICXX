@@ -71,7 +71,7 @@ namespace mpicxx {
              * If @p key exceeds its size limit.
              * }
              */
-            proxy(MPI_Info_ref info, detail::string auto&& key) : info_(&info), key_(std::forward<decltype(key)>(key)) {
+            proxy(MPI_Info_ref info, detail::string auto&& key) : info_(std::addressof(info)), key_(std::forward<decltype(key)>(key)) {
                 MPICXX_ASSERT_SANITY(!this->info_moved_from(),
                         "Attempt to create a proxy from an info object in the moved-from state!");
                 MPICXX_ASSERT_SANITY(this->legal_size(key_, MPI_MAX_INFO_KEY),
@@ -285,7 +285,7 @@ namespace mpicxx {
              * If @p pos falls outside the valid range.
              * }
              */
-            iterator_impl(MPI_Info_ref info, const difference_type pos) : info_(&info), pos_(pos) {
+            iterator_impl(MPI_Info_ref info, const difference_type pos) : info_(std::addressof(info)), pos_(pos) {
                 MPICXX_ASSERT_SANITY(!this->singular(),
                         "Attempt to explicitly create a singular iterator!");
                 MPICXX_ASSERT_SANITY(!this->info_moved_from(),
