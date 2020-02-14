@@ -1,7 +1,7 @@
 /**
- * @file info/capacity/max_size.cpp
+ * @file test/info/capacity/max_size.cpp
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::max_size() static member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *CapacityTest*

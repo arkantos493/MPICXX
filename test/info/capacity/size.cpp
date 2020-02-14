@@ -1,7 +1,7 @@
 /**
- * @file info/capacity/size.cpp
+ * @file test/info/capacity/size.cpp
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::size() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *CapacityTest*
@@ -55,5 +55,5 @@ TEST(CapacityDeathTest, MovedFromSize) {
 
     // calling size() on an info object in the moved-from state is illegal
     [[maybe_unused]] mpicxx::info::size_type size;
-    ASSERT_DEATH(size = info.size(), "");
+    ASSERT_DEATH( size = info.size() , "");
 }

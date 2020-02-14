@@ -1,7 +1,7 @@
 /**
- * @file info/capacity/empty.cpp
+ * @file test/info/capacity/empty.cpp
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::empty() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *CapacityTest*
@@ -55,5 +55,5 @@ TEST(CapacityDeathTest, MovedFromEmpty) {
 
     // calling empty() on an info object in the moved-from state is illegal
     [[maybe_unused]] bool empty;
-    ASSERT_DEATH(empty = info.empty(), "");
+    ASSERT_DEATH( empty = info.empty() , "");
 }

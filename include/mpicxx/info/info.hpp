@@ -1481,14 +1481,14 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
         [[nodiscard]] bool empty() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to call a function on an info object in the moved-from state!");
 
             return this->size() == 0;
         }
@@ -1499,14 +1499,14 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
         [[nodiscard]] size_type size() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to call a function on an info object in the moved-from state!");
 
             int nkeys;
             MPI_Info_get_nkeys(info_, &nkeys);
