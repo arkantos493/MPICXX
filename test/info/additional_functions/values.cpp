@@ -1,7 +1,7 @@
 /**
- * @file info/additional_functions/values.cpp
+ * @file test/info/additional_functions/values.cpp
  * @author Marcel Breyer
- * @date 2020-01-27
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::values() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
@@ -62,5 +62,5 @@ TEST(NonMemberFunctionDeathTest, MovedFromValues) {
     mpicxx::info dummy(std::move(info));
 
     // calling value() on an info object in the moved-from state is illegal
-    ASSERT_DEATH(info.values(), "");
+    ASSERT_DEATH( info.values() , "");
 }

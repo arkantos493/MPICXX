@@ -1,7 +1,7 @@
 /**
- * @file info/additional_functions/max_value_size.cpp
+ * @file test/info/additional_functions/max_value_size.cpp
  * @author Marcel Breyer
- * @date 2020-01-27
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::max_value_size() static member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*

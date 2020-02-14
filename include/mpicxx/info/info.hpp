@@ -2691,7 +2691,7 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
@@ -2699,7 +2699,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> keys() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
 
             // create vector which will hold all keys
             const size_type size = this->size();
@@ -2720,7 +2720,7 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
@@ -2730,7 +2730,7 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> values() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
 
             // create vector which will hold all values
             const size_type size = this->size();
