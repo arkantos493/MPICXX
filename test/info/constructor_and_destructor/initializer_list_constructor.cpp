@@ -1,5 +1,5 @@
 /**
- * @file info/constructor_and_destructor/initializer_list_constructor.cpp
+ * @file test/info/constructor_and_destructor/initializer_list_constructor.cpp
  * @author Marcel Breyer
  * @date 2020-01-31
  *

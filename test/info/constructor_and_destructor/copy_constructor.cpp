@@ -1,7 +1,7 @@
 /**
- * @file info/constructor_and_destructor/copy_constructor.cpp
+ * @file test/info/constructor_and_destructor/copy_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-01-27
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::info(const info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
