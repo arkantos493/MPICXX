@@ -2523,7 +2523,7 @@ namespace mpicxx {
          *
          * @pre @p lhs and @p rhs **must not** be in the moved-from state.
          *
-         * @assert{ If `lhs` or `rhs` are in the moved-from state. }
+         * @assert_precondition{ If `lhs` or `rhs` are in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
@@ -2533,8 +2533,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "'lhs' is in the moved-from state!");
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "'rhs' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!lhs.moved_from(), "Attempt to call a function on an info object ('lhs') in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to call a function on an info object ('rhs') in the moved-from state!");
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
@@ -2591,7 +2591,7 @@ namespace mpicxx {
          *
          * @pre @p lhs and @p rhs **must not** be in the moved-from state.
          *
-         * @assert{ If `lhs` or `rhs` are in the moved-from state. }
+         * @assert_precondition{ If `lhs` or `rhs` are in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
@@ -2601,8 +2601,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT(lhs.info_ != MPI_INFO_NULL, "'lhs' is in the moved-from state!");
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "'rhs' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!lhs.moved_from(), "Attempt to call a function on an info object ('lhs') in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to call a function on an info object ('rhs') in the moved-from state!");
 
             return !(lhs == rhs);
         }
@@ -2638,7 +2638,7 @@ namespace mpicxx {
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first point of erase remain valid, all
          * other iterators are invalidated.
          *
-         * @assert{ If `c` is in the moved-from state. }
+         * @assert_precondition{ If `c` is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly 'c.size()' times
@@ -2649,7 +2649,7 @@ namespace mpicxx {
          */
         template <typename Pred>
         friend void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, value_type> {
-            MPICXX_ASSERT(c.info_ != MPI_INFO_NULL, "'c' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!c.moved_from(), "Attempt to call a function on an info object ('c') in the moved-from state!");
 
             size_type size = c.size();
             char key[MPI_MAX_INFO_KEY];

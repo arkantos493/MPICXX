@@ -1,7 +1,7 @@
 /**
- * @file info/non-member_functions/swap.cpp
+ * @file test/info/non-member_functions/swap.cpp
  * @author Marcel Breyer
- * @date 2020-01-30
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::swap(info&, info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*

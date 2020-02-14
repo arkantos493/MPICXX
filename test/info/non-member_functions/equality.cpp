@@ -1,7 +1,7 @@
 /**
- * @file info/non-member_functions/equality.cpp
+ * @file test/info/non-member_functions/equality.cpp
  * @author Marcel Breyer
- * @date 2020-01-30
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::operator==(const info&, const info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
@@ -109,7 +109,7 @@ TEST(NonMemberFunctionDeathTest, MovedFromEquality) {
     ASSERT_TRUE(valid_1 == valid_2);
     // comparing two moved-from info objects is illegal
     [[maybe_unused]] bool comp;
-    ASSERT_DEATH(comp = moved_from_1 == valid_1, "");
-    ASSERT_DEATH(comp = moved_from_2 == valid_2, "");
-    ASSERT_DEATH(comp = moved_from_1 == moved_from_2, "");
+    ASSERT_DEATH( comp = moved_from_1 == valid_1 , "");
+    ASSERT_DEATH( comp = moved_from_2 == valid_2 , "");
+    ASSERT_DEATH( comp = moved_from_1 == moved_from_2 , "");
 }
