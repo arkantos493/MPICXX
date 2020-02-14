@@ -24,16 +24,17 @@ option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 # set assertion level
 set(max_assertion_level 2)
 set(ASSERTION_LEVEL 0 CACHE STRING "The active assertion level.")
-if (ENABLE_DEATH_TESTS)
-    message(WARNING "Enabled all assertion categories because death tests are enabled.")
-    set(ASSERTION_LEVEL ${max_assertion_level})
-endif (ENABLE_DEATH_TESTS)
 
 # check if assertion level is valid
 if (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
     message(FATAL_ERROR "ASSERTION_LEVEL must be an integer in the range: 0-${max_assertion_level}")
 endif (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
 message(STATUS "ASSERTION_LEVEL: ${ASSERTION_LEVEL}")
+
+if (ENABLE_DEATH_TESTS AND ${ASSERTION_LEVEL} LESS ${max_assertion_level})
+    message(WARNING "Enabled highest assertion level because death tests are enabled.")
+    set(ASSERTION_LEVEL ${max_assertion_level})
+endif (ENABLE_DEATH_TESTS AND ${ASSERTION_LEVEL} LESS ${max_assertion_level})
 
 
 # add custom cmake modules path
