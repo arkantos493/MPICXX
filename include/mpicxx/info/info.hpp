@@ -1168,10 +1168,14 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre @p rhs **must not** be in the moved-from state.
+         * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
          * @post The assigned to info object is in a valid state.
          * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
          *
-         * @assert{ If @p rhs is in the moved-from state. }
+         * @assert_precondition{
+         * If @p rhs is in the moved-from state. \n
+         * If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`.
+         * }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);                       // at most once
@@ -1179,12 +1183,15 @@ namespace mpicxx {
          * }
          */
         info& operator=(const info& rhs) {
-            MPICXX_ASSERT(rhs.info_ != MPI_INFO_NULL, "'rhs' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
 
             // check against self-assignment
             if (this != std::addressof(rhs)) {
-                // delete current MPI_Info object iff it is marked as freeable and in a valid state
-                if (is_freeable_ && info_ != MPI_INFO_NULL) {
+                // delete current MPI_Info object if and only if it is marked as freeable
+                if (is_freeable_) {
+                    MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
+                    MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
+
                     MPI_Info_free(&info_);
                 }
                 // copy rhs info object
@@ -1200,17 +1207,26 @@ namespace mpicxx {
          * @param[in] rhs another info object to use as data source
          * @return `*this`
          *
+         * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
          * @post The assigned to info object is in a valid state iff @p rhs was in a valid state.
          * @post @p rhs is now in the moved-from state.
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
+         *
+         * @assert_precondition{ If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. }
+         * @assert_sanity{ If @p rhs is in the moved-from state. }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
          * }
          */
         info& operator=(info&& rhs) {
-            // delete current MPI_Info object iff it is marked as freeable and in a valid state
-            if (is_freeable_ && info_ != MPI_INFO_NULL) {
+            MPICXX_ASSERT_SANITY(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
+
+            // delete current MPI_Info object if and only if it is marked as freeable
+            if (is_freeable_) {
+                MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
+                MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
+
                 MPI_Info_free(&info_);
             }
             // transfer ownership
@@ -1228,12 +1244,16 @@ namespace mpicxx {
          * @param[in] ilist initializer list to initialize the [key, value]-pairs of the info object with
          * @return `*this`
          *
+         * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
          * @post The assigned to info object is in a valid state.
          *
-         * @assert{ If any key or value exceed their size limit. }
+         * @assert_precondition{
+         * If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. \n
+         * If any key or value exceed their size limit.
+         * }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);                                           // at most once
@@ -1243,7 +1263,10 @@ namespace mpicxx {
          */
         info& operator=(std::initializer_list<value_type> ilist) {
             // delete current MPI_Info object iff it is marked as freeable and in a valid state
-            if (is_freeable_ && info_ != MPI_INFO_NULL) {
+            if (is_freeable_) {
+                MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
+                MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
+
                 MPI_Info_free(&info_);
             }
             // recreate the info object

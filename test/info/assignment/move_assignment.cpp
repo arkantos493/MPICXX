@@ -1,18 +1,18 @@
 /**
- * @file info/assignment/move_assignment.cpp
+ * @file test/info/assignment/move_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
- * | test case name                 | test case description                                                            |
- * |:-------------------------------|:---------------------------------------------------------------------------------|
- * | MoveAssignValidToValid         | `info1 = std::move(info2);`                                                      |
- * | MoveAssignMovedFromToValid     | `info1 = std::move(info2); // where info2 is in the moved-from state`            |
- * | MoveAssignValidToMovedFrom     | `info1 = std::move(info2); // where info1 is in the moved-from state`            |
- * | MoveAssignMovedFromToMovedFrom | `info1 = std::move(info2); // where info1 and info2 are in the moved-from state` |
- * | MoveAssignToNonFreeable        | non-freeable info object should be freeable now                                  |
- * | MoveAssignFromNonFreeable      | info object should be non-freeable (because the copied-from was non-freeable)    |
+ * | test case name                 | test case description                                                                         |
+ * |:-------------------------------|:----------------------------------------------------------------------------------------------|
+ * | MoveAssignValidToValid         | `info1 = std::move(info2);`                                                                   |
+ * | MoveAssignMovedFromToValid     | `info1 = std::move(info2); // where info2 is in the moved-from state` (death test)            |
+ * | MoveAssignValidToMovedFrom     | `info1 = std::move(info2); // where info1 is in the moved-from state`                         |
+ * | MoveAssignMovedFromToMovedFrom | `info1 = std::move(info2); // where info1 and info2 are in the moved-from state` (death test) |
+ * | MoveAssignToNonFreeable        | non-freeable info object should be freeable now                                               |
+ * | MoveAssignFromNonFreeable      | info object should be non-freeable (because the copied-from was non-freeable)                 |
  */
 
 #include <gtest/gtest.h>
@@ -45,17 +45,13 @@ TEST(AssignmentTest, MoveAssignValidToValid) {
     EXPECT_STREQ(value, "value2");
 }
 
-TEST(AssignmentTest, MoveAssignMovedFromToValid) {
+TEST(AssignmentDeathTest, MoveAssignMovedFromToValid) {
     // create first info object and move-construct second info object from it
     mpicxx::info moved_from;
     mpicxx::info valid(std::move(moved_from));
 
-    // perform move assignment
-    valid = std::move(moved_from);
-
-    // now both info objects should be in the moved-from state
-    EXPECT_EQ(valid.get(), MPI_INFO_NULL);
-    EXPECT_EQ(moved_from.get(), MPI_INFO_NULL);
+    // perform invalid move assignment
+    EXPECT_DEATH( valid = std::move(moved_from) , "");
 }
 
 TEST(AssignmentTest, MoveAssignValidToMovedFrom) {
@@ -83,19 +79,15 @@ TEST(AssignmentTest, MoveAssignValidToMovedFrom) {
     EXPECT_STREQ(value, "value");
 }
 
-TEST(AssignmentTest, MoveAssignMovedFromToMovedFrom) {
+TEST(AssignmentDeathTest, MoveAssignMovedFromToMovedFrom) {
     // create empty info objects and set them to the moved-from state
     mpicxx::info moved_from_1;
     mpicxx::info dummy_1(std::move(moved_from_1));
     mpicxx::info moved_from_2;
     mpicxx::info dummy_2(std::move(moved_from_2));
 
-    // perform move assignment
-    moved_from_1 = std::move(moved_from_2);
-
-    // now both info objects should still be in the moved-from state
-    EXPECT_EQ(moved_from_1.get(), MPI_INFO_NULL);
-    EXPECT_EQ(moved_from_2.get(), MPI_INFO_NULL);
+    // perform invalid move assignment
+    EXPECT_DEATH( moved_from_1 = std::move(moved_from_2) , "");
 }
 
 TEST(AssignmentTest, MoveAssignToNonFreeable) {

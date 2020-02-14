@@ -1,7 +1,7 @@
 /**
- * @file info/assignment/initializer_list_assignment.cpp
+ * @file test/info/assignment/initializer_list_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const std::initializer_list<value_type>) member function provided by the
  * @ref mpicxx::info class.

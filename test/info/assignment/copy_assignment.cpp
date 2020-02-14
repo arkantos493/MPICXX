@@ -1,7 +1,7 @@
 /**
- * @file info/assignment/copy_assignment.cpp
+ * @file test/info/assignment/copy_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
