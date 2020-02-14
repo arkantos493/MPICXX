@@ -12,7 +12,7 @@
  * | CopyAssignMovedFromToValid     | `info1 = info2; // where info2 is in the moved-from state` (death test)            |
  * | CopyAssignValidToMovedFrom     | `info1 = info2; // where info1 is in the moved-from state`                         |
  * | CopyAssignMovedFromToMovedFrom | `info1 = info2; // where info1 and info2 are in the moved-from state` (death test) |
- * | CopySelfAssignment             | `info1 = info1; // no-op`                                                          |
+ * | CopySelfAssignment             | `info1 = info1; // no-op` (death test)                                             |
  * | CopyAssignToNonFreeable        | non-freeable info object should be freeable now                                    |
  * | CopyAssignFromNonFreeable      | info object should be freeable (despite that the copied-from was non-freeable)     |
  */
@@ -145,26 +145,12 @@ TEST(AssignmentDeathTest, CopyAssignMovedFromToMovedFrom) {
     ASSERT_DEATH( moved_from_1 = moved_from_2 , "");
 }
 
-TEST(AssignmentTest, CopySelfAssignment) {
+TEST(AssignmentDeathTest, CopySelfAssignment) {
     // create info object
     mpicxx::info info;
-    MPI_Info_set(info.get(), "key", "value");
-    const bool is_freeable = info.freeable();
 
     // perform self assignment
-    info = info;
-
-    // should have done nothing, i.e. its state should not have changed
-    // check content
-    int nkeys, flag;
-    char value[MPI_MAX_INFO_VAL];
-    MPI_Info_get_nkeys(info.get(), &nkeys);
-    EXPECT_EQ(nkeys, 1);
-    MPI_Info_get(info.get(), "key", 5, value, &flag);
-    EXPECT_TRUE(static_cast<bool>(flag));
-    EXPECT_STREQ(value, "value");
-    // check freeable state
-    EXPECT_EQ(info.freeable(), is_freeable);
+    EXPECT_DEATH( info = info, "");
 }
 
 TEST(AssignmentTest, CopyAssignToNonFreeable) {

@@ -1176,6 +1176,7 @@ namespace mpicxx {
          * If @p rhs is in the moved-from state. \n
          * If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`.
          * }
+         * @assert_sanity{ If `*this` and @p rhs are the same info object! }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);                       // at most once
@@ -1184,6 +1185,7 @@ namespace mpicxx {
          */
         info& operator=(const info& rhs) {
             MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
+            MPICXX_ASSERT_SANITY(!this->self_operation(rhs), "Attempt to perform a \"self copy assignment\"!");
 
             // check against self-assignment
             if (this != std::addressof(rhs)) {
@@ -1213,7 +1215,10 @@ namespace mpicxx {
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
          *
          * @assert_precondition{ If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. }
-         * @assert_sanity{ If @p rhs is in the moved-from state. }
+         * @assert_sanity{
+         * If @p rhs is in the moved-from state. \n
+         * If `*this` and @p rhs are the same info object!
+         * }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
@@ -1221,6 +1226,7 @@ namespace mpicxx {
          */
         info& operator=(info&& rhs) {
             MPICXX_ASSERT_SANITY(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
+            MPICXX_ASSERT_SANITY(!this->self_operation(rhs), "Attempt to perform a \"self move assignment\"!");
 
             // delete current MPI_Info object if and only if it is marked as freeable
             if (is_freeable_) {
