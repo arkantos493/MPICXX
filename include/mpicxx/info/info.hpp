@@ -180,7 +180,7 @@ namespace mpicxx {
              * @brief Check whether @p val has a legal size.
              * @details @p val has a legal size if it is greater than zero and less then @p max_size.
              */
-            bool legal_size(const std::string_view val, const int max_size) {
+            bool legal_size(const std::string_view val, const int max_size) const {
                 return 0 < val.size() && static_cast<int>(val.size()) < max_size;
             }
 #endif
