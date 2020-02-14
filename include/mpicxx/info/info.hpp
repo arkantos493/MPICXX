@@ -1011,7 +1011,7 @@ namespace mpicxx {
          * }
          */
         info(const info& other) : is_freeable_(true) {
-            MPICXX_ASSERT(!other.moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!other.moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
 
             MPI_Info_dup(other.info_, &info_);
         }
@@ -1027,7 +1027,7 @@ namespace mpicxx {
          * @assert_sanity{ If @p other is in the moved-from state. }
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
-            MPICXX_ASSERT(!this->moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
+            MPICXX_ASSERT_SANITY(!this->moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
 
             // set other to the moved-from state
             other.info_ = MPI_INFO_NULL;
