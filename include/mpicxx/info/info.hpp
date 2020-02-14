@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-02-14
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -54,7 +54,7 @@ namespace mpicxx {
          *
          * Can be printed through an @ref operator<<(std::ostream&, const proxy&) overload.
          */
-        class proxy { // TODO 2020-02-13 21:30 marcel: copy/move constructor/assignment???
+        class proxy {
             /// pointer type to the referred to info object
             using MPI_Info_ptr = MPI_Info*;
             /// reference type to the referred to info object
