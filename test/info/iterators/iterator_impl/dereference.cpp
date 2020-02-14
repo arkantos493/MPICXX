@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/dereference.cpp
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-02-14
  *
  * @brief Test cases for the dereference operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -117,20 +117,20 @@ TEST(InfoIteratorImplDeathTest, DereferenceInvalid) {
     mpicxx::info::iterator sit;
 
     // dereference using operator[]
-    EXPECT_DEATH(sit[0], "");
-    EXPECT_DEATH(moved_from_it[0], "");
-    EXPECT_DEATH(it[-1], "");
-    EXPECT_DEATH(it[1], "");
+    EXPECT_DEATH( sit[0] , "");
+    EXPECT_DEATH( moved_from_it[0] , "");
+    EXPECT_DEATH( it[-1] , "");
+    EXPECT_DEATH( it[1] , "");
 
     // dereference using operator*
-    EXPECT_DEATH(*sit, "");
-    EXPECT_DEATH(*moved_from_it, "");
-    EXPECT_DEATH(*(it - 1), "");
-    EXPECT_DEATH(*(it + 1), "");
+    EXPECT_DEATH( *sit , "");
+    EXPECT_DEATH( *moved_from_it , "");
+    EXPECT_DEATH( *(it - 1) , "");
+    EXPECT_DEATH( *(it + 1) , "");
 
     // dereference using operator->
-    EXPECT_DEATH(sit->first, "");
-    EXPECT_DEATH(moved_from_it->first, "");
-    EXPECT_DEATH((it - 2)->first, "");
-    EXPECT_DEATH((it + 2)->first, "");
+    EXPECT_DEATH( sit->first , "");
+    EXPECT_DEATH( moved_from_it->first , "");
+    EXPECT_DEATH( (it - 2)->first , "");
+    EXPECT_DEATH( (it + 2)->first , "");
 }

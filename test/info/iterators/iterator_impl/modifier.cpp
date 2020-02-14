@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/modifier.cpp
  * @author Marcel Breyer
- * @date 2020-02-11
+ * @date 2020-02-14
  *
  * @brief Test cases for the modifying operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -59,13 +59,13 @@ TEST(InfoIteratorImplDeathTest, PreIncrementInvalid) {
     mpicxx::info dummy(std::move(moved_from));
 
     // incrementing a singular iterator is not permitted
-    EXPECT_DEATH(++sit, "");
+    EXPECT_DEATH( ++sit , "");
 
     // incrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH(++moved_from_it, "");
+    EXPECT_DEATH( ++moved_from_it , "");
 
     // incrementing a past-the-end iterator is not permitted
-    EXPECT_DEATH(++info.begin(), "");
+    EXPECT_DEATH( ++info.begin() , "");
 }
 
 
@@ -103,13 +103,13 @@ TEST(InfoIteratorImplDeathTest, PostIncrementInvalid) {
     mpicxx::info dummy(std::move(moved_from));
 
     // incrementing a singular iterator is not permitted
-    EXPECT_DEATH(sit++, "");
+    EXPECT_DEATH( sit++ , "");
 
     // incrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH(moved_from_it++, "");
+    EXPECT_DEATH( moved_from_it++ , "");
 
     // incrementing a past-the-end iterator is not permitted
-    EXPECT_DEATH((info.begin())++, "");
+    EXPECT_DEATH( (info.begin())++ , "");
 }
 
 
@@ -243,13 +243,13 @@ TEST(InfoIteratorImplDeathTest, PreDecrementInvalid) {
     mpicxx::info dummy(std::move(moved_from));
 
     // decrementing a singular iterator is not permitted
-    EXPECT_DEATH(--sit, "");
+    EXPECT_DEATH( --sit , "");
 
     // decrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH(--moved_from_it, "");
+    EXPECT_DEATH( --moved_from_it , "");
 
     // decrementing a start-of-sequence iterator is not permitted
-    EXPECT_DEATH(--info.begin(), "");
+    EXPECT_DEATH( --info.begin() , "");
 }
 
 
