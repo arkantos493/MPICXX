@@ -1,7 +1,7 @@
 /**
- * @file info/iterators/const_reverse_iterator.cpp
+ * @file test/info/iterators/const_reverse_iterator.cpp
  * @author Marcel Breyer
- * @date 2020-02-03
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::rbegin() const, @ref mpicxx::info::rend() const, @ref mpicxx::info::crbegin() const and
  * @ref mpicxx::info::crend() const member functions provided by the @ref mpicxx::info class.

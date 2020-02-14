@@ -1288,12 +1288,13 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] iterator begin() {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create an iterator referring to an info object in the moved-from state");
 
             return iterator(info_, 0);
         }
@@ -1304,7 +1305,7 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1312,7 +1313,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] iterator end() {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create an iterator referring to an info object in the moved-from state");
 
             return iterator(info_, this->size());
         }
@@ -1323,12 +1325,13 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] const_iterator begin() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
 
             return const_iterator(info_, 0);
         }
@@ -1339,7 +1342,7 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1347,7 +1350,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_iterator end() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
 
             return const_iterator(info_, this->size());
         }
@@ -1355,7 +1359,8 @@ namespace mpicxx {
          * @copydoc begin() const
          */
         [[nodiscard]] const_iterator cbegin() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
 
             return const_iterator(info_, 0);
         }
@@ -1363,7 +1368,8 @@ namespace mpicxx {
          * @copydoc end() const
          */
         [[nodiscard]] const_iterator cend() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
 
             return const_iterator(info_, this->size());
         }
@@ -1376,7 +1382,7 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1384,7 +1390,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] reverse_iterator rbegin() {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a reverse_iterator referring to an info object in the moved-from state");
 
             return std::make_reverse_iterator(this->end());
         }
@@ -1396,12 +1403,13 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] reverse_iterator rend() {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a reverse_iterator referring to an info object in the moved-from state");
 
             return std::make_reverse_iterator(this->begin());
         }
@@ -1413,7 +1421,7 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1421,7 +1429,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_reverse_iterator rbegin() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
 
             return std::make_reverse_iterator(this->cend());
         }
@@ -1433,12 +1442,13 @@ namespace mpicxx {
          *
          * @pre `*this` **must not** be in the moved-from state.
          *
-         * @assert{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` is in the moved-from state. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] const_reverse_iterator rend() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
 
             return std::make_reverse_iterator(this->cbegin());
         }
@@ -1446,7 +1456,8 @@ namespace mpicxx {
          * @copydoc rbegin() const
          */
         [[nodiscard]] const_reverse_iterator crbegin() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
 
             return std::make_reverse_iterator(this->cend());
         }
@@ -1454,7 +1465,8 @@ namespace mpicxx {
          * @copydoc rend() const
          */
         [[nodiscard]] const_reverse_iterator crend() const {
-            MPICXX_ASSERT(info_ != MPI_INFO_NULL, "'*this' is in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
+                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
 
             return std::make_reverse_iterator(this->cbegin());
         }

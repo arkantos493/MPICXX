@@ -1,7 +1,7 @@
 /**
- * @file info/iterators/const_iterator.cpp
+ * @file test/info/iterators/const_iterator.cpp
  * @author Marcel Breyer
- * @date 2020-02-03
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::begin() const, @ref mpicxx::info::end() const, @ref mpicxx::info::cbegin() const and
  * @ref mpicxx::info::cend() const member functions provided by the @ref mpicxx::info class.

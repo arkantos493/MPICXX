@@ -1,7 +1,7 @@
 /**
- * @file info/iterators/iterator.cpp
+ * @file test/info/iterators/iterator.cpp
  * @author Marcel Breyer
- * @date 2020-02-03
+ * @date 2020-02-14
  *
  * @brief Test cases for the @ref mpicxx::info::begin() and @ref mpicxx::info::end() member functions provided by the
  * @ref mpicxx::info class.
