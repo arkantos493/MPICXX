@@ -27,6 +27,7 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <mpi.h>
 
 #include <mpicxx/detail/assert.hpp>
@@ -686,7 +687,7 @@ namespace mpicxx {
              *
              * @pre `*this` **must not** be a singular iterator.
              * @pre `*this` **must not** refer to an info object in the moved-from state.
-             * @pre `*this` **must** be dereferencable, i.e. the position denoted by the current iterator + @p n must be in the
+             * @pre `*this` **must** be dereferenceable, i.e. the position denoted by the current iterator + @p n must be in the
              * half-open interval [0, nkeys), where `nkeys` ist the size of the referred to info object.
              *
              * @assert_precondition{
@@ -751,7 +752,7 @@ namespace mpicxx {
              *
              * @pre `*this` **must not** be a singular iterator.
              * @pre `*this` **must not** refer to an info object in the moved-from state.
-             * @pre `*this` **must** be dereferencable, i.e. the position denoted by the current iteratormust be in the half-open interval
+             * @pre `*this` **must** be dereferenceable, i.e. the position denoted by the current iteratormust be in the half-open interval
              * [0, nkeys), where `nkeys` ist the size of the referred to info object.
              *
              * @assert_precondition{
@@ -1992,7 +1993,7 @@ namespace mpicxx {
         /**
          * @brief Removes the [key, value]-pair at @p pos.
          * @details The iterator @p pos must be valid and **dereferenceable**. Thus the @ref end() iterator (which is valid, but is
-         * not dereferencable) cannot be used as a value for @p pos.
+         * not dereferenceable) cannot be used as a value for @p pos.
          * @param[in] pos iterator to the [key, value]-pair to remove
          * @return iterator following the removed [key, value]-pair (= position of @p pos prior to removal); \n
          * if @p pos refers to the last [key, value]-pair, then the @ref end() iterator is returned
