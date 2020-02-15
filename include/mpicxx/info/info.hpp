@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-02-15
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  *
@@ -35,14 +35,11 @@
 #include <mpicxx/detail/concepts.hpp>
 
 
-// TODO 2020-01-22 19:26 marcel: remaining tests
 // TODO 2020-01-26 19:35 marcel: usage example
 namespace mpicxx {
     /**
      * This class is a wrapper to the *MPI_Info* object providing a interface inspired by
      * [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map).
-     *
-     * TODO: usage example
      */
     class info {
 

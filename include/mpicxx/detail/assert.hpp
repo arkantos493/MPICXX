@@ -92,7 +92,7 @@ namespace mpicxx::detail {
                << "  in function '" << loc.function_name() << "'\n"
                << "  @ line " << loc.line() << "\n\n";
 
-            // TODO 2020-02-07 22:24 marcel: change to std::format as soon as possible
+            // TODO 2020-02-07 22:24 marcel: change from fmt::format to std::format
             ss << fmt::format(msg, std::forward<Args>(args)...) << "\n\n";
 
             // write stacktrace into the string stream
