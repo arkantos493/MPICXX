@@ -75,7 +75,7 @@ namespace mpicxx {
             proxy(MPI_Info_ref info, detail::string auto&& key) : info_(std::addressof(info)), key_(std::forward<decltype(key)>(key)) {
                 MPICXX_ASSERT_SANITY(!this->info_moved_from(),
                         "Attempt to create a proxy from an info object in the moved-from state!");
-                MPICXX_ASSERT_SANITY(this->legal_size(key_, MPI_MAX_INFO_KEY),
+                MPICXX_ASSERT_SANITY(this->legal_string_size(key_, MPI_MAX_INFO_KEY),
                         "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key_.size(), MPI_MAX_INFO_KEY);
             }
 
@@ -99,7 +99,7 @@ namespace mpicxx {
             void operator=(const std::string_view value) {
                 MPICXX_ASSERT_PRECONDITION(!this->info_moved_from(),
                         "Attempt to access a [key, value]-pair of an info object in the moved-from state!");
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(value, MPI_MAX_INFO_VAL),
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(value, MPI_MAX_INFO_VAL),
                         "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
 
                 MPI_Info_set(*info_, key_.data(), value.data());
@@ -182,7 +182,7 @@ namespace mpicxx {
              * @brief Check whether @p val has a legal size.
              * @details @p val has a legal size if it is greater than zero and less then @p max_size.
              */
-            bool legal_size(const std::string_view val, const int max_size) const {
+            bool legal_string_size(const std::string_view val, const int max_size) const {
                 return 0 < val.size() && static_cast<int>(val.size()) < max_size;
             }
 #endif
@@ -1189,7 +1189,7 @@ namespace mpicxx {
          */
         info& operator=(const info& rhs) {
             MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
-            MPICXX_ASSERT_SANITY(!this->self_operation(rhs), "Attempt to perform a \"self copy assignment\"!");
+            MPICXX_ASSERT_SANITY(!this->identical(rhs), "Attempt to perform a \"self copy assignment\"!");
 
             // check against self-assignment
             if (this != std::addressof(rhs)) {
@@ -1230,7 +1230,7 @@ namespace mpicxx {
          */
         info& operator=(info&& rhs) {
             MPICXX_ASSERT_SANITY(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
-            MPICXX_ASSERT_SANITY(!this->self_operation(rhs), "Attempt to perform a \"self move assignment\"!");
+            MPICXX_ASSERT_SANITY(!this->identical(rhs), "Attempt to perform a \"self move assignment\"!");
 
             // delete current MPI_Info object if and only if it is marked as freeable
             if (is_freeable_) {
@@ -1587,7 +1587,7 @@ namespace mpicxx {
          */
         proxy at(detail::string auto&& key) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(key).size(), MPI_MAX_INFO_KEY);
 
             // check whether the key exists
@@ -1643,7 +1643,7 @@ namespace mpicxx {
          */
         std::string at(const std::string_view key) const {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             // get the length of the value associated with key
@@ -1704,7 +1704,7 @@ namespace mpicxx {
          */
         proxy operator[](detail::string auto&& key) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(key).size(), MPI_MAX_INFO_KEY);
 
             // create proxy object and forward key
@@ -1741,9 +1741,9 @@ namespace mpicxx {
          */
         std::pair<iterator, bool> insert(const std::string_view key, const std::string_view value) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(value, MPI_MAX_INFO_VAL),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(value, MPI_MAX_INFO_VAL),
                     "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
 
             // check whether the key exists
@@ -1796,9 +1796,9 @@ namespace mpicxx {
                 // retrieve element
                 const value_type& pair = *first;
 
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.first, MPI_MAX_INFO_KEY),
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.first, MPI_MAX_INFO_KEY),
                         "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", pair.first.size(), MPI_MAX_INFO_KEY);
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.second, MPI_MAX_INFO_VAL),
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.second, MPI_MAX_INFO_VAL),
                         "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", pair.second.size(), MPI_MAX_INFO_VAL);
 
                 // check whether the key exists
@@ -1870,9 +1870,9 @@ namespace mpicxx {
          */
         std::pair<iterator, bool> insert_or_assign(const std::string_view key, const std::string_view value) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(value, MPI_MAX_INFO_VAL),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(value, MPI_MAX_INFO_VAL),
                     "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
 
             // check whether an insertion or assignment will take place
@@ -1920,9 +1920,9 @@ namespace mpicxx {
             for (; first != last; ++first) {
                 // retrieve element
                 const value_type& pair = *first;
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.first, MPI_MAX_INFO_KEY),
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.first, MPI_MAX_INFO_KEY),
                         "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", pair.first.size(), MPI_MAX_INFO_KEY);
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.second, MPI_MAX_INFO_VAL),
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.second, MPI_MAX_INFO_VAL),
                         "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", pair.second.size(), MPI_MAX_INFO_VAL);
 
                 // insert or assign [key, value]-pair
@@ -2016,7 +2016,7 @@ namespace mpicxx {
         iterator erase(const_iterator pos) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(pos), "Attempt to use an info iterator referring to another info object!");
-            MPICXX_ASSERT_PRECONDITION(this->info_iterator_dereferenceable(pos), "Attempt to dereference a {} iterator!", pos.state());
+            MPICXX_ASSERT_PRECONDITION(this->info_iterator_valid(pos), "Attempt to dereference a {} iterator!", pos.state());
 
             char key[MPI_MAX_INFO_KEY];
             MPI_Info_get_nthkey(info_, pos.pos_, key);
@@ -2069,9 +2069,9 @@ namespace mpicxx {
                     "Attempt to use an info iterator ('first') referring to another info object!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(last),
                     "Attempt to use an info iterator ('last') referring to another info object!");
-            MPICXX_ASSERT_PRECONDITION(this->info_iterator_dereferenceable(first),
+            MPICXX_ASSERT_PRECONDITION(this->info_iterator_valid(first),
                     "Attempt to dereference a {} iterator ('first')!", first.state());
-            MPICXX_ASSERT_PRECONDITION(this->info_iterator_dereferenceable(last),
+            MPICXX_ASSERT_PRECONDITION(this->info_iterator_valid(last),
                     "Attempt to dereference a {} iterator ('last')!", last.state());
             MPICXX_ASSERT_SANITY(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
@@ -2119,7 +2119,7 @@ namespace mpicxx {
          */
         size_type erase(const std::string_view key) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             // check whether the key exists
@@ -2174,7 +2174,7 @@ namespace mpicxx {
         [[nodiscard]] value_type extract(const_iterator pos) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(pos), "Attempt to use an info iterator referring to another info object!");
-            MPICXX_ASSERT_PRECONDITION(this->info_iterator_dereferenceable(pos), "Attempt to dereference a {} iterator!", pos.state());
+            MPICXX_ASSERT_PRECONDITION(this->info_iterator_valid(pos), "Attempt to dereference a {} iterator!", pos.state());
 
             // get [key, value]-pair pointed to by pos
             const value_type& pair = *pos;
@@ -2211,7 +2211,7 @@ namespace mpicxx {
          */
         [[nodiscard]] std::optional<value_type> extract(const std::string_view key) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             // check whether the key exists
@@ -2270,7 +2270,7 @@ namespace mpicxx {
                     "Attempt to call a function on an info object ('*this') in the moved-from state!");
             MPICXX_ASSERT_PRECONDITION(!source.moved_from(),
                     "Attempt to call a function on an info object ('source') in the moved-from state!");
-            MPICXX_ASSERT_SANITY(!this->self_operation(source), "Attempt to perform a \"self merge\"!");
+            MPICXX_ASSERT_SANITY(!this->identical(source), "Attempt to perform a \"self merge\"!");
 
             // do nothing if a "self merge" is attempted
             if (this == std::addressof(source)) return;
@@ -2333,7 +2333,7 @@ namespace mpicxx {
          */
         [[nodiscard]] size_type count(const std::string_view key) const {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             return static_cast<size_type>(this->contains(key));
@@ -2361,7 +2361,7 @@ namespace mpicxx {
          */
         [[nodiscard]] iterator find(const std::string_view key) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
@@ -2390,7 +2390,7 @@ namespace mpicxx {
          */
         [[nodiscard]] const_iterator find(const std::string_view key) const {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
@@ -2417,7 +2417,7 @@ namespace mpicxx {
          */
         [[nodiscard]] bool contains(const std::string_view key) const {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
@@ -2453,7 +2453,7 @@ namespace mpicxx {
          */
         [[nodiscard]] std::pair<iterator, iterator> equal_range(const std::string_view key) {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
@@ -2497,7 +2497,7 @@ namespace mpicxx {
          */
         [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const std::string_view key) const {
             MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
+            MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
             const size_type size = this->size();
@@ -2770,8 +2770,12 @@ namespace mpicxx {
          * @brief Get the underlying *MPI_Info* object.
          * @return the *MPI_Info* object wrapped in this mpicxx::info object
          */
-        [[nodiscard]] const MPI_Info& get() const noexcept { return info_; } // TODO 2020-02-12 14:39 marcel: test
-        [[nodiscard]] MPI_Info& get() noexcept { return info_; } // TODO 2020-02-12 14:39 marcel: test
+        [[nodiscard]] const MPI_Info& get() const noexcept { return info_; }
+        /**
+         * @brief Get the underlying *MPI_Info* object.
+         * @return the *MPI_Info* object wrapped in this mpicxx::info object
+         */
+        [[nodiscard]] MPI_Info& get() noexcept { return info_; }
         /**
          * @brief Returns whether the underlying *MPI_Info* object gets automatically freed upon destruction, i.e. the destructor
          * calls *MPI_Info_free*.
@@ -2833,24 +2837,38 @@ namespace mpicxx {
             return info_ == MPI_INFO_NULL;
         }
         /*
+         * @brief Check whether `*this` and @p other are identical, i.e. they refer to the **same** underlying *MPI_INFO* object.
+         */
+        bool identical(const info& other) const {
+            return this == std::addressof(other);
+        }
+        /*
          * @brief Check whether @p val has a legal size.
          * @details @p val has a legal size if it is greater than zero and less then @p max_size.
          */
-        bool legal_size(const std::string_view val, const int max_size) const {
+        bool legal_string_size(const std::string_view val, const int max_size) const {
             return 0 < val.size() && static_cast<int>(val.size()) < max_size;
         }
+        /*
+         * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
+         * @details Checks whether the distance bewteen @p first and @p last is not negative.
+         */
         template <std::input_iterator InputIt>
         bool legal_iterator_range(InputIt first, InputIt last) {
             return std::distance(first, last) >= 0;
         }
-        bool legal_info_iterator(const const_iterator it) const {
+        /*
+         * @brief Checks whether @p it is a legal info iterator, i.e. @it is not singular and points to `*this` info object.
+         */
+        bool legal_info_iterator(const_iterator it) const {
             return !it.singular() && it.info_ == std::addressof(info_);
         }
-        bool info_iterator_dereferenceable(const const_iterator it) const { // TODO 2020-02-14 21:37 marcel: names
-            return 0 <= it.pos_ && it.pos_ <= static_cast<const_iterator::difference_type>(this->size());
-        }
-        bool self_operation(const info& other) const {
-            return this == std::addressof(other);
+        /*
+         * @brief Checks wether @p it can be savely used as an iterator to denote an iterator range, i.e. @p it is a legal info iterator and
+         * points to a [key, value]-pair in the range `[0, this->size()]`.
+         */
+        bool info_iterator_valid(const_iterator it) const {
+            return this->legal_info_iterator(it) && 0 <= it.pos_ && it.pos_ <= static_cast<const_iterator::difference_type>(this->size());
         }
 #endif
 
