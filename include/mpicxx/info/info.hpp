@@ -1793,17 +1793,17 @@ namespace mpicxx {
             // try to insert every element in the range [first, last)
             for (; first != last; ++first) {
                 // retrieve element
-                const auto& [key, value] = *first;
+                const value_type& pair = *first;
 
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
-                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(value, MPI_MAX_INFO_VAL),
-                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
+                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.first, MPI_MAX_INFO_KEY),
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", pair.first.size(), MPI_MAX_INFO_KEY);
+                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.second, MPI_MAX_INFO_VAL),
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", pair.second.size(), MPI_MAX_INFO_VAL);
 
                 // check whether the key exists
-                if (!this->key_exists(key)) {
+                if (!this->key_exists(pair.first)) {
                     // key doesn't exist -> add new [key, value]-pair
-                    MPI_Info_set(info_, key.data(), value.data());
+                    MPI_Info_set(info_, pair.first.data(), pair.second.data());
                 }
             }
         }
@@ -1918,14 +1918,14 @@ namespace mpicxx {
             // insert or assign every element in the range [first, last)
             for (; first != last; ++first) {
                 // retrieve element
-                const auto [key, value] = *first;
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(key, MPI_MAX_INFO_KEY),
-                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
-                MPICXX_ASSERT_PRECONDITION(this->legal_size(value, MPI_MAX_INFO_VAL),
-                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
+                const value_type& pair = *first;
+                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.first, MPI_MAX_INFO_KEY),
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", pair.first.size(), MPI_MAX_INFO_KEY);
+                MPICXX_ASSERT_PRECONDITION(this->legal_size(pair.second, MPI_MAX_INFO_VAL),
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", pair.second.size(), MPI_MAX_INFO_VAL);
 
                 // insert or assign [key, value]-pair
-                MPI_Info_set(info_, key.data(), value.data());
+                MPI_Info_set(info_, pair.first.data(), pair.second.data());
             }
         }
         /**
@@ -2176,11 +2176,11 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(this->info_iterator_dereferenceable(pos), "Attempt to dereference a {} iterator!", pos.state());
 
             // get [key, value]-pair pointed to by pos
-            value_type key_value_pair = *pos;
+            const value_type& pair = *pos;
             // remove [key, value]-pair from info object
-            MPI_Info_delete(info_, key_value_pair.first.data());
+            MPI_Info_delete(info_, pair.first.data());
             // return extracted [key, value]-pair
-            return key_value_pair;
+            return pair;
         }
         /**
          * @brief Removes the [key, value]-pair (if one exists) with the key equivalent to @p key and returns the removed [key, value]-pair.
@@ -2666,12 +2666,12 @@ namespace mpicxx {
                 std::string value(valuelen, ' ');
                 MPI_Info_get(c.info_, key, valuelen, value.data(), &flag);
                 // create [key, value]-pair as a std::pair
-                value_type key_value_pair = std::make_pair(std::string(key), std::move(value));
+                const value_type& pair = std::make_pair(std::string(key), std::move(value));
 
                 // check whether the predicate holds
-                if (pred(key_value_pair)) {
+                if (pred(pair)) {
                     // the predicate evaluates to true -> remember key for erasure
-                    keys_to_delete.emplace_back(std::move(key_value_pair.first));
+                    keys_to_delete.emplace_back(std::move(pair.first));
                 }
             }
 

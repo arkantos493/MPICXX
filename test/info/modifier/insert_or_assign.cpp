@@ -1,24 +1,25 @@
 /**
  * @file test/info/modifier/insert_or_assign.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-02-15
  *
  * @brief Test cases for the @ref mpicxx::info::insert_or_assign(const std::string_view, const std::string_view),
  * @ref mpicxx::info::insert_or_assign(InputIt, InputIt) and @ref mpicxx::info::insert_or_assign(std::initializer_list<value_type>) member
  * functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name                                 | test case description                                                            |
- * |:-----------------------------------------------|:---------------------------------------------------------------------------------|
- * | InsertOrAssignByKeyValuePair                   | insert or assign single [key, value]-pair                                        |
- * | InsertOrAssignByIllegalKeyOrValue              | try to insert or assign [key, value]-pair with illegal key or value (death test) |
- * | MovedFromInsertOrAssignByKeyValuePair          | info object in the moved-from state (death test)                                 |
- * | InsertOrAssignByIteratorRange                  | insert or assign all [key, value]-pairs from the iterator range                  |
- * | InsertOrAssignByIllegalIteratorRange           | iterator range is not valid (death test)                                         |
- * | InsertOrAssignByIllegalIteratorRangeKeyOrValue | key or value in the iterator range illegal (death test)                          |
- * | MovedFromInsertOrAssignByIteratorRange         | info object in the moved-from state (death test)                                 |
- * | InsertOrAssignByInitializerList                | insert or assign all [key, value]-pairs from the initializer list                |
- * | InsertOrAssignByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                        |
- * | MovedFromInsertOrAssignByInitializerList       | info object in the moved-from state (death test)                                 |
+ * | test case name                                 | test case description                                                                         |
+ * |:-----------------------------------------------|:----------------------------------------------------------------------------------------------|
+ * | InsertOrAssignByKeyValuePair                   | insert or assign single [key, value]-pair                                                     |
+ * | InsertOrAssignByIllegalKeyOrValue              | try to insert or assign [key, value]-pair with illegal key or value (death test)              |
+ * | MovedFromInsertOrAssignByKeyValuePair          | info object in the moved-from state (death test)                                              |
+ * | InsertOrAssignByIteratorRange                  | insert or assign all [key, value]-pairs from the iterator range                               |
+ * | InsertOrAssignByIteratorRangeFromInfo          | insert or assign all [key, value]-pairs from the iterator range retrieved from an info object |
+ * | InsertOrAssignByIllegalIteratorRange           | iterator range is not valid (death test)                                                      |
+ * | InsertOrAssignByIllegalIteratorRangeKeyOrValue | key or value in the iterator range illegal (death test)                                       |
+ * | MovedFromInsertOrAssignByIteratorRange         | info object in the moved-from state (death test)                                              |
+ * | InsertOrAssignByInitializerList                | insert or assign all [key, value]-pairs from the initializer list                             |
+ * | InsertOrAssignByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                                     |
+ * | MovedFromInsertOrAssignByInitializerList       | info object in the moved-from state (death test)                                              |
  */
 
 #include <string>
@@ -125,6 +126,36 @@ TEST(ModifierTest, InsertOrAssignByIteratorRange) {
     MPI_Info_get(info.get(), "key3", 6, value, &flag);
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value3");
+}
+
+TEST(ModifierTest, InsertOrAssignByIteratorRangeFromInfo) {
+    // create info objects and add [key, value]-pairs
+    mpicxx::info info_1;
+    MPI_Info_set(info_1.get(), "key1", "value1");
+    mpicxx::info info_2;
+    MPI_Info_set(info_2.get(), "key1", "value1_override");
+    MPI_Info_set(info_2.get(), "key2", "value2");
+    MPI_Info_set(info_2.get(), "key3", "value3");
+
+    // insert all elements from info_2 in info_1
+    info_1.insert_or_assign(info_2.begin(), info_2.end());
+
+    // check info_1 for the correct values
+    int nkeys;
+    MPI_Info_get_nkeys(info_1.get(), &nkeys);
+    ASSERT_EQ(nkeys, 3);
+
+    int flag;
+    char value[MPI_MAX_INFO_VAL];
+    MPI_Info_get(info_1.get(), "key1", 15, value, &flag);
+    ASSERT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value1_override");
+    MPI_Info_get(info_1.get(), "key2", 6, value, &flag);
+    ASSERT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+    MPI_Info_get(info_1.get(), "key2", 6, value, &flag);
+    ASSERT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
 }
 
 TEST(ModifierDeathTest, InsertOrAssignByIllegalIteratorRange) {
