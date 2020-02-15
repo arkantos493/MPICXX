@@ -116,24 +116,6 @@ namespace mpicxx::detail {
     }
 }
 
-// TODO 2020-02-05 21:33 marcel: remove later
-/**
- * @def MPICXX_ASSERT()
- * Defines the @ref MPICXX_ASSERT macro iff ``NDEBUG`` is **not** set, otherwise this macro does nothing.
- *
- * This macro effectively calls the @ref check() function by insertion the condition as string argument, adding the current
- * location information (by using @ref mpicxx::detail::source_location) and forwarding all other parameters.
- *
- * @param cond the assert condition
- * @param msg the custom assert message
- * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
- */
-#ifdef NDEBUG
-#define MPICXX_ASSERT(cond, msg, ...)
-#else
-#define MPICXX_ASSERT(cond, msg, ...) mpicxx::detail::check(cond, #cond, "General", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
-#endif
-
 
 // ASSERTION_LEVEL
 // 0 -> no assertions

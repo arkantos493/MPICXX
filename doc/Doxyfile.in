@@ -228,7 +228,6 @@ TAB_SIZE               = 4
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                += assert{1}="<dl class=\"section assert\"><dt>Assertions</dt><dd>\1</dd></dl>"
 ALIASES                += assert_precondition{1}="<dl class=\"section assert_precondition\"><dt>Precondition assertions</dt><dd>\1</dd></dl>"
 ALIASES                += assert_sanity{1}="<dl class=\"section assert_sanity\"><dt>Sanity assertions</dt><dd>\1</dd></dl>"
 ALIASES                += assert{1}="<dl class=\"section assert\"><dt>Assertions</dt><dd>\1</dd></dl>"
