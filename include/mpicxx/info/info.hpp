@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <functional>
 #include <initializer_list>
 #include <limits>
 #include <memory>
@@ -2669,7 +2670,7 @@ namespace mpicxx {
                 const value_type& pair = std::make_pair(std::string(key), std::move(value));
 
                 // check whether the predicate holds
-                if (pred(pair)) {
+                if (std::invoke(pred, pair)) {
                     // the predicate evaluates to true -> remember key for erasure
                     keys_to_delete.emplace_back(std::move(pair.first));
                 }
