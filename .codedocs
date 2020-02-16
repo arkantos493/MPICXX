@@ -32,9 +32,9 @@ TAGLINKS =
 
 # These variables have to be redefined since codedocs cannot run CMake
 PROJECT_NAME = "mpicxx"
-PROJECT_NUMBER = 0.1.0
+PROJECT_NUMBER = 0.2.0
 PROJECT_BRIEF = "A header only C++ wrapper library for MPI"
 OUTPUT_DIRECTORY = doc/
 INPUT = doc/ include/
 USE_MDFILE_AS_MAINPAGE = doc/main_page.md
-EXTRACT_ALL = YES
+EXTRACT_ALL = NO

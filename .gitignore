@@ -65,5 +65,6 @@ dirs/
 
 ### config.hpp ###
 config.hpp
+.codedocs.in
 
 # End of https://www.gitignore.io/api/c++,cmake
