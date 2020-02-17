@@ -1,0 +1,7 @@
+/**
+ * @dir include/mpicxx/chrono
+ * @author Marcel Breyer
+ * @date 2020-02-17
+ *
+ * @brief This directory contains all headers for the @ref mpicxx::clock class provided by the mpicxx library.
+ */
