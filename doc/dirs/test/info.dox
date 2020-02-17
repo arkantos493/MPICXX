@@ -1,0 +1,89 @@
+/**
+ * @dir test/info
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::info implementation.
+ */
+
+
+
+/**
+ * @dir test/info/additional_functions
+ * @author Marcel Breyer
+ * @date 2020-01-27
+ *
+ * @brief This directory contains all test cases for the additional member functions provided by the
+ * @ref mpicxx::info class.
+ */
+
+/**
+ * @dir test/info/assignment
+ * @author Marcel Breyer
+ * @date 2020-01-29
+ *
+ * @brief This directory contains all test cases for the assignment operations provided by the @ref mpicxx::info class.
+ */
+
+/**
+ * @dir test/info/capacity
+ * @author Marcel Breyer
+ * @date 2020-01-29
+ *
+ * @brief This directory contains all test cases for the capacity member functions provided by the @ref mpicxx::info
+ * class.
+ */
+
+/**
+ * @dir test/info/constructor_and_destructor
+ * @author Marcel Breyer
+ * @date 2020-01-31
+ *
+ * @brief This directory contains all test cases for the constructors and the destructor provided by the
+ * @ref mpicxx::info class.
+ */
+
+/**
+ * @dir test/info/iterators
+ * @author Marcel Breyer
+ * @date 2020-02-03
+ *
+ * @brief This directory contains all test cases for the iterators provided by the @ref mpicxx::info class.
+ */
+
+/**
+ * @dir test/info/lookup
+ * @author Marcel Breyer
+ * @date 2020-01-30
+ *
+ * @brief This directory contains all test cases for the lookup member functions provided by the @ref mpicxx::info
+ * class.
+ */
+
+/**
+ * @dir test/info/modifier
+ * @author Marcel Breyer
+ * @date 2020-02-02
+ *
+ * @brief This directory contains all test cases for the modifying member functions provided by the @ref mpicxx::info
+ * class.
+ */
+
+/**
+ * @dir test/info/non-member_functions
+ * @author Marcel Breyer
+ * @date 2020-01-30
+ *
+ * @brief This directory contains all test cases for the non-member functions provided by the @ref mpicxx::info class.
+ */
+
+
+
+/**
+ * @dir test/info/iterators/iterator_impl
+ * @author
+ * @date 2020-02-04
+ *
+ * @brief This directory contains all test cases for the iterator implementation provided by the @ref mpicxx::info
+ * class.
+ */
