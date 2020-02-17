@@ -20,10 +20,6 @@
 #include <thread>
 TEST(ClockTest, ClockTest) {
 
-//    std::cout << mpicxx::clock::global_synchronized() << std::endl;
-//    std::cout << mpicxx::clock::now() << std::endl;
-//    std::cout << std::chrono::high_resolution_clock::now() << std::endl;
-
     std::cout << "Tick Rate: " << mpicxx::clock::resolution() << std::endl;
 
     auto start = mpicxx::clock::now();
