@@ -17,6 +17,7 @@
 #define MPICXX_SOURCE_LOCATION_HPP
 
 #include <iostream>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <string_view>
