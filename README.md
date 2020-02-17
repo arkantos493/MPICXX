@@ -29,15 +29,21 @@ make -j $(nproc)
 ```
 Supported configuration options are:
 - `-DCMAKE_BUILD_TYPE=Debug/Release/...` (default: `Release`)
+
 - `-DCMAKE_INSTALL_PREFIX=...`: set the installation path (default: `/usr/local/include`)
+
 - `-DENABLE_TESTS=ON/OFF`: uses the googletest framework (automatically installed if this option is set to `ON`) to enable the target `test` (default: `OFF`)
+
 - `-DENABLE_DEATH_TEST=ON/OFF`: enables googletests death tests (currently not supported for MPI during its usage of fork()); only used if `ENABLE_TESTS` is set to `ON` (default: `OFF`)
+
 - `-DENABLE_COVERALLS_REPORT=ON/OFF`: enables coverage reports via coveralls; only used if `ENABLE_TESTS` is set to `ON`; requires the build type to be set to `Debug` (default: `OFF`)
+
 - `-DGENERATE_DOCUMENTATION=ON/OFF`: enables the target `doc` documentation; requires Doxygen (default: `OFF`)
+
 - `-DASSERTION_LEVEL=0/1/2`: sets the assertion level; emits a warning if used in `Release` mode (default: `0`)
-   - `0`: no assertions are active
-   - `1`: only precondition assertions are active
-   - `2`: additional sanity checks are activated
+  - `0`: no assertions are active
+  - `1`: only precondition assertions are active
+  - `2`: additional sanity checks are activated
 
 ## Running the tests
 
