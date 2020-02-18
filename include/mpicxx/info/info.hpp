@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-16
+ * @date 2020-02-18
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -39,6 +39,8 @@ namespace mpicxx {
      * @brief This class is a wrapper to the *MPI_Info* object providing a interface inspired by
      * [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map) and
      * [`std::map`](https://en.cppreference.com/w/cpp/container/map).
+     * @details Example usage:
+     * @include examples/info/info.cpp
      */
     class info {
 
@@ -2875,10 +2877,6 @@ namespace mpicxx {
     // initialize static environment object
     inline const info info::env = info(MPI_INFO_ENV, false);
 
-    /**
-     * @brief Usage example for the @ref mpicxx::info class:
-     * @example examples/info/info.cpp
-     */
 }
 
 #endif // MPICXX_INFO_HPP
