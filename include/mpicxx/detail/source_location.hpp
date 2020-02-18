@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
- * @date 2020-02-08
+ * @date 2020-02-18
  *
  * @brief Provides a `source_location` class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
@@ -46,6 +46,8 @@
 namespace mpicxx::detail {
     /**
      * @brief Represents information of a specific source code location.
+     * @details Example usage:
+     * @include examples/detail/source_location.cpp
      */
     class source_location {
     public:
@@ -206,10 +208,6 @@ namespace mpicxx::detail {
         std::optional<int> rank_ = std::nullopt;
     };
 
-    /**
-     * @brief Usage example for the @ref mpicxx::detail::source_location class:
-     * @example examples/detail/source_location.cpp
-     */
 }
 
 #endif // MPICXX_SOURCE_LOCATION_HPP
