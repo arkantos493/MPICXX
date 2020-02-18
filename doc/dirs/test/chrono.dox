@@ -1,0 +1,7 @@
+/**
+ * @dir test/chrono
+ * @author Marcel Breyer
+ * @date 2020-02-17
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::clock class.
+ */

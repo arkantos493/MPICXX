@@ -53,12 +53,7 @@ googletest-download/
 googletest-src/
 
 ### Docu ###
-xml_doxygen/
-rst_doxyrest/
 html/
-doxyrest/
-html_doxygen/
-dirs/
 
 ### CLion ###
 .idea/
