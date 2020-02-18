@@ -35,8 +35,6 @@ Supported configuration options are:
 
 - `-DENABLE_DEATH_TEST=ON/OFF`: enables googletests death tests (currently not supported for MPI during its usage of fork()); only used if `ENABLE_TESTS` is set to `ON` (default: `OFF`)
 
-- `-DENABLE_COVERALLS_REPORT=ON/OFF`: enables coverage reports via coveralls; only used if `ENABLE_TESTS` is set to `ON`; requires the build type to be set to `Debug` (default: `OFF`)
-
 - `-DGENERATE_DOCUMENTATION=ON/OFF`: enables the target `doc` documentation; requires Doxygen (default: `OFF`)
 
 - `-DASSERTION_LEVEL=0/1/2`: sets the assertion level; emits a warning if used in `Release` mode (default: `0`)

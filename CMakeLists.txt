@@ -19,8 +19,6 @@ configure_file(${CONFIG_IN} ${CONFIG_OUT} @ONLY)
 # enable/disable options
 include(CMakeDependentOption)
 option(ENABLE_TESTS "Generate tests" OFF)
-cmake_dependent_option(ENABLE_COVERALLS_REPORT "Generate coveralls data" OFF 
-                       "ENABLE_TESTS" OFF)
 cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
                        "ENABLE_TESTS" OFF)
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
@@ -52,10 +50,6 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type (Debug/Release)" FORCE)
 endif (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
-# to generate coveralls reports be sure that the current build type is debug
-if (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(FATAL_ERROR "In order to use coveralls reports please change the build type to debug")
-endif (ENABLE_COVERALLS_REPORT AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # warn if assertions are used in a Release build
 if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${ASSERTION_LEVEL} GREATER 0)
@@ -156,18 +150,6 @@ endif (ENABLE_TESTS)
 if (ENABLE_DEATH_TESTS)
     message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
 endif(ENABLE_DEATH_TESTS)
-
-# enable coverage reports using coveralls
-if (ENABLE_COVERALLS_REPORT)
-    ### based on https://github.com/JoakimSoderberg/coveralls-cmake ###
-    message(STATUS "Enabled coverage reports using coveralls")
-    include(Coveralls)
-    coveralls_turn_on_coverage()
-    # TODO: test if coverage reports work
-    file(GLOB_RECURSE COVERAGE_SRCS "${PROJECT_SOURCE_DIR}/include/mpicxx(*.hpp)")
-    coveralls_setup("${COVERAGE_SRCS}" ON
-                    "${PROJECT_SOURCE_DIR}/cmake/modules/")
-endif(ENABLE_COVERALLS_REPORT)
 
 
 # generate documentation if requested
