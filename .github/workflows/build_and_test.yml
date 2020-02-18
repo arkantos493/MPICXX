@@ -1,0 +1,94 @@
+name: Run tests
+
+on: [push]
+
+jobs:
+  build-and-run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cache GCC
+        id: cache-gcc-trunk
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/gcc-trunk
+          key: cache-gcc-trunk
+          
+      - name: Install GCC
+        if: steps.cache-gcc-trunk.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install flex
+          git clone https://github.com/gcc-mirror/gcc.git
+          cd gcc
+          ./contrib/download_prerequisites
+          cd ..
+          mkdir objdir
+          cd objdir
+          $PWD/../gcc/configure --prefix=${{ github.workspace }}/gcc-trunk --enable-languages=c,c++ --disable-multilib
+          make
+          make install
+          
+      - name: Set GCC
+        run: |
+          sudo update-alternatives --install /usr/bin/gcc gcc ${{ github.workspace }}/gcc-trunk/bin/gcc 100 --slave /usr/bin/g++ g++ ${{ github.workspace }}/gcc-trunk/bin/g++
+          g++ --version
+          
+      - name: Cache OpenMPI with GCC
+        id: cache-openmpi-gcc
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/openmpi-gcc
+          key: cache-openmpi-gcc
+      
+      - name: Install OpenMPI with GCC
+        if: steps.cache-openmpi-gcc.outputs.cache-hit != 'true'
+        run: |
+          wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.gz
+          tar -xvf openmpi-4.0.2.tar.gz
+          cd openmpi-4.0.2
+          ./configure --prefix=${{ github.workspace }}/openmpi-gcc
+          make
+          make install
+      
+      - name: Set OpenMPI with GCC
+        run: |
+          export PATH=$PATH:${{ github.workspace }}/openmpi-gcc/bin/
+          mpirun --version
+          
+      - name: Cache fmt with GCC
+        id: cache-fmt-master-gcc
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/fmt-gcc
+          key: cache-fmt-master-gcc          
+          
+      - name: Install fmt with GCC
+        if: steps.cache-fmt-master-gcc.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/fmtlib/fmt.git
+          cd fmt
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/fmt-gcc ..
+          make -j
+          make install
+          
+      - name: Checkout mpicxx
+        uses: actions/checkout@v2.0.0
+        with:
+          path: mpicxx
+          ref: 'master'
+      
+      - name: Build mpicxx and run tests
+        run: |
+          cd mpicxx
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug \
+                -DMPI_CXX_COMPILER=${{ github.workspace }}/openmpi-gcc/bin/mpic++ \
+                -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/openmpi-gcc/bin/mpirun \
+                -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-gcc \
+                -DENABLE_TESTS=ON \
+                -DASSERTION_LEVEL=2 ..
+          make -j
+          ctest --output-on-failure
