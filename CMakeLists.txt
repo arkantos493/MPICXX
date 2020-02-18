@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 project("mpicxx" 
-        VERSION "0.2.0"
+        VERSION "0.3.0"
         LANGUAGES CXX
         DESCRIPTION "A header only C++ wrapper library for MPI"
         HOMEPAGE_URL "https://github.com/arkantos493/MPICXX")
