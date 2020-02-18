@@ -7,8 +7,8 @@
  * @details These functions include *MPI_Wtime*, *MPI_Wtick* and the attribute *MPI_WTIME_IS_GLOBAL*.
  */
 
-#ifndef MPICXX_TIME_HPP
-#define MPICXX_TIME_HPP
+#ifndef MPICXX_CLOCK_HPP
+#define MPICXX_CLOCK_HPP
 
 #include <chrono>
 
@@ -20,7 +20,7 @@ namespace mpicxx {
     /**
      * @brief A clock wrapper for *MPI_Wtime* and *MPI_Wtick* which supports [`std::chrono`](https://en.cppreference.com/w/cpp/chrono).
      * @details Example usage:
-     * @include /examples/chrono/clock.cpp
+     * @include examples/chrono/clock.cpp
      */
     struct clock {
         /**
@@ -80,4 +80,4 @@ namespace mpicxx {
 
 }
 
-#endif // MPICXX_TIME_HPP
+#endif // MPICXX_CLOCK_HPP
