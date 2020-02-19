@@ -92,7 +92,7 @@ if (NOT (active_assertion_categories EQUAL 0))
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC
         message(STATUS "Enabled '-rdynamic' linker flag for better stack traces in assertions")
-        add_link_options(-rdynamic)
+        add_link_options(-rdynamic) # TODO: pass to consuming library
     endif()
 endif ()
 
