@@ -1,7 +1,7 @@
 /**
  * @file test/info/assignment/move_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-02-19
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
@@ -112,10 +112,13 @@ TEST(AssignmentTest, MoveAssignToNonFreeable) {
 }
 
 TEST(AssignmentTest, MoveAssignFromNonFreeable) {
-    // create empty info object
+    // create info objects and add [key, value]-pairs
     mpicxx::info info;
+    MPI_Info mpi_info;
+    MPI_Info_create(&mpi_info);
+    MPI_Info_set(mpi_info, "key", "value");
     // create non-freeable info object
-    mpicxx::info non_freeable(MPI_INFO_ENV, false);
+    mpicxx::info non_freeable(mpi_info, false);
 
     // perform move assignment
     info = std::move(non_freeable);
@@ -123,11 +126,12 @@ TEST(AssignmentTest, MoveAssignFromNonFreeable) {
     // info shouldn't be empty anymore and marked as non-freeable (as non_freeable was)
     int nkeys;
     MPI_Info_get_nkeys(info.get(), &nkeys);
-    EXPECT_NE(nkeys, 0);
+    EXPECT_EQ(nkeys, 1);
     EXPECT_FALSE(info.freeable());
 
     // non_freeable should be in the moved-from state
     EXPECT_EQ(non_freeable.get(), MPI_INFO_NULL);
 
     // -> if info would have been freed, the MPI runtime would crash
+    MPI_Info_free(&mpi_info);
 }

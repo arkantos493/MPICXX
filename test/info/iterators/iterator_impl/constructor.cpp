@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/constructor.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-02-19
  *
  * @brief Test cases for the constructors of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -43,9 +43,6 @@ TEST(InfoIteratorImplDeathTest, ConstructFromInfoObjectInvalid) {
     // create info object
     mpicxx::info moved_from;
     mpicxx::info info(std::move(moved_from));
-
-    // explicitly construct a singular iterator
-    EXPECT_DEATH( mpicxx::info::const_iterator(nullptr, 0) , "");
 
     // construct iterator from info object in the moved-from state
     EXPECT_DEATH( mpicxx::info::iterator(moved_from.get(), 0) , "");
