@@ -1,0 +1,8 @@
+/**
+ * @dir include/mpicxx/startup
+ * @author Marcel Breyer
+ * @date 2020-02-19
+ *
+ * @brief This directory contains all headers that provide functions related to the initialization or finalization of
+ * the MPI runtime system.
+ */

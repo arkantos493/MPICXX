@@ -21,6 +21,12 @@ namespace mpicxx::detail {
     template <typename T>
     concept string = std::is_constructible_v<std::string_view, T>;
 
+    template <typename T>
+    concept main_pointer = std::is_invocable_r_v<int, T>;
+
+    template <typename T>
+    concept main_args_pointer = std::is_invocable_r_v<int, T, int, char**>;
+
 }
 
 #endif // MPICXX_CONCEPTS_HPP
