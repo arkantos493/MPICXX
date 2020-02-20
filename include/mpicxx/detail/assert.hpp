@@ -137,7 +137,7 @@ namespace mpicxx::detail {
  */
 #if ASSERTION_LEVEL > 0
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...)
 #endif
@@ -157,7 +157,7 @@ namespace mpicxx::detail {
  */
 #if ASSERTION_LEVEL > 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define MPICXX_ASSERT_SANITY(cond, msg, ...)
 #endif
