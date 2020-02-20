@@ -1,0 +1,222 @@
+name: Run Tests
+
+on: [push]
+
+jobs:
+  build-gcc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache GCC
+        id: cache-gcc
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/gcc-install
+          key: cache-gcc
+      - name: Build GCC
+        if: steps.cache-gcc.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install flex
+          git clone https://github.com/gcc-mirror/gcc.git
+          cd gcc
+          ./contrib/download_prerequisites
+          cd ..
+          mkdir objdir
+          cd objdir
+          $PWD/../gcc/configure --prefix=${{ github.workspace }}/gcc-install --enable-languages=c,c++ --disable-multilib
+          make
+          make install
+      - name: Upload GCC artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: GCC
+          path: ${{ github.workspace }}/gcc-install
+
+  build-openmpi-gcc:
+    needs: build-gcc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: GCC
+          path: ${{ github.workspace }}/gcc
+      - name: Cache OpenMPI with GCC
+        id: cache-openmpi-gcc
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/openmpi-gcc
+          key: cache-openmpi-gcc
+      - name: Build OpenMPI with GCC
+        if: steps.cache-openmpi-gcc.outputs.cache-hit != 'true'
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/gcc
+          export CC=${{ github.workspace }}/gcc/bin/gcc
+          export CXX=${{ github.workspace }}/gcc/bin/g++
+          wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.gz
+          tar -xvf openmpi-4.0.2.tar.gz
+          cd openmpi-4.0.2
+          ./configure --prefix=${{ github.workspace }}/openmpi-gcc
+          make
+          make install
+      - name: Upload OpenMPI with GCC artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: OpenMPI-GCC
+          path: ${{ github.workspace }}/openmpi-gcc
+
+  build-mpich-gcc:
+    needs: build-gcc
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Download GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: GCC
+          path: ${{ github.workspace }}/gcc
+      - name: Cache MPICH with GCC
+        id: cache-mpich-gcc
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/mpich-gcc
+          key: cache-mpich-gcc
+      - name: Build MPICH with GCC
+        if: steps.cache-mpich-gcc.outputs.cache-hit != 'true'
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/gcc
+          export CC=${{ github.workspace }}/gcc/bin/gcc
+          export CXX=${{ github.workspace }}/gcc/bin/g++
+          wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz
+          tar -xvf mpich-3.3.2.tar.gz
+          mkdir ${{ github.workspace }}/mpich-gcc
+          mkdir mpich-build
+          cd mpich-build
+          ${{ github.workspace }}/mpich-3.3.2/configure --prefix=${{ github.workspace }}/mpich-gcc --disable-fortran
+          make
+          make install
+      - name: Upload MPICH with GCC artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: MPICH-GCC
+          path: ${{ github.workspace }}/mpich-gcc
+
+  build-fmt-gcc:
+    needs: build-gcc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: GCC
+          path: ${{ github.workspace }}/gcc
+      - name: Cache fmt with GCC
+        id: cache-fmt-gcc
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/fmt-gcc
+          key: cache-fmt-gcc
+      - name: Build fmt with GCC
+        if: steps.cache-fmt-master-gcc.outputs.cache-hit != 'true'
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/gcc
+          export CC=${{ github.workspace }}/gcc/bin/gcc
+          export CXX=${{ github.workspace }}/gcc/bin/g++
+          git clone https://github.com/fmtlib/fmt.git
+          cd fmt
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/fmt-gcc ..
+          make -j
+          make install
+      - name: Upload fmt with GCC artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: fmt-GCC
+          path: ${{ github.workspace }}/fmt-gcc
+
+  test-openmpi-gcc:
+    needs: [build-gcc, build-openmpi-gcc, build-fmt-gcc]
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Download GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: GCC
+          path: ${{ github.workspace }}/gcc
+      - name: Download OpenMPI with GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: OpenMPI-GCC
+          path: ${{ github.workspace }}/openmpi-gcc
+      - name: Download fmt with GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: fmt-GCC
+          path: ${{ github.workspace }}/fmt-gcc
+      - name: Checkout mpicxx
+        uses: actions/checkout@v2.0.0
+        with:
+          repository: arkantos493/MPICXX
+          path: mpicxx
+          ref: 'master'
+      - name: Build mpicxx and run tests
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/gcc
+          sudo chmod -R 777 ${{ github.workspace }}/openmpi-gcc
+          sudo chmod -R 777 ${{ github.workspace }}/fmt-gcc
+          cd mpicxx
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_CXX_COMPILER=${{ github.workspace }}/gcc/bin/g++\
+                -DCMAKE_CC_COMPILER=${{ github.workspace }}/gcc/bin/gcc \
+                -DMPI_CXX_COMPILER=${{ github.workspace }}/openmpi-gcc/bin/mpic++ \
+                -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/openmpi-gcc/bin/mpirun \
+                -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-gcc \
+                -DENABLE_TESTS=ON \
+                -DASSERTION_LEVEL=2 ..
+          make -j
+          ctest --output-on-failure
+
+  test-mpich-gcc:
+    needs: [build-gcc, build-mpich-gcc, build-fmt-gcc]
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Download GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: GCC
+          path: ${{ github.workspace }}/gcc
+      - name: Download MPICH with GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: MPICH-GCC
+          path: ${{ github.workspace }}/mpich-gcc
+      - name: Download fmt with GCC artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: fmt-GCC
+          path: ${{ github.workspace }}/fmt-gcc
+      - name: Checkout mpicxx
+        uses: actions/checkout@v2.0.0
+        with:
+          repository: arkantos493/MPICXX
+          path: mpicxx
+          ref: 'master'
+      - name: Build mpicxx and run tests
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/gcc
+          sudo chmod -R 777 ${{ github.workspace }}/mpich-gcc
+          sudo chmod -R 777 ${{ github.workspace }}/fmt-gcc
+          cd mpicxx
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_CXX_COMPILER=${{ github.workspace }}/gcc/bin/g++\
+                -DCMAKE_CC_COMPILER=${{ github.workspace }}/gcc/bin/gcc \
+                -DMPI_CXX_COMPILER=${{ github.workspace }}/mpich-gcc/bin/mpic++ \
+                -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/mpich-gcc/bin/mpirun \
+                -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-gcc \
+                -DENABLE_TESTS=ON \
+                -DASSERTION_LEVEL=2 ..
+          make -j
+          ctest --output-on-failure

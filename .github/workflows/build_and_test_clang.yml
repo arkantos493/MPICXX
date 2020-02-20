@@ -1,0 +1,218 @@
+name: Run Tests
+
+on: [push]
+
+jobs:
+  build-clang:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache clang
+        id: cache-clang
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/clang-install
+          key: cache-clang
+      - name: Build clang
+        if: steps.cache-clang.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/llvm/llvm-project.git
+          cd llvm-project
+          mkdir build
+          cd build
+          cmake -DLLVM_ENABLE_PROJECTS=clang -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/clang-install ../llvm
+          make
+          make install
+      - name: Upload clang artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: clang
+          path: ${{ github.workspace }}/clang-install
+
+  build-openmpi-clang:
+    needs: build-clang
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: clang
+          path: ${{ github.workspace }}/clang
+      - name: Cache OpenMPI with clang
+        id: cache-openmpi-clang
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/openmpi-clang
+          key: cache-openmpi-clang
+      - name: Build OpenMPI with clang
+        if: steps.cache-openmpi-clang.outputs.cache-hit != 'true'
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/clang
+          export CC=${{ github.workspace }}/clang/bin/clang
+          export CXX=${{ github.workspace }}/clang/bin/clang++
+          wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.gz
+          tar -xvf openmpi-4.0.2.tar.gz
+          cd openmpi-4.0.2
+          ./configure --prefix=${{ github.workspace }}/openmpi-clang
+          make
+          make install
+      - name: Upload OpenMPI with clang artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: OpenMPI-clang
+          path: ${{ github.workspace }}/openmpi-clang
+
+  build-mpich-clang:
+    needs: build-clang
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Download clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: clang
+          path: ${{ github.workspace }}/clang
+      - name: Cache MPICH with clang
+        id: cache-mpich-clang
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/mpich-clang
+          key: cache-mpich-clang
+      - name: Build MPICH with clang
+        if: steps.cache-mpich-clang.outputs.cache-hit != 'true'
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/clang
+          export CC=${{ github.workspace }}/clang/bin/clang
+          export CXX=${{ github.workspace }}/clang/bin/clang++
+          wget http://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz
+          tar -xvf mpich-3.3.2.tar.gz
+          mkdir ${{ github.workspace }}/mpich-clang
+          mkdir mpich-build
+          cd mpich-build
+          ${{ github.workspace }}/mpich-3.3.2/configure --prefix=${{ github.workspace }}/mpich-clang --disable-fortran
+          make
+          make install
+      - name: Upload MPICH with clang artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: MPICH-clang
+          path: ${{ github.workspace }}/mpich-clang
+
+  build-fmt-clang:
+    needs: build-clang
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: clang
+          path: ${{ github.workspace }}/clang
+      - name: Cache fmt with clang
+        id: cache-fmt-clang
+        uses: actions/cache@v1.1.2
+        with:
+          path: ${{ github.workspace }}/fmt-clang
+          key: cache-fmt-calng
+      - name: Build fmt with clang
+        if: steps.cache-fmt-master-calng.outputs.cache-hit != 'true'
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/clang
+          export CC=${{ github.workspace }}/clang/bin/clang
+          export CXX=${{ github.workspace }}/clang/bin/clang++
+          git clone https://github.com/fmtlib/fmt.git
+          cd fmt
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/fmt-clang ..
+          make -j
+          make install
+      - name: Upload fmt with clang artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: fmt-clang
+          path: ${{ github.workspace }}/fmt-clang
+
+  test-openmpi-clang:
+    needs: [build-clang, build-openmpi-clang, build-fmt-clang]
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Download clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: clang
+          path: ${{ github.workspace }}/clang
+      - name: Download OpenMPI with clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: OpenMPI-clang
+          path: ${{ github.workspace }}/openmpi-clang
+      - name: Download fmt with clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: fmt-clang
+          path: ${{ github.workspace }}/fmt-clang
+      - name: Checkout mpicxx
+        uses: actions/checkout@v2.0.0
+        with:
+          repository: arkantos493/MPICXX
+          path: mpicxx
+          ref: 'master'
+      - name: Build mpicxx and run tests
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/clang
+          sudo chmod -R 777 ${{ github.workspace }}/openmpi-clang
+          sudo chmod -R 777 ${{ github.workspace }}/fmt-clang
+          cd mpicxx
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_CXX_COMPILER=${{ github.workspace }}/clang/bin/clang++\
+                -DCMAKE_CC_COMPILER=${{ github.workspace }}/clang/bin/clang \
+                -DMPI_CXX_COMPILER=${{ github.workspace }}/openmpi-clang/bin/mpic++ \
+                -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/openmpi-clang/bin/mpirun \
+                -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-clang \
+                -DENABLE_TESTS=ON \
+                -DASSERTION_LEVEL=2 ..
+          make -j
+          ctest --output-on-failure
+
+  test-mpich-clang:
+    needs: [build-clang, build-mpich-clang, build-fmt-clang]
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Download clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: clang
+          path: ${{ github.workspace }}/clang
+      - name: Download MPICH with clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: MPICH-clang
+          path: ${{ github.workspace }}/mpich-clang
+      - name: Download fmt with clang artifact
+        uses: actions/download-artifact@v1.0.0
+        with:
+          name: fmt-clang
+          path: ${{ github.workspace }}/fmt-clang
+      - name: Checkout mpicxx
+        uses: actions/checkout@v2.0.0
+        with:
+          repository: arkantos493/MPICXX
+          path: mpicxx
+      - name: Build mpicxx and run tests
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}/clang
+          sudo chmod -R 777 ${{ github.workspace }}/mpich-clang
+          sudo chmod -R 777 ${{ github.workspace }}/fmt-clang
+          cd mpicxx
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_CXX_COMPILER=${{ github.workspace }}/clang/bin/clang++\
+                -DCMAKE_CC_COMPILER=${{ github.workspace }}/clang/bin/clang \
+                -DMPI_CXX_COMPILER=${{ github.workspace }}/mpich-clang/bin/mpic++ \
+                -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/mpich-clang/bin/mpirun \
+                -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-clang \
+                -DENABLE_TESTS=ON \
+                -DASSERTION_LEVEL=2 ..
+          make -j
+          ctest --output-on-failure
