@@ -33,7 +33,7 @@ namespace mpicxx {
      * @details It is valid to call @ref mpicxx::finalized() before @ref mpicxx::initialize() and after @ref mpicxx::finalize().
      * @return `true` if @ref mpicxx::finalize() has completed, otherwise `false`
      */
-    [[nodiscard]] inline bool finalized() {
+    [[nodiscard("Did you mean 'finalize()'?")]] inline bool finalized() {
         int flag;
         MPI_Finalized(&flag);
         return static_cast<bool>(flag);

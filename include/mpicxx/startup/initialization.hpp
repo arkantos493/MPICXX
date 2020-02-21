@@ -94,7 +94,7 @@ namespace mpicxx {
      * @details It is valid to call @ref mpicxx::initialized() before @ref mpicxx::initialize() and after @ref mpicxx::finalize().
      * @return `true` if @ref mpicxx::initialize() has completed, otherwise `false`
      */
-    [[nodiscard]] inline bool initialized() {
+    [[nodiscard("Did you mean 'initialize()'?")]] inline bool initialized() {
         int flag;
         MPI_Initialized(&flag);
         return static_cast<bool>(flag);
