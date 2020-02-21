@@ -21,7 +21,7 @@ namespace mpicxx {
      * perform all MPI calls needed to complete its involvement in MPI communications.
      *
      * Once @ref mpicxx::finalize() returns, no MPI routine (not even @ref mpicxx::initialize()) may be called, except for
-     * @ref mpicxx::version(), @ref mpicxx::library_version(), @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool
+     * @ref mpicxx::mpi_library_version(), @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool
      * function.
      */
     inline void finalize() {
