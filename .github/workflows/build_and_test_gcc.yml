@@ -1,4 +1,4 @@
-name: Run Tests
+name: Test with GCC
 
 on: [push]
 
@@ -157,7 +157,6 @@ jobs:
         with:
           repository: arkantos493/MPICXX
           path: mpicxx
-          ref: 'master'
       - name: Build mpicxx and run tests
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/gcc
@@ -201,7 +200,6 @@ jobs:
         with:
           repository: arkantos493/MPICXX
           path: mpicxx
-          ref: 'master'
       - name: Build mpicxx and run tests
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/gcc
