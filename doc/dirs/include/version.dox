@@ -1,0 +1,8 @@
+/**
+ * @dir include/mpicxx/version
+ * @author Marcel Breyer
+ * @date 2020-02-21
+ *
+ * @brief This directory contains all headers that provide constants and functions to query the current mpicxx and MPI
+ * versions.
+ */

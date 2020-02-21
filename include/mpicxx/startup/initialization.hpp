@@ -24,8 +24,8 @@ namespace mpicxx {
      * @details All MPI programs must contain exactly one call to an MPI initialization routine. Subsequent calls to any initialization
      * routines are erroneous.
      *
-     * The only MPI functions that may be invoked before the MPI initialization routines are called are @ref mpicxx::version(),
-     * @ref mpicxx::library_version(), @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool function.
+     * The only MPI functions that may be invoked before the MPI initialization routines are called are, @ref mpicxx::mpi_library_version(),
+     * @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool function.
      */
     inline void initialize() {
         MPI_Init(nullptr, nullptr);

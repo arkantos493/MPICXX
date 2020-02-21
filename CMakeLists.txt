@@ -6,9 +6,9 @@ project("mpicxx"
         DESCRIPTION "A header only C++ wrapper library for MPI"
         HOMEPAGE_URL "https://github.com/arkantos493/MPICXX")
 
-# configure config file
-set(CONFIG_IN ${CMAKE_CURRENT_SOURCE_DIR}/include/mpicxx/config.hpp.in)
-set(CONFIG_OUT ${CMAKE_CURRENT_SOURCE_DIR}/include/mpicxx/config.hpp)
+# configure version file
+set(CONFIG_IN ${CMAKE_CURRENT_SOURCE_DIR}/include/mpicxx/version/version.hpp.in)
+set(CONFIG_OUT ${CMAKE_CURRENT_SOURCE_DIR}/include/mpicxx/version/version.hpp)
 configure_file(${CONFIG_IN} ${CONFIG_OUT} @ONLY)
 
 # configure .codedocs file
@@ -130,7 +130,7 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 
 # install headers
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/mpicxx DESTINATION include
-        PATTERN "config.hpp.in" EXCLUDE)
+        PATTERN "version.hpp.in" EXCLUDE)
 #install documentation if generated
 if (GENERATE_DOCUMENTATION)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/doc/html DESTINATION share/doc)
