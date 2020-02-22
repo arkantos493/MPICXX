@@ -164,7 +164,6 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_CXX_COMPILER=${{ github.workspace }}/clang/bin/clang++\
-                -DCMAKE_CC_COMPILER=${{ github.workspace }}/clang/bin/clang \
                 -DMPI_CXX_COMPILER=${{ github.workspace }}/openmpi-clang/bin/mpic++ \
                 -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/openmpi-clang/bin/mpirun \
                 -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-clang \
@@ -207,7 +206,6 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Debug \
                 -DCMAKE_CXX_COMPILER=${{ github.workspace }}/clang/bin/clang++\
-                -DCMAKE_CC_COMPILER=${{ github.workspace }}/clang/bin/clang \
                 -DMPI_CXX_COMPILER=${{ github.workspace }}/mpich-clang/bin/mpic++ \
                 -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/mpich-clang/bin/mpirun \
                 -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-clang \
