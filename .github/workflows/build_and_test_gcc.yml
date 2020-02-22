@@ -115,7 +115,7 @@ jobs:
           path: ${{ github.workspace }}/fmt-gcc
           key: cache-fmt-gcc
       - name: Build fmt with GCC
-        if: steps.cache-fmt-master-gcc.outputs.cache-hit != 'true'
+        if: steps.cache-fmt-gcc.outputs.cache-hit != 'true'
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/gcc
           export CC=${{ github.workspace }}/gcc/bin/gcc

@@ -110,9 +110,9 @@ jobs:
         uses: actions/cache@v1.1.2
         with:
           path: ${{ github.workspace }}/fmt-clang
-          key: cache-fmt-calng
+          key: cache-fmt-clang
       - name: Build fmt with clang
-        if: steps.cache-fmt-master-calng.outputs.cache-hit != 'true'
+        if: steps.cache-fmt-clang.outputs.cache-hit != 'true'
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/clang
           export CC=${{ github.workspace }}/clang/bin/clang
