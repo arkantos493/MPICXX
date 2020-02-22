@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalization.hpp
  * @author Marcel Breyer
- * @date 2020-02-20
+ * @date 2020-02-22
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
@@ -15,7 +15,7 @@
 namespace mpicxx {
 
     /**
-     * @brief Clean up die MPI state.
+     * @brief Clean up the MPI state.
      * @details If an MPI program terminates normally (i.e., not due to a call to @ref mpicxx::abort() or an unrecoverable error) then each
      * process  must call @ref mpicxx::finalize() before it exits. Before an MPI process invokes @ref mpicxx::finalize(), the process must
      * perform all MPI calls needed to complete its involvement in MPI communications.
