@@ -24,11 +24,11 @@ std::vector<std::string_view> split(const std::string_view& version, const char 
     std::size_t last_pos = 0;
     for (std::size_t i = 0; i < version.size(); ++i) {
         if (version[i] == delim) {
-            splitted.emplace_back(version.data() + last_pos, version.data() + i);
+            splitted.emplace_back(version.data() + last_pos, i - last_pos);
             last_pos = i + 1;
         }
     }
-    splitted.emplace_back(version.data() + last_pos, version.data() + version.size());
+    splitted.emplace_back(version.data() + last_pos, version.size() - last_pos);
     return splitted;
 }
 
