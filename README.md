@@ -1,6 +1,8 @@
 # mpicxx - A header only C++ wrapper library for MPI
 
-![Run tests](https://github.com/arkantos493/MPICXX/workflows/Run%20tests/badge.svg)
+![Test with GCC](https://github.com/arkantos493/MPICXX/workflows/Test%20with%20GCC/badge.svg)
+![Test with clang](https://github.com/arkantos493/MPICXX/workflows/Test%20with%20clang/badge.svg)
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9088a6289f864f19ba5869e103925b30)](https://www.codacy.com/manual/arkantos493/MPICXX?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=arkantos493/MPICXX&amp;utm_campaign=Badge_Grade)
 [![Documentation](https://codedocs.xyz/arkantos493/MPICXX.svg)](https://codedocs.xyz/arkantos493/MPICXX/)
 
