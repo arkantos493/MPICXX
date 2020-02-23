@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-02-23
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -36,6 +36,7 @@
 
 namespace mpicxx {
     /**
+     * @nosubgrouping
      * @brief This class is a wrapper to the *MPI_Info* object providing a interface inspired by
      * [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map) and
      * [`std::map`](https://en.cppreference.com/w/cpp/container/map).
@@ -194,6 +195,7 @@ namespace mpicxx {
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
+         * @nosubgrouping
          * @brief Provides iterator and const_iterator for an info object.
          * @details The standard reverse_iterator and const_reverse_iterator are provided
          * in terms of [`std::reverse_iterator<iterator>`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator) and
@@ -265,6 +267,8 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name constructors and destructor
+            ///@{
             /**
              * @brief Default construct a new iterator.
              *
@@ -328,11 +332,14 @@ namespace mpicxx {
                                      "Attempt to create an iterator from a {} iterator{}!",
                                      other.state(), other.info_state());
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
-            //                                            assignment operator                                             //
+            //                                            assignment operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name assignment operators
+            ///@{
             /**
              * @brief Copy assignment operator. Replace the contents with a copy of the contents of @p other.
              * @param[in] rhs another iterator to use as data source
@@ -379,11 +386,14 @@ namespace mpicxx {
                 pos_ = rhs.pos_;
                 return *this;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            relational operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name relational operators
+            ///@{
             /**
              * @brief Perform the respective comparison operation on the iterator and the given @p rhs one.
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
@@ -478,11 +488,14 @@ namespace mpicxx {
 
                 return info_ == rhs.info_ && pos_ >= rhs.pos_;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
-            //                                            modifying operations                                            //
+            //                                                  modifiers                                                 //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name modifiers
+            ///@{
             /**
              * @brief Move the iterator one position forward.
              * @return modified iterator pointing to the new position
@@ -637,11 +650,14 @@ namespace mpicxx {
                 it.pos_ -= inc;
                 return it;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            distance calculation                                            //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name distance calculation
+            ///@{
             /**
              * @brief Calculate the distance between the iterator and the given @p rhs one.
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
@@ -668,11 +684,14 @@ namespace mpicxx {
 
                 return pos_ - rhs.pos_;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
-            //                                          dereferencing operations                                          //
+            //                                               dereferencing                                                //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name dereferencing
+            ///@{
             /**
              * @brief Get the [key, value]-pair at the current iterator position + @p n.
              * @details If the current iterator is a const_iterator, the returned type is a
@@ -788,6 +807,7 @@ namespace mpicxx {
 
                 return std::make_unique<value_type>(this->operator[](0));
             }
+            ///@}
 
 
         private:
@@ -982,6 +1002,8 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                        constructors and destructor                                         //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name constructors and destructor
+        ///@{
         /**
          * @brief Constructs an empty info object.
          *
@@ -1158,11 +1180,14 @@ namespace mpicxx {
                 MPI_Info_free(&info_);
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            assignment operators                                            //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name assignment operators
+        ///@{
         /**
          * @brief Copy assignment operator. Replaces the contents with a copy of the contents of @p other.
          * @details Retains @p rhs's [key, value]-pair ordering. Gracefully handles self-assignment.
@@ -1284,11 +1309,14 @@ namespace mpicxx {
             this->insert_or_assign(ilist);
             return *this;
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name iterators
+        ///@{
         /**
          * @brief Returns an @ref iterator to the first [key, value]-pair of the info object.
          * @details If the info object is empty, the returned @ref iterator will be equal to @ref end().
@@ -1478,11 +1506,14 @@ namespace mpicxx {
 
             return std::make_reverse_iterator(this->cbegin());
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  capacity                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name capacity
+        ///@{
         /**
          * @brief Checks if the info object has no [key, value]-pairs, i.e. whether `begin() == end()`.
          * @return `true` if the info object is empty, `false` otherwise
@@ -1534,11 +1565,14 @@ namespace mpicxx {
         [[nodiscard]] static constexpr size_type max_size() {
             return std::numeric_limits<difference_type>::max();
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                                  modifier                                                  //
+        //                                                  modifiers                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name modifiers
+        ///@{
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
          * @details Returns a proxy class, which is used to distinguish between read and write accesses.
@@ -2302,11 +2336,14 @@ namespace mpicxx {
                 MPI_Info_delete(source.info_, str.data());
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                   lookup                                                   //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name lookup
+        ///@{
         /**
          * @brief Returns the number of [key, value]-pairs with key equivalent to @p key.
          * @details Since info objects don't allow duplicated keys the returned value is either 0 (key not found) or 1 (key found).
@@ -2508,11 +2545,14 @@ namespace mpicxx {
                 return std::make_pair(const_iterator(info_, size), const_iterator(info_, size));
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            non-member functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name non-member functions
+        ///@{
         /**
          * @brief Compares the contents of the two info objects for equality.
          * @details Two info objects compare equal iff they have the same size and their contents compare equal.
@@ -2679,11 +2719,16 @@ namespace mpicxx {
                 MPI_Info_delete(c.info_, str.data());
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            additional functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name additional member functions
+        /// (member functions which are not related to the [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map)
+        /// or [`std::map`](https://en.cppreference.com/w/cpp/container/map) interface)
+        ///@{
         /**
          * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all keys of the info object.
          * @return all keys of the info object
@@ -2780,6 +2825,7 @@ namespace mpicxx {
          * @return `true` if *MPI_Info_free* gets called upon destruction, `false` otherwise
          */
         [[nodiscard]] bool freeable() const noexcept { return is_freeable_; }
+        ///@}
 
 
     private:
