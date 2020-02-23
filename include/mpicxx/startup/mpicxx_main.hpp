@@ -72,7 +72,7 @@ namespace mpicxx {
     /**
      * @brief Correctly setup and teardown the MPI environment while executing the code given by @p ptr.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::initialize(int& argc, char** argv)
+     * 1. call @ref mpicxx::initialize(int argc, char** argv)
      * 2. invoke the function represented by @p ptr
      * 3. call @ref mpicxx::finalize()
      *

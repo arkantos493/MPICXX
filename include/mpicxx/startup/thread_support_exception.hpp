@@ -1,10 +1,10 @@
 /**
  * @file include/mpicxx/startup/thread_support_exception.hpp
  * @author Marcel Breyer
- * @date 2020-02-20
+ * @date 2020-02-23
  *
  * @brief Contains an exception which is thrown in @ref mpicxx::initialize(const thread_support) and
- * @ref mpicxx::initialize(int&, char**, const thread_support) if the required level of thread support can't be satisfied.
+ * @ref mpicxx::initialize(int, char**, const thread_support) if the required level of thread support can't be satisfied.
  */
 
 #ifndef MPICXX_THREAD_SUPPORT_EXCEPTION_HPP
@@ -22,7 +22,7 @@ namespace mpicxx {
 
     /**
      * @brief An exception which is thrown in @ref mpicxx::initialize(const thread_support) and
-     * @ref mpicxx::initialize(int&, char**, const thread_support) if the required level of thread support can't be satisfied.
+     * @ref mpicxx::initialize(int, char**, const thread_support) if the required level of thread support can't be satisfied.
      */
     class thread_support_not_satisfied : public std::exception {
     public:
