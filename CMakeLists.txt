@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.13)
 
 project("mpicxx" 
         VERSION "0.3.1"
@@ -83,8 +83,8 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 # set general compiler flags
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using Clang or GCC
-    message(STATUS "Enabled '-Wall Wextra -pedantic' compiler flags to catch more potential errors")
-    add_compile_options(-Wall -Wextra -pedantic)
+    message(STATUS "Enabled '-Wall -Wextra -pedantic' compiler flags to catch more potential errors")
+    target_compile_options(${PROJECT_NAME} INTERFACE -Wall -Wextra -pedantic)
 endif()
 
 # set compiler linker flag for better stack traces
@@ -92,7 +92,7 @@ if (NOT (active_assertion_categories EQUAL 0))
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC
         message(STATUS "Enabled '-rdynamic' linker flag for better stack traces in assertions")
-        add_link_options(-rdynamic) # TODO: pass to consuming library
+        target_link_options(${PROJECT_NAME} INTERFACE -rdynamic)
     endif()
 endif ()
 
