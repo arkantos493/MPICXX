@@ -32,7 +32,7 @@ namespace mpicxx::version {
      * @details The value gets automatically configured with the library version specified in the main cmake file. \n
      * It has the form: "version_major.version_minor.version_patch".
      */
-    constexpr std::string_view version = "0.3.0";
+    constexpr std::string_view version = "0.3.1";
     /**
      * @brief The current major version of the mpicxx library.
      * @details The value gets automatically configured with the library major version specified in the main cmake file.
@@ -47,7 +47,7 @@ namespace mpicxx::version {
      * @brief The current patch version of the mpicxx library.
      * @details The value gets automatically configured with the library patch version specified in the main cmake file.
      */
-    constexpr int version_patch = 0;
+    constexpr int version_patch = 1;
     ///@}
 
     /// @name version details specific to the used MPI standard
@@ -72,31 +72,51 @@ namespace mpicxx::version {
 
     /// @name version details specific to the used MPI library
     ///@{
-    /**
-     * @brief The current version of the used MPI library.
-     * @details The value gets automatically set via the used MPI library.
-     * @returns a library specific version string
-     */
-    std::string mpi_library_version() {
-        char library_version[MPI_MAX_LIBRARY_VERSION_STRING];
-        int length;
-        MPI_Get_library_version(library_version, &length);
-        return std::string(library_version, length);
+    namespace detail {
+        /*
+         * @brief The current version of the used MPI library.
+         * @details The only reason this function exists is that all version constants and function can return a std::string_view.
+         * @returns a library specific version string
+         */
+        std::string get_mpi_library_version() {
+            char library_version[MPI_MAX_LIBRARY_VERSION_STRING];
+            int length;
+            MPI_Get_library_version(library_version, &length);
+            return std::string(library_version, length);
+        }
+        /*
+         * @brief The name of the used MPI library.
+         * @details
+         * @return the name of the used MPI library or `"unknown"`
+         */
+        std::string get_mpi_library_name() {
+            std::string library_version = detail::get_mpi_library_version();
+            if (library_version.find("Open MPI") != std::string::npos) {
+                return std::string("Open MPI");
+            } else if (library_version.find("MPICH") != std::string::npos) {
+                return std::string("MPICH");
+            } else {
+                return std::string("unknown");
+            }
+        }
     }
     /**
      * @brief The name of the used MPI library.
      * @details The value is one of: "Open MPI", "MPICH", or "unknown.
      * @return the name of the used MPI library
      */
-    std::string mpi_library_name() {
-        std::string library_version = mpi_library_version();
-        if (library_version.find("Open MPI") != std::string::npos) {
-            return "Open MPI";
-        } else if (library_version.find("MPICH") != std::string::npos) {
-            return "MPICH";
-        } else {
-            return "unknown";
-        }
+    std::string_view mpi_library_name() {
+        static const std::string library_name = detail::get_mpi_library_name();
+        return std::string_view(library_name);
+    }
+    /**
+     * @brief The current version of the used MPI library.
+     * @details The value gets automatically set via the used MPI library.
+     * @returns a library specific version string
+     */
+    std::string_view mpi_library_version() {
+        static const std::string library_version = detail::get_mpi_library_version();
+        return std::string_view(library_version);
     }
     ///@}
 
