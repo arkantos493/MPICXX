@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/initialization.hpp
  * @author Marcel Breyer
- * @date 2020-02-20
+ * @date 2020-02-23
  *
  * @brief Implements wrapper around the MPI initialization functions.
  */
@@ -35,7 +35,7 @@ namespace mpicxx {
      * @param argc number of command line arguments
      * @param argv command line arguments
      */
-    inline void initialize(int& argc, char** argv) {
+    inline void initialize(int argc, char** argv) {
         MPI_Init(&argc, &argv);
     }
 
@@ -67,7 +67,7 @@ namespace mpicxx {
      *
      * @throws mpicxx::thread_support_not_satisfied if the requested level of thread support can't be satisfied
      */
-    inline thread_support initialize(int& argc, char** argv, const thread_support required) {
+    inline thread_support initialize(int argc, char** argv, const thread_support required) {
         int provided_in;
         MPI_Init_thread(&argc, &argv, static_cast<int>(required), &provided_in);
 

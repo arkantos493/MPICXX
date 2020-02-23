@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/mpicxx_main.hpp
  * @author Marcel Breyer
- * @date 2020-02-22
+ * @date 2020-02-23
  *
  * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
  * *MPI_Finalize*.
@@ -111,7 +111,7 @@ namespace mpicxx {
      * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
      */
     template <detail::main_args_pointer FuncPtr>
-    int init(FuncPtr ptr, int& argc, char** argv) { // TODO 2020-02-22 21:17 marcel: argc as int or int&
+    int init(FuncPtr ptr, int argc, char** argv) {
         initialize(argc, argv);
 
         int ret = std::invoke(ptr, argc, argv);
@@ -223,7 +223,7 @@ namespace mpicxx {
      * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
      */
     template <detail::main_args_pointer FuncPtr>
-    int init(FuncPtr ptr, int& argc, char** argv, const thread_support required) {
+    int init(FuncPtr ptr, int argc, char** argv, const thread_support required) {
         int ret = -1;
         try {
             initialize(argc, argv, required);
