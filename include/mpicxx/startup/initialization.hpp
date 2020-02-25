@@ -144,6 +144,16 @@ namespace mpicxx {
         return static_cast<thread_support>(provided);
     }
 
+    /**
+     * @brief Returns `true` if this thread is the main thread, i.e. this thread that called @ref mpicxx::initialize().
+     * @return `true` if this is the main thread, otherwise `false`
+     */
+    [[nodiscard]] inline bool is_main_thread() {
+        int flag;
+        MPI_Is_thread_main(&flag);
+        return static_cast<bool>(flag);
+    }
+
 }
 
 #endif // MPICXX_INITIALIZATION_HPP
