@@ -1,7 +1,7 @@
 /**
  * @file test/startup/initialize.cpp
  * @author Marcel Breyer
- * @date 2020-02-20
+ * @date 2020-02-26
  *
  * @brief Test cases for the @ref mpicxx::initialized() function.
  * @details Testsuite: *StartupTest*
@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/initialization.hpp>
+#include <mpicxx/startup/init.hpp>
 
 
 TEST(StartupTest, IsInitialized) {

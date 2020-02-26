@@ -1,7 +1,7 @@
 /**
  * @file test/startup/finalize.cpp
  * @author Marcel Breyer
- * @date 2020-02-20
+ * @date 2020-02-26
  *
  * @brief Test cases for the @ref mpicxx::finalized() function.
  * @details Testsuite: *StartupTest*
@@ -12,7 +12,7 @@
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/finalization.hpp>
+#include <mpicxx/startup/finalize.hpp>
 
 
 TEST(StartupTest, IsFinalized) {
