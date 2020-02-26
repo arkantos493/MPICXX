@@ -29,9 +29,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * \snippet examples/startup/init_and_finalize.cpp normal version without args and thread support
+     * @snippet examples/startup/init_and_finalize.cpp normal version without args and thread support
      * is the same as:
-     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
+     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @return the result of the invocation of @p FuncPtr
@@ -53,9 +53,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * \snippet examples/startup/init_and_finalize.cpp normal version with args and without thread support
+     * @snippet examples/startup/init_and_finalize.cpp normal version with args and without thread support
      * is the same as:
-     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
+     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_args_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
@@ -80,9 +80,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * \snippet examples/startup/init_and_finalize.cpp normal version without args and with thread support
+     * @snippet examples/startup/init_and_finalize.cpp normal version without args and with thread support
      * is nearly the same as (except for the return value):
-     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
+     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @param[in] required the required level of thread support
@@ -110,9 +110,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * \snippet examples/startup/init_and_finalize.cpp normal version with args and thread support
+     * @snippet examples/startup/init_and_finalize.cpp normal version with args and thread support
      * is nearly the same as (except for the return value):
-     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
+     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
