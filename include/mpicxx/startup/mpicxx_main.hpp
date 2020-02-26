@@ -29,33 +29,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * @code{.cpp}
-     * int main() {
-     *     mpicxx::init();  // don't forget the initialization call (exactly once)!
-     *     {                      // brackets needed or mpicxx objects would get destroyed after the finalization call which is not permitted
-     *
-     *         // user code
-     *
-     *     }
-     *     mpicxx::finalize();    // don't forget the finalization call (exactly once)!
-     *     return 0;
-     * }
-     * @endcode
+     * \snippet examples/startup/init_and_finalize.cpp normal version without args and thread support
      * is the same as:
-     * @code{.cpp}
-     * int mpicxx_main() {
-     *     // no need to call a initialization function!
-     *
-     *     // user code
-     *
-     *     // no need to call a finalization function!
-     *     return 0;
-     * }
-     *
-     * int main() {
-     *     return mpicxx::main(&mpicxx_main);   // can't make any mistake related to initialization or finalization!
-     * }
-     * @endcode
+     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @return the result of the invocation of @p FuncPtr
@@ -77,33 +53,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * @code{.cpp}
-     * int main(int argc, char** argv) {
-     *     mpicxx::init(argc, argv);  // don't forget the initialization call (exactly once)!
-     *     {                                // brackets needed or mpicxx objects would get destroyed after the finalization call which is not permitted
-     *
-     *         // user code
-     *
-     *     }
-     *     mpicxx::finalize();              // don't forget the finalization call (exactly once)!
-     *     return 0;
-     * }
-     * @endcode
+     * \snippet examples/startup/init_and_finalize.cpp normal version with args and without thread support
      * is the same as:
-     * @code{.cpp}
-     * int mpicxx_main(int argc, char** argv) {
-     *     // no need to call a initialization function!
-     *
-     *     // user code
-     *
-     *     // no need to call a finalization function!
-     *     return 0;
-     * }
-     *
-     * int main(int argc, char** argv) {
-     *     return mpicxx::main(&mpicxx_main, argc, argv);   // can't make any mistake related to initialization or finalization!
-     * }
-     * @endcode
+     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_args_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
@@ -128,36 +80,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * @code{.cpp}
-     * int main() {
-     *     try {
-     *         mpicxx::init(mpicxx::thread_support::MULTIPLE);  // don't forget the initialization call (exactly once)!
-     *
-     *         // user code
-     *
-     *     } catch(const mpicxx::thread_support_not_satisfied& e) {
-     *         std::cout << e.what() << std::endl;
-     *     }
-     *     mpicxx::finalize();                                        // don't forget the finalization call even in case of an exception (exactly once)!
-     *     return 0;
-     * }
-     * @endcode
+     * \snippet examples/startup/init_and_finalize.cpp normal version without args and with thread support
      * is nearly the same as (except for the return value):
-     * @code{.cpp}
-     * int mpicxx_main() {
-     *     // no need to call a initialization function!
-     *     // no need to catch an exception; if this function gets called, the required level of thread support could be satisfied
-     *
-     *     // user code
-     *
-     *     // no need to call a finalization function!
-     *     return 0;
-     * }
-     *
-     * int main() {
-     *     return mpicxx::main(&mpicxx_main, mpicxx::thread_support::MULTIPLE);   // can't make any mistake related to initialization or finalization!
-     * }
-     * @endcode
+     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @param[in] required the required level of thread support
@@ -185,36 +110,9 @@ namespace mpicxx {
      * 3. call @ref mpicxx::finalize()
      *
      * Example:
-     * @code{.cpp}
-     * int main(int argc, char** argv) {
-     *     try {
-     *         mpicxx::init(argc, argv, mpicxx::thread_support::MULTIPLE);  // don't forget the initialization call (exactly once)!
-     *
-     *         // user code
-     *
-     *     } catch(const mpicxx::thread_support_not_satisfied& e) {
-     *         std::cout << e.what() << std::endl;
-     *     }
-     *     mpicxx::finalize();                                                    // don't forget the finalization call even in case of an exception (exactly once)!
-     *     return 0;
-     * }
-     * @endcode
+     * \snippet examples/startup/init_and_finalize.cpp normal version with args and thread support
      * is nearly the same as (except for the return value):
-     * @code{.cpp}
-     * int mpicxx_main(int argc, char** argv) {
-     *     // no need to call a initialization function!
-     *     // no need to catch an exception; if this function gets called, the required level of thread support could be satisfied
-     *
-     *     // user code
-     *
-     *     // no need to call a finalization function!
-     *     return 0;
-     * }
-     *
-     * int main(int argc, char** argv) {
-     *     return mpicxx::main(&mpicxx_main, argc, argv, mpicxx::thread_support::MULTIPLE);   // can't make any mistake related to initialization or finalization!
-     * }
-     * @endcode
+     * \snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
      * @param[in] ptr any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
