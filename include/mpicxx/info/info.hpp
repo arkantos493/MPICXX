@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-23
+ * @date 2020-02-26
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -1063,15 +1063,7 @@ namespace mpicxx {
          * @param[in] last iterator one-past the last [key, value]-pair in the range
          *
          * Example:
-         * @code{.cpp}
-         * std::vector<std::pair<const std::string, std::string>> key_value_pairs;
-         * key_value_pairs.emplace_back("key1", "value1");
-         * key_value_pairs.emplace_back("key2", "value2");
-         * key_value_pairs.emplace_back("key1", "value1_override");
-         * key_value_pairs.emplace_back("key3", "value3");
-         *
-         * mpicxx::info obj(key_value_pairs.begin(), key_value_pairs.end());
-         * @endcode
+         * @snippet examples/info/constructor.cpp constructor iterator range
          * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order): \n
          * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
          *
@@ -1104,12 +1096,7 @@ namespace mpicxx {
          * @param[in] init initializer list to initialize the [key, value]-pairs of the info object with
          *
          * Example:
-         * @code{.cpp}
-         * mpicxx::info obj = { {"key1", "value1"},
-         *                      {"key2", "value2"},
-         *                      {"key1", "value1_override"},
-         *                      {"key3", "value3"} };
-         * @endcode
+         * @snippet examples/info/constructor.cpp constructor initializer list
          * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
          * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
          *
@@ -1140,14 +1127,8 @@ namespace mpicxx {
          * @attention If @p is_freeable is set to `false`, **the user** has to ensure that the *MPI_Info* object @p other gets properly
          * freed (via a call to *MPI_Info_free*) at the end of its lifetime.
          * @attention Changing the underlying *MPI_Info* object **does not** change the value of `*this`!:
-         * @code{.cpp}
-         * MPI_Info mpi_info;
-         * MPI_Info_create(&mpi_info);
+         * @snippet examples/info/constructor.cpp constructor MPI_Info
          *
-         * mpicxx::info info (mpi_info, true);
-         *
-         * mpi_info = MPI_INFO_NULL;    // <- does not change the value of 'info'!
-         * @endcode
          *
          * @assert_sanity{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
          */
@@ -1580,22 +1561,7 @@ namespace mpicxx {
          * @return a proxy object
          *
          * Example:
-         * @code{.cpp}
-         * mpicxx::info obj = { {"key", "foo"} };
-         * try {
-         *     obj.at("key") = "bar";                   // write access
-         *     std::string str_val = obj.at("key");     // read access: returns a proxy object, which is immediately casted to a std::string
-         *     str_val = "baz";                         // changing str_val will (obviously) not change the value of obj.at("key")
-         *
-         *     // same as: obj.at("key") = "baz";
-         *     auto val = obj.at("key");                // read access: returns a proxy object
-         *     val = "baz";                             // write access: now obj.at("key") will return "baz"
-         *
-         *     obj.at("key_2") = "baz";                 // will throw
-         * } catch (const std::out_of_range& e) {
-         *     std::cerr << e.what() << std::endl;      // prints: "key_2 doesn't exist!"
-         * }
-         * @endcode
+         * @snippet examples/info/access.cpp access at
          *
          * @pre `*this` **must not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
@@ -1637,21 +1603,7 @@ namespace mpicxx {
          * @return the value associated with @p key
          *
          * Example:
-         * @code{.cpp}
-         * const mpicxx::info obj = { {"key", "foo"} };
-         * try {
-         *     obj.at("key") = "bar";                      // write access: modifying a temporary is nonsensical
-         *     std::string str_val = obj.at("key");        // read access: directly returns a std::string
-         *     str_val = "baz";                            // changing str_val will (obviously) not change the value of obj.at("key")
-         *
-         *     auto val = obj.at("key");                   // read access: directly returns a std::string
-         *     val = "baz";                                // typeof val is std::string -> changing val will not change the value of obj.at("key)"
-         *
-         *     std::string throw_val = obj.at("key_2");    // will throw
-         * } catch (const std::out_of_range& e) {
-         *     std::cerr << e.what() << std::endl;         // prints: "key_2 doesn't exist!"
-         * }
-         * @endcode
+         * @snippet examples/info/access.cpp access const at
          *
          * @pre `*this` **must not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
@@ -1702,19 +1654,7 @@ namespace mpicxx {
          * @return a proxy object
          *
          * Example:
-         * @code{.cpp}
-         * mpicxx::info obj = { {"key", "foo"} };
-         *
-         * obj["key"] = "bar";                 // write access
-         * std::string str_val = obj["key"];   // read access: returns a proxy object, which is immediately casted to a std::string
-         * str_val = "baz";                    // changing val won't alter obj["key"] !!!
-         *
-         * // same as: obj["key"] = "baz";
-         * auto val = obj["key"];              // read access: returns a proxy object
-         * val = "baz";                        // write access: now obj["key"] will return "baz"
-         *
-         * obj["key_2"] = "baz";               // inserts a new [key, value]-pair in obj
-         * @endcode
+         * @snippet examples/info/access.cpp access operator overload
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
