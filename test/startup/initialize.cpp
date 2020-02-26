@@ -9,6 +9,7 @@
  * |:---------------|:----------------------------------------------------|
  * | IsInitialized  | check that *MPI_Init()* has been called             |
  * | IsRunning      | check that the MPI environment is currently running |
+ * | IsMainThread   | check whether this thread is the main thread        |
  */
 
 #include <gtest/gtest.h>
@@ -24,4 +25,9 @@ TEST(StartupTest, IsInitialized) {
 TEST(StartupTest, IsRunning) {
     // the MPI environment should be running
     EXPECT_TRUE(mpicxx::running());
+}
+
+TEST(StartupTest, IsMainThread) {
+    // check whether this thread is the main thread -> true since only one thread is spawned
+    EXPECT_TRUE(mpicxx::is_main_thread());
 }
