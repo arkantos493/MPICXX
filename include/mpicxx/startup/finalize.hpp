@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalization.hpp
  * @author Marcel Breyer
- * @date 2020-02-25
+ * @date 2020-02-26
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
@@ -43,6 +43,16 @@ namespace mpicxx {
         MPICXX_ASSERT_PRECONDITION(!finalized(), "MPI environment already finalized!");
 
         MPI_Finalize();
+    }
+
+    // TODO 2020-02-26 17:49 marcel: change to the mpicxx equivalent
+    /**
+     * @brief Attempts to abort all tasks in the communication group of @p comm.
+     * @param error_code the returned error code (not necessarily returned from the executable)
+     * @param comm the communicator whom's tasks to abort
+     */
+    inline void abort(int error_code = -1, MPI_Comm comm = MPI_COMM_WORLD) {
+        MPI_Abort(comm, error_code);
     }
 
 }
