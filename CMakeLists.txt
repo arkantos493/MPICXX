@@ -31,13 +31,13 @@ set(ASSERTION_LEVEL 0 CACHE STRING "The active assertion level.")
 # check if assertion level is valid
 if (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
     message(FATAL_ERROR "ASSERTION_LEVEL must be an integer in the range: 0-${max_assertion_level}")
-endif (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
+endif ()
 message(STATUS "ASSERTION_LEVEL: ${ASSERTION_LEVEL}")
 
 if (ENABLE_DEATH_TESTS AND ${ASSERTION_LEVEL} LESS ${max_assertion_level})
     message(WARNING "Enabled highest assertion level because death tests are enabled.")
     set(ASSERTION_LEVEL ${max_assertion_level})
-endif (ENABLE_DEATH_TESTS AND ${ASSERTION_LEVEL} LESS ${max_assertion_level})
+endif ()
 
 
 # add custom cmake modules path
@@ -48,7 +48,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type (Debug/Release)" FORCE)
-endif (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+endif ()
 
 
 # warn if assertions are used in a Release build
@@ -98,7 +98,7 @@ if (NOT (active_assertion_categories EQUAL 0))
         # using Clang or GCC
         message(STATUS "Enabled '-rdynamic' linker flag for better stack traces in assertions")
         target_link_options(${PROJECT_NAME} INTERFACE -rdynamic)
-    endif()
+    endif ()
 endif ()
 
 # set targets to install
@@ -139,7 +139,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/mpicxx DESTINATION include
 #install documentation if generated
 if (GENERATE_DOCUMENTATION)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/doc/html DESTINATION share/doc)
-endif (GENERATE_DOCUMENTATION)
+endif ()
 
 
 # tests for interface library
@@ -150,17 +150,17 @@ if (ENABLE_TESTS)
     include(CTest)
     enable_testing()
     add_subdirectory(test)
-endif (ENABLE_TESTS)
+endif ()
 
 if (ENABLE_DEATH_TESTS)
     message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
-endif(ENABLE_DEATH_TESTS)
+endif ()
 
 
 # generate documentation if requested
 if (GENERATE_DOCUMENTATION)
     message(STATUS "Enabled documentation generation with Doxygen")
     add_subdirectory(doc)
-endif (GENERATE_DOCUMENTATION)
+endif ()
 
 
