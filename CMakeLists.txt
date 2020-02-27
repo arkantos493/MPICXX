@@ -85,7 +85,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
     # using Clang or GCC
     message(STATUS "Enabled '-Wall -Wextra -pedantic' compiler flags to catch more potential errors")
     target_compile_options(${PROJECT_NAME} INTERFACE -Wall -Wextra -pedantic)
-endif()
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(STATUS "Disabling '-Wno-gnu-zero-variadic-macro-arguments' compiler warning")
+        target_compile_options(${PROJECT_NAME} INTERFACE -Wno-gnu-zero-variadic-macro-arguments)
+    endif ()
+endif ()
 
 # set compiler linker flag for better stack traces
 if (NOT (active_assertion_categories EQUAL 0))
