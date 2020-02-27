@@ -198,7 +198,7 @@ namespace mpicxx::detail {
          * [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) is empty.
          * @return a `std::optional<int>` containing the current rank
          */
-        constexpr std::optional<int> rank() const noexcept { return rank_; };
+        constexpr std::optional<int> rank() const noexcept { return rank_; }
 
     private:
         std::string file_ = "unknown";
