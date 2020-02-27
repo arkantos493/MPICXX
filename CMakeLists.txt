@@ -82,14 +82,21 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
 # set general compiler flags
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # using Clang or GCC
-    message(STATUS "Enabled '-Wall -Wextra -pedantic' compiler flags to catch more potential errors")
-    target_compile_options(${PROJECT_NAME} INTERFACE -Wall -Wextra -pedantic)
+    # clang and GCC specific flags
+    set(WARNING_FLAGS -Wall -Wextra -Wpedantic -Wextra-semi -Wnull-dereference -Wswitch-enum)
 
+    # clang specific flags
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        message(STATUS "Disabling '-Wno-gnu-zero-variadic-macro-arguments' compiler warning")
-        target_compile_options(${PROJECT_NAME} INTERFACE -Wno-gnu-zero-variadic-macro-arguments)
+        list(APPEND WARNING_FLAGS -Wno-gnu-zero-variadic-macro-arguments)
     endif ()
+
+    # GCC specific flags
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        list(APPEND WARNING_FLAGS -Wduplicated-cond -Wduplicated-branches -Wsuggest-override)
+    endif ()
+
+    message(STATUS "Enabled '${WARNING_FLAGS}' compiler flags to catch more potential errors")
+    target_compile_options(${PROJECT_NAME} INTERFACE ${WARNING_FLAGS})
 endif ()
 
 # set compiler linker flag for better stack traces
