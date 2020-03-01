@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/init.hpp
  * @author Marcel Breyer
- * @date 2020-02-26
+ * @date 2020-03-01
  *
  * @brief Implements wrapper around the MPI initialization functions.
  */
@@ -14,8 +14,8 @@
 #include <mpi.h>
 
 #include <mpicxx/detail/assert.hpp>
+#include <mpicxx/exception/thread_support_exception.hpp>
 #include <mpicxx/startup/thread_support.hpp>
-#include <mpicxx/startup/thread_support_exception.hpp>
 
 
 namespace mpicxx {
