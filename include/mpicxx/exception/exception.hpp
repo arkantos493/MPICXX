@@ -22,7 +22,7 @@
 
 
 namespace mpicxx {
-
+    // TODO 2020-03-01 20:31 marcel: throw_with_info ?
     /**
      * @brief The base class of all exceptions in the mpicxx namespace.
      * @details The @ref mpicxx::detail::source_location class is used to provide more information in case of an exceptional case.
@@ -36,7 +36,7 @@ namespace mpicxx {
          * @brief Construct an exception, i.e. construct the exception location message.
          * @details If the location message couldn't be constructed, the respective exception gets directly catched to prevent a call to
          * [`std::terminate`](https://en.cppreference.com/w/cpp/error/terminate) during stack unwinding.
-         * @param loc the source location information
+         * @param[in] loc the source location information
          */
         exception(const detail::source_location& loc = detail::source_location::current()) : loc_(loc) {
             try {
@@ -84,7 +84,7 @@ namespace mpicxx {
          * try to prepend @p msg; if an exception is thrown, this function has no effect and only the source location message is stored
          * 2. the source location message was **not** successfully created:
          * try to store @p msg; if an exception is thrown, this function has no effect and nothing is stored
-         * @param msg the message to prepend
+         * @param[in] msg the message to prepend
          */
         void prepend_to_what_message(detail::string auto&& msg) {
             try {
@@ -108,7 +108,7 @@ namespace mpicxx {
          * try to append @p msg; if an exception is thrown, this function has no effect and only the source location message is stored
          * 2. the source location message was **not** successfully created:
          * try to store @p msg; if an exception is thrown, this function has no effect and nothing is stored
-         * @param msg the message to append
+         * @param[in] msg the message to append
          */
         void append_to_what_message(detail::string auto&& msg) {
             try {
