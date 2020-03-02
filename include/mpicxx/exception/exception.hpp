@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/exception.hpp
  * @author Marcel Breyer
- * @date 2020-03-01
+ * @date 2020-03-02
  *
  * @brief Contains the base class for all custom exception in the mpicxx namespace.
  * @details This base class is fully standard conformant, i.e. it provides a public **noexcept** copy constructor and copy assignment
@@ -22,7 +22,7 @@
 
 
 namespace mpicxx {
-    // TODO 2020-03-01 20:31 marcel: throw_with_info ?
+
     /**
      * @brief The base class of all exceptions in the mpicxx namespace.
      * @details The @ref mpicxx::detail::source_location class is used to provide more information in case of an exceptional case.
@@ -130,6 +130,11 @@ namespace mpicxx {
         std::shared_ptr<std::string> msg_;
         const detail::source_location loc_;
     };
+
+/**
+ * @brief Macro to be able to easily use @ref PRETTY_FUNC_NAME__ for a better source location message.
+ */
+#define throw_with_info(except, ...) throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__));
 
 }
 
