@@ -12,6 +12,7 @@
 #define MPICXX_EXCEPTION_HPP
 
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -37,15 +38,29 @@ namespace mpicxx {
          * @details If the location message couldn't be constructed, the respective exception gets directly catched to prevent a call to
          * [`std::terminate`](https://en.cppreference.com/w/cpp/error/terminate) during stack unwinding.
          * @param[in] loc the source location information
+         * @param[in] use_stack_trace if `true` a detailed stack trace is included in the exception message (if supported, see
+         * @ref mpicxx::detail::source_location::stack_trace(std::ostream&, const int))
          */
-        exception(const detail::source_location& loc = detail::source_location::current()) : loc_(loc) {
+        exception(const detail::source_location& loc = detail::source_location::current(), const bool use_stack_trace = true) : loc_(loc) {
             try {
-                // try to create a detailed error message containing the source location if the thrown exception
-                std::string rank = loc.rank().has_value() ? fmt::format(" on rank {}", loc.rank().value()) : "";
-                msg_ = std::make_shared<std::string>(
-                        fmt::format("Exception thrown{}:\n  in file {}\n  in function {}\n  @ line {}",
-                                rank, loc.file_name(), loc.function_name(), loc.line()));
-                // // TODO 2020-03-01 19:13 marcel: stack trace ?
+                // try to create a detailed error message containing the source location of the thrown exception
+                std::stringstream ss;
+                ss << "Exception thrown";
+                // if we are in an active MPI environment, print current rank
+                if (loc.rank().has_value()) {
+                    ss << " on rank " << loc.rank().value();
+                }
+                ss << "\n"
+                   << "  in file " << loc.file_name() << "\n"
+                   << "  in function '" << loc.function_name() << "'\n"
+                   << "  @ line " << loc.line() << "\n\n";
+
+                // write stacktrace into the string stream if requested (default = true)
+                if (use_stack_trace) {
+                    loc.stack_trace(ss);
+                }
+
+                msg_ = std::make_shared<std::string>(std::move(ss.str()));
             } catch (...) {
                 // unable to create source location message
                 msg_ = nullptr;
