@@ -57,5 +57,3 @@ TEST(ExceptionTest, ThrowExceptionWithPrettyFunctionName) {
         FAIL() << "expected mpicxx::exception";
     }
 }
-
-// TODO 2020-03-01 20:16 marcel: more tests
