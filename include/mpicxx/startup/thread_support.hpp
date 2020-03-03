@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/thread_support.hpp
  * @author Marcel Breyer
- * @date 2020-02-20
+ * @date 2020-03-03
  *
  * @brief Contains the level of thread support enum.
  * @details Additionally specializes a [*fmt*](https://github.com/fmtlib/fmt) formatter to print the actual thread support names.
@@ -23,13 +23,13 @@ namespace mpicxx {
      */
     enum thread_support {
         /** only one thread will execute */
-        SINGLE = MPI_THREAD_SINGLE,
+        single = MPI_THREAD_SINGLE,
         /** the process may be multi-threaded, but the application must ensure that only the main thread makes MPI calls */
-        FUNNELED = MPI_THREAD_FUNNELED,
+        funneled = MPI_THREAD_FUNNELED,
         /** the process may be multi-threaded, and multiple threads may make MPI calls, but only one at a time */
-        SERIALIZED = MPI_THREAD_SERIALIZED,
+        serialized = MPI_THREAD_SERIALIZED,
         /** multiple threads may call MPI, with no restrictions */
-        MULTIPLE = MPI_THREAD_MULTIPLE,
+        multiple = MPI_THREAD_MULTIPLE,
     };
 
 }
@@ -44,16 +44,16 @@ struct fmt::formatter<mpicxx::thread_support> : fmt::formatter<string_view> {
     auto format(const mpicxx::thread_support ts, FormatContext& ctx) {
         string_view name;
         switch (ts) {
-            case mpicxx::thread_support::SINGLE:
+            case mpicxx::thread_support::single:
                 name = "MPI_THREAD_SINGLE";
                 break;
-            case mpicxx::thread_support::FUNNELED:
+            case mpicxx::thread_support::funneled:
                 name = "MPI_THREAD_FUNNELED";
                 break;
-            case mpicxx::thread_support::SERIALIZED:
+            case mpicxx::thread_support::serialized:
                 name = "MPI_THREAD_SERIALIZED";
                 break;
-            case mpicxx::thread_support::MULTIPLE:
+            case mpicxx::thread_support::multiple:
                 name = "MPI_THREAD_MULTIPLE";
                 break;
         }

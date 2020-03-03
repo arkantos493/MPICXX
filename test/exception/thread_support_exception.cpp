@@ -19,11 +19,11 @@
 namespace {
 
     void function_that_throws() {
-        throw mpicxx::thread_support_not_satisfied(mpicxx::thread_support::MULTIPLE, mpicxx::thread_support::SINGLE);
+        throw mpicxx::thread_support_not_satisfied(mpicxx::thread_support::multiple, mpicxx::thread_support::single);
     }
 
     void function_that_pretty_throws() {
-        throw_with_pretty_location(mpicxx::thread_support_not_satisfied, mpicxx::thread_support::MULTIPLE, mpicxx::thread_support::SINGLE);
+        throw_with_pretty_location(mpicxx::thread_support_not_satisfied, mpicxx::thread_support::multiple, mpicxx::thread_support::single);
     }
 
 }
@@ -38,8 +38,8 @@ TEST(ExceptionTest, ThrowThreadSupportNotSatisfiedException) {
         EXPECT_STREQ(e.location().function_name().c_str(), "function_that_throws");
         ASSERT_TRUE(e.location().rank().has_value());
         EXPECT_EQ(e.location().rank().value(), 0);
-        EXPECT_EQ(e.required(), mpicxx::thread_support::MULTIPLE);
-        EXPECT_EQ(e.provided(), mpicxx::thread_support::SINGLE);
+        EXPECT_EQ(e.required(), mpicxx::thread_support::multiple);
+        EXPECT_EQ(e.provided(), mpicxx::thread_support::single);
     } catch (...) {
         FAIL() << "expected mpicxx::thread_support_not_satisfied exception";
     }
@@ -55,8 +55,8 @@ TEST(ExceptionTest, ThrowThreadSupportNotSatisfiedExceptionWithPrettyFunctionNam
         EXPECT_STREQ(e.location().function_name().c_str(), "void {anonymous}::function_that_pretty_throws()");
         ASSERT_TRUE(e.location().rank().has_value());
         EXPECT_EQ(e.location().rank().value(), 0);
-        EXPECT_EQ(e.required(), mpicxx::thread_support::MULTIPLE);
-        EXPECT_EQ(e.provided(), mpicxx::thread_support::SINGLE);
+        EXPECT_EQ(e.required(), mpicxx::thread_support::multiple);
+        EXPECT_EQ(e.provided(), mpicxx::thread_support::single);
     } catch (...) {
         FAIL() << "expected mpicxx::thread_support_not_satisfied exception";
     }
