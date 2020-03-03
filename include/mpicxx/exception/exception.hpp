@@ -149,7 +149,8 @@ namespace mpicxx {
 /**
  * @brief Macro to be able to easily use @ref PRETTY_FUNC_NAME__ for a better source location message.
  */
-#define throw_with_info(except, ...) throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__));
+#define throw_with_pretty_location(except, ...) \
+    throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__));
 
 }
 

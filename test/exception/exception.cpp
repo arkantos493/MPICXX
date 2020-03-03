@@ -23,7 +23,7 @@ namespace {
     }
 
     void function_that_pretty_throws() {
-        throw_with_info(mpicxx::exception);
+        throw_with_pretty_location(mpicxx::exception);
     }
 
 }
