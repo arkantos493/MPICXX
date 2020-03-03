@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/thread_support_exception.hpp
  * @author Marcel Breyer
- * @date 2020-03-01
+ * @date 2020-03-03
  *
  * @brief Contains an exception which is thrown in @ref mpicxx::init(const thread_support) and
  * @ref mpicxx::init(int, char**, const thread_support) if the required level of thread support can't be satisfied.
@@ -9,8 +9,6 @@
 
 #ifndef MPICXX_THREAD_SUPPORT_EXCEPTION_HPP
 #define MPICXX_THREAD_SUPPORT_EXCEPTION_HPP
-
-#include <string>
 
 #include <fmt/format.h>
 
@@ -20,7 +18,7 @@
 
 
 namespace mpicxx {
-    // TODO 2020-03-01 20:31 marcel: test cases
+
     /**
      * @brief An exception which is thrown in @ref mpicxx::init(const thread_support) and
      * @ref mpicxx::init(int, char**, const thread_support) if the required level of thread support can't be satisfied.
