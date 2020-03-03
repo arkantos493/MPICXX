@@ -84,6 +84,10 @@ namespace mpicxx {
      *
      * The only MPI functions that may be invoked before the MPI initialization routines are called are, @ref mpicxx::mpi_library_version(),
      * @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool function.
+     *
+     * A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a higher level
+     * of thread support. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*)
+     * an implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
      * @param required the required level of thread support
      * @return the provided level of thread support
      *
@@ -111,6 +115,10 @@ namespace mpicxx {
      *
      * The only MPI functions that may be invoked before the MPI initialization routines are called are, @ref mpicxx::mpi_library_version(),
      * @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool function.
+     *
+     * A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a higher level
+     * of thread support. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*)
+     * an implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
      * @param argc number of command line arguments
      * @param argv command line arguments
      * @param required the requested level of thread support
@@ -135,7 +143,10 @@ namespace mpicxx {
     }
 
     /**
-     * @brief Query the proved level of thread support.
+     * @brief Query the provided level of thread support.
+     * @details Note that the provided level of thread support must **not** be equal to the requested level of thread support but could be
+     * higher. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*) an
+     * implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
      * @return the provided level of thread support
      */
     [[nodiscard]] inline thread_support provided_thread_support() {
