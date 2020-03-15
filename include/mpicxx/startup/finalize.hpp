@@ -14,6 +14,7 @@
 #include <mpicxx/detail/assert.hpp>
 
 
+// TODO 2020-03-15 18:36 marcel: CALLS docu
 namespace mpicxx {
 
     /**
@@ -86,8 +87,12 @@ namespace mpicxx {
      * At most `32` callback functions can be registered.
      * @param func pointer to a function to be called on normal MPI finalization
      * @return `0` if the registration succeeded, `1` otherwise
+     *
+     * @assert_precondition{ If @p func is the `nullptr`. }
      */
     int atfinalize(detail::atfinalize_callback_t func) {
+        MPICXX_ASSERT_PRECONDITION(func != nullptr, "The callback function cannot be nullptr!");
+
         int comm_keyval;
 
         // return if the number of registered callbacks exceeds the limit
