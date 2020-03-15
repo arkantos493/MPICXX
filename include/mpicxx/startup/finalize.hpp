@@ -55,6 +55,55 @@ namespace mpicxx {
         MPI_Abort(comm, error_code);
     }
 
+    namespace detail {
+        // maximum number of handler functions
+        constexpr std::size_t max_number_of_atfinalize_callbacks = 32;
+        // callback functions type
+        using atfinalize_callback_t = void (*)(void);
+        // registered callback functions
+        std::array<atfinalize_callback_t, max_number_of_atfinalize_callbacks> atfinalize_lookup_callbacks;
+        // number of registered callback functions
+        std::size_t atfinalize_idx = 0;
+
+        /*
+         * @brief Calls a specific callback function (previously registered).
+         * @param comm not used
+         * @param comm_key_val not used
+         * @param attribute_val not used
+         * @param extra_state not used
+         * @return always `0`
+         */
+        int atfinalize_delete_fn([[maybe_unused]] MPI_Comm comm, [[maybe_unused]] int comm_key_val,
+                [[maybe_unused]] void* attribute_val, [[maybe_unused]] void* extra_state) {
+            // invoke handler function
+            std::invoke(atfinalize_lookup_callbacks[--atfinalize_idx]);
+            return 0;
+        }
+    }
+    /**
+     * @brief Registers the callback function @p func to be called directly before *MPI_Finalize*.
+     * @details Calls all registered functions in reversed order in which they were set. This occurs before before any other parts of MPI
+     * are affected, i.e. @ref mpicxx::finalized() will return `false` in any of these handler callback functions.
+     *
+     * At most `32` callback functions can be registered.
+     * @param func pointer to a function to be called on normal MPI finalization
+     * @return `0` if the registration succeeded, `1` otherwise
+     */
+    int atfinalize(detail::atfinalize_callback_t func) {
+        int comm_keyval;
+
+        // return if the number of registered callbacks exceeds the limit
+        if (detail::atfinalize_idx >= detail::max_number_of_atfinalize_callbacks) return 1;
+
+        // register function
+        detail::atfinalize_lookup_callbacks[detail::atfinalize_idx] = func;
+        MPI_Comm_create_keyval(MPI_COMM_NULL_COPY_FN, &detail::atfinalize_delete_fn, &comm_keyval, nullptr);
+        MPI_Comm_set_attr(MPI_COMM_SELF, comm_keyval, nullptr);
+        ++detail::atfinalize_idx;
+
+        return 0;
+    }
+
 }
 
 #endif // MPICXX_FINALIZATION_HPP
