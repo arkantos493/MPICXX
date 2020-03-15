@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalize.hpp
  * @author Marcel Breyer
- * @date 2020-02-26
+ * @date 2020-03-15
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
