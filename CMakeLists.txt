@@ -24,6 +24,14 @@ cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not supp
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
 
 
+# set maximum possible number of atfinalize callback functions
+set(MAX_NUMBER_OF_ATFINALIZE_CALLBACKS 32 CACHE STRING "The maximum possible number of atfinalize callback functions.")
+if (NOT (${MAX_NUMBER_OF_ATFINALIZE_CALLBACKS} MATCHES "^[0-9]+$"))
+    message(FATAL_ERROR "MAX_NUMBER_OF_ATFINALIZE_CALLBACKS must be a positive integer")
+endif ()
+message(STATUS "MAX_NUMBER_OF_ATFINALIZE_CALLBACKS: ${MAX_NUMBER_OF_ATFINALIZE_CALLBACKS}")
+
+
 # set assertion level
 set(max_assertion_level 2)
 set(ASSERTION_LEVEL 0 CACHE STRING "The active assertion level.")
@@ -61,6 +69,7 @@ endif ()
 # create header-only (interface) library
 add_library(${PROJECT_NAME} INTERFACE)
 target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_LEVEL=${ASSERTION_LEVEL})
+target_compile_definitions(${PROJECT_NAME} INTERFACE MAX_NUMBER_OF_ATFINALIZE_CALLBACKS=${MAX_NUMBER_OF_ATFINALIZE_CALLBACKS})
 
 # find MPI and add it to the library target
 find_package(MPI REQUIRED)

@@ -56,12 +56,10 @@ namespace mpicxx {
     }
 
     namespace detail {
-        // maximum number of handler functions
-        constexpr std::size_t max_number_of_atfinalize_callbacks = 32;
         // callback functions type
         using atfinalize_callback_t = void (*)(void);
         // registered callback functions
-        std::array<atfinalize_callback_t, max_number_of_atfinalize_callbacks> atfinalize_lookup_callbacks;
+        std::array<atfinalize_callback_t, MAX_NUMBER_OF_ATFINALIZE_CALLBACKS> atfinalize_lookup_callbacks;
         // number of registered callback functions
         std::size_t atfinalize_idx = 0;
 
@@ -93,7 +91,7 @@ namespace mpicxx {
         int comm_keyval;
 
         // return if the number of registered callbacks exceeds the limit
-        if (detail::atfinalize_idx >= detail::max_number_of_atfinalize_callbacks) return 1;
+        if (detail::atfinalize_idx >= MAX_NUMBER_OF_ATFINALIZE_CALLBACKS) return 1;
 
         // register function
         detail::atfinalize_lookup_callbacks[detail::atfinalize_idx] = func;
