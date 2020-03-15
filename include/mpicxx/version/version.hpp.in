@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-02-21
+ * @date 2020-03-15
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -12,10 +12,7 @@
 #include <string_view>
 
 #include <mpi.h>
-
-
-#define STRINGIFY_STR(X) #X
-#define STRINGIFY(X) STRINGIFY_STR(X)
+#include <fmt/format.h>
 
 
 namespace mpicxx::version {
@@ -52,22 +49,44 @@ namespace mpicxx::version {
 
     /// @name version details specific to the used MPI standard
     ///@{
+    namespace detail {
+        /*
+         * @brief The current version of the used MPI standard.
+         * @details The only reason this function exists is that all version constants and function can return a std::string_view.
+         * @returns a pair containing the major and minor MPI standard version
+         */
+        std::pair<int, int> get_mpi_version() {
+            int version, subversion;
+            MPI_Get_version(&version, &subversion);
+            return std::make_pair(version, subversion);
+        }
+    }
     /**
      * @brief The current version of the used MPI standard.
      * @details The value gets automatically set via the used MPI library. \n
      * It has the form: "mpi_version_major.mpi_version_minor".
      */
-    constexpr std::string_view mpi_version = STRINGIFY(MPI_VERSION) "." STRINGIFY(MPI_SUBVERSION);
+     std::string_view mpi_version() {
+         // TODO 2020-03-15 15:37 marcel: change from fmt::format to std::format
+         static const std::string version = fmt::format("{}.{}", detail::get_mpi_version().first, detail::get_mpi_version().second);
+         return std::string_view(version);
+     }
     /**
      * @brief The current major version of the used MPI standard.
      * @details The value gets automatically set via the used MPI library.
      */
-    constexpr int mpi_version_major = MPI_VERSION;
+     int mpi_version_major() {
+         static const int version_major = detail::get_mpi_version().first;
+         return version_major;
+     }
     /**
-     * @brief The current minor version of the used MPI standard.
+     * @brief The current minor version (subversion) of the used MPI standard.
      * @details The value gets automatically set via the used MPI library.
      */
-    constexpr int mpi_version_minor = MPI_SUBVERSION;
+     int mpi_version_minor() {
+         static const int version_minor = detail::get_mpi_version().second;
+         return version_minor;
+     }
     ///@}
 
     /// @name version details specific to the used MPI library

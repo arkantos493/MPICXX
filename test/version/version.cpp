@@ -1,7 +1,7 @@
 /**
  * @file test/version/version.cpp
  * @author Marcel Breyer
- * @date 2020-02-21
+ * @date 2020-03-15
  *
  * @brief Test cases for the version constants and function.
  * @details Testsuite: *VersionTest*
@@ -19,7 +19,7 @@
 #include <vector>
 
 
-std::vector<std::string_view> split(const std::string_view& version, const char delim = '.') {
+std::vector<std::string_view> split(const std::string_view version, const char delim = '.') {
     std::vector<std::string_view> splitted;
     std::size_t last_pos = 0;
     for (std::size_t i = 0; i < version.size(); ++i) {
@@ -59,10 +59,10 @@ TEST(VersionTest, MPICXXVersion) {
 
 TEST(VersionTest, MPIVersion) {
     // split version number
-    std::vector<std::string_view> version_splitted = split(mpicxx::version::mpi_version);
+    std::vector<std::string_view> version_splitted = split(mpicxx::version::mpi_version());
 
     // correct splitted version numbers
-    std::vector<int> version_splitted_int = { mpicxx::version::mpi_version_major, mpicxx::version::mpi_version_minor };
+    std::vector<int> version_splitted_int = { mpicxx::version::mpi_version_major(), mpicxx::version::mpi_version_minor() };
 
     ASSERT_EQ(version_splitted.size(), version_splitted_int.size());
     for (std::size_t i = 0; i < version_splitted.size(); ++i) {
