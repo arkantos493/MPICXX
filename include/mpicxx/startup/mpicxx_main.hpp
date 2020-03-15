@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/mpicxx_main.hpp
  * @author Marcel Breyer
- * @date 2020-03-03
+ * @date 2020-03-15
  *
  * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
  * *MPI_Finalize*.
@@ -38,7 +38,8 @@ namespace mpicxx {
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
      */
-    template <detail::main_pointer FuncPtr, typename... Args>
+    template <typename FuncPtr, typename... Args>
+    requires detail::main_pointer<FuncPtr, Args...>
     int main(FuncPtr func, Args&&... args) {
         init();
 
@@ -66,7 +67,8 @@ namespace mpicxx {
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
      */
-    template <detail::main_args_pointer FuncPtr, typename... Args>
+    template <typename FuncPtr, typename... Args>
+    requires detail::main_args_pointer<FuncPtr, Args...>
     int main(FuncPtr func, int argc, char** argv, Args&&... args) {
         init(argc, argv);
 
@@ -75,6 +77,7 @@ namespace mpicxx {
         finalize();
         return ret;
     }
+
     /**
      * @brief Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by
      * @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
@@ -94,7 +97,8 @@ namespace mpicxx {
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
      */
-    template <detail::main_pointer FuncPtr, typename... Args>
+    template <typename FuncPtr, typename... Args>
+    requires detail::main_pointer<FuncPtr, Args...>
     int main(FuncPtr func, const thread_support required, Args&&... args) {
         int ret = -1;
         try {
@@ -128,7 +132,8 @@ namespace mpicxx {
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
      */
-    template <detail::main_args_pointer FuncPtr, typename... Args>
+    template <typename FuncPtr, typename... Args>
+    requires detail::main_args_pointer<FuncPtr, Args...>
     int main(FuncPtr func, int argc, char** argv, const thread_support required, Args&&... args) {
         int ret = -1;
         try {
