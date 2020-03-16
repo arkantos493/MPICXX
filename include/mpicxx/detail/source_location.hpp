@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-03-16
  *
  * @brief Provides a `source_location` class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
@@ -60,6 +60,12 @@ namespace mpicxx::detail {
          * @return the source_location holding the call side location information
          *
          * @attention @p column is always (independent of the call side position) default initialized to 0!
+         *
+         * @calls{
+         * int MPI_Initialized(int *flag);                  // exactly once
+         * int MPI_Finalized(int *flag);                    // exactly once
+         * int MPI_Comm_rank(MPI_Comm comm, int *rank);     // at most once
+         * }
          */
         static source_location current(
                 const std::string_view func = __builtin_FUNCTION(),
