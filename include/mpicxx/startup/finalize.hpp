@@ -95,7 +95,8 @@ namespace mpicxx {
      * @details Calls all registered functions in reversed order in which they were set. This occurs before before any other parts of MPI
      * are affected, i.e. @ref mpicxx::finalized() will return `false` in any of these handler callback functions.
      *
-     * At most `32` callback functions can be registered.
+     * The maximum number of callback functions, that can be registered, can be set via the compiler flag
+     * `MAX_NUMBER_OF_ATFINALIZE_CALLBACKS` (default: `32`).
      * @param[in] func pointer to a function to be called on normal MPI finalization
      * @return `0` if the registration succeeded, `1` otherwise
      *
