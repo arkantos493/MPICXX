@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalize.hpp
  * @author Marcel Breyer
- * @date 2020-03-15
+ * @date 2020-03-16
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
@@ -14,13 +14,16 @@
 #include <mpicxx/detail/assert.hpp>
 
 
-// TODO 2020-03-15 18:36 marcel: CALLS docu
 namespace mpicxx {
 
     /**
      * @brief Checks whether @ref mpicxx::finalize() has completed.
      * @details It is valid to call @ref mpicxx::finalized() before @ref mpicxx::init() and after @ref mpicxx::finalize().
      * @return `true` if @ref mpicxx::finalize() has completed, otherwise `false`
+     *
+     * @calls{
+     * int MPI_Finalized(int *flag);    // exactly once
+     * }
      */
     [[nodiscard("Did you mean 'finalize()'?")]] inline bool finalized() {
         int flag;
@@ -39,6 +42,10 @@ namespace mpicxx {
      * function.
      *
      * @assert_precondition{ If the MPI environment has already been finalized. }
+     *
+     * @calls{
+     * int MPI_Finalize(void);      // exactly once
+     * }
      */
     inline void finalize() {
         MPICXX_ASSERT_PRECONDITION(!finalized(), "MPI environment already finalized!");
@@ -49,8 +56,12 @@ namespace mpicxx {
     // TODO 2020-02-26 17:49 marcel: change to the mpicxx equivalent
     /**
      * @brief Attempts to abort all tasks in the communication group of @p comm.
-     * @param error_code the returned error code (not necessarily returned from the executable)
-     * @param comm the communicator whom's tasks to abort
+     * @param[in] error_code the returned error code (not necessarily returned from the executable)
+     * @param[in] comm the communicator whom's tasks to abort
+     *
+     * @calls{
+     * int MPI_Abort(MPI_Comm comm, int errorcode);      // exactly once
+     * }
      */
     inline void abort(int error_code = -1, MPI_Comm comm = MPI_COMM_WORLD) {
         MPI_Abort(comm, error_code);
@@ -66,10 +77,10 @@ namespace mpicxx {
 
         /*
          * @brief Calls a specific callback function (previously registered).
-         * @param comm not used
-         * @param comm_key_val not used
-         * @param attribute_val not used
-         * @param extra_state not used
+         * @param[in] comm not used
+         * @param[in] comm_key_val not used
+         * @param[in] attribute_val not used
+         * @param[in] extra_state not used
          * @return always `0`
          */
         int atfinalize_delete_fn([[maybe_unused]] MPI_Comm comm, [[maybe_unused]] int comm_key_val,
@@ -85,10 +96,15 @@ namespace mpicxx {
      * are affected, i.e. @ref mpicxx::finalized() will return `false` in any of these handler callback functions.
      *
      * At most `32` callback functions can be registered.
-     * @param func pointer to a function to be called on normal MPI finalization
+     * @param[in] func pointer to a function to be called on normal MPI finalization
      * @return `0` if the registration succeeded, `1` otherwise
      *
      * @assert_precondition{ If @p func is the `nullptr`. }
+     *
+     * @calls{
+     * int MPI_Comm_create_keyval(MPI_Comm_copy_attr_function *comm_copy_attr_fn, MPI_Comm_delete_attr_function *comm_delete_attr_fn, int *comm_keyval, void *extra_state);     // exactly once
+     * int MPI_Comm_set_attr(MPI_Comm comm, int comm_keyval, void *attribute_val);                                                                                              // exactly once
+     * }
      */
     int atfinalize(detail::atfinalize_callback_t func) {
         MPICXX_ASSERT_PRECONDITION(func != nullptr, "The callback function cannot be nullptr!");
