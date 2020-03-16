@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-03-16
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into three levels:
@@ -75,6 +75,10 @@ namespace mpicxx::detail {
      * @param loc the location where the assertion appeared
      * @param msg the custom message printed after the assertion location
      * @param args the arguments used to fill the ``printf`` like placeholders in the custom message
+     *
+     * @calls{
+     * int MPI_Abort(MPI_Comm comm, int errorcode);     // at most once
+     * }
      */
     template <typename... Args>
     inline void check(const bool cond, const char* cond_str, const char* assertion_category, const source_location& loc,
