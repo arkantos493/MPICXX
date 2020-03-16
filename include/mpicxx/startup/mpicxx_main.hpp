@@ -56,7 +56,7 @@ namespace mpicxx {
     /**
      * @brief Correctly setup and teardown the MPI environment while executing the code given by @p func.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::init(int argc, char** argv)
+     * 1. call @ref mpicxx::init(int& argc, char** argv)
      * 2. invoke the function represented by @p func (forwarding all additional parameters)
      * 3. call @ref mpicxx::finalize()
      *
@@ -79,7 +79,7 @@ namespace mpicxx {
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
-    int main(FuncPtr func, int argc, char** argv, Args&&... args) {
+    int main(FuncPtr func, int& argc, char** argv, Args&&... args) {
         init(argc, argv);
 
         int ret = std::invoke(func, argc, argv, std::forward<Args>(args)...);
@@ -130,7 +130,7 @@ namespace mpicxx {
      * @brief Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by
      * @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::init(const thread_support)
+     * 1. call @ref mpicxx::init(int& argc, char** argv, const thread_support)
      * 2. invoke the function represented by @p func (forwarding all additional parameters)
      * 3. call @ref mpicxx::finalize()
      *
@@ -154,7 +154,7 @@ namespace mpicxx {
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
-    int main(FuncPtr func, int argc, char** argv, const thread_support required, Args&&... args) {
+    int main(FuncPtr func, int& argc, char** argv, const thread_support required, Args&&... args) {
         int ret = -1;
         try {
             init(argc, argv, required);

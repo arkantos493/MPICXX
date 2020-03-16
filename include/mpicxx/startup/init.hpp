@@ -79,8 +79,8 @@ namespace mpicxx {
      *
      * The only MPI functions that may be invoked before the MPI initialization routines are called are, @ref mpicxx::mpi_library_version(),
      * @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool function.
-     * @param argc number of command line arguments
-     * @param argv command line arguments
+     * @param[inout] argc number of command line arguments
+     * @param[inout] argv command line arguments
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
@@ -88,7 +88,7 @@ namespace mpicxx {
      * int MPI_Init(int *argc, char ***argv);       // exactly once
      * }
      */
-    inline void init(int argc, char** argv) {
+    inline void init(int& argc, char** argv) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
 
         MPI_Init(&argc, &argv);
@@ -140,9 +140,9 @@ namespace mpicxx {
      * A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a higher level
      * of thread support. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*)
      * an implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
-     * @param argc number of command line arguments
-     * @param argv command line arguments
-     * @param required the requested level of thread support
+     * @param[inout] argc number of command line arguments
+     * @param[inout] argv command line arguments
+     * @param[in] required the requested level of thread support
      * @return the provided level of thread support
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
@@ -153,7 +153,7 @@ namespace mpicxx {
      * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
      * }
      */
-    inline thread_support init(int argc, char** argv, const thread_support required) {
+    inline thread_support init(int& argc, char** argv, const thread_support required) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
 
         int provided_in;
