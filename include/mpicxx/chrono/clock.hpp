@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/chrono/clock.hpp
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-03-16
  *
  * @brief Implements a wrapper class around the MPI timer functions.
  * @details These functions include *MPI_Wtime*, *MPI_Wtick* and the attribute *MPI_WTIME_IS_GLOBAL*.
@@ -43,6 +43,10 @@ namespace mpicxx {
         /**
          * @brief Returns a floating-point number of seconds, representing elapsed wall-clock time since some time in the past.
          * @return the elapsed wall-clock time
+         *
+         * @calls{
+         * MPI_Wtime();      // exactly once
+         * }
          */
         [[nodiscard]] static time_point now() noexcept {
             return time_point(duration(MPI_Wtime()));
@@ -52,6 +56,10 @@ namespace mpicxx {
          * @brief Returns the resolution of @ref mpicxx::clock::now() in seconds.
          * @details Example: if the clock is incremented every millisecond, this function would return \f$10^{-3}\f$.
          * @return a double precision value (the number of seconds between successive clock ticks)
+         *
+         * @calls{
+         * double MPI_Wtick();      // exactly once
+         * }
          */
         [[nodiscard]] static double resolution() noexcept {
             return MPI_Wtick();
@@ -65,6 +73,10 @@ namespace mpicxx {
          * *MPI_Comm_get_attr* is used, which is always valid.
          * @param comm the communicator for which the synchronization should be checked
          * @return boolean variable that indicates whether clocks are synchronized
+         *
+         * @calls{
+         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);      // exactly once
+         * }
          */
         [[nodiscard]] static bool synchronized(MPI_Comm comm = MPI_COMM_WORLD) {
             void* ptr;
