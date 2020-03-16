@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/init.hpp
  * @author Marcel Breyer
- * @date 2020-03-01
+ * @date 2020-03-16
  *
  * @brief Implements wrapper around the MPI initialization functions.
  */
@@ -24,6 +24,10 @@ namespace mpicxx {
      * @brief Checks whether @ref mpicxx::init() has completed.
      * @details It is valid to call @ref mpicxx::initialized() before @ref mpicxx::init() and after @ref mpicxx::finalize().
      * @return `true` if @ref mpicxx::init() has completed, otherwise `false`
+     *
+     * @calls{
+     * int MPI_Initialized(int *flag);    // exactly once
+     * }
      */
     [[nodiscard("Did you mean 'init()'?")]] inline bool initialized() {
         int flag;
@@ -36,6 +40,11 @@ namespace mpicxx {
      * @ref mpicxx::finalized() returns `false`.
      * @details It is valid to call any mpicxx function while this function returns `true`.
      * @return `true` if currently the MPI environment is active, otherwise `false`
+     *
+     * @calls{
+     * int MPI_Initialized(int *flag);    // exactly once
+     * int MPI_Finalized(int *flag);      // exactly once
+     * }
      */
     [[nodiscard]] inline bool running() {
         int flag_init, flag_final;
@@ -53,6 +62,10 @@ namespace mpicxx {
      * @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool function.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
+     *
+     * @calls{
+     * int MPI_Init(int *argc, char ***argv);       // exactly once
+     * }
      */
     inline void init() {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -70,6 +83,10 @@ namespace mpicxx {
      * @param argv command line arguments
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
+     *
+     * @calls{
+     * int MPI_Init(int *argc, char ***argv);       // exactly once
+     * }
      */
     inline void init(int argc, char** argv) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -88,12 +105,16 @@ namespace mpicxx {
      * A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a higher level
      * of thread support. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*)
      * an implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
-     * @param required the required level of thread support
+     * @param[in] required the required level of thread support
      * @return the provided level of thread support
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
      * @throws mpicxx::thread_support_not_satisfied if the requested level of thread support can't be satisfied
+     *
+     * @calls{
+     * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
+     * }
      */
     inline thread_support init(const thread_support required) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -127,6 +148,10 @@ namespace mpicxx {
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
      * @throws mpicxx::thread_support_not_satisfied if the requested level of thread support can't be satisfied
+     *
+     * @calls{
+     * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
+     * }
      */
     inline thread_support init(int argc, char** argv, const thread_support required) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -148,6 +173,10 @@ namespace mpicxx {
      * higher. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*) an
      * implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
      * @return the provided level of thread support
+     *
+     * @calls{
+     * int MPI_Query_thread(int *provided);     // exactly once
+     * }
      */
     [[nodiscard]] inline thread_support provided_thread_support() {
         int provided;
@@ -158,6 +187,10 @@ namespace mpicxx {
     /**
      * @brief Returns `true` if this thread is the main thread, i.e. this thread that called @ref mpicxx::init().
      * @return `true` if this is the main thread, otherwise `false`
+     *
+     * @calls{
+     * int MPI_Is_thread_main(int *flag);       // exactly once
+     * }
      */
     [[nodiscard]] inline bool is_main_thread() {
         int flag;

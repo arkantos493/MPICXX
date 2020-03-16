@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/mpicxx_main.hpp
  * @author Marcel Breyer
- * @date 2020-03-15
+ * @date 2020-03-16
  *
  * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
  * *MPI_Finalize*.
@@ -37,6 +37,11 @@ namespace mpicxx {
      * @param[in] func any callable holding the main code of the application
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
+     *
+     * @calls{
+     * int MPI_Init(int *argc, char ***argv);       // exactly once
+     * int MPI_Finalize();                          // exactly once
+     * }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_pointer<FuncPtr, Args...>
@@ -66,6 +71,11 @@ namespace mpicxx {
      * @param[inout] argv the command line parameters
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
+     *
+     * @calls{
+     * int MPI_Init(int *argc, char ***argv);       // exactly once
+     * int MPI_Finalize();                          // exactly once
+     * }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
@@ -96,6 +106,11 @@ namespace mpicxx {
      * @param[in] required the required level of thread support
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
+     *
+     * @calls{
+     * int MPI_Init(int *argc, char ***argv);       // exactly once
+     * int MPI_Finalize();                          // exactly once
+     * }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_pointer<FuncPtr, Args...>
@@ -131,6 +146,11 @@ namespace mpicxx {
      * @param[in] required the required level of thread support
      * @param[in] args the additional arguments forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
+     *
+     * @calls{
+     * int MPI_Init(int *argc, char ***argv);       // exactly once
+     * int MPI_Finalize();                          // exactly once
+     * }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
