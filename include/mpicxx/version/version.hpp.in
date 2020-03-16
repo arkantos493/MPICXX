@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-03-15
+ * @date 2020-03-16
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -53,7 +53,11 @@ namespace mpicxx::version {
         /*
          * @brief The current version of the used MPI standard.
          * @details The only reason this function exists is that all version constants and function can return a std::string_view.
-         * @returns a pair containing the major and minor MPI standard version
+         * @return a pair containing the major and minor MPI standard version
+         *
+         * @calls{
+         * int MPI_Get_version(int *version, int *subversion);      // exactly once
+         * }
          */
         std::pair<int, int> get_mpi_version() {
             int version, subversion;
@@ -65,6 +69,11 @@ namespace mpicxx::version {
      * @brief The current version of the used MPI standard.
      * @details The value gets automatically set via the used MPI library. \n
      * It has the form: "mpi_version_major.mpi_version_minor".
+     * @return the MPI standard version
+     *
+     * @calls{
+     * int MPI_Get_version(int *version, int *subversion);      // exactly twice (through all function calls)
+     * }
      */
      std::string_view mpi_version() {
          // TODO 2020-03-15 15:37 marcel: change from fmt::format to std::format
@@ -74,18 +83,26 @@ namespace mpicxx::version {
     /**
      * @brief The current major version of the used MPI standard.
      * @details The value gets automatically set via the used MPI library.
+     * @return the MPI standard version
+     *
+     * @calls{
+     * int MPI_Get_version(int *version, int *subversion);      // exactly once
+     * }
      */
      int mpi_version_major() {
-         static const int version_major = detail::get_mpi_version().first;
-         return version_major;
+         return detail::get_mpi_version().first;
      }
     /**
      * @brief The current minor version (subversion) of the used MPI standard.
      * @details The value gets automatically set via the used MPI library.
+     * @return the MPI standard subversion
+     *
+     * @calls{
+     * int MPI_Get_version(int *version, int *subversion);      // exactly once
+     * }
      */
      int mpi_version_minor() {
-         static const int version_minor = detail::get_mpi_version().second;
-         return version_minor;
+         return detail::get_mpi_version().second;
      }
     ///@}
 
@@ -95,7 +112,11 @@ namespace mpicxx::version {
         /*
          * @brief The current version of the used MPI library.
          * @details The only reason this function exists is that all version constants and function can return a std::string_view.
-         * @returns a library specific version string
+         * @return a library specific version string
+         *
+         * @calls{
+         * int MPI_Get_library_version(char *version, int *resultlen);      // exactly once
+         * }
          */
         std::string get_mpi_library_version() {
             char library_version[MPI_MAX_LIBRARY_VERSION_STRING];
@@ -107,6 +128,10 @@ namespace mpicxx::version {
          * @brief The name of the used MPI library.
          * @details
          * @return the name of the used MPI library or `"unknown"`
+         *
+         * @calls{
+         * int MPI_Get_library_version(char *version, int *resultlen);      // exactly once
+         * }
          */
         std::string get_mpi_library_name() {
             std::string library_version = detail::get_mpi_library_version();
@@ -123,6 +148,10 @@ namespace mpicxx::version {
      * @brief The name of the used MPI library.
      * @details The value is one of: "Open MPI", "MPICH", or "unknown.
      * @return the name of the used MPI library
+     *
+     * @calls{
+     * int MPI_Get_library_version(char *version, int *resultlen);      // exactly once (through all function calls)
+     * }
      */
     std::string_view mpi_library_name() {
         static const std::string library_name = detail::get_mpi_library_name();
@@ -131,7 +160,11 @@ namespace mpicxx::version {
     /**
      * @brief The current version of the used MPI library.
      * @details The value gets automatically set via the used MPI library.
-     * @returns a library specific version string
+     * @return a library specific version string
+     *
+     * @calls{
+     * int MPI_Get_library_version(char *version, int *resultlen);      // exactly once (through all function calls)
+     * }
      */
     std::string_view mpi_library_version() {
         static const std::string library_version = detail::get_mpi_library_version();
