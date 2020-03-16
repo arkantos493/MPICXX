@@ -4,7 +4,7 @@
  * @date 2020-03-03
  *
  * @brief Contains an exception which is thrown in @ref mpicxx::init(const thread_support) and
- * @ref mpicxx::init(int, char**, const thread_support) if the required level of thread support can't be satisfied.
+ * @ref mpicxx::init(int&, char**, const thread_support) if the required level of thread support can't be satisfied.
  */
 
 #ifndef MPICXX_THREAD_SUPPORT_EXCEPTION_HPP
@@ -21,7 +21,7 @@ namespace mpicxx {
 
     /**
      * @brief An exception which is thrown in @ref mpicxx::init(const thread_support) and
-     * @ref mpicxx::init(int, char**, const thread_support) if the required level of thread support can't be satisfied.
+     * @ref mpicxx::init(int&, char**, const thread_support) if the required level of thread support can't be satisfied.
      */
     class thread_support_not_satisfied final : public exception {
     public:
