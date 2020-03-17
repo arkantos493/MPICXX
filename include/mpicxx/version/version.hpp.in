@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-03-16
+ * @date 2020-03-17
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -66,9 +66,9 @@ namespace mpicxx::version {
         }
     }
     /**
-     * @brief The current version of the used MPI standard.
-     * @details The value gets automatically set via the used MPI library. \n
-     * It has the form: "mpi_version_major.mpi_version_minor".
+     * @brief The current version of the used MPI standard in the form "mpi_version_major.mpi_version_minor" (e.g. `"3.1"`).
+     * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     * the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the MPI standard version
      *
      * @calls{
@@ -82,7 +82,8 @@ namespace mpicxx::version {
      }
     /**
      * @brief The current major version of the used MPI standard.
-     * @details The value gets automatically set via the used MPI library.
+     * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     * the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the MPI standard version
      *
      * @calls{
@@ -94,7 +95,8 @@ namespace mpicxx::version {
      }
     /**
      * @brief The current minor version (subversion) of the used MPI standard.
-     * @details The value gets automatically set via the used MPI library.
+     * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     * the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the MPI standard subversion
      *
      * @calls{
@@ -146,7 +148,10 @@ namespace mpicxx::version {
     }
     /**
      * @brief The name of the used MPI library.
-     * @details The value is one of: "Open MPI", "MPICH", or "unknown.
+     * @details The value is one of: `"Open MPI"`, `"MPICH"`, or `"unknown"`.
+     *
+     * This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     * the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the name of the used MPI library
      *
      * @calls{
@@ -158,8 +163,9 @@ namespace mpicxx::version {
         return std::string_view(library_name);
     }
     /**
-     * @brief The current version of the used MPI library.
-     * @details The value gets automatically set via the used MPI library.
+     * @brief The current version of the used MPI library (library specific implementation defined).
+     * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     * the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return a library specific version string
      *
      * @calls{
