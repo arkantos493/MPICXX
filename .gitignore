@@ -54,6 +54,7 @@ googletest-src/
 
 ### Docu ###
 html/
+mpi31-report.pdf
 
 ### CLion ###
 .idea/
