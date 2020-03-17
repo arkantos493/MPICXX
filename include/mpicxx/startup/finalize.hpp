@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalize.hpp
  * @author Marcel Breyer
- * @date 2020-03-16
+ * @date 2020-03-17
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
@@ -19,6 +19,8 @@ namespace mpicxx {
     /**
      * @brief Checks whether @ref mpicxx::finalize() has completed.
      * @details It is valid to call @ref mpicxx::finalized() before @ref mpicxx::init() and after @ref mpicxx::finalize().
+     *
+     * This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return `true` if @ref mpicxx::finalize() has completed, otherwise `false`
      *
      * @calls{
@@ -34,12 +36,8 @@ namespace mpicxx {
     /**
      * @brief Clean up the MPI state.
      * @details If an MPI program terminates normally (i.e., not due to a call to @ref mpicxx::abort() or an unrecoverable error) then each
-     * process  must call @ref mpicxx::finalize() before it exits. Before an MPI process invokes @ref mpicxx::finalize(), the process must
+     * process must call @ref mpicxx::finalize() before it exits. Before an MPI process invokes @ref mpicxx::finalize(), the process must
      * perform all MPI calls needed to complete its involvement in MPI communications.
-     *
-     * Once @ref mpicxx::finalize() returns, no MPI routine (not even @ref mpicxx::init()) may be called, except for
-     * @ref mpicxx::mpi_library_version(), @ref mpicxx::initialized(), @ref mpicxx::finalized(), and any MPI Tool
-     * function.
      *
      * @assert_precondition{ If the MPI environment has already been finalized. }
      *
@@ -56,6 +54,7 @@ namespace mpicxx {
     // TODO 2020-02-26 17:49 marcel: change to the mpicxx equivalent
     /**
      * @brief Attempts to abort all tasks in the communication group of @p comm.
+     * @details An MPI implementation is **not** required to be able to abort only a subset of processes of *MPI_COMM_WORLD*.
      * @param[in] error_code the returned error code (not necessarily returned from the executable)
      * @param[in] comm the communicator whom's tasks to abort
      *
@@ -92,11 +91,11 @@ namespace mpicxx {
     }
     /**
      * @brief Registers the callback function @p func to be called directly before *MPI_Finalize*.
-     * @details Calls all registered functions in reversed order in which they were set. This occurs before before any other parts of MPI
-     * are affected, i.e. @ref mpicxx::finalized() will return `false` in any of these handler callback functions.
+     * @details Calls all registered functions in reversed order in which they were set. This happens before any other parts of MPI are
+     * affected, i.e. @ref mpicxx::finalized() will return `false` in any of these callback functions.
      *
-     * The maximum number of callback functions, that can be registered, can be set via the compiler flag
-     * `MAX_NUMBER_OF_ATFINALIZE_CALLBACKS` (default: `32`).
+     * The maximum number of registrable callback functions can be set via the compiler flag `MAX_NUMBER_OF_ATFINALIZE_CALLBACKS`
+     * (default: `32`).
      * @param[in] func pointer to a function to be called on normal MPI finalization
      * @return `0` if the registration succeeded, `1` otherwise
      *

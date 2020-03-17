@@ -1,15 +1,15 @@
 /**
  * @file test/startup/initialize.cpp
  * @author Marcel Breyer
- * @date 2020-02-26
+ * @date 2020-03-17
  *
  * @brief Test cases for the @ref mpicxx::initialized() function.
  * @details Testsuite: *StartupTest*
- * | test case name | test case description                               |
- * |:---------------|:----------------------------------------------------|
- * | IsInitialized  | check that *MPI_Init()* has been called             |
- * | IsRunning      | check that the MPI environment is currently running |
- * | IsMainThread   | check whether this thread is the main thread        |
+ * | test case name | test case description                              |
+ * |:---------------|:---------------------------------------------------|
+ * | IsInitialized  | check that *MPI_Init()* has been called            |
+ * | IsActive       | check that the MPI environment is currently active |
+ * | IsMainThread   | check whether this thread is the main thread       |
  */
 
 #include <gtest/gtest.h>
@@ -22,9 +22,9 @@ TEST(StartupTest, IsInitialized) {
     EXPECT_TRUE(mpicxx::initialized());
 }
 
-TEST(StartupTest, IsRunning) {
+TEST(StartupTest, IsActive) {
     // the MPI environment should be running
-    EXPECT_TRUE(mpicxx::running());
+    EXPECT_TRUE(mpicxx::active());
 }
 
 TEST(StartupTest, IsMainThread) {
