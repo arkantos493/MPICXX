@@ -180,6 +180,7 @@ namespace mpicxx {
 
     /**
      * @brief Returns `true` if this thread is the main thread, i.e. the thread that called @ref mpicxx::init().
+     * @details This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return `true` if this is the main thread, otherwise `false`
      *
      * @calls{
