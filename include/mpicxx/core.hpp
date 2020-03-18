@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/core.hpp
  * @author Marcel Breyer
- * @date 2020-02-21
+ * @date 2020-03-18
  *
  * @brief Core header which includes every other necessary header file, i.e. \#`include <mpicxx/core.hpp>` is sufficient to use every
  * function or class of the mpicxx library.
@@ -15,7 +15,7 @@
 #include <mpicxx/chrono/clock.hpp>
 #include <mpicxx/info/info.hpp>
 #include <mpicxx/version/version.hpp>
-
+#include <mpicxx/startup/mpicxx_main.hpp>
 
 
 // namespace documentation
