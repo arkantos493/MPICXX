@@ -2,6 +2,7 @@
 set(TEST_SOURCES
         finalize.cpp
         initialize.cpp
+        thread_support.cpp
 )
 
 # create google test with MPI support
