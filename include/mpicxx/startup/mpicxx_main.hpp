@@ -33,9 +33,9 @@ namespace mpicxx {
      * is the same as:
      * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
-     * @tparam Args a parameter pack for the additional arguments
+     * @tparam Args a parameter pack representing the additional (optional) parameters
      * @param[in] func any callable holding the main code of the application
-     * @param[in] args the additional arguments forwarded to the user defined function @p func
+     * @param[in] args the additional parameters forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
      *
      * @calls{
@@ -65,11 +65,11 @@ namespace mpicxx {
      * is the same as:
      * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_args_pointer requirements
-     * @tparam Args a parameter pack for the additional arguments
+     * @tparam Args a parameter pack representing the additional (optional) parameters
      * @param[in] func any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
      * @param[inout] argv the command line parameters
-     * @param[in] args the additional arguments forwarded to the user defined function @p func
+     * @param[in] args the additional parameters forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
      *
      * @calls{
@@ -101,15 +101,15 @@ namespace mpicxx {
      * is nearly the same as (except for the return value):
      * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
-     * @tparam Args a parameter pack for the additional arguments
+     * @tparam Args a parameter pack representing the additional (optional) parameters
      * @param[in] func any callable holding the main code of the application
      * @param[in] required the required level of thread support
-     * @param[in] args the additional arguments forwarded to the user defined function @p func
-     * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
+     * @param[in] args the additional parameters forwarded to the user defined function @p func
+     * @return the result of the invocation of @p FuncPtr or -1 if the required level of thread support couldn't be satisfied
      *
      * @calls{
-     * int MPI_Init(int *argc, char ***argv);       // exactly once
-     * int MPI_Finalize();                          // exactly once
+     * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
+     * int MPI_Finalize();                                                              // exactly once
      * }
      */
     template <typename FuncPtr, typename... Args>
@@ -139,17 +139,17 @@ namespace mpicxx {
      * is nearly the same as (except for the return value):
      * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
      * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
-     * @tparam Args a parameter pack for the additional arguments
+     * @tparam Args a parameter pack representing the additional (optional) parameters
      * @param[in] func any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
      * @param[inout] argv the command line parameters
      * @param[in] required the required level of thread support
-     * @param[in] args the additional arguments forwarded to the user defined function @p func
-     * @return the result of the invocation of @p FuncPtr or -1 if the required level level of thread support couldn't be satisfied
+     * @param[in] args the additional parameters forwarded to the user defined function @p func
+     * @return the result of the invocation of @p FuncPtr or -1 if the required level of thread support couldn't be satisfied
      *
      * @calls{
-     * int MPI_Init(int *argc, char ***argv);       // exactly once
-     * int MPI_Finalize();                          // exactly once
+     * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
+     * int MPI_Finalize();                                                              // exactly once
      * }
      */
     template <typename FuncPtr, typename... Args>
