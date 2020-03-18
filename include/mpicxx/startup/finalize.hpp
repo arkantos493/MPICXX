@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalize.hpp
  * @author Marcel Breyer
- * @date 2020-03-17
+ * @date 2020-03-18
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
@@ -16,6 +16,8 @@
 
 namespace mpicxx {
 
+    /// @name finalization of the MPI environment
+    ///@{
     /**
      * @brief Checks whether @ref mpicxx::finalize() has completed.
      * @details It is valid to call @ref mpicxx::finalized() before @ref mpicxx::init() and after @ref mpicxx::finalize().
@@ -122,6 +124,7 @@ namespace mpicxx {
 
         return 0;
     }
+    ///@}
 
 }
 

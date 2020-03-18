@@ -36,6 +36,8 @@ namespace mpicxx {
         multiple = MPI_THREAD_MULTIPLE,
     };
 
+    /// @name thread_support conversion functions
+    ///@{
     // TODO 2020-03-18 15:29 marcel: change from fmt::format to std::format
     /**
      * @brief Stream-insertion operator overload for the mpicxx::thread_support enum class.
@@ -86,6 +88,7 @@ namespace mpicxx {
         ts = enum_from_string(str);
         return in;
     }
+    ///@}
 
 }
 

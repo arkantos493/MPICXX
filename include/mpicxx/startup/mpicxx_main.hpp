@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/mpicxx_main.hpp
  * @author Marcel Breyer
- * @date 2020-03-16
+ * @date 2020-03-18
  *
  * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
  * *MPI_Finalize*.
@@ -21,6 +21,8 @@
 
 namespace mpicxx {
 
+    /// @name automatic initialization and finalization of the MPI environment
+    ///@{
     /**
      * @brief Correctly setup and teardown the MPI environment while executing the code given by @p func.
      * @details This function performs the following tasks in the given order:
@@ -166,6 +168,7 @@ namespace mpicxx {
         finalize();
         return ret;
     }
+    ///@}
 
 }
 

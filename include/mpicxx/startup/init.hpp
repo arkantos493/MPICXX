@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/init.hpp
  * @author Marcel Breyer
- * @date 2020-03-17
+ * @date 2020-03-18
  *
  * @brief Implements wrapper around the MPI initialization functions.
  */
@@ -20,6 +20,8 @@
 
 namespace mpicxx {
 
+    /// @name initialization of the MPI environment
+    ///@{
     /**
      * @brief Checks whether @ref mpicxx::init() has completed.
      * @details It is valid to call @ref mpicxx::initialized() before @ref mpicxx::init() and after @ref mpicxx::finalize().
@@ -192,6 +194,7 @@ namespace mpicxx {
         MPI_Is_thread_main(&flag);
         return static_cast<bool>(flag);
     }
+    ///@}
 
 }
 
