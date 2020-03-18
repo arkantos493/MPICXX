@@ -78,14 +78,19 @@ namespace mpicxx::detail {
             loc.func_ = func;
             loc.line_ = line;
             loc.column_ = column;
-            // get the current MPI rank iff the MPI environment is active
-            int is_initialized, is_finalized;
-            MPI_Initialized(&is_initialized);
-            MPI_Finalized(&is_finalized);
-            if (static_cast<bool>(is_initialized) && !static_cast<bool>(is_finalized)) {
-                int rank;
-                MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-                loc.rank_ = std::optional<int>(rank);
+            try {
+                // get the current MPI rank iff the MPI environment is active
+                int is_initialized, is_finalized;
+                MPI_Initialized(&is_initialized);
+                MPI_Finalized(&is_finalized);
+                if (static_cast<bool>(is_initialized) && !static_cast<bool>(is_finalized)) {
+                    int rank;
+                    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+                    loc.rank_ = std::optional<int>(rank);
+                }
+            } catch (...) {
+                // something went wrong during the MPI calls -> no information could be retrieved
+                loc.rank_ = std::nullopt;
             }
             return loc;
         }
