@@ -1,7 +1,7 @@
 /**
- * @dir test/version
+ * @dir test/startup
  * @author Marcel Breyer
- * @date 2020-02-21
+ * @date 2020-03-18
  *
  * @brief This directory contains all test cases for the functions related to the initialization or finalization of
  * the MPI runtime system.
