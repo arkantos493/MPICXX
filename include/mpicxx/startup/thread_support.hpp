@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/thread_support.hpp
  * @author Marcel Breyer
- * @date 2020-03-18
+ * @date 2020-03-19
  *
  * @brief Contains the level of thread support enum.
  * @details Additionally specializes a [*fmt*](https://github.com/fmtlib/fmt) formatter to print the actual thread support names.
@@ -48,6 +48,15 @@ namespace mpicxx {
     inline std::ostream& operator<<(std::ostream& out, const thread_support ts) {
         out << fmt::format("{}", ts);
         return out;
+    }
+    // TODO 2020-03-19 14:35 marcel: change from fmt::format to std::format
+    /**
+     * @brief `to_string` overload (using ADL) for the mpicxx::thread_support enum class.
+     * @param ts the enum class value
+     * @return the converted [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+     */
+    inline std::string to_string(const thread_support ts) {
+        return fmt::format("{}", ts);
     }
 
     // TODO 2020-03-18 15:29 marcel: change from fmt::format to std::format

@@ -1,7 +1,7 @@
 /**
  * @file test/startup/thread_support.cpp
  * @author Marcel Breyer
- * @date 2020-03-18
+ * @date 2020-03-19
  *
  * @brief Test cases for the @ref mpicxx::thread_support enum class.
  * @details Testsuite: *StartupTest*
@@ -9,12 +9,14 @@
  * |:---------------------------------------|:---------------------------------------------------------------------|
  * | CorrectEnumClassValues                 | check if the enum class reflects the correct MPI values              |
  * | ToStringViaFormat                      | check whether the conversion to `std::string` via fmt::format works  |
+ * | ToStringViaToString                    | check whether the conversion to `std::string` via `to_string` works  |
  * | ToStringViaStreamInsertionOperator     | check whether the conversion to `std::string` via `operator<<` works |
  * | ToEnumClass                            | check whether the conversion from a string works                     |
  * | ToEnumClassViaStreamExtractionOperator | check whether the conversion from a string via `operator>>` works    |
  */
 // TODO 2020-03-18 15:51 marcel: change from fmt::format to std::format
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -42,6 +44,14 @@ TEST(StartupTest, ToStringViaFormat) {
     EXPECT_EQ(fmt::format("{}", mpicxx::thread_support::funneled), "MPI_THREAD_FUNNELED"s);
     EXPECT_EQ(fmt::format("{}", mpicxx::thread_support::serialized), "MPI_THREAD_SERIALIZED"s);
     EXPECT_EQ(fmt::format("{}", mpicxx::thread_support::multiple), "MPI_THREAD_MULTIPLE"s);
+}
+
+TEST(StartupTest, ToStringViaToString) {
+    // conversion via to_string should work as expected
+    EXPECT_EQ(to_string(mpicxx::thread_support::single), "MPI_THREAD_SINGLE"s);
+    EXPECT_EQ(to_string(mpicxx::thread_support::funneled), "MPI_THREAD_FUNNELED"s);
+    EXPECT_EQ(to_string(mpicxx::thread_support::serialized), "MPI_THREAD_SERIALIZED"s);
+    EXPECT_EQ(to_string(mpicxx::thread_support::multiple), "MPI_THREAD_MULTIPLE"s);
 }
 
 TEST(StartupTest, ToStringViaStreamInsertionOperator) {
