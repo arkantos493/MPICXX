@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-26
+ * @date 2020-03-20
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -997,6 +997,13 @@ namespace mpicxx {
          * @attention **No** *MPI_Info_free* gets called upon destruction (doing so would result in a MPI runtime failure).
          */
         static const info env;
+
+        /**
+         * @brief Static null object which is mainly used to explicitly indicate that **no** info is provided.
+         *
+         * @attention **No** *MPI_Info_free* gets called upon destruction (doing so would result in a MPI runtime failure).
+         */
+        static const info null;
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -2862,6 +2869,9 @@ namespace mpicxx {
 
     // initialize static environment object
     inline const info info::env = info(MPI_INFO_ENV, false);
+
+    // initialize static null object
+    inline const info info::null = info(MPI_INFO_NULL, false);
 
 }
 
