@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/spawn.hpp
  * @author Marcel Breyer
- * @date 2020-03-20
+ * @date 2020-03-22
  *
  * @brief Implements wrapper around the MPI spawn functions.
  */
@@ -12,9 +12,14 @@
 #include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <initializer_list>
+#include <numeric>
+#include <optional>
 #include <ostream>
 #include <span>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -102,51 +107,196 @@ namespace mpicxx {
 //        MPI_Comm intercomm() const noexcept { return intercomm_; }
 
 
+
+    // TODO 2020-03-22 19:04 marcel: change from MPI_Comm to mpicxx equivalent
+
+    /**
+     * @brief Spawner class which enables to spawn MPI processes at runtime.
+     */
     class spawner {
+        using argv_type = std::pair<std::string, std::string>;
     public:
         spawner(detail::string auto&& command, const int maxprocs)
             : command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs), errcodes_(maxprocs, -1)
         {
-            MPICXX_ASSERT_SANITY(!command_.empty(), "An empty command name isn't executable!");
+            MPICXX_ASSERT_SANITY(!command_.empty(), "No executable name given!");
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
-                    "Can't spawn the given number of processes: 0 < {} <= {}.", maxprocs, spawner::spawnable());   // TODO 2020-03-20 19:22 marcel: check <= max
+                    "Can't spawn the given number of processes: 0 < {} <= {}.", maxprocs, spawner::universe_size());
         }
+//        spawner(std::initializer_list<std::pair<std::string, int>> ilist) {
+//            for (auto&& pair : ilist) {
+//                commands_.emplace_back(std::move(pair.first));
+//                maxprocs_.emplace_back(pair.second);
+//            }
+//            errcodes_ = std::vector<int>(std::reduce(maxprocs_.cbegin(), maxprocs_.cend()), -1);
+//        }
 
+        /**
+         * @brief Returns the name of the executable which should get spawned.
+         * @return the executable name
+         */
         [[nodiscard]] const std::string& command() const noexcept { return command_; }
+
+        /**
+         * @brief Returns the number of processes which should get spawned.
+         * @return the number of processes
+         */
         [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
-
-        void set_info(info info) noexcept {
-            info_ = std::move(info);
+        /**
+         * @brief Returns the number of spawned processes.
+         * @details Two possible behaviours:
+         * 1. **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in an error
+         * (returning `0`).
+         * 2. **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed values for
+         * the number of spawned processes. If one of these allowed numbers of processes \f$ m_i \f$ can be spawned, the call to spawn
+         * succeeds (returning \f$ m_i \f$). If it isn't possible to spawn one of the allowed number of processes, the call to spawn results
+         * in an error (returning `0`).
+         * @return the number of spawned processes
+         *
+         * @calls{
+         * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
+         * }
+         */
+        [[nodiscard]] int number_of_spawned_processes() const {
+            if (intercomm_ != MPI_COMM_NULL) {
+                int size;
+                MPI_Comm_remote_size(intercomm_, &size);
+                return size;
+            } else {
+                return 0;
+            }
         }
-        [[nodiscard]] const info& get_info() const noexcept { return info_; } // TODO 2020-03-20 19:26 marcel: name
+        /**
+         * @brief Check whether it was possible to spawn `maxprocs` processes.
+         * @return `true` if `maxprocs` processes could be spawned, otherwise `false`
+         */
+        [[nodiscard]] bool maxprocs_processes_spanwed() const {
+            return maxprocs_ == this->number_of_spawned_processes();
+        }
+        /**
+         * @brief Returns the maximum possible number of processes.
+         * @return the maximum possible number of processes.
+         *
+         * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
+         *
+         * @calls{
+         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
+         * }
+         */
+        [[nodiscard]] static int universe_size() {
+            void* ptr;
+            int flag;
+            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
+            if (static_cast<bool>(flag)) {
+                return *reinterpret_cast<int*>(ptr);
+            } else {
+                return 0;
+            }
+        }
 
+        /**
+         * @brief Set the spawn info object representing additional information for the runtime system where and how to spawn the processes.
+         * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
+         *
+         *  key | description
+         * :----| :--------------------------------------------------------------------------------------------------------------------------------------------------|
+         * host | a hostname                                                                                                                                         |
+         * arch | an architecture name                                                                                                                               |
+         * wdir | a name of a directory on a machine on which the spawned processes execute; this directory is made the working directory of the executing processes |
+         * path | a directory or set of directories where the MPI implementation should look for the executable                                                      |
+         * file | a name of a file in which additional information is specified                                                                                      |
+         * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
+         *
+         * @note An implementation is not required to interpret these keys, bit if it does interpret the key, it must provide the
+         * functionality described.
+         * @param[in] additional_info copy of the info object
+         * @return `*this`
+         */
+        spawner& set_spawn_info(info additional_info) noexcept(std::is_nothrow_move_assignable_v<info>) {
+            // TODO 2020-03-22 18:39 marcel: asserts?, parameter type?, calls?
+            info_ = std::move(additional_info);
+            return *this;
+        }
+        /**
+         * @brief Returns the info object representing additional information for the runtime system where and how to spawn the processes.
+         * @return the info object
+         */
+        [[nodiscard]] const info& spawn_info() const noexcept { return info_; }
+
+        /**
+         * @brief Set the rank of the root process (from which the other processes are spawned).
+         * @param[in] root the root process
+         * @return `*this`
+         *
+         * @pre @p root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_NULL*).
+         *
+         * @assert_precondition{ If @p root isn't a legal root. }
+         */
+        spawner& set_root(const int root) noexcept {
+            MPICXX_ASSERT_PRECONDITION(this->legal_root(root, comm_),
+                    "The root can't be used in the provided communicator!: 0 <= {} < {}", root, this->comm_size(comm_));
+
+            root_ = root;
+            return *this;
+        }
+        /**
+         * @brief Returns the rank of the root process.
+         * @return the root rank
+         */
+        [[nodiscard]] int root() const noexcept { return root_; }
+
+        /**
+         * @brief Intracommunicator containing the group of spawning processes.
+         * @param[in] comm an intracommunicator
+         * @return `*this`
+         *
+         * @pre @p comm **must not** be *MPI_COMM_NULL*.
+         * @pre The set rank **must be** valid in @p comm.
+         *
+         * @assert_precondition{ If @p comm is the null communicator. }
+         * @assert_sanity{ If the specified root isn't valid in @p comm. }
+         */
+        spawner& set_communicator(MPI_Comm comm) noexcept {
+            MPICXX_ASSERT_PRECONDITION(comm != MPI_COMM_NULL, "Can't use null communicator!");
+            MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
+                                 "The previously set root {} isn't a valid root in the new communicator!", root_);
+
+            comm_ = comm;
+            return *this;
+        }
+        /**
+         * @brief Returns the intracommunicator containing the group of spawning processes.
+         * @return the intracommunicator
+         */
+        [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
+
+        /**
+         * @brief Adds an argument pair the the `argv` list which gets passed to the spawned program.
+         * @details Adds a leading `-` to @p key if not already present.
+         *
+         * Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
+         * @tparam T the type of the value
+         * @param[in] key the argument key (e.g. `"-gridfile"` or `"gridfile"`)
+         * @param[in] value the value associated with @p key
+         * @return `*this`
+         */
         template <typename T>
-        void add_argv(std::string key, T&& value) {
+        spawner& add_argv(std::string key, T&& value) {
             // add leading '-' if necessary
             if (!key.starts_with('-')) {
                 key.insert(0, 1, '-');
             }
             // add [key, value]-argv-pair to argvs
             argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
+            return *this;
         }
-        [[nodiscard]] const std::vector<std::pair<std::string, std::string>>& argv() const noexcept { return argv_; }
+        /**
+         * @brief Returns the arguments which will be passed to `command`.
+         * @return the arguments passed to `command`
+         */
+        [[nodiscard]] const std::vector<argv_type>& argv() const noexcept { return argv_; }
 
-        void set_root(const int root) noexcept {
-            MPICXX_ASSERT_PRECONDITION(this->legal_root(root, comm_),
-                    "The root can't be used in the provided communicator!: 0 <= {} < {}", root, this->comm_size(comm_));
-
-            root_ = root;
-        }
-        [[nodiscard]] int root() const noexcept { return root_; }
-
-        void set_comm(MPI_Comm comm) noexcept {
-            MPICXX_ASSERT_PRECONDITION(comm != MPI_COMM_NULL, "Can't use null communicator!");
-            MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
-                    "The previously set root {} isn't a valid root in the new communicator!", root_); // TODO 2020-03-20 17:51 marcel: or PRECONDITION?
-
-            comm_ = comm;
-        }
-        [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
 
 
         [[nodiscard]] MPI_Comm intercommunicator() const noexcept { return intercomm_; }
@@ -165,56 +315,61 @@ namespace mpicxx {
             argv_ptr.emplace_back(nullptr);
 
             MPI_Comm_spawn(command_.c_str(), argv_ptr.size() == 1 ? MPI_ARGV_NULL : argv_ptr.data(),
-                    maxprocs_, info_.get(), root_, comm_, &intercomm_, ignore ? MPI_ERRCODES_IGNORE : errcodes_.data());
+                           maxprocs_, info_.get(), root_, comm_, &intercomm_, ignore ? MPI_ERRCODES_IGNORE : errcodes_.data());
         }
 
 
-        bool all_spawned() const {
-            return std::all_of(errcodes_.cbegin(), errcodes_.cend(), [](const int err) { return err == MPI_SUCCESS; });
-        }
-        int spawned() const {
-            if (intercomm_ == MPI_COMM_NULL) {
-                return 0;
-            } else {
-                int size;
-                MPI_Comm_remote_size(intercomm_, &size);
-                return size;
+
+
+        friend std::ostream& operator<<(std::ostream& out, const spawner& sp) {
+            out << "command: " << sp.command_ << std::endl;
+            out << "maxprocs: " << sp.maxprocs_ << std::endl;
+            out << "root: " << sp.root_ << std::endl;
+
+            for (const auto& a : sp.argv_) {
+                std::cout << a.first << " " << a.second << std::endl;
             }
-        }
 
-        static int spawnable() {
-            void* ptr;
-            int flag;
-            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
-            if (static_cast<bool>(flag)) {
-                int size;
-                MPI_Comm_size(MPI_COMM_WORLD, &size);
-                return *reinterpret_cast<int*>(ptr) - size;
-            } else {
-                return 0;
-            }
+            return out;
         }
-
 
     private:
 #if ASSERTION_LEVEL > 0
+        /*
+         * @brief Returns the size of @p comm.
+         * @param[in] comm an intracommunicator
+         * @return the size of @p comm
+         */
         int comm_size(const MPI_Comm comm) const {
             int size;
             MPI_Comm_size(comm, &size);
             return size;
         }
+        /*
+         * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
+         * @param[in] root the root
+         * @param[in] comm the communicator
+         * @return `true` if @p root is legal, otherwise `false`
+         */
         bool legal_root(const int root, const MPI_Comm comm) const {
             return 0 <= root && root < this->comm_size(comm);
         }
+        /*
+         * @brief Checks whether @p maxprocs is valid, i.e. @maxprocs is greater than `0` and less or equal than the current universe size.
+         * @param[in] maxprocs the number of processes which should be spawned
+         * @return `true` if @p maxprocs is legal, otherwise `false`
+         */
         bool legal_maxprocs(const int maxprocs) const {
-            return 0 < maxprocs && maxprocs <= spawner::spawnable();
+            return 0 < maxprocs && maxprocs <= spawner::universe_size();
         }
 #endif
 
         const std::string command_;
         const int maxprocs_;
-        std::vector<std::pair<std::string, std::string>> argv_;
-        info info_ = info::null;
+//        std::vector<std::string> commands_;
+//        std::vector<int> maxprocs_;
+        std::vector<argv_type> argv_;
+        info info_ = info(MPI_INFO_NULL, false);
         int root_ = 0;
         MPI_Comm comm_ = MPI_COMM_WORLD;
 
@@ -222,12 +377,21 @@ namespace mpicxx {
         std::vector<int> errcodes_;
     };
 
-    // return intercomm
-    MPI_Comm parent_process() {
+    // TODO 2020-03-22 19:28 marcel: return type, docu
+    /**
+     * @brief Returns the parent intracommunicator of the current process if the process was started with *MPI_COMM_SPAWN* or
+     * *MPI_COMM_SPAWN_MULTIPLE*.
+     * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the parent intracommunicator or
+     * `std::nullopt`.
+     */
+    std::optional<MPI_Comm> parent_process() {
         MPI_Comm intercomm;
         MPI_Comm_get_parent(&intercomm);
-        // if (intercomm == MPI_COMM_NULL) ...
-        return intercomm;
+        if (intercomm != MPI_COMM_NULL) {
+            return std::make_optional(intercomm);
+        } else {
+            return std::nullopt;
+        }
     }
 
 }
