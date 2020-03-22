@@ -992,7 +992,7 @@ namespace mpicxx {
          * file         | value is the name of a file in which additional information is specified                                        |
          * thread_level | requested level of thread support, if requested before the program started execution (e.g. "MPI_THREAD_SINGLE”) |
          *
-         * Note: The contents of *MPI_INFO_ENV* are implementation defined, i.e. not all of the predefined keys have to be defined.
+         * @note The contents of *MPI_INFO_ENV* are implementation defined, i.e. not all of the predefined keys have to be defined.
          *
          * @attention **No** *MPI_Info_free* gets called upon destruction (doing so would result in a MPI runtime failure).
          */
