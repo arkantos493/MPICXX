@@ -1,39 +1,48 @@
 /**
  * @file test/startup/spawn.cpp
  * @author Marcel Breyer
- * @date 2020-03-20
+ * @date 2020-03-23
  *
  * @brief Test cases for the ??? function.
  * @details Testsuite: *StartupTest*
- * | test case name | test case description                              |
- * |:---------------|:---------------------------------------------------|
+ * | test case name  | test case description                               |
+ * |:----------------|:----------------------------------------------------|
+ * | Command         | check whether `command` is set correctly            |
+ * | EmptyCommand    | create spawner with empty `command` (death test)    |
+ * | Maxprocs        | check whether `maxprocs` is set correctly           |
+ * | IllegalMaxprocs | create spawner with illegal `maxprocs` (death test) |
  */
+
+#include <limits>
+#include <string>
 
 #include <gtest/gtest.h>
 
 #include <mpicxx/startup/spawn.hpp>
 
-#include <iostream>
-TEST(StartupTest, Spawn) {
+using namespace std::string_literals;
 
-//    mpicxx::spawner sp("spawn.out", 4, 0, MPI_COMM_WORLD);
-//    sp.add_argv({{"-hello", "world"}, {"-foo", "bar"}});
+TEST(StartupTest, Command) {
+    // create spawner
+    mpicxx::spawner sp("a.out", 4);
 
-//    mpicxx::spawner sp;
-//    std::cout << sp << std::endl << std::endl;
-//
-//    mpicxx::spawner spm(4);
-//    std::cout << spm << std::endl;
-//    sp.add_argv("hello", "world");
-//    sp.add_argv("foo", "bar");
-//    sp.add_argv("-foo", "baz");
-//    sp.add_argv("n", 2);
-//    sp.add_argv("host", true);
-//    sp.add_argv("file", 4.323);
-//    std::cout << sp << std::endl;
-//
-//    std::cout << std::endl << sp.number_of_remaining_processes() << std::endl;
-//    std::cout << std::endl << sp.number_of_spawned_processes() << std::endl;
+    EXPECT_EQ(sp.command(), "a.out"s);
+}
 
-//    sp.spawn();
+TEST(StartupDeathTest, EmptyCommand) {
+    // create spawner with empty command
+    ASSERT_DEATH( mpicxx::spawner("", 2) , "");
+}
+
+TEST(StartupTest, Maxprocs) {
+    // create spawner
+    mpicxx::spawner sp("a.out", 4);
+
+    EXPECT_EQ(sp.maxprocs(), 4);
+}
+
+TEST(StartupDeathTest, IllegalMaxprocs) {
+    // create spawner with illegal maxprocs values
+    ASSERT_DEATH( mpicxx::spawner("a.out", -1) , "");
+    ASSERT_DEATH( mpicxx::spawner("a.out", std::numeric_limits<int>::max()) , "");
 }

@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/spawn.hpp
  * @author Marcel Breyer
- * @date 2020-03-22
+ * @date 2020-03-23
  *
  * @brief Implements wrapper around the MPI spawn functions.
  */
@@ -10,19 +10,16 @@
 #define MPICXX_SPAWN_HPP
 
 #include <algorithm>
-#include <cstring>
 #include <iostream>
-#include <initializer_list>
-#include <numeric>
+#include <map>
 #include <optional>
 #include <ostream>
-#include <span>
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <variant>
 #include <vector>
 
+#include <fmt/format.h>
 #include <mpi.h>
 
 #include <mpicxx/detail/concepts.hpp>
@@ -33,82 +30,10 @@
 
 namespace mpicxx {
 
-//    class spawner {
-//        using arg_t = std::pair<std::string, std::string>;
-//    public:
-//        // TODO 2020-03-19 17:25 marcel: MPI_Comm_spawn_multiple: MPI_ARGVS_NULL (S!)
-//        // TODO 2020-03-19 17:15 marcel: maxproc range? (non-negative) -> ASSERT
-////        spawner(detail::string auto&& command, const int maxprocs, const int root)
-////            : command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs), root_(root), errcodes_(maxprocs, -1) { }
-//
-//        spawner(std::string command) : count_(1), command_(std::move(command)) { }
-//        spawner(std::span<std::string> commands) : count_(static_cast<int>(commands.size())) { }
-//
-////        template <detail::string T>
-////        spawner(const int count, std::span<T> commands, const std::span<int> maxprocs, const int root, const MPI_Comm comm)
-////            :
-//
-//        void spawn() {
-//            // TODO 2020-03-19 17:15 marcel: revise: MPI_ERRCODES_IGNORE, return this->successful()?
-//            std::vector<char*> argv;
-//            argv.reserve(argv_.size() * 2);
-//            for (auto& [key, value] : argv_) {
-//                argv.emplace_back(key.data());
-//                argv.emplace_back(value.data());
-//            }
-//            // add NULL termination
-//            argv.emplace_back(nullptr);
-//            MPI_Comm_spawn(command_.c_str(), argv.empty() ? MPI_ARGV_NULL : argv.data(), maxprocs_, info_.get(), root_, comm_, &intercomm_, errcodes_.data());
-//        }
-//
-//        template <typename T>
-//        void add_argv(std::string key, T&& value) {
-//            // add leading '-' to the argument key if not already present
-//            if (!key.starts_with('-')) {
-//                key.insert(0, "-");
-//            }
-//
-//            // add argument
-//            argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
-//        }
-//
-//        std::size_t number_of_remaining_processes() const {
-//            // TODO 2020-03-19 16:42 marcel: revise
-//            void* ptr;
-//            int flag;
-//            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
-//            if (static_cast<bool>(flag)) {
-//                int size;
-//                MPI_Comm_size(MPI_COMM_WORLD, &size);
-//                return *reinterpret_cast<int*>(ptr) - size;
-//            } else {
-//                return 0;
-//            }
-//        }
-//
-//        std::size_t number_of_spawned_processes() const {
-//            // TODO 2020-03-19 17:02 marcel: revise (nullptr): hard <-> soft
-//            int size;
-//            MPI_Comm_remote_size(intercomm_, &size);
-//            return static_cast<std::size_t>(size);
-//        }
-//
-//        void add_info(const info& info) {
-//            // TODO 2020-03-19 17:06 marcel: revise
-//            info_ = info;
-//        }
-//
-//        bool successful() const {
-//            // TODO 2020-03-19 17:12 marcel: revise
-//            return std::all_of(errcodes_.begin(), errcodes_.end(), [](int err) { return err == MPI_SUCCESS; });
-//        }
-//
-//        const std::vector<int>& errcodes() const noexcept { return errcodes_; }
-//        MPI_Comm intercomm() const noexcept { return intercomm_; }
-
-
-
     // TODO 2020-03-22 19:04 marcel: change from MPI_Comm to mpicxx equivalent
+    // TODO 2020-03-23 12:56 marcel: errcode equivalent
+    // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
+    // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
     /**
      * @brief Spawner class which enables to spawn MPI processes at runtime.
@@ -116,20 +41,29 @@ namespace mpicxx {
     class spawner {
         using argv_type = std::pair<std::string, std::string>;
     public:
+        /**
+         * @brief Create a new spawner.
+         * @param[in] command name of program to be spawned
+         * @param[in] maxprocs maximum number of processes to start
+         *
+         * @pre @p command **must not** be empty.
+         * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_sanity{
+         * If @p command is empty. \n
+         * If @p maxprocs is invalid.
+         * }
+         */
         spawner(detail::string auto&& command, const int maxprocs)
-            : command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs), errcodes_(maxprocs, -1)
+            : command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs)
         {
             MPICXX_ASSERT_SANITY(!command_.empty(), "No executable name given!");
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
                     "Can't spawn the given number of processes: 0 < {} <= {}.", maxprocs, spawner::universe_size());
+
+            errcodes_ = std::vector<int>(maxprocs, -1);
         }
-//        spawner(std::initializer_list<std::pair<std::string, int>> ilist) {
-//            for (auto&& pair : ilist) {
-//                commands_.emplace_back(std::move(pair.first));
-//                maxprocs_.emplace_back(pair.second);
-//            }
-//            errcodes_ = std::vector<int>(std::reduce(maxprocs_.cbegin(), maxprocs_.cend()), -1);
-//        }
 
         /**
          * @brief Returns the name of the executable which should get spawned.
@@ -297,40 +231,92 @@ namespace mpicxx {
          */
         [[nodiscard]] const std::vector<argv_type>& argv() const noexcept { return argv_; }
 
+        /**
+         * @brief Returns the intercommunicator between the original group and the newly spawned group.
+         * @return the intercommunicator
+         *
+         * @pre @ref spawn() **must** already have been called.
+         *
+         * @assert_precondition{ If spawn hasn't been called yet. }
+         */
+        [[nodiscard]] MPI_Comm intercommunicator() const noexcept {
+            MPICXX_ASSERT_SANITY(this->already_spawned(), "Spawn not called, so no intercommunicator has been created yet!");
 
+            return intercomm_;
+        }
+        /**
+         * @brief Returns the error codes (one code per process) returned by the spawn call.
+         * @return the error codes
+         *
+         * @pre @ref spawn() **must** already have been called.
+         *
+         * @assert_precondition{ If spawn hasn't been called yet. }
+         */
+        [[nodiscard]] const std::vector<int>& errcodes() const noexcept {
+            MPICXX_ASSERT_SANITY(this->already_spawned(), "Spawn not called, so no errcodes available yet!");
 
-        [[nodiscard]] MPI_Comm intercommunicator() const noexcept { return intercomm_; }
-        [[nodiscard]] const std::vector<int>& errcodes() const noexcept { return errcodes_; }
+            return errcodes_;
+        }
+        /**
+         * @brief Prints the number of failed spawns and the respective errcode message (including how often the errcode occurred).
+         * @param[inout] out the output stream on which the errcodes messages should be written
+         *
+         * @pre @ref spawn() **must** already have been called.
+         *
+         * @assert_precondition{ If spawn hasn't been called yet. }
+         *
+         * @calls{
+         * int MPI_Error_string(int errorcode, char *string, int *resultlen);       // at most 'maxprocs' times
+         * }
+         */
+        void print_errors_to(std::ostream& out = std::cout) const {
+            MPICXX_ASSERT_PRECONDITION(this->already_spawned(), "Spawn not called, so no errcodes available yet!");
 
+            // count and display the number of errors
+            const auto failed_spawns = std::count_if(errcodes_.cbegin(), errcodes_.cend(),
+                    [](const int err) { return err != MPI_SUCCESS; });
+            out << fmt::format("{} {} occurred!:\n", failed_spawns, failed_spawns == 1 ? "error" : "errors");
 
-        // TODO 2020-03-20 18:36 marcel: where to ignore?
-        void spawn(const bool ignore = false) {
-            std::vector<char*> argv_ptr;
-            argv_ptr.reserve(argv_.size() * 2 + 1);
-            for (auto& [key, value] : argv_) {
-                argv_ptr.emplace_back(key.data());
-                argv_ptr.emplace_back(value.data());
+            // count how often each error occurred
+            std::map<int, int> counts;
+            for (const int err : errcodes_) {
+                if (err != MPI_SUCCESS) {
+                    ++counts[err];
+                }
             }
-            // add NULL termination
-            argv_ptr.emplace_back(nullptr);
 
-            MPI_Comm_spawn(command_.c_str(), argv_ptr.size() == 1 ? MPI_ARGV_NULL : argv_ptr.data(),
-                           maxprocs_, info_.get(), root_, comm_, &intercomm_, ignore ? MPI_ERRCODES_IGNORE : errcodes_.data());
+            // retrieve the error string and print it
+            for (const auto [err, count] : counts) {
+                char error_string[MPI_MAX_ERROR_STRING];
+                int resultlen;
+                MPI_Error_string(err, error_string, &resultlen);
+                out << fmt::format("{:>5}x {}\n", count, std::string(error_string, resultlen));
+            }
         }
 
+        /**
+         * @brief Spawns a number of MPI processes according to the previously set options.
+         *
+         * @calls{
+         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * }
+         */
+        void spawn() {
+            if (argv_.empty()) {
+                MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_.get(), root_, comm_, &intercomm_, errcodes_.data());
+            } else {
+                // convert to char**
+                std::vector<char*> argv_ptr;
+                argv_ptr.reserve(argv_.size() * 2 + 1);
+                for (auto& [key, value] : argv_) {
+                    argv_ptr.emplace_back(key.data());
+                    argv_ptr.emplace_back(value.data());
+                }
+                // add null termination
+                argv_ptr.emplace_back(nullptr);
 
-
-
-        friend std::ostream& operator<<(std::ostream& out, const spawner& sp) {
-            out << "command: " << sp.command_ << std::endl;
-            out << "maxprocs: " << sp.maxprocs_ << std::endl;
-            out << "root: " << sp.root_ << std::endl;
-
-            for (const auto& a : sp.argv_) {
-                std::cout << a.first << " " << a.second << std::endl;
+                MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_.get(), root_, comm_, &intercomm_, errcodes_.data());
             }
-
-            return out;
         }
 
     private:
@@ -362,12 +348,18 @@ namespace mpicxx {
         bool legal_maxprocs(const int maxprocs) const {
             return 0 < maxprocs && maxprocs <= spawner::universe_size();
         }
+        /*
+         * @brief Checks whether spawn has already been called.
+         * @details Checks whether the errcodes are all `-1` (default initialization).
+         * @return `true` if spawn has already been called, otherwise `false`
+         */
+        bool already_spawned() const {
+            return std::none_of(errcodes_.cbegin(), errcodes_.cend(), [](const int count) { return count == -1; });
+        }
 #endif
 
-        const std::string command_;
-        const int maxprocs_;
-//        std::vector<std::string> commands_;
-//        std::vector<int> maxprocs_;
+        std::string command_;
+        int maxprocs_;
         std::vector<argv_type> argv_;
         info info_ = info(MPI_INFO_NULL, false);
         int root_ = 0;
