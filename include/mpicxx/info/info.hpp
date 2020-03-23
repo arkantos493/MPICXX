@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-03-20
+ * @date 2020-03-23
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -885,7 +885,7 @@ namespace mpicxx {
              * - it is **not** a singular iterator
              * - it is **not** referring to an info object in the moved-from state
              * - the current position + @p **does not** fall outside its valid range
-             * @param n the number of advance steps (@p n may be negative)
+             * @param[in] n the number of advance steps (@p n may be negative)
              */
             bool advanceable(const difference_type n) const {
                 if (this->singular() || this->info_moved_from()) {

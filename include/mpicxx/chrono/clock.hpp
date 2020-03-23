@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/chrono/clock.hpp
  * @author Marcel Breyer
- * @date 2020-03-16
+ * @date 2020-03-23
  *
  * @brief Implements a wrapper class around the MPI timer functions.
  * @details These functions include *MPI_Wtime*, *MPI_Wtick* and the attribute *MPI_WTIME_IS_GLOBAL*.
@@ -71,7 +71,7 @@ namespace mpicxx {
          * @details The global variable *MPI_WTIME_IS_GLOBAL* is set to 1 if clocks at all processes in *MPI_COMM_WORLD* are synchronized,
          * 0 otherwise. Because this variable need not be present when the clocks are not synchronized, the attribute key to
          * *MPI_Comm_get_attr* is used, which is always valid.
-         * @param comm the communicator for which the synchronization should be checked
+         * @param[in] comm the communicator for which the synchronization should be checked
          * @return boolean variable that indicates whether clocks are synchronized
          *
          * @calls{

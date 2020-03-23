@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-03-16
+ * @date 2020-03-23
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into three levels:
@@ -69,12 +69,12 @@ namespace mpicxx::detail {
      * [`std::abort`](https://en.cppreference.com/w/cpp/utility/program/abort) respectively.
      *
      * @tparam Args parameter pack for the placeholder types
-     * @param cond the assert condition, halts the program if evaluated to ``false``
-     * @param cond_str the assert condition as string for a better assert message
-     * @param assertion_category the assertion category (one of: *PRECONDITION*, *SANITY*)
-     * @param loc the location where the assertion appeared
-     * @param msg the custom message printed after the assertion location
-     * @param args the arguments used to fill the ``printf`` like placeholders in the custom message
+     * @param[in] cond the assert condition, halts the program if evaluated to ``false``
+     * @param[in] cond_str the assert condition as string for a better assert message
+     * @param[in] assertion_category the assertion category (one of: *PRECONDITION*, *SANITY*)
+     * @param[in] loc the location where the assertion appeared
+     * @param[in] msg the custom message printed after the assertion location
+     * @param[in] args the arguments used to fill the ``printf`` like placeholders in the custom message
      *
      * @calls{
      * int MPI_Abort(MPI_Comm comm, int errorcode);     // at most once
@@ -135,9 +135,9 @@ namespace mpicxx::detail {
  *
  * An example is to check whether an iterator can be safely dereference or not.
  *
- * @param cond the assert condition
- * @param msg the custom assert message
- * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
+ * @param[in] cond the assert condition
+ * @param[in] msg the custom assert message
+ * @param[in] ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
  */
 #if ASSERTION_LEVEL > 0
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...) \
@@ -155,9 +155,9 @@ namespace mpicxx::detail {
  *
  * An example is the check whether an attempt is made to increment a past-the-end iterator.
  *
- * @param cond the assert condition
- * @param msg the custom assert message
- * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
+ * @param[in] cond the assert condition
+ * @param[in] msg the custom assert message
+ * @param[in] ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
  */
 #if ASSERTION_LEVEL > 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \

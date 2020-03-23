@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/conversion.hpp
  * @author Marcel Breyer
- * @date 2020-03-22
+ * @date 2020-03-23
  *
  * @brief Defines conversion functions used in the mpicxx library.
  */
@@ -18,7 +18,7 @@ namespace mpicxx::detail {
 
     /**
      * @brief Converts a boolean value to its string representation.
-     * @param val the boolean value
+     * @param[in] val the boolean value
      * @return `std::string("true")` or `std::string("false")`
      */
     std::string convert_to_string(const bool val) {
@@ -27,7 +27,7 @@ namespace mpicxx::detail {
     }
     /**
      * @brief Converts every *string* like type to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
-     * @param val a *string* like value
+     * @param[in] val a *string* like value
      * @return a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) with the same content as @p val
      */
     std::string convert_to_string(string auto&& val) {
@@ -37,7 +37,7 @@ namespace mpicxx::detail {
      * @brief Converts the given @p val to its string representation using the
      * [`to_string()](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
      * @tparam T the convert to type
-     * @param val the value to convert
+     * @param[in] val the value to convert
      * @return the string representation of @p val
      */
     template <typename T>

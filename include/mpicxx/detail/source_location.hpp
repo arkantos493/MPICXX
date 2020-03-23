@@ -54,10 +54,10 @@ namespace mpicxx::detail {
     public:
         /**
          * @brief Constructs a new source_location with the respective information about the current call side.
-         * @param func the function name (including its signature if supported via the macro `PRETTY_FUNC_NAME__`)
-         * @param file the file name (absolute path)
-         * @param line the line number
-         * @param column the column number
+         * @param[in] func the function name (including its signature if supported via the macro `PRETTY_FUNC_NAME__`)
+         * @param[in] file the file name (absolute path)
+         * @param[in] line the line number
+         * @param[in] column the column number
          * @return the source_location holding the call side location information
          *
          * @attention @p column is always (independent of the call side position) default initialized to 0!
@@ -110,8 +110,8 @@ namespace mpicxx::detail {
          *   #2    /lib/x86_64-linux-gnu/libc.so.6: __libc_start_main() [+0xe]
          *   #1    ./output.s: _start() [+0x2]
          * @endcode
-         * @param out the output stream on which the report should be written
-         * @param max_call_stack_size the maximum depth of the stack trace report
+         * @param[inout] out the output stream on which the report should be written
+         * @param[in] max_call_stack_size the maximum depth of the stack trace report
          *
          * @attention The stack trace report is only available under [*GCC*](https://gcc.gnu.org/) and [*clang*](https://clang.llvm.org/)
          * (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
