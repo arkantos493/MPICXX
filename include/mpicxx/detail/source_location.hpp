@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
- * @date 2020-03-16
+ * @date 2020-03-23
  *
  * @brief Provides a `source_location` class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
@@ -23,6 +23,7 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/format.h>
 #include <mpi.h>
 
 /**
@@ -142,10 +143,10 @@ namespace mpicxx::detail {
                 free(symbollist);
             }
 
+            // TODO 2020-03-23 16:14 marcel: change from fmt::format to std::format
             // iterate over the returned symbol lines -> skip the first and second symbol because they are unimportant
             for (std::size_t i = 2; i < symbols.size(); ++i) {
-                out << "  #" << symbols.size() - i;
-                if (symbols.size() > 9 && symbols.size() - i  < 10) out << " ";
+                out << fmt::format("  #{:<6}", symbols.size() - i);
 
                 // file_name(function_name+offset) -> split the symbol line accordingly
                 const std::size_t position1 = std::min(symbols[i].find_first_of("("), symbols[i].size());
@@ -165,15 +166,15 @@ namespace mpicxx::detail {
 
                     if (status == 0) {
                         // demangling successful -> print pretty function name
-                        out << "    " << file_name << ": " << function_name_demangled << " [" << function_offset << "]\n";
+                        out << fmt::format("{}: {} [{}]\n", file_name, function_name_demangled, function_offset);
                     } else {
                         // demangling failed -> print un-demangled function name
-                        out << "    " << file_name << ": " << function_name << "() [" << function_offset << "]\n";
+                        out << fmt::format("{}: {}() [{}]\n", file_name, function_name, function_offset);
                     }
                     free(function_name_demangled);
                 } else {
                     // print complete symbol line if the splitting went wrong
-                    out << "    " << symbols[i] << "\n";
+                    out << fmt::format("{}\n", symbols[i]);
                 }
             }
             out << std::endl;
