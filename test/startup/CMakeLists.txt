@@ -3,7 +3,8 @@ set(TEST_SOURCES
         finalize.cpp
         initialize.cpp
         thread_support.cpp
-        spawn.cpp
+        spawner.cpp
+        multi_spawner.cpp
 )
 
 # create google test with MPI support
