@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/spawn.hpp
  * @author Marcel Breyer
- * @date 2020-03-23
+ * @date 2020-03-24
  *
  * @brief Implements wrapper around the MPI spawn functions.
  */
@@ -14,6 +14,7 @@
 #include <map>
 #include <optional>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -39,6 +40,7 @@ namespace mpicxx {
      * @brief Spawner class which enables to spawn MPI processes at runtime.
      */
     class spawner {
+        /// the type of a single argv argument (including a key and a value)
         using argv_type = std::pair<std::string, std::string>;
     public:
         /**
@@ -87,11 +89,17 @@ namespace mpicxx {
          * in an error (returning `0`).
          * @return the number of spawned processes
          *
+         * @pre @ref spawn() **must** already have been called.
+         *
+         * @assert_sanity{ If @ref spawn() hasn't been called yet. }
+         *
          * @calls{
          * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
          * }
          */
         [[nodiscard]] int number_of_spawned_processes() const {
+            MPICXX_ASSERT_SANITY(this->already_spawned(), "Spawn not called, so can't query the number of spawned processes yet!");
+
             if (intercomm_ != MPI_COMM_NULL) {
                 int size;
                 MPI_Comm_remote_size(intercomm_, &size);
@@ -103,8 +111,15 @@ namespace mpicxx {
         /**
          * @brief Check whether it was possible to spawn `maxprocs` processes.
          * @return `true` if `maxprocs` processes could be spawned, otherwise `false`
+         *
+         * @pre @ref spawn() **must** already have been called.
+         *
+         * @assert_sanity{ If @ref spawn() hasn't been called yet. }
          */
         [[nodiscard]] bool maxprocs_processes_spanwed() const {
+            MPICXX_ASSERT_SANITY(this->already_spawned(),
+                    "Spawn not called, so can't decide whether 'maxprocs' process have been spawned yet!");
+
             return maxprocs_ == this->number_of_spawned_processes();
         }
         /**
@@ -129,7 +144,7 @@ namespace mpicxx {
         }
 
         /**
-         * @brief Set the spawn info object representing additional information for the runtime system where and how to spawn the processes.
+         * @brief Set the info object representing additional information for the runtime system where and how to spawn the processes.
          * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
          *
          *  key | description
@@ -141,7 +156,7 @@ namespace mpicxx {
          * file | a name of a file in which additional information is specified                                                                                      |
          * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
          *
-         * @note An implementation is not required to interpret these keys, bit if it does interpret the key, it must provide the
+         * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
          * functionality described.
          * @param[in] additional_info copy of the info object
          * @return `*this`
@@ -194,7 +209,7 @@ namespace mpicxx {
         spawner& set_communicator(MPI_Comm comm) noexcept {
             MPICXX_ASSERT_PRECONDITION(comm != MPI_COMM_NULL, "Can't use null communicator!");
             MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
-                                 "The previously set root {} isn't a valid root in the new communicator!", root_);
+                                 "The previously set root '{}' isn't a valid root in the new communicator!", root_);
 
             comm_ = comm;
             return *this;
@@ -230,6 +245,20 @@ namespace mpicxx {
          * @return the arguments passed to `command`
          */
         [[nodiscard]] const std::vector<argv_type>& argv() const noexcept { return argv_; }
+        /**
+         * @brief Returns the i-th argument which will be passed to `command`.
+         * @param[in] i the argv to return
+         * @return the i-th argument
+         *
+         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         */
+        [[nodiscard]] const argv_type& argv(const std::size_t i) const {
+            if (i >= argv_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access! doesn't exist!: {} < {}", i, argv_.size()));
+            }
+
+            return argv_[i];
+        }
 
         /**
          * @brief Returns the intercommunicator between the original group and the newly spawned group.
