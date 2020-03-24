@@ -1,7 +1,7 @@
 /**
  * @file test/info/non-member_functions/inequality.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-03-24
  *
  * @brief Test cases for the @ref mpicxx::info::operator!=(const info&, const info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
@@ -11,7 +11,7 @@
  * | InequalityIdempotence | `info1 != info1; // false`                          |
  * | InequalitySymmetry    | `info1 != info2` <-> `info2 != info1`               |
  * | InequalityNonFreeable | freeable state should't have any impact on equality |
- * | MovedFromInequality   | info objects in the moved-from state (death test)   |
+ * | MovedFromInequality   | info objects in the moved-from state                |
  */
 
 #include <gtest/gtest.h>
@@ -99,7 +99,7 @@ TEST(NonMemberFunctionTest, InequalityNonFreeable) {
     MPI_Info_free(&info_2);
 }
 
-TEST(NonMemberFunctionDeathTest, MovedFromInequality) {
+TEST(NonMemberFunctionTest, MovedFromInequality) {
     // create two info objects and set them to the moved-from state
     mpicxx::info moved_from_1;
     mpicxx::info valid_1(std::move(moved_from_1));
@@ -109,7 +109,7 @@ TEST(NonMemberFunctionDeathTest, MovedFromInequality) {
     ASSERT_FALSE(valid_1 != valid_2);
     // comparing two moved-from info objects is illegal
     [[maybe_unused]] bool comp;
-    ASSERT_DEATH( comp = moved_from_1 != valid_1 , "");
-    ASSERT_DEATH( comp = moved_from_2 != valid_2 , "");
-    ASSERT_DEATH( comp = moved_from_1 != moved_from_2 , "");
+    EXPECT_TRUE(comp = moved_from_1 != valid_1);
+    EXPECT_TRUE(comp = moved_from_2 != valid_2);
+    EXPECT_FALSE(comp = moved_from_1 != moved_from_2);
 }

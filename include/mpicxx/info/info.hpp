@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-03-23
+ * @date 2020-03-24
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -2507,20 +2507,18 @@ namespace mpicxx {
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are equal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs **must not** be in the moved-from state.
-         *
-         * @assert_precondition{ If `lhs` or `rhs` are in the moved-from state. }
-         *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // at most twice
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
         [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT_PRECONDITION(!lhs.moved_from(), "Attempt to call a function on an info object ('lhs') in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to call a function on an info object ('rhs') in the moved-from state!");
+            // if both info object refer to MPI_INFO_NULL they compare equal
+            if (lhs.moved_from() && rhs.moved_from()) return true;
+            // if only one info object refers to MPI_INFO_NULL they don't compare equal
+            if (lhs.moved_from() || rhs.moved_from()) return false;
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
@@ -2575,23 +2573,14 @@ namespace mpicxx {
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are inequal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs **must not** be in the moved-from state.
-         *
-         * @assert_precondition{ If `lhs` or `rhs` are in the moved-from state. }
-         *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // at most twice
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
-        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT_PRECONDITION(!lhs.moved_from(), "Attempt to call a function on an info object ('lhs') in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to call a function on an info object ('rhs') in the moved-from state!");
-
-            return !(lhs == rhs);
-        }
+        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
         /**
          * @brief Specializes the [`std::swap`](https://en.cppreference.com/w/cpp/algorithm/swap) algorithm for info objects.
          * Swaps the contents of @p lhs and @p rhs.
