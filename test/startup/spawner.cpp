@@ -1,5 +1,5 @@
 /**
- * @file test/startup/spawn.cpp
+ * @file test/startup/spawner.cpp
  * @author Marcel Breyer
  * @date 2020-03-24
  *
@@ -147,8 +147,6 @@ TEST(StartupDeathTest, SetIllegalCommunicator) {
 }
 
 TEST(StartupTest, AddingArgv) {
-    using namespace std::string_literals;
-
     // create spawn object
     mpicxx::spawner sp("a.out", 4);
 
@@ -203,8 +201,6 @@ TEST(StartupTest, OutOfBounceArgv) {
 }
 
 TEST(StartupTest, ChainingCalls) {
-    using namespace std::string_literals;
-
     // create spawner object
     mpicxx::spawner sp("a.out", 4);
 
