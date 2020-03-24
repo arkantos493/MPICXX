@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <numeric>
 #include <optional>
 #include <ostream>
 #include <stdexcept>
@@ -397,6 +398,97 @@ namespace mpicxx {
         MPI_Comm intercomm_ = MPI_COMM_NULL;
         std::vector<int> errcodes_;
     };
+
+
+    // TODO 2020-03-24 17:32 marcel: class hierarchy?
+    /**
+     * @brief Spawner class which enables to spawn multiple MPI processes at runtime.
+     */
+    class multi_spawner {
+        using argv_type = std::pair<std::string, std::string>;
+
+    public:
+        template <typename... Args>
+        requires ( (detail::string<typename Args::first_type> && std::is_same_v<std::decay_t<typename Args::second_type>, int>) && ...)
+        multi_spawner(Args&&... args) {
+            commands_.reserve(sizeof...(Args));
+            maxprocs_.reserve(sizeof...(Args));
+
+            const auto add_to = [&]<typename T>(T&& arg) {
+                commands_.emplace_back(std::forward<typename T::first_type>(arg.first));
+                maxprocs_.emplace_back(arg.second);
+            };
+
+            (add_to(std::forward<Args>(args)), ...);
+
+            errcodes_ = std::vector<int>(std::reduce(maxprocs_.cbegin(), maxprocs_.cend()));
+        }
+
+        [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
+        [[nodiscard]] const std::string& command(const std::size_t i) const noexcept { return commands_[i]; } // TODO 2020-03-24 17:09 marcel: exceptions?
+
+        [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
+        [[nodiscard]] int maxprocs(const std::size_t i) const noexcept { return maxprocs_[i]; }
+
+        [[nodiscard]] int number_of_spawned_processes() const {
+            if (intercomm_ != MPI_COMM_NULL) {
+                int size;
+                MPI_Comm_remote_size(intercomm_, &size);
+                return size;
+            } else {
+                return 0;
+            }
+        }
+        [[nodiscard]] bool maxprocs_processes_spanwed() const {
+            return errcodes_.size() == static_cast<std::size_t>(this->number_of_spawned_processes()); // TODO 2020-03-24 17:14 marcel: revise
+        }
+        [[nodiscard]] static int universe_size() {
+            void* ptr;
+            int flag;
+            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
+            if (static_cast<bool>(flag)) {
+                return *reinterpret_cast<int*>(ptr);
+            } else {
+                return 0;
+            }
+        }
+
+        template <typename... Infos>
+        requires (std::is_same_v<std::decay_t<Infos>, info> && ...)
+        multi_spawner& set_spawn_info(Infos... infos) noexcept(std::is_nothrow_copy_assignable_v<info>) {
+            // TODO 2020-03-24 17:29 marcel: asserts?, parameter type?, calls?
+            const auto add_to = [&]<typename T>(T&& arg) {
+                infos_.emplace_back(std::forward<T>(arg));
+            };
+            (add_to(std::forward<Infos>(infos)), ...);
+            return *this;
+        }
+        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
+        [[nodiscard]] const info& spawn_info(const std::size_t i) const noexcept { return infos_[i]; }
+
+        multi_spawner& set_root(const int root) noexcept {
+            root_ = root;
+            return *this;
+        }
+        [[nodiscard]] int root() const noexcept { return root_; }
+
+        multi_spawner& set_communicator(MPI_Comm comm) noexcept {
+            comm_ = comm;
+            return *this;
+        }
+        [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
+
+    private:
+        std::vector<std::string> commands_;
+        std::vector<int> maxprocs_;
+        std::vector<info> infos_;
+        int root_;
+        MPI_Comm comm_;
+
+        MPI_Comm intercomm_;
+        std::vector<int> errcodes_;
+    };
+
 
     // TODO 2020-03-22 19:28 marcel: return type, docu
     /**
