@@ -405,7 +405,7 @@ namespace mpicxx {
      * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the parent intracommunicator or
      * `std::nullopt`.
      */
-    std::optional<MPI_Comm> parent_process() {
+    inline std::optional<MPI_Comm> parent_process() {
         MPI_Comm intercomm;
         MPI_Comm_get_parent(&intercomm);
         if (intercomm != MPI_COMM_NULL) {

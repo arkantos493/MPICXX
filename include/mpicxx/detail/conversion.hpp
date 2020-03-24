@@ -21,7 +21,7 @@ namespace mpicxx::detail {
      * @param[in] val the boolean value
      * @return `std::string("true")` or `std::string("false")`
      */
-    std::string convert_to_string(const bool val) {
+    inline std::string convert_to_string(const bool val) {
         using namespace std::string_literals;
         return val ? "true"s : "false"s;
     }
@@ -30,7 +30,7 @@ namespace mpicxx::detail {
      * @param[in] val a *string* like value
      * @return a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) with the same content as @p val
      */
-    std::string convert_to_string(string auto&& val) {
+    inline std::string convert_to_string(string auto&& val) {
         return std::string(std::forward<decltype(val)>(val));
     }
     /**
@@ -41,7 +41,7 @@ namespace mpicxx::detail {
      * @return the string representation of @p val
      */
     template <typename T>
-    std::string convert_to_string(T&& val) {
+    inline std::string convert_to_string(T&& val) {
         using std::to_string;
         return to_string(std::forward<T>(val));
     }
