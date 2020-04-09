@@ -1,9 +1,9 @@
 /**
  * @file test/startup/multi_spawner.cpp
  * @author Marcel Breyer
- * @date 2020-03-24
+ * @date 2020-04-09
  *
- * @brief Test cases for the @ref mpicxx::multi_spawner class wrapping the *MPI_COMM_SPAWN* function.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner class wrapping the *MPI_COMM_SPAWN_MULTIPLE* function.
  * @details Testsuite: *StartupTest*
  * | test case name           | test case description                                                                             |
  * |:-------------------------|:--------------------------------------------------------------------------------------------------|

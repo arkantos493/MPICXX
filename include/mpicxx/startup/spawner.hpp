@@ -1,20 +1,16 @@
 /**
  * @file include/mpicxx/startup/spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-08
+ * @date 2020-04-09
  *
- * @brief Implements wrapper around the MPI spawn functions.
+ * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
 
 #ifndef MPICXX_SPAWNER_HPP
 #define MPICXX_SPAWNER_HPP
 
-#include <algorithm>
 #include <iostream>
-#include <map>
 #include <numeric>
-#include <optional>
-#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -24,11 +20,12 @@
 #include <fmt/format.h>
 #include <mpi.h>
 
+#include <mpicxx/detail/assert.hpp>
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/detail/conversion.hpp>
 #include <mpicxx/info/info.hpp>
-#include <mpicxx/detail/assert.hpp>
 #include <mpicxx/startup/spawner_base.hpp>
+
 
 namespace mpicxx {
 
@@ -45,7 +42,7 @@ namespace mpicxx {
         using argv_type = std::pair<std::string, std::string>;
     public:
         /**
-         * @brief Create a new spawner.
+         * @brief Create a new single_spawner.
          * @param[in] command name of program to be spawned
          * @param[in] maxprocs maximum number of processes to start
          *
@@ -59,9 +56,15 @@ namespace mpicxx {
          * }
          */
         single_spawner(detail::string auto&& command, const int maxprocs)
-            : command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs)
-        { }
+            : base_(maxprocs), command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs)
+        {
+            MPICXX_ASSERT_SANITY(!command_.empty(), "No executable name given!");
+        }
 
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                  getter                                                    //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Returns the name of the executable which should get spawned.
          * @return the executable name
@@ -74,6 +77,10 @@ namespace mpicxx {
          */
         [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
 
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                         manipulate additional info                                         //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Set the info object representing additional information for the runtime system where and how to spawn the processes.
          * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
@@ -91,9 +98,10 @@ namespace mpicxx {
          * functionality described.
          * @param[in] additional_info copy of the info object
          */
-        void set_spawn_info(info additional_info) noexcept(std::is_nothrow_move_assignable_v<info>) {
+        single_spawner& set_spawn_info(info additional_info) noexcept(std::is_nothrow_move_assignable_v<info>) {
             // TODO 2020-03-22 18:39 marcel: asserts?, parameter type?, calls?
             info_ = std::move(additional_info);
+            return *this;
         }
         /**
          * @brief Returns the info object representing additional information for the runtime system where and how to spawn the processes.
@@ -101,6 +109,10 @@ namespace mpicxx {
          */
         [[nodiscard]] const info& spawn_info() const noexcept { return info_; }
 
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                       manipulate additional arguments                                      //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Adds an argument pair the the `argv` list which gets passed to the spawned program.
          * @details Adds a leading `-` to @p key if not already present.
@@ -111,13 +123,27 @@ namespace mpicxx {
          * @param[in] value the value associated with @p key
          */
         template <typename T>
-        void add_argv(std::string key, T&& value) {
+        single_spawner& add_argv(std::string key, T&& value) {
             // add leading '-' if necessary
             if (!key.starts_with('-')) {
                 key.insert(0, 1, '-');
             }
             // add [key, value]-argv-pair to argvs
             argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
+            return *this;
+        }
+        template <std::input_iterator InputIt>
+        requires (!std::is_constructible_v<std::string, InputIt>) // TODO 2020-04-09 18:52 marcel: revise
+        single_spawner& add_argv(InputIt first, InputIt last) {
+            for (; first != last; ++first) {
+                auto&& pair = *first;
+                this->add_argv(std::forward<decltype(pair.first)>(pair.first), std::forward<decltype(pair.second)>(pair.second));
+            }
+            return *this;
+        }
+        template <typename T>
+        single_spawner& add_argv(std::initializer_list<std::pair<std::string, T>> ilist) {
+            return this->add_argv(ilist.begin(), ilist.end());
         }
         /**
          * @brief Returns the arguments which will be passed to `command`.
@@ -139,6 +165,10 @@ namespace mpicxx {
             return argv_[i];
         }
 
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                            spawn new process(es)                                           //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
          *
@@ -146,30 +176,100 @@ namespace mpicxx {
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
          * }
          */
-//        void spawn() override {
-//            if (argv_.empty()) {
-//                MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_.get(), root_, comm_, &intercomm_, errcodes_.data());
-//            } else {
-//                // convert to char**
-//                std::vector<char*> argv_ptr;
-//                argv_ptr.reserve(argv_.size() * 2 + 1);
-//                for (auto& [key, value] : argv_) {
-//                    argv_ptr.emplace_back(key.data());
-//                    argv_ptr.emplace_back(value.data());
-//                }
-//                // add null termination
-//                argv_ptr.emplace_back(nullptr);
-//
-//                MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_.get(), root_, comm_, &intercomm_, errcodes_.data());
-//            }
-//        }
+        void spawn() {
+            if (argv_.empty()) {
+                // no additional arguments provided -> use MPI_ARGV_NULL
+                MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_.get(),
+                               base_.root_, base_.comm_, &base_.intercomm_, base_.errcodes_.data());
+            } else {
+                // convert additional arguments to char**
+                std::vector<char*> argv_ptr;
+                argv_ptr.reserve(argv_.size() * 2 + 1);
+                for (auto& [key, value] : argv_) {
+                    argv_ptr.emplace_back(key.data());
+                    argv_ptr.emplace_back(value.data());
+                }
+                // add null termination
+                argv_ptr.emplace_back(nullptr);
+
+                MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_.get(),
+                               base_.root_, base_.comm_, &base_.intercomm_, base_.errcodes_.data());
+            }
+        }
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                      functions provided by spawner_base                                    //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @copydoc detail::spawner_base::number_of_spawned_processes()
+         */
+        [[nodiscard]] int number_of_spawned_processes() const {
+            return base_.number_of_spawned_processes();
+        }
+        /**
+         * @copydoc detail::spawner_base::maxprocs_processes_spanwed()
+         */
+        [[nodiscard]] bool maxprocs_processes_spanwed() const {
+            return base_.maxprocs_processes_spanwed();
+        }
+        /**
+         * @copydoc detail::spawner_base::universe_size()
+         */
+        [[nodiscard]] static int universe_size() {
+            return detail::spawner_base::universe_size();
+        }
+        /**
+         * @copydoc detail::spawner_base::set_root(const int)
+         */
+        single_spawner& set_root(const int root) noexcept {
+            base_.set_root(root);
+            return *this;
+        }
+        /**
+         * @copydoc detail::spawner_base::root()
+         */
+        [[nodiscard]] int root() const noexcept { return base_.root(); }
+        /**
+         * @copydoc detail::spawner_base::set_communicator(MPI_Comm)
+         */
+        single_spawner& set_communicator(MPI_Comm comm) noexcept {
+            base_.set_communicator(comm);
+            return *this;
+        }
+        /**
+         * @copydoc detail::spawner_base::communicator()
+         */
+        [[nodiscard]] MPI_Comm communicator() const noexcept { return base_.communicator(); }
+        /**
+         * @copydoc detail::spawner_base::intercommunicator()
+         */
+        [[nodiscard]] MPI_Comm intercommunicator() const noexcept { return base_.intercommunicator(); }
+        /**
+         * @copydoc detail::spawner_base::errcodes()
+         */
+        [[nodiscard]] const std::vector<int>& errcodes() const noexcept {
+            return base_.errcodes();
+        }
+        /**
+         * @copydoc detail::spawner_base::print_errors_to()
+         */
+        void print_errors_to(std::ostream& out = std::cout) const {
+            base_.print_errors_to(out);
+        }
+
 
     private:
+        detail::spawner_base base_;
+
         std::string command_;
         int maxprocs_;
         std::vector<argv_type> argv_;
         info info_ = info(MPI_INFO_NULL, false);
     };
+
+    /// default spawner is a @ref single_spawner
+    using spawner = single_spawner;
 
 }
 

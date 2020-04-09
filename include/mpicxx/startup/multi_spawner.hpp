@@ -1,20 +1,16 @@
 /**
  * @file include/mpicxx/startup/multi_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-08
+ * @date 2020-04-09
  *
- * @brief Implements wrapper around the MPI spawn functions.
+ * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
 
 #ifndef MPICXX_MULTI_SPAWNER_HPP
 #define MPICXX_MULTI_SPAWNER_HPP
 
-#include <algorithm>
 #include <iostream>
-#include <map>
 #include <numeric>
-#include <optional>
-#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -24,10 +20,11 @@
 #include <fmt/format.h>
 #include <mpi.h>
 
+#include <mpicxx/detail/assert.hpp>
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/detail/conversion.hpp>
 #include <mpicxx/info/info.hpp>
-#include <mpicxx/detail/assert.hpp>
+#include <mpicxx/startup/spawner_base.hpp>
 
 
 namespace mpicxx {
@@ -38,7 +35,7 @@ namespace mpicxx {
     // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
     /**
-     * @brief Spawner class which enables to spawn multiple MPI processes at runtime.
+     * @brief Spawner class which enables to spawn multiple different MPI processes at runtime.
      */
     class multiple_spawner {
         /// the type of a single argv argument (including a key and a value)
@@ -57,13 +54,14 @@ namespace mpicxx {
 
             (add_to(std::forward<Args>(args)), ...);
 
+            base_ = spawner_base(std::reduce(maxprocs_.cbegin(), maxprocs_.cend()));
       }
 
         [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
-        [[nodiscard]] const std::string& command(const std::size_t i) const noexcept { return commands_[i]; } // TODO 2020-03-24 17:09 marcel: exceptions?
+//        [[nodiscard]] const std::string& command(const std::size_t i) const noexcept { return commands_[i]; } // TODO 2020-03-24 17:09 marcel: exceptions?
 
         [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
-        [[nodiscard]] int maxprocs(const std::size_t i) const noexcept { return maxprocs_[i]; }
+//        [[nodiscard]] int maxprocs(const std::size_t i) const noexcept { return maxprocs_[i]; }
 
 
         template <typename... Infos>
@@ -76,10 +74,20 @@ namespace mpicxx {
             (add_to(std::forward<Infos>(infos)), ...);
         }
         [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
-        [[nodiscard]] const info& spawn_info(const std::size_t i) const noexcept { return infos_[i]; }
+//        [[nodiscard]] const info& spawn_info(const std::size_t i) const noexcept { return infos_[i]; }
+
+
+        /**
+         * @brief DOC
+         */
+        void spawn() {
+
+        }
 
 
     private:
+        spawner_base base_;
+
         std::vector<std::string> commands_;
         std::vector<int> maxprocs_;
         std::vector<std::vector<argv_type>> argvs_;
