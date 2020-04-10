@@ -5,11 +5,11 @@
  *
  * @brief Test cases for the @ref mpicxx::info::swap(info&, info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name            | test case description                                              |
- * |:--------------------------|:-------------------------------------------------------------------|
- * | SwapValidAndValid         | swap two info objects                                              |
- * | SwapValidAndMovedFrom     | swap two info objects where one of them is in the moved-from state |
- * | SwapMovedFromAndMovedFrom | swap two info objects where both are in the moved-from state       |
+ * | test case name    | test case description                                             |
+ * |:------------------|:------------------------------------------------------------------|
+ * | SwapValidAndValid | swap two info objects                                             |
+ * | SwapValidAndNull  | swap two info objects where one of them refers to *MPI_INFO_NULL* |
+ * | SwapNullAndNull   | swap two info objects where both refer to *MPI_INFO_NULL*         |
  */
 
 #include <gtest/gtest.h>
@@ -50,11 +50,11 @@ TEST(NonMemberFunctionTest, SwapValidAndValid) {
     EXPECT_STREQ(value, "value1");
 }
 
-TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
-    // create two info objects and add [key, value]-pairs to one and set the other to the moved-from state
-    mpicxx::info info_1;
-    MPI_Info_set(info_1.get(), "key", "value");
-    mpicxx::info info_2(std::move(info_1));
+TEST(NonMemberFunctionTest, SwapValidAndNull) {
+    // create two info objects and add [key, value]-pairs to one and set the other to refer to MPI_INFO_NULL
+    mpicxx::info info_1(MPI_INFO_NULL, false);
+    mpicxx::info info_2;
+    MPI_Info_set(info_2.get(), "key", "value");
 
     // swap both info objects
     using std::swap;
@@ -63,10 +63,9 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
 
-    // check info_2 -> now in the default-initialized state
-    MPI_Info_get_nkeys(info_2.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(info_2.freeable());
+    // check info_2 -> now refers to MPI_INFO_NULL
+    EXPECT_EQ(info_2.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_2.freeable());
 
     // check info_1
     MPI_Info_get_nkeys(info_1.get(), &nkeys);
@@ -80,10 +79,9 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
     using std::swap;
     swap(info_1, info_2);
 
-    // check info_1 -> now in the default-initialized state
-    MPI_Info_get_nkeys(info_1.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(info_1.freeable());
+    // check info_1 -> now refers to MPI_INFO_NULL
+    EXPECT_EQ(info_1.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_1.freeable());
 
     // check info_2
     MPI_Info_get_nkeys(info_2.get(), &nkeys);
@@ -94,21 +92,18 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
     EXPECT_TRUE(info_2.freeable());
 }
 
-TEST(NonMemberFunctionTest, SwapMovedFromAndMovedFrom) {
-    // create two info objects and set them to the moved-from state
-    mpicxx::info moved_from_1;
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info moved_from_2;
-    mpicxx::info dummy_2(std::move(moved_from_2));
+TEST(NonMemberFunctionTest, SwapNullAndNull) {
+    // create two null info objects
+    mpicxx::info info_null_1(MPI_INFO_NULL, false);
+    mpicxx::info info_null_2(MPI_INFO_NULL, false);
 
-    // swap both moved-from info objects
+    // swap both null info objects
     using std::swap;
-    swap(moved_from_1, moved_from_2);
+    swap(info_null_1, info_null_2);
 
-    // both are still in the default-initialized state
-    int nkeys_1, nkeys_2;
-    MPI_Info_get_nkeys(moved_from_1.get(), &nkeys_1);
-    MPI_Info_get_nkeys(moved_from_2.get(), &nkeys_2);
-    EXPECT_EQ(nkeys_1, nkeys_2);
-    EXPECT_EQ(moved_from_1.freeable(), moved_from_2.freeable());
+    // both are still referring to MPI_INFO_NULL
+    EXPECT_EQ(info_null_1.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null_1.freeable());
+    EXPECT_EQ(info_null_2.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null_2.freeable());
 }
