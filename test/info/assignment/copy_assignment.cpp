@@ -1,20 +1,21 @@
 /**
  * @file test/info/assignment/copy_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-10
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
- * | test case name                 | test case description                                                              |
- * |:-------------------------------|:-----------------------------------------------------------------------------------|
- * | CopyAssignValidToValid         | `info1 = info2;`                                                                   |
- * | CopyAssignMultiple             | `info1 = info2 = info3; // test *this return`                                      |
- * | CopyAssignMovedFromToValid     | `info1 = info2; // where info2 is in the moved-from state` (death test)            |
- * | CopyAssignValidToMovedFrom     | `info1 = info2; // where info1 is in the moved-from state`                         |
- * | CopyAssignMovedFromToMovedFrom | `info1 = info2; // where info1 and info2 are in the moved-from state` (death test) |
- * | CopySelfAssignment             | `info1 = info1; // no-op` (death test)                                             |
- * | CopyAssignToNonFreeable        | non-freeable info object should be freeable now                                    |
- * | CopyAssignFromNonFreeable      | info object should be freeable (despite that the copied-from was non-freeable)     |
+ * | test case name                 | test case description                                                          |
+ * |:-------------------------------|:-------------------------------------------------------------------------------|
+ * | CopyAssignValidToValid         | `info1 = info2;`                                                               |
+ * | CopyAssignMultiple             | `info1 = info2 = info3; // test *this return`                                  |
+ * | CopyAssignMovedFromToValid     | `info1 = info2; // where info2 was already moved-from`                         |
+ * | CopyAssignValidToMovedFrom     | `info1 = info2; // where info1 was already moved-from`                         |
+ * | CopyAssignMovedFromToMovedFrom | `info1 = info2; // where info1 and info2 were already moved-from`              |
+ * | CopyAssignFromNull             | `info1 = info2; // where info2 refers to MPI_INFO_NULL`                        |
+ * | CopySelfAssignment             | `info1 = info1; // no-op` (death test)                                         |
+ * | CopyAssignToNonFreeable        | non-freeable info object should be freeable now                                |
+ * | CopyAssignFromNonFreeable      | info object should be freeable (despite that the copied-from was non-freeable) |
  */
 
 #include <gtest/gtest.h>
@@ -88,13 +89,19 @@ TEST(AssignmentTest, CopyAssignMultiple) {
     EXPECT_STREQ(value, "value3");
 }
 
-TEST(AssignmentDeathTest, CopyAssignMovedFromToValid) {
+TEST(AssignmentTest, CopyAssignMovedFromToValid) {
     // create first info object and move-construct second info object from it
     mpicxx::info moved_from;
     mpicxx::info valid(std::move(moved_from));
 
-    // copy assignment where rhs is in the moved-from state is illegal
-    ASSERT_DEATH( valid = moved_from , "");
+    // copy assign moved-from object
+    valid = moved_from;
+
+    // valid should be in the default-initialized state
+    int nkeys;
+    MPI_Info_get_nkeys(valid.get(), &nkeys);
+    EXPECT_EQ(nkeys, 0);
+    EXPECT_TRUE(valid.freeable());
 }
 
 TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
@@ -134,15 +141,39 @@ TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
     EXPECT_EQ(nkeys, 1);
 }
 
-TEST(AssignmentDeathTest, CopyAssignMovedFromToMovedFrom) {
+TEST(AssignmentTest, CopyAssignMovedFromToMovedFrom) {
     // create empty info objects and set them to the moved-from state
     mpicxx::info moved_from_1;
     mpicxx::info dummy_1(std::move(moved_from_1));
     mpicxx::info moved_from_2;
     mpicxx::info dummy_2(std::move(moved_from_2));
 
-    // copy assignment where rhs is in the moved-from state is illegal
-    ASSERT_DEATH( moved_from_1 = moved_from_2 , "");
+    // copy assign moved-from object
+    moved_from_1 = moved_from_2;
+
+    // moved_from_1 should be in the default-initialized state
+    int nkeys;
+    MPI_Info_get_nkeys(moved_from_1.get(), &nkeys);
+    EXPECT_EQ(nkeys, 0);
+    EXPECT_TRUE(moved_from_1.freeable());
+}
+
+TEST(AssignmentTest, CopyAssignFromNull) {
+    // create info object
+    mpicxx::info valid;
+    // create null info object
+    mpicxx::info info_null(MPI_INFO_NULL, false);
+
+    // copy assign null object
+    valid = info_null;
+
+    // info_null should still refer to MPI_INFO_NULL
+    EXPECT_EQ(info_null.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null.freeable());
+
+    // valid should refer to MPI_INFO_NULL
+    EXPECT_EQ(valid.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(valid.freeable());
 }
 
 TEST(AssignmentDeathTest, CopySelfAssignment) {

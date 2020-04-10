@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-04-10
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -36,6 +36,7 @@
 
 namespace mpicxx {
     /**
+     * @nosubgrouping
      * @brief This class is a wrapper to the *MPI_Info* object providing a interface inspired by
      * [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map) and
      * [`std::map`](https://en.cppreference.com/w/cpp/container/map).
@@ -194,6 +195,7 @@ namespace mpicxx {
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
+         * @nosubgrouping
          * @brief Provides iterator and const_iterator for an info object.
          * @details The standard reverse_iterator and const_reverse_iterator are provided
          * in terms of [`std::reverse_iterator<iterator>`](https://en.cppreference.com/w/cpp/iterator/reverse_iterator) and
@@ -265,6 +267,8 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             //                                                constructors                                                //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name constructors and destructor
+            ///@{
             /**
              * @brief Default construct a new iterator.
              *
@@ -328,11 +332,14 @@ namespace mpicxx {
                                      "Attempt to create an iterator from a {} iterator{}!",
                                      other.state(), other.info_state());
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
-            //                                            assignment operator                                             //
+            //                                            assignment operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name assignment operators
+            ///@{
             /**
              * @brief Copy assignment operator. Replace the contents with a copy of the contents of @p other.
              * @param[in] rhs another iterator to use as data source
@@ -379,11 +386,14 @@ namespace mpicxx {
                 pos_ = rhs.pos_;
                 return *this;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            relational operators                                            //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name relational operators
+            ///@{
             /**
              * @brief Perform the respective comparison operation on the iterator and the given @p rhs one.
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
@@ -478,11 +488,14 @@ namespace mpicxx {
 
                 return info_ == rhs.info_ && pos_ >= rhs.pos_;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
-            //                                            modifying operations                                            //
+            //                                                  modifiers                                                 //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name modifiers
+            ///@{
             /**
              * @brief Move the iterator one position forward.
              * @return modified iterator pointing to the new position
@@ -637,11 +650,14 @@ namespace mpicxx {
                 it.pos_ -= inc;
                 return it;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
             //                                            distance calculation                                            //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name distance calculation
+            ///@{
             /**
              * @brief Calculate the distance between the iterator and the given @p rhs one.
              * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
@@ -668,11 +684,14 @@ namespace mpicxx {
 
                 return pos_ - rhs.pos_;
             }
+            ///@}
 
 
             // ---------------------------------------------------------------------------------------------------------- //
-            //                                          dereferencing operations                                          //
+            //                                               dereferencing                                                //
             // ---------------------------------------------------------------------------------------------------------- //
+            /// @name dereferencing
+            ///@{
             /**
              * @brief Get the [key, value]-pair at the current iterator position + @p n.
              * @details If the current iterator is a const_iterator, the returned type is a
@@ -788,6 +807,7 @@ namespace mpicxx {
 
                 return std::make_unique<value_type>(this->operator[](0));
             }
+            ///@}
 
 
         private:
@@ -865,7 +885,7 @@ namespace mpicxx {
              * - it is **not** a singular iterator
              * - it is **not** referring to an info object in the moved-from state
              * - the current position + @p **does not** fall outside its valid range
-             * @param n the number of advance steps (@p n may be negative)
+             * @param[in] n the number of advance steps (@p n may be negative)
              */
             bool advanceable(const difference_type n) const {
                 if (this->singular() || this->info_moved_from()) {
@@ -972,20 +992,27 @@ namespace mpicxx {
          * file         | value is the name of a file in which additional information is specified                                        |
          * thread_level | requested level of thread support, if requested before the program started execution (e.g. "MPI_THREAD_SINGLE”) |
          *
-         * Note: The contents of *MPI_INFO_ENV* are implementation defined, i.e. not all of the predefined keys have to be defined.
+         * @note The contents of *MPI_INFO_ENV* are implementation defined, i.e. not all of the predefined keys have to be defined.
          *
          * @attention **No** *MPI_Info_free* gets called upon destruction (doing so would result in a MPI runtime failure).
          */
         static const info env;
 
+        /**
+         * @brief Static null object which is mainly used to explicitly indicate that **no** info is provided.
+         *
+         * @attention **No** *MPI_Info_free* gets called upon destruction (doing so would result in a MPI runtime failure).
+         */
+        static const info null;
+
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                        constructors and destructor                                         //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name constructors and destructor
+        ///@{
         /**
          * @brief Constructs an empty info object.
-         *
-         * @post The newly constructed info object is in a valid state.
          *
          * @calls{
          * int MPI_Info_create(MPI_Info *info);     // exactly once
@@ -1000,38 +1027,40 @@ namespace mpicxx {
          * @details Retains @p other's [key, value]-pair ordering.
          * @param[in] other another info object to be used as source to initialize the [key, value]-pairs of this info object with
          *
-         * @pre @p other **must not** be in the moved-from state.
-         * @post The newly constructed info object is in a valid state.
-         * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
-         *
-         * @assert_precondition{ If @p other is in the moved-from state. }
+         * @attention Every copied info object (except if `other.get() == MPI_INFO_NULL`) is marked **freeable** independent of the
+         * **freeable** state of make the copied-from info object.
          *
          * @calls{
-         * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);      // exactly once
+         * int MPI_Info_dup(MPI_info info, MPI_info *newinfo);      // at most once
          * }
          */
-        info(const info& other) : is_freeable_(true) {
-            MPICXX_ASSERT_PRECONDITION(!other.moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
-
-            MPI_Info_dup(other.info_, &info_);
+        info(const info& other) {
+            if (other.info_ == MPI_INFO_NULL) {
+                // copy an info object which refers to MPI_INFO_NULL
+                info_ = MPI_INFO_NULL;
+                is_freeable_ = other.is_freeable_;
+            } else {
+                // copy normal info object
+                MPI_Info_dup(other.info_, &info_);
+                is_freeable_ = true;
+            }
         }
         /**
          * @brief Move constructor. Constructs the info object with the contents of @p other using move semantics.
          * @details Retains @p other's [key, value]-pair ordering.
          * @param[in] other another info object to be used as source to initialize the [key, value]-pairs of this info object with
          *
-         * @post The newly constructed info object is in a valid state iff @p other was in a valid state.
-         * @post @p other is now in the moved-from state.
+         * @post @p other is now in the default-initialized state.
          * @post All iterators referring to @p other remain valid, but now refer to `*this`.
          *
-         * @assert_sanity{ If @p other is in the moved-from state. }
+         * @calls{
+         * int MPI_Info_create(MPI_Info *info);     // exactly once
+         * }
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
-            MPICXX_ASSERT_SANITY(!this->moved_from(), "Attempt to access an info object ('other') in the moved-from state!");
-
-            // set other to the moved-from state
-            other.info_ = MPI_INFO_NULL;
-            other.is_freeable_ = false;
+            // set other to the default-initialized state
+            MPI_Info_create(&other.info_);
+            other.is_freeable_ = true;
         }
         /**
          * @brief Constructs the info object with the contents of the range [@p first, @p last).
@@ -1041,15 +1070,7 @@ namespace mpicxx {
          * @param[in] last iterator one-past the last [key, value]-pair in the range
          *
          * Example:
-         * @code{.cpp}
-         * std::vector<std::pair<const std::string, std::string>> key_value_pairs;
-         * key_value_pairs.emplace_back("key1", "value1");
-         * key_value_pairs.emplace_back("key2", "value2");
-         * key_value_pairs.emplace_back("key1", "value1_override");
-         * key_value_pairs.emplace_back("key3", "value3");
-         *
-         * mpicxx::info obj(key_value_pairs.begin(), key_value_pairs.end());
-         * @endcode
+         * @snippet examples/info/constructor.cpp constructor iterator range
          * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order): \n
          * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
          *
@@ -1058,7 +1079,6 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
-         * @post The newly constructed info object is in a valid state.
          *
          * @assert_precondition{
          * If any key or value exceed their size limit. \n
@@ -1082,19 +1102,13 @@ namespace mpicxx {
          * @param[in] init initializer list to initialize the [key, value]-pairs of the info object with
          *
          * Example:
-         * @code{.cpp}
-         * mpicxx::info obj = { {"key1", "value1"},
-         *                      {"key2", "value2"},
-         *                      {"key1", "value1_override"},
-         *                      {"key3", "value3"} };
-         * @endcode
+         * @snippet examples/info/constructor.cpp constructor initializer list
          * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
          * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
          *
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
-         * @post The newly constructed info object is in a valid state.
          *
          * @assert_precondition{ If any key or value exceed their size limit. }
          *
@@ -1114,18 +1128,10 @@ namespace mpicxx {
          * @param[in] is_freeable mark whether the *MPI_Info* object wrapped in this info object should be automatically
          * freed at the end of its lifetime
          *
-         * @post The newly constructed info object is in a valid state iff @p other was in a valid state (i.e. was **not** *MPI_INFO_NULL*).
          * @attention If @p is_freeable is set to `false`, **the user** has to ensure that the *MPI_Info* object @p other gets properly
          * freed (via a call to *MPI_Info_free*) at the end of its lifetime.
          * @attention Changing the underlying *MPI_Info* object **does not** change the value of `*this`!:
-         * @code{.cpp}
-         * MPI_Info mpi_info;
-         * MPI_Info_create(&mpi_info);
-         *
-         * mpicxx::info info (mpi_info, true);
-         *
-         * mpi_info = MPI_INFO_NULL;    // <- does not change the value of 'info'!
-         * @endcode
+         * @snippet examples/info/constructor.cpp constructor MPI_Info
          *
          * @assert_sanity{ If @p other equals to *MPI_INFO_NULL* or *MPI_INFO_ENV* **and** @p is_freeable is set to `true`. }
          */
@@ -1158,27 +1164,26 @@ namespace mpicxx {
                 MPI_Info_free(&info_);
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            assignment operators                                            //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name assignment operators
+        ///@{
         /**
          * @brief Copy assignment operator. Replaces the contents with a copy of the contents of @p other.
          * @details Retains @p rhs's [key, value]-pair ordering. Gracefully handles self-assignment.
          * @param[in] rhs another info object to use as data source
          * @return `*this`
          *
-         * @pre @p rhs **must not** be in the moved-from state.
          * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
-         * @post The assigned to info object is in a valid state.
-         * @attention Every copied info object is marked **freeable** independent of the **freeable** state of the copied-from info object.
+         * @attention Every copied info object (except if `other.get() == MPI_INFO_NULL`)  is marked **freeable** independent of the
+         * **freeable** state of the copied-from info object.
          *
-         * @assert_precondition{
-         * If @p rhs is in the moved-from state. \n
-         * If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`.
-         * }
-         * @assert_sanity{ If `*this` and @p rhs are the same info object! }
+         * @assert_precondition{ If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. }
+         * @assert_sanity{ If `*this` and @p rhs are the same info object. }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);                       // at most once
@@ -1186,7 +1191,6 @@ namespace mpicxx {
          * }
          */
         info& operator=(const info& rhs) {
-            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
             MPICXX_ASSERT_SANITY(!this->identical(rhs), "Attempt to perform a \"self copy assignment\"!");
 
             // check against self-assignment
@@ -1199,8 +1203,15 @@ namespace mpicxx {
                     MPI_Info_free(&info_);
                 }
                 // copy rhs info object
-                MPI_Info_dup(rhs.info_, &info_);
-                is_freeable_ = true;
+                if (rhs.info_ == MPI_INFO_NULL) {
+                    // copy an info object which refers to MPI_INFO_NULL
+                    info_ = MPI_INFO_NULL;
+                    is_freeable_ = rhs.is_freeable_;
+                } else {
+                    // copy normal info object
+                    MPI_Info_dup(rhs.info_, &info_);
+                    is_freeable_ = true;
+                }
             }
             return *this;
         }
@@ -1212,22 +1223,18 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
-         * @post The assigned to info object is in a valid state iff @p rhs was in a valid state.
-         * @post @p rhs is now in the moved-from state.
+         * @post `rhs` is in the default-initialized state.
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
          *
          * @assert_precondition{ If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. }
-         * @assert_sanity{
-         * If @p rhs is in the moved-from state. \n
-         * If `*this` and @p rhs are the same info object!
-         * }
+         * @assert_sanity{ `*this` and @p rhs are the same info object. }
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
+         * int MPI_Info_create(MPI_Info *info);     // exactly once
          * }
          */
         info& operator=(info&& rhs) {
-            MPICXX_ASSERT_SANITY(!rhs.moved_from(), "Attempt to access an info object ('rhs') in the moved-from state!");
             MPICXX_ASSERT_SANITY(!this->identical(rhs), "Attempt to perform a \"self move assignment\"!");
 
             // delete current MPI_Info object if and only if it is marked as freeable
@@ -1240,9 +1247,9 @@ namespace mpicxx {
             // transfer ownership
             info_ = std::move(rhs.info_);
             is_freeable_ = std::move(rhs.is_freeable_);
-            // set rhs to the moved-from state
-            rhs.info_ = MPI_INFO_NULL;
-            rhs.is_freeable_ = false;
+            // set rhs to the default-initialized state
+            MPI_Info_create(&rhs.info_);
+            rhs.is_freeable_ = true;
             return *this;
         }
         /**
@@ -1256,7 +1263,6 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
-         * @post The assigned to info object is in a valid state.
          *
          * @assert_precondition{
          * If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. \n
@@ -1284,11 +1290,14 @@ namespace mpicxx {
             this->insert_or_assign(ilist);
             return *this;
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  iterators                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name iterators
+        ///@{
         /**
          * @brief Returns an @ref iterator to the first [key, value]-pair of the info object.
          * @details If the info object is empty, the returned @ref iterator will be equal to @ref end().
@@ -1478,11 +1487,14 @@ namespace mpicxx {
 
             return std::make_reverse_iterator(this->cbegin());
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                  capacity                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name capacity
+        ///@{
         /**
          * @brief Checks if the info object has no [key, value]-pairs, i.e. whether `begin() == end()`.
          * @return `true` if the info object is empty, `false` otherwise
@@ -1534,11 +1546,14 @@ namespace mpicxx {
         [[nodiscard]] static constexpr size_type max_size() {
             return std::numeric_limits<difference_type>::max();
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                                  modifier                                                  //
+        //                                                  modifiers                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name modifiers
+        ///@{
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
          * @details Returns a proxy class, which is used to distinguish between read and write accesses.
@@ -1546,22 +1561,7 @@ namespace mpicxx {
          * @return a proxy object
          *
          * Example:
-         * @code{.cpp}
-         * mpicxx::info obj = { {"key", "foo"} };
-         * try {
-         *     obj.at("key") = "bar";                   // write access
-         *     std::string str_val = obj.at("key");     // read access: returns a proxy object, which is immediately casted to a std::string
-         *     str_val = "baz";                         // changing str_val will (obviously) not change the value of obj.at("key")
-         *
-         *     // same as: obj.at("key") = "baz";
-         *     auto val = obj.at("key");                // read access: returns a proxy object
-         *     val = "baz";                             // write access: now obj.at("key") will return "baz"
-         *
-         *     obj.at("key_2") = "baz";                 // will throw
-         * } catch (const std::out_of_range& e) {
-         *     std::cerr << e.what() << std::endl;      // prints: "key_2 doesn't exist!"
-         * }
-         * @endcode
+         * @snippet examples/info/access.cpp access at
          *
          * @pre `*this` **must not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
@@ -1603,21 +1603,7 @@ namespace mpicxx {
          * @return the value associated with @p key
          *
          * Example:
-         * @code{.cpp}
-         * const mpicxx::info obj = { {"key", "foo"} };
-         * try {
-         *     obj.at("key") = "bar";                      // write access: modifying a temporary is nonsensical
-         *     std::string str_val = obj.at("key");        // read access: directly returns a std::string
-         *     str_val = "baz";                            // changing str_val will (obviously) not change the value of obj.at("key")
-         *
-         *     auto val = obj.at("key");                   // read access: directly returns a std::string
-         *     val = "baz";                                // typeof val is std::string -> changing val will not change the value of obj.at("key)"
-         *
-         *     std::string throw_val = obj.at("key_2");    // will throw
-         * } catch (const std::out_of_range& e) {
-         *     std::cerr << e.what() << std::endl;         // prints: "key_2 doesn't exist!"
-         * }
-         * @endcode
+         * @snippet examples/info/access.cpp access const at
          *
          * @pre `*this` **must not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
@@ -1668,19 +1654,7 @@ namespace mpicxx {
          * @return a proxy object
          *
          * Example:
-         * @code{.cpp}
-         * mpicxx::info obj = { {"key", "foo"} };
-         *
-         * obj["key"] = "bar";                 // write access
-         * std::string str_val = obj["key"];   // read access: returns a proxy object, which is immediately casted to a std::string
-         * str_val = "baz";                    // changing val won't alter obj["key"] !!!
-         *
-         * // same as: obj["key"] = "baz";
-         * auto val = obj["key"];              // read access: returns a proxy object
-         * val = "baz";                        // write access: now obj["key"] will return "baz"
-         *
-         * obj["key_2"] = "baz";               // inserts a new [key, value]-pair in obj
-         * @endcode
+         * @snippet examples/info/access.cpp access operator overload
          *
          * @pre `*this` **may not** be in the moved-from state.
          * @pre @p key **must** include the null-terminator.
@@ -2302,11 +2276,14 @@ namespace mpicxx {
                 MPI_Info_delete(source.info_, str.data());
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                   lookup                                                   //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name lookup
+        ///@{
         /**
          * @brief Returns the number of [key, value]-pairs with key equivalent to @p key.
          * @details Since info objects don't allow duplicated keys the returned value is either 0 (key not found) or 1 (key found).
@@ -2508,11 +2485,14 @@ namespace mpicxx {
                 return std::make_pair(const_iterator(info_, size), const_iterator(info_, size));
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            non-member functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name non-member functions
+        ///@{
         /**
          * @brief Compares the contents of the two info objects for equality.
          * @details Two info objects compare equal iff they have the same size and their contents compare equal.
@@ -2520,20 +2500,18 @@ namespace mpicxx {
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are equal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs **must not** be in the moved-from state.
-         *
-         * @assert_precondition{ If `lhs` or `rhs` are in the moved-from state. }
-         *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // at most twice
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
         [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT_PRECONDITION(!lhs.moved_from(), "Attempt to call a function on an info object ('lhs') in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to call a function on an info object ('rhs') in the moved-from state!");
+            // if both info object refer to MPI_INFO_NULL they compare equal
+            if (lhs.moved_from() && rhs.moved_from()) return true;
+            // if only one info object refers to MPI_INFO_NULL they don't compare equal
+            if (lhs.moved_from() || rhs.moved_from()) return false;
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
@@ -2588,23 +2566,14 @@ namespace mpicxx {
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are inequal, `false` otherwise
          *
-         * @pre @p lhs and @p rhs **must not** be in the moved-from state.
-         *
-         * @assert_precondition{ If `lhs` or `rhs` are in the moved-from state. }
-         *
          * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // exactly twice
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // at most twice
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
          * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
          * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
          * }
          */
-        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) {
-            MPICXX_ASSERT_PRECONDITION(!lhs.moved_from(), "Attempt to call a function on an info object ('lhs') in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(!rhs.moved_from(), "Attempt to call a function on an info object ('rhs') in the moved-from state!");
-
-            return !(lhs == rhs);
-        }
+        [[nodiscard]] friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
         /**
          * @brief Specializes the [`std::swap`](https://en.cppreference.com/w/cpp/algorithm/swap) algorithm for info objects.
          * Swaps the contents of @p lhs and @p rhs.
@@ -2679,11 +2648,16 @@ namespace mpicxx {
                 MPI_Info_delete(c.info_, str.data());
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            additional functions                                            //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name additional member functions
+        /// (member functions which are not related to the [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map)
+        /// or [`std::map`](https://en.cppreference.com/w/cpp/container/map) interface)
+        ///@{
         /**
          * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all keys of the info object.
          * @return all keys of the info object
@@ -2780,6 +2754,7 @@ namespace mpicxx {
          * @return `true` if *MPI_Info_free* gets called upon destruction, `false` otherwise
          */
         [[nodiscard]] bool freeable() const noexcept { return is_freeable_; }
+        ///@}
 
 
     private:
@@ -2876,6 +2851,9 @@ namespace mpicxx {
 
     // initialize static environment object
     inline const info info::env = info(MPI_INFO_ENV, false);
+
+    // initialize static null object
+    inline const info info::null = info(MPI_INFO_NULL, false);
 
 }
 
