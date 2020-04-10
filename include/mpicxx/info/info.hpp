@@ -172,9 +172,9 @@ namespace mpicxx {
         private:
 #if ASSERTION_LEVEL > 0
             /*
-             * @brief Check whether `*this` refers to an info object in the moved-from state.
+             * @brief Check whether `*this` refers to an info object referring to *MPI_INFO_NULL*.
              */
-            bool info_moved_from() const {
+            bool info_refers_to_mpi_info_null() const {
                 return *info_ == MPI_INFO_NULL;
             }
             /*
@@ -1303,15 +1303,15 @@ namespace mpicxx {
          * @details If the info object is empty, the returned @ref iterator will be equal to @ref end().
          * @return iterator to the first [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] iterator begin() {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create an iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create an iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return iterator(info_, 0);
         }
@@ -1320,9 +1320,9 @@ namespace mpicxx {
          * @details This element acts as a placeholder; attempting to access it results in **undefined behavior**.
          * @return @ref iterator to the element following the last [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1330,8 +1330,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] iterator end() {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create an iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create an iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return iterator(info_, this->size());
         }
@@ -1340,15 +1340,15 @@ namespace mpicxx {
          * @details If the info object is empty, the returned @ref const_iterator will be equal to @ref cend().
          * @return @ref const_iterator to the first [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] const_iterator begin() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return const_iterator(info_, 0);
         }
@@ -1357,9 +1357,9 @@ namespace mpicxx {
          * @details This element acts as a placeholder; attempting to access it results in **undefined behavior**.
          * @return @ref const_iterator to the element following the last [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1367,8 +1367,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_iterator end() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return const_iterator(info_, this->size());
         }
@@ -1376,8 +1376,8 @@ namespace mpicxx {
          * @copydoc begin() const
          */
         [[nodiscard]] const_iterator cbegin() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return const_iterator(info_, 0);
         }
@@ -1385,8 +1385,8 @@ namespace mpicxx {
          * @copydoc end() const
          */
         [[nodiscard]] const_iterator cend() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return const_iterator(info_, this->size());
         }
@@ -1397,9 +1397,9 @@ namespace mpicxx {
          * If the info object is empty, the returned @ref reverse_iterator will be equal to @ref rend().
          * @return @ref reverse_iterator to the first [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1407,8 +1407,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] reverse_iterator rbegin() {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a reverse_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a reverse_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return std::make_reverse_iterator(this->end());
         }
@@ -1418,15 +1418,15 @@ namespace mpicxx {
          * This element acts as a placeholder, attempting to access it results in **undefined behavior**.
          * @return @ref reverse_iterator to the element following the last [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] reverse_iterator rend() {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a reverse_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a reverse_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return std::make_reverse_iterator(this->begin());
         }
@@ -1436,9 +1436,9 @@ namespace mpicxx {
          * If the info object is empty, the returned @ref const_reverse_iterator will be equal to @ref crend().
          * @return @ref const_reverse_iterator to the first [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{
          * @code{.cpp} int MPI_Info_get_nkeys(MPI_Info *info, int *nkeys);    // exactly once @endcode
@@ -1446,8 +1446,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_reverse_iterator rbegin() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_reverse_iterator from an info object referring to 'MPI_INFO_NULL!");
 
             return std::make_reverse_iterator(this->cend());
         }
@@ -1457,15 +1457,15 @@ namespace mpicxx {
          * This element acts as a placeholder, attempting to access it results in **undefined behavior**.
          * @return @ref const_reverse_iterator to the element following the last [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls_ref{ For *MPI* functions called while using an iterator see the @ref iterator_impl documentation. }
          */
         [[nodiscard]] const_reverse_iterator rend() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_reverse_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return std::make_reverse_iterator(this->cbegin());
         }
@@ -1473,8 +1473,8 @@ namespace mpicxx {
          * @copydoc rbegin() const
          */
         [[nodiscard]] const_reverse_iterator crbegin() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_reverse_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return std::make_reverse_iterator(this->cend());
         }
@@ -1482,8 +1482,8 @@ namespace mpicxx {
          * @copydoc rend() const
          */
         [[nodiscard]] const_reverse_iterator crend() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to create a const_reverse_iterator referring to an info object in the moved-from state");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to create a const_reverse_iterator from an info object referring to 'MPI_INFO_NULL'!");
 
             return std::make_reverse_iterator(this->cbegin());
         }
@@ -1499,16 +1499,17 @@ namespace mpicxx {
          * @brief Checks if the info object has no [key, value]-pairs, i.e. whether `begin() == end()`.
          * @return `true` if the info object is empty, `false` otherwise
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
         [[nodiscard]] bool empty() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             return this->size() == 0;
         }
@@ -1517,16 +1518,17 @@ namespace mpicxx {
          * [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(begin(), end())`.
          * @return the number of [key, value]-pairs in the info object
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);       // exactly once
          * }
          */
         [[nodiscard]] size_type size() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             int nkeys;
             MPI_Info_get_nkeys(info_, &nkeys);
@@ -1563,14 +1565,14 @@ namespace mpicxx {
          * Example:
          * @snippet examples/info/access.cpp access at
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise a
          * [`std::out_of_range`](https://en.cppreference.com/w/cpp/error/out_of_range) exception will be thrown.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -1584,7 +1586,8 @@ namespace mpicxx {
          * }
          */
         proxy at(detail::string auto&& key) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(key).size(), MPI_MAX_INFO_KEY);
 
@@ -1605,7 +1608,7 @@ namespace mpicxx {
          * Example:
          * @snippet examples/info/access.cpp access const at
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The @p key **must** already exist, otherwise a
@@ -1614,7 +1617,7 @@ namespace mpicxx {
          * [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)!
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -1626,7 +1629,8 @@ namespace mpicxx {
          * }
          */
         std::string at(const std::string_view key) const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -1656,17 +1660,16 @@ namespace mpicxx {
          * Example:
          * @snippet examples/info/access.cpp access operator overload
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **may not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this` are
-         * invalidated, if an insertion took place. \n
          * invalidated, if an insertion took place. \n
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the insertion point remain valid, all other
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -1675,7 +1678,8 @@ namespace mpicxx {
          * }
          */
         proxy operator[](detail::string auto&& key) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(key).size(), MPI_MAX_INFO_KEY);
 
@@ -1690,7 +1694,7 @@ namespace mpicxx {
          * @return a pair consisting of an iterator to the inserted [key, value]-pair (or the one that prevented the insertion) and a `bool`
          * denoting whether the insertion took place
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre **Both** @p key **and** @p value **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
@@ -1700,7 +1704,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key or @p value exceed their size limit.
          * }
          *
@@ -1712,7 +1716,8 @@ namespace mpicxx {
          * }
          */
         std::pair<iterator, bool> insert(const std::string_view key, const std::string_view value) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(value, MPI_MAX_INFO_VAL),
@@ -1735,7 +1740,7 @@ namespace mpicxx {
          * @param[in] first iterator to the first [key, value]-pair in the range
          * @param[in] last iterator one-past the last [key, value]-pair in the range
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          * @pre All @p keys and @p values **must** include the null-terminator.
@@ -1747,7 +1752,7 @@ namespace mpicxx {
          * other iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p first and @p last don't denote a valid range. \n
          * If any key or value exceed their size limit.
          * }
@@ -1759,7 +1764,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         void insert(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
@@ -1787,7 +1793,7 @@ namespace mpicxx {
          * value.
          * @param[in] ilist initializer list to insert the [key, value]-pairs from
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
@@ -1797,7 +1803,7 @@ namespace mpicxx {
          * other iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If any key or value exceed their size limit.
          * }
          *
@@ -1807,7 +1813,8 @@ namespace mpicxx {
          * }
          */
         void insert(std::initializer_list<value_type> ilist) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             this->insert(ilist.begin(), ilist.end());
         }
@@ -1819,7 +1826,7 @@ namespace mpicxx {
          * @return a pair consisting of an iterator to the inserted or assigned [key, value]-pair and a `bool`
          * denoting whether the insertion (`true`) or the assignment (`false`) took place
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre **Both** @p key **and** @p value **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The @p value's length **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
@@ -1829,7 +1836,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key or @p value exceed their size limit.
          * }
          *
@@ -1841,7 +1848,8 @@ namespace mpicxx {
          * }
          */
         std::pair<iterator, bool> insert_or_assign(const std::string_view key, const std::string_view value) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(value, MPI_MAX_INFO_VAL),
@@ -1861,7 +1869,7 @@ namespace mpicxx {
          * @param[in] first iterator to the first [key, value]-pair in the range
          * @param[in] last iterator one-past the last [key, value]-pair in the range
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          * @pre All @p keys and @p values **must** include the null-terminator.
@@ -1873,7 +1881,7 @@ namespace mpicxx {
          * other iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p first and @p last don't denote a valid range. \n
          * If any key or value exceed their size limit.
          * }
@@ -1884,7 +1892,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         void insert_or_assign(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
@@ -1907,7 +1916,7 @@ namespace mpicxx {
          * value.
          * @param[in] ilist initializer list to insert or assign the [key, value]-pairs from
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
@@ -1917,7 +1926,7 @@ namespace mpicxx {
          * other iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If any key or value exceed their size limit.
          * }
          *
@@ -1926,7 +1935,8 @@ namespace mpicxx {
          * }
          */
         void insert_or_assign(std::initializer_list<value_type> ilist) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             this->insert_or_assign(ilist.begin(), ilist.end());
         }
@@ -1934,11 +1944,11 @@ namespace mpicxx {
         /**
          * @brief Erase all [key, value]-pairs from the info object.
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @post The info object is empty, i.e. `this->size() == 0` respectively `this->empty() == true`.
          * @post Invalidates **all** iterators referring to `*this`.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);
@@ -1947,7 +1957,8 @@ namespace mpicxx {
          * }
          */
         void clear() {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             const size_type size = this->size();
             char key[MPI_MAX_INFO_KEY];
@@ -1966,7 +1977,7 @@ namespace mpicxx {
          * @return iterator following the removed [key, value]-pair (= position of @p pos prior to removal); \n
          * if @p pos refers to the last [key, value]-pair, then the @ref end() iterator is returned
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p pos **must** refer to `*this` info object.
          * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
@@ -1975,7 +1986,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p pos does not refer to `*this` info object. \n
          * If attempting an illegal dereferencing.
          * }
@@ -1986,7 +1997,8 @@ namespace mpicxx {
          * }
          */
         iterator erase(const_iterator pos) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(pos), "Attempt to use an info iterator referring to another info object!");
             MPICXX_ASSERT_PRECONDITION(this->info_iterator_valid(pos), "Attempt to dereference a {} iterator!", pos.state());
 
@@ -2013,7 +2025,7 @@ namespace mpicxx {
          * if `last == end()` prior to removal, then the updated @ref end() iterator is returned; \n
          * if [@p first, @p last) is an empty range, then @p last is returned
          *
-         * @pre `*this` **may not** be in the moved-from state.
+         * @pre `*this` **may not** refer to *MPI_INFO_NULL*.
          * @pre @p first and @p last **must** refer to `*this` info object
          * @pre The position denoted by @p first **must** be in the interval [0, `this->size()`].
          * @pre The position denoted by @p last **must** be in the interval [0, `this->size()`].
@@ -2024,7 +2036,7 @@ namespace mpicxx {
          * other iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p first or @p last does not refer to `*this` info object. \n
          * If attempting an illegal dereferencing.
          * }
@@ -2036,7 +2048,8 @@ namespace mpicxx {
          * }
          */
         iterator erase(const_iterator first, const_iterator last) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(first),
                     "Attempt to use an info iterator ('first') referring to another info object!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(last),
@@ -2071,7 +2084,7 @@ namespace mpicxx {
          * @param[in] key key value of the [key, value]-pair to remove
          * @return number of elements removed (either 0 or 1)
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
@@ -2080,7 +2093,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2090,7 +2103,8 @@ namespace mpicxx {
          * }
          */
         size_type erase(const std::string_view key) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2108,7 +2122,6 @@ namespace mpicxx {
          * @details Does not invoke any move, copy, or swap operations on individual [key, value]-pairs.
          * @param[inout] other info object to exchange the contents with
          *
-         * @post `*this` is in a valid state iff @p other was in a valid state (and vice versa).
          * @post All iterators remain valid, but now refer to the other info object.
          */
         void swap(info& other) noexcept {
@@ -2122,7 +2135,7 @@ namespace mpicxx {
          * @param[in] pos iterator to the [key, value]-pair to remove
          * @return the extracted [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p pos **must** refer to `*this` info object.
          * @pre The position denoted by @p pos **must** be in the half-open interval [0, `this->size()`).
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
@@ -2131,7 +2144,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p pos does not refer to `*this` info object. \n
          * If attempting an illegal dereferencing.
          * }
@@ -2144,7 +2157,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] value_type extract(const_iterator pos) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_info_iterator(pos), "Attempt to use an info iterator referring to another info object!");
             MPICXX_ASSERT_PRECONDITION(this->info_iterator_valid(pos), "Attempt to dereference a {} iterator!", pos.state());
 
@@ -2162,7 +2176,7 @@ namespace mpicxx {
          * @param[in] key the @p key to extract
          * @return the extracted [key, value]-pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
@@ -2171,7 +2185,7 @@ namespace mpicxx {
          * iterators are invalidated.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2182,7 +2196,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::optional<value_type> extract(const std::string_view key) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2219,14 +2234,14 @@ namespace mpicxx {
          * 2. Delete all [key, value]-pairs in @p source with a key contained in the previously created vector.
          * @param[inout] source the info object to transfer the [key, value]-pairs from
          *
-         * @pre `*this` **must not** be in the moved-from state.
-         * @pre @p source **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
+         * @pre @p source **must not** refer to *MPI_INFO_NULL*.
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
          * and @p source are invalidated, if a transfer of [key, value]-pairs took place. \n
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first point of insertion/extraction remain
          * valid, all other iterators are invalidated.
          *
-         * @assert_precondition{ If `*this` or @p source are in the moved-from state. }
+         * @assert_precondition{ If `*this` or @p source refer to *MPI_INFO_NULL*. }
          * @assert_sanity{ If `*this` and @p source are the same info object. }
          *
          * @calls{
@@ -2238,10 +2253,10 @@ namespace mpicxx {
          * }
          */
         void merge(info& source) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(),
-                    "Attempt to call a function on an info object ('*this') in the moved-from state!");
-            MPICXX_ASSERT_PRECONDITION(!source.moved_from(),
-                    "Attempt to call a function on an info object ('source') in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object ('*this') referring to 'MPI_INFO_NULL'!");
+            MPICXX_ASSERT_PRECONDITION(source.info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object ('source') referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_SANITY(!this->identical(source), "Attempt to perform a \"self merge\"!");
 
             // do nothing if a "self merge" is attempted
@@ -2292,12 +2307,12 @@ namespace mpicxx {
          * @param[in] key @p key value of the [key, value]-pairs to count
          * @return number of [key, value]-pairs with key equivalent to @p key, which is either 0 or 1
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2307,7 +2322,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] size_type count(const std::string_view key) const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2320,12 +2336,12 @@ namespace mpicxx {
          * @param[in] key @p key value of the [key, value]-pair to search for
          * @return iterator to a [key, value]-pair with key equivalent to @p key or the past-the-end iterator if no such key is found
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2335,7 +2351,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] iterator find(const std::string_view key) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2349,12 +2366,12 @@ namespace mpicxx {
          * @param[in] key @p key value of the [key, value]-pair to search for
          * @return const_iterator to a [key, value]-pair with key equivalent to @p key or the past-the-end iterator if no such key is found
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2364,7 +2381,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] const_iterator find(const std::string_view key) const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2376,12 +2394,12 @@ namespace mpicxx {
          * @param[in] key @p key value of the [key, value]-pair to search for
          * @return `true` if there is such a [key, value]-pair, otherwise `false`
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL'.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to 'MPI_INFO_NULL'. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2391,7 +2409,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] bool contains(const std::string_view key) const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2412,12 +2431,12 @@ namespace mpicxx {
          * @return [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing a pair of iterators defining the wanted range;\n
          * if there is no such element, past-the-end (see @ref end()) iterators are returned as both elements of the pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2427,7 +2446,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<iterator, iterator> equal_range(const std::string_view key) {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2456,12 +2476,12 @@ namespace mpicxx {
          * range; \n
          * if there is no such element, past-the-end (see @ref end()) const_iterators are returned as both elements of the pair
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          * @pre @p key **must** include the null-terminator.
          * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          *
          * @assert_precondition{
-         * If `*this` is in the moved-from state. \n
+         * If `*this` refers to *MPI_INFO_NULL*. \n
          * If @p key exceeds its size limit.
          * }
          *
@@ -2471,7 +2491,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const std::string_view key) const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", key.size(), MPI_MAX_INFO_KEY);
 
@@ -2509,9 +2530,9 @@ namespace mpicxx {
          */
         [[nodiscard]] friend bool operator==(const info& lhs, const info& rhs) {
             // if both info object refer to MPI_INFO_NULL they compare equal
-            if (lhs.moved_from() && rhs.moved_from()) return true;
+            if (lhs.info_ == MPI_INFO_NULL && rhs.info_ == MPI_INFO_NULL) return true;
             // if only one info object refers to MPI_INFO_NULL they don't compare equal
-            if (lhs.moved_from() || rhs.moved_from()) return false;
+            if (lhs.info_ == MPI_INFO_NULL || rhs.info_ == MPI_INFO_NULL) return false;
 
             // not the same number of [key, value]-pairs therefore can't compare equal
             const size_type size = lhs.size();
@@ -2583,7 +2604,6 @@ namespace mpicxx {
          * @param[inout] lhs the info object whose contents to swap
          * @param[inout] rhs the info object whose contents to swap
          *
-         * @post @p lhs is in a valid state iff @p rhs was in a valid state (and vice versa).
          * @post All iterators remain valid, but now refer to the other info object.
          */
         friend void swap(info& lhs, info& rhs) noexcept { lhs.swap(rhs); }
@@ -2600,13 +2620,13 @@ namespace mpicxx {
          * @param[inout] c info object from which to erase
          * @param[in] pred predicate that returns `true` if the element should be erased
          *
-         * @pre @p c **must not** be in the moved-from state.
+         * @pre @p c **must not** refer to *MPI_INFO_NULL*.
          * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to @p c
          * are invalidated. \n
          * Specific MPI implementations **may** differ in this regard, i.e. iterators before the first point of erase remain valid, all
          * other iterators are invalidated.
          *
-         * @assert_precondition{ If `c` is in the moved-from state. }
+         * @assert_precondition{ If `c` refers to *MPI_INFO_NULL*. }
          *
          * @calls{
          * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                    // exactly 'c.size()' times
@@ -2617,7 +2637,8 @@ namespace mpicxx {
          */
         template <typename Pred>
         friend void erase_if(info& c, Pred pred) requires std::is_invocable_r_v<bool, Pred, value_type> {
-            MPICXX_ASSERT_PRECONDITION(!c.moved_from(), "Attempt to call a function on an info object ('c') in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(c.info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object ('c') referring to 'MPI_INFO_NULL'!");
 
             size_type size = c.size();
             char key[MPI_MAX_INFO_KEY];
@@ -2662,9 +2683,9 @@ namespace mpicxx {
          * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all keys of the info object.
          * @return all keys of the info object
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);               // exactly once
@@ -2672,7 +2693,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> keys() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             // create vector which will hold all keys
             const size_type size = this->size();
@@ -2691,9 +2713,9 @@ namespace mpicxx {
          * @brief Returns a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing all values of the info object.
          * @return all values of the info object
          *
-         * @pre `*this` **must not** be in the moved-from state.
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
          *
-         * @assert_precondition{ If `*this` is in the moved-from state. }
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. }
          *
          * @calls{
          * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                           // exactly once
@@ -2703,7 +2725,8 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] std::vector<std::string> values() const {
-            MPICXX_ASSERT_PRECONDITION(!this->moved_from(), "Attempt to call a function on an info object in the moved-from state!");
+            MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL,
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             // create vector which will hold all values
             const size_type size = this->size();
@@ -2803,12 +2826,6 @@ namespace mpicxx {
             return static_cast<bool>(flag);
         }
 #if ASSERTION_LEVEL > 0
-        /*
-         * @brief Check whether `*this` refers to an info object in the moved-from state.
-         */
-        bool moved_from() const {
-            return info_ == MPI_INFO_NULL;
-        }
         /*
          * @brief Check whether `*this` and @p other are identical, i.e. they refer to the **same** underlying *MPI_INFO* object.
          */

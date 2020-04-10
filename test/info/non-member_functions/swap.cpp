@@ -1,7 +1,7 @@
 /**
  * @file test/info/non-member_functions/swap.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-10
  *
  * @brief Test cases for the @ref mpicxx::info::swap(info&, info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
@@ -63,9 +63,10 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
 
-    // check info_2 -> now in the moved-from state
-    EXPECT_EQ(info_2.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(info_2.freeable());
+    // check info_2 -> now in the default-initialized state
+    MPI_Info_get_nkeys(info_2.get(), &nkeys);
+    EXPECT_EQ(nkeys, 0);
+    EXPECT_TRUE(info_2.freeable());
 
     // check info_1
     MPI_Info_get_nkeys(info_1.get(), &nkeys);
@@ -79,9 +80,10 @@ TEST(NonMemberFunctionTest, SwapValidAndMovedFrom) {
     using std::swap;
     swap(info_1, info_2);
 
-    // check info_1 -> now in the moved-from state
-    EXPECT_EQ(info_1.get(), MPI_INFO_NULL);
-    EXPECT_FALSE(info_1.freeable());
+    // check info_1 -> now in the default-initialized state
+    MPI_Info_get_nkeys(info_1.get(), &nkeys);
+    EXPECT_EQ(nkeys, 0);
+    EXPECT_TRUE(info_1.freeable());
 
     // check info_2
     MPI_Info_get_nkeys(info_2.get(), &nkeys);
@@ -103,7 +105,10 @@ TEST(NonMemberFunctionTest, SwapMovedFromAndMovedFrom) {
     using std::swap;
     swap(moved_from_1, moved_from_2);
 
-    // both are still in the moved-from state
-    EXPECT_EQ(moved_from_1.get(), MPI_INFO_NULL);
-    EXPECT_EQ(moved_from_2.get(), MPI_INFO_NULL);
+    // both are still in the default-initialized state
+    int nkeys_1, nkeys_2;
+    MPI_Info_get_nkeys(moved_from_1.get(), &nkeys_1);
+    MPI_Info_get_nkeys(moved_from_2.get(), &nkeys_2);
+    EXPECT_EQ(nkeys_1, nkeys_2);
+    EXPECT_EQ(moved_from_1.freeable(), moved_from_2.freeable());
 }
