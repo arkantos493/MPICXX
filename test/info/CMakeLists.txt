@@ -1,6 +1,7 @@
 # specify all source files for this test suite
 set(TEST_SOURCES
         env.cpp
+        null.cpp
         proxy.cpp
 
         constructor_and_destructor/default_constructor.cpp
