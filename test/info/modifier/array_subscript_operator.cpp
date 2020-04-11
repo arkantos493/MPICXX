@@ -1,16 +1,16 @@
 /**
  * @file test/info/modifier/array_subscript_operator.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::operator[](detail::string auto&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name                       | test case description                            |
- * |:-------------------------------------|:-------------------------------------------------|
- * | ArraySubscriptOperatorRead           | read [key, value]-pairs                          |
- * | ArraySubscriptOperatorWrite          | write [key, value]-pairs                         |
- * | MovedFromArraySubscriptOperator      | info object in the moved-from state (death test) |
- * | ArraySubscriptOperatorWithIllegalKey | try to add an illegal key (death test)           |
+ * | test case name                       | test case description                               |
+ * |:-------------------------------------|:----------------------------------------------------|
+ * | ArraySubscriptOperatorRead           | read [key, value]-pairs                             |
+ * | ArraySubscriptOperatorWrite          | write [key, value]-pairs                            |
+ * | NullArraySubscriptOperator           | info object referring to MPI_INFO_NULL (death test) |
+ * | ArraySubscriptOperatorWithIllegalKey | try to add an illegal key (death test)              |
  */
 
 #include <string>
@@ -88,12 +88,11 @@ TEST(ModifierTest, ArraySubscriptOperatorWrite) {
     EXPECT_STREQ(value, "value1_override");
 }
 
-TEST(ModifierDeathTest, MovedFromArraySubscriptOperator) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullArraySubscriptOperator) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling operator[]() on an info object in the moved-from state is illegal
+    // calling operator[]() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info["key"] = "value" , "");
 }
 

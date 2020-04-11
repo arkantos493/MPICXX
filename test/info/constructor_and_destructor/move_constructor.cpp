@@ -1,15 +1,14 @@
 /**
  * @file info/constructor_and_destructor/move_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::info(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
  * | test case name                   | test case description                                                          |
  * |:---------------------------------|:-------------------------------------------------------------------------------|
  * | MoveConstructFromValidObject     | `mpicxx::info info1(std::move(info2));`                                        |
- * | MoveConstructFromMovedFromObject | `mpicxx::info info1(std::move(info2)); // where info2 was already moved-from`  |
- * | MoveConstructFromNull            | `mpicxx::info info1(std::move(info2)); // where info2 refers to MPI_INFO_NULL` |
+ * | MoveConstructFromNullObject      | `mpicxx::info info1(std::move(info2)); // where info2 refers to MPI_INFO_NULL` |
  * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable)  |
  */
 
@@ -53,26 +52,7 @@ TEST(ConstructionTest, MoveConstructFromValidObject) {
     EXPECT_TRUE(moved_from.freeable());
 }
 
-TEST(ConstructionTest, MoveConstructFromMovedFromObject) {
-    // create info object and set it to the moved-from state
-    mpicxx::info moved_from;
-    mpicxx::info dummy(std::move(moved_from));
-
-    // create an new info object by invoking the move constructor
-    mpicxx::info info_move(std::move(moved_from));
-
-    // info_move and moved_from are in the default-initialized state
-    int nkeys;
-    MPI_Info_get_nkeys(info_move.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(info_move.freeable());
-
-    MPI_Info_get_nkeys(moved_from.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(moved_from.freeable());
-}
-
-TEST(ConstructionTest, MoveConstructFromNull) {
+TEST(ConstructionTest, MoveConstructFromNullObject) {
     // create null info object
     mpicxx::info info_null(MPI_INFO_NULL, false);
 

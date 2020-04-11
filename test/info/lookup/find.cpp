@@ -1,7 +1,7 @@
 /**
  * @file test/info/lookup/find.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::find(const std::string_view) and @ref mpicxx::info::find(const std::string_view) const
  * member functions provided by the @ref mpicxx::info
@@ -13,8 +13,8 @@
  * | ConstFindExisting       | find key in const info object                                |
  * | FindNonExisting         | find non-existing key in info object                         |
  * | ConstFindNonExisting    | find non-existing key in const info object                   |
- * | MovedFromFind           | info object in the moved-from state (death test)             |
- * | MovedFromConstFind      | const info object in the moved-from state (death test)       |
+ * | NullFind                | info object referring to MPI_INFO_NULL (death test)          |
+ * | NullConstFind           | const info object referring to MPI_INFO_NULL (death test)    |
  * | FindWithIllegalKey      | try to find an illegal key in info object (death test)       |
  * | ConstFindWithIllegalKey | try to find an illegal key in const info object (death test) |
  */
@@ -82,21 +82,20 @@ TEST(LookupTest, ConstFindNonExisting) {
     EXPECT_EQ(it, info.cend());
 }
 
-TEST(LookupDeathTest, MovedFromFind) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(LookupDeathTest, NullFind) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling find() on an info object in the moved-from state is illegal
+    // calling find() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] mpicxx::info::iterator it;
     ASSERT_DEATH( it = info.find("key") , "");
 }
 
-TEST(LookupDeathTest, MovedFromConstFind) {
-    // create const info object and set it to the moved-from state
+TEST(LookupDeathTest, NullConstFind) {
+    // create const null info object
     const mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling find() const on an info object in the moved-from state is illegal
+    // calling find() const on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] mpicxx::info::const_iterator it;
     ASSERT_DEATH( it = info.find("key") , "");
 }

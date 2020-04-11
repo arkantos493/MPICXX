@@ -53,8 +53,8 @@ TEST(InfoProxyDeathTest, ProxyWriteAccessInvalid) {
     std::string value(MPI_MAX_INFO_VAL, ' ');
     EXPECT_DEATH( p = value , "");
 
-    // attempt write access on a proxy that refers to an info object in the moved-from state
-    mpicxx::info dummy(std::move(info));
+    // attempt write access on a proxy that refers to an info object referring to MPI_INFO_NULL
+    info = mpicxx::info(MPI_INFO_NULL, false);
     EXPECT_DEATH( p = "value" , "");
 }
 
@@ -90,8 +90,8 @@ TEST(InfoProxyDeathTest, ProxyReadAccessInvalid) {
     // create proxy
     auto p = info["key"];
 
-    // attempt read access on a proxy that refers to an info object in the moved-from state
-    mpicxx::info dummy(std::move(info));
+    // attempt read access on a proxy that refers to an info object referring to MPI_INFO_NULL
+    info = mpicxx::info(MPI_INFO_NULL, false);
     EXPECT_DEATH( static_cast<std::string>(p) , "");
 }
 
@@ -119,8 +119,8 @@ TEST(InfoProxyDeathTest, ProxyOutputOperatorInvalid) {
     // create proxy
     auto p = info["key"];
 
-    // attempt read access on a proxy that refers to an info object in the moved-from state
-    mpicxx::info dummy(std::move(info));
+    // attempt read access on a proxy that refers to an info object referring to MPI_INFO_NULL
+    info = mpicxx::info(MPI_INFO_NULL, false);
     std::stringstream ss;
     EXPECT_DEATH( ss << p; , "");
 }

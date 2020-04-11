@@ -5,12 +5,11 @@
  *
  * @brief Test cases for the @ref mpicxx::info::info(const info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description                                                          |
- * |:---------------------------------|:-------------------------------------------------------------------------------|
- * | CopyConstructFromValidObject     | `mpicxx::info info1(info2);`                                                   |
- * | CopyConstructFromMovedFromObject | `mpicxx::info info1(info2); // where info2 was already moved-from`             |
- * | CopyConstructFromNull            | `mpicxx::info info1(info2); // where info2 refers to MPI_INFO_NULL`            |
- * | CopyConstructFromNonFreeable     | info object should be freeable (despite that the copied-from was non-freeable) |
+ * | test case name               | test case description                                                          |
+ * |:-----------------------------|:-------------------------------------------------------------------------------|
+ * | CopyConstructFromValidObject | `mpicxx::info info1(info2);`                                                   |
+ * | CopyConstructFromNullObject  | `mpicxx::info info1(info2); // where info2 refers to MPI_INFO_NULL`            |
+ * | CopyConstructFromNonFreeable | info object should be freeable (despite that the copied-from was non-freeable) |
  */
 
 #include <gtest/gtest.h>
@@ -62,23 +61,7 @@ TEST(ConstructionTest, CopyConstructFromValidObject) {
     EXPECT_EQ(info.freeable(), is_freeable);
 }
 
-TEST(ConstructionTest, CopyConstructFromMovedFromObject) {
-    // create info object and set it to the moved-from state
-    mpicxx::info moved_from;
-    mpicxx::info dummy(std::move(moved_from));
-
-    // create an new info object by invoking the copy constructor
-    mpicxx::info info(moved_from);
-
-    // both info objects should be in the default-initialized state
-    int info_nkeys, moved_from_nkeys;
-    MPI_Info_get_nkeys(info.get(), &info_nkeys);
-    MPI_Info_get_nkeys(moved_from.get(), &moved_from_nkeys);
-    EXPECT_EQ(info_nkeys, moved_from_nkeys);
-    EXPECT_EQ(info.freeable(), moved_from.freeable());
-}
-
-TEST(ConstructionTest, CopyConstructFromNull) {
+TEST(ConstructionTest, CopyConstructFromNullObject) {
     // create null info object
     mpicxx::info info_null(MPI_INFO_NULL, false);
 

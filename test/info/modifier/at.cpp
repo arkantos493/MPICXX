@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/at.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::at(detail::string auto&&) and @ref mpicxx::info::at(const std::string_view) const member
  * functions provided by the @ref mpicxx::info class.
@@ -11,8 +11,8 @@
  * | AtRead                     | read [key, value]-pairs                                       |
  * | ConstAtRead                | read [key, value]-pairs (const info object)                   |
  * | AtWrite                    | overwrite already existing [key, value]-pair                  |
- * | MovedFromAt                | info object in the moved-from state (death test)              |
- * | MovedFromConstAt           | const info object in the moved-from state (death test)        |
+ * | NullAt                     | info object referring to MPI_INFO_NULL (death test)           |
+ * | NullConstAt                | const info object referring to MPI_INFO_NULL (death test)     |
  * | AtOutOfRangeException      | try to access a non-existing key                              |
  * | ConstAtOutOfRangeException | try to access a non-existing key (const info object)          |
  * | AtWithIllegalKey           | try to access an illegal key (death test)                     |
@@ -79,20 +79,19 @@ TEST(ModifierTest, AtWrite) {
     EXPECT_STREQ(value, "value_override");
 }
 
-TEST(ModifierDeathTest, MovedFromAt) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullAt) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling at() on an info object in the moved-from state is illegal
+    // calling at() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.at("key") , "");
 }
 
-TEST(ModifierDeathTest, MovedFromConstAt) {
-    // create const info object and set it to the moved-from state
+TEST(ModifierDeathTest, NullConstAt) {
+    // create const null info object
     const mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling at() on an info object in the moved-from state is illegal
+    // calling at() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.at("key") , "");
 }
 

@@ -1,17 +1,17 @@
 /**
  * @file test/info/assignment/initializer_list_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const std::initializer_list<value_type>) member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
- * | test case name                         | test case description                                                                  |
- * |:---------------------------------------|:---------------------------------------------------------------------------------------|
- * | AssignInitializerListToValid           | assign all elements of the initializer list to the info object                         |
- * | AssignInitializerListToMovedFrom       | assign all elements of the initializer list to the info object in the moved-from state |
- * | AssignInitializerListToNonFreeable     | assign all elements of the initializer list to the non-freeable info object            |
- * | AssignInitializerListIllegalKeyOrValue | try to assign an illegal key/value to the info object (death test)                     |
+ * | test case name                         | test case description                                                                     |
+ * |:---------------------------------------|:------------------------------------------------------------------------------------------|
+ * | AssignInitializerListToValid           | assign all elements of the initializer list to the info object                            |
+ * | AssignInitializerListToNull            | assign all elements of the initializer list to the info object referring to MPI_INFO_NULL |
+ * | AssignInitializerListToNonFreeable     | assign all elements of the initializer list to the non-freeable info object               |
+ * | AssignInitializerListIllegalKeyOrValue | try to assign an illegal key/value to the info object (death test)                        |
  */
 
 #include <string>
@@ -50,15 +50,14 @@ TEST(AssignmentTest, AssignInitializerListToValid) {
     EXPECT_STREQ(value, "value2");
 }
 
-TEST(AssignmentTest, AssignInitializerListToMovedFrom) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(AssignmentTest, AssignInitializerListToNull) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
     // assign initializer_list
     info = { { "key1", "value1" }, { "key2", "value2" } };
 
-    // info should not be in the moved-from state anymore
+    // info should not refer to MPI_INFO_NULL anymore
     EXPECT_NE(info.get(), MPI_INFO_NULL);
 
     // check if the info object now contains the correct entries

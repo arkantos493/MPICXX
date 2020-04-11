@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/merge.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::merge(info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
@@ -11,7 +11,7 @@
  * | MergeEmptyAndEmpty       | merge two info objects (where `*this` and `source` are empty) |
  * | MergeNonEmptyAndEmpty    | merge two info objects (where `source` is empty)              |
  * | MergeEmptyAndNonEmpty    | merge two info objects (where `*this` is empty)               |
- * | MovedFromMerge           | info object in the moved-from state (death test)              |
+ * | NullMerge                | info object referring to MPI_INFO_NULL (death test)           |
  * | SelfMerge                | perform merge with itself (death test)                        |
  */
 
@@ -136,17 +136,16 @@ TEST(ModifierTest, MergeEmptyAndNonEmpty) {
     EXPECT_EQ(nkeys, 0);
 }
 
-TEST(ModifierDeathTest, MovedFromMerge) {
-    // create info objects and set them to the moved-from state
-    mpicxx::info moved_from_1;
-    mpicxx::info valid(std::move(moved_from_1));
-    mpicxx::info moved_from_2;
-    mpicxx::info dummy(std::move(moved_from_2));
+TEST(ModifierDeathTest, NullMerge) {
+    // create null info objects
+    mpicxx::info valid;
+    mpicxx::info info_null_1(MPI_INFO_NULL, false);
+    mpicxx::info info_null_2(MPI_INFO_NULL, false);
 
-    // calling merge() on/with an info object in the moved-from state is illegal
-    ASSERT_DEATH( moved_from_1.merge(valid) , "");
-    ASSERT_DEATH( valid.merge(moved_from_2) , "");
-    ASSERT_DEATH( moved_from_1.merge(moved_from_2) , "");
+    // calling merge() on/with an info object referring to MPI_INFO_NULL is illegal
+    ASSERT_DEATH( info_null_1.merge(valid) , "");
+    ASSERT_DEATH( valid.merge(info_null_2) , "");
+    ASSERT_DEATH( info_null_1.merge(info_null_2) , "");
 }
 
 TEST(ModifierDeathTest, SelfMerge) {
@@ -154,5 +153,5 @@ TEST(ModifierDeathTest, SelfMerge) {
     mpicxx::info info;
 
     // perform "self merge"
-    info.merge(info);
+    ASSERT_DEATH( info.merge(info) , "");
 }

@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/distance.cpp
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-04-11
  *
  * @brief Test cases for the distance calculation of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -41,13 +41,13 @@ TEST(InfoIteratorImplDeathTest, DistanceInvalid) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] int dist;
     // distance calculation between singular iterators is not permitted
@@ -55,10 +55,10 @@ TEST(InfoIteratorImplDeathTest, DistanceInvalid) {
     EXPECT_DEATH( dist = sit_1 - info_1.begin() , "");
     EXPECT_DEATH( dist = info_1.begin() - sit_1 , "");
 
-    // distance calculation between iterators referring to info objects in the moved-from state is not permitted
-    EXPECT_DEATH( dist = moved_from_it_1 - moved_from_it_2 , "");
-    EXPECT_DEATH( dist = moved_from_it_1 - info_1.begin() , "");
-    EXPECT_DEATH( dist = info_1.begin() - moved_from_it_1 , "");
+    // distance calculation between iterators referring to info objects referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( dist = info_null_it_1 - info_null_it_2 , "");
+    EXPECT_DEATH( dist = info_null_it_1 - info_1.begin() , "");
+    EXPECT_DEATH( dist = info_1.begin() - info_null_it_1 , "");
 
     // distance calculation between iterators from different info objects is not permitted
     EXPECT_DEATH( dist = info_1.begin() - info_2.end() , "");

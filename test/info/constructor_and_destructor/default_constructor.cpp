@@ -1,7 +1,7 @@
 /**
  * @file test/info/constructor_and_destructor/default_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::info() member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
@@ -20,7 +20,7 @@ TEST(ConstructionTest, DefaultConstruction) {
     // default construct an info object
     mpicxx::info info;
 
-    // a default constructed info object should not be in the moved-from state
+    // a default constructed info object should not refer to MPI_INFO_NULL
     ASSERT_NE(info.get(), MPI_INFO_NULL);
 
     // a default constructed info object should be emtpy

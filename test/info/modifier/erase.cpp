@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/erase.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::erase(const_iterator), @ref mpicxx::info::erase(const_iterator, const_iterator)
  * and @ref mpicxx::info::erase(const std::string_view) member functions provided by the @ref mpicxx::info class.
@@ -11,14 +11,14 @@
  * | EraseByIterator                        | erase [key, value]-pair at the given iterator position     |
  * | EraseByIllegalIterator                 | iterator doesn't refer to `*this` info object (death test) |
  * | EraseByIteratorNotDereferenceable      | iterator not dereferenceable (death test)                  |
- * | MovedFromEraseByIterator               | info object in the moved-from state (death test)           |
+ * | NullEraseByIterator                    | info object referring to MPI_INFO_NULL (death test)        |
  * | EraseByIteratorRange                   | erase all [key, value]-pairs in the given iterator range   |
  * | EraseByIllegalIteratorRange            | iterator range is not valid (death test)                   |
  * | EraseByIteratorRangeNotDereferenceable | iterators not dereferenceable (death test)                 |
- * | MovedFromEraseByIteratorRange          | info object in the moved-from state (death test)           |
+ * | NullEraseByIteratorRange               | info object referring to MPI_INFO_NULL (death test)        |
  * | EraseByKey                             | erase [key, value]-pair with the given key                 |
  * | EraseByIllegalKey                      | try to erase with an illegal key (death test)              |
- * | MovedFromEraseByKey                    | info object in the moved-from state (death test)           |
+ * | NullEraseByKey                         | info object referring to MPI_INFO_NULL (death test)        |
  */
 
 #include <string>
@@ -89,13 +89,13 @@ TEST(ModifierDeathTest, EraseByIteratorNotDereferenceable) {
     ASSERT_DEATH( info.erase(info.end()) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromEraseByIterator) {
-    // create info object and set it to the moved-from state
+TEST(ModifierDeathTest, NullEraseByIterator) {
+    // create null info object
     mpicxx::info info;
     mpicxx::info::const_iterator it = info.begin();
-    mpicxx::info dummy(std::move(info));
+    info = mpicxx::info(MPI_INFO_NULL, false);
 
-    // calling erase() on an info object in the moved-from state is illegal
+    // calling erase() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.erase(it) , "");
 }
 
@@ -162,13 +162,13 @@ TEST(ModifierDeathTest, EraseByIteratorRangeNotDereferenceable) {
     ASSERT_DEATH( info.erase(info.end() + 1, info.end()) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromEraseByIteratorRange) {
-    // create info object and set it to the moved-from state
+TEST(ModifierDeathTest, NullEraseByIteratorRange) {
+    // create null info object
     mpicxx::info info;
     mpicxx::info::const_iterator it = info.begin();
-    mpicxx::info dummy(std::move(info));
+    info = mpicxx::info(MPI_INFO_NULL, false);
 
-    // calling erase() on an info object in the moved-from state is illegal
+    // calling erase() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.erase(it, it) , "");
 }
 
@@ -221,11 +221,10 @@ TEST(ModifierDeathTest, EraseByIllegalKey) {
     ASSERT_DEATH( info.erase("") , "");
 }
 
-TEST(ModifierDeathTest, MovedFromEraseByKey) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullEraseByKey) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling erase() on an info object in the moved-from state is illegal
+    // calling erase() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.erase("key") , "");
 }

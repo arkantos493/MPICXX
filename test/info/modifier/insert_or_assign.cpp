@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/insert_or_assign.cpp
  * @author Marcel Breyer
- * @date 2020-02-15
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::insert_or_assign(const std::string_view, const std::string_view),
  * @ref mpicxx::info::insert_or_assign(InputIt, InputIt) and @ref mpicxx::info::insert_or_assign(std::initializer_list<value_type>) member
@@ -11,15 +11,15 @@
  * |:-----------------------------------------------|:----------------------------------------------------------------------------------------------|
  * | InsertOrAssignByKeyValuePair                   | insert or assign single [key, value]-pair                                                     |
  * | InsertOrAssignByIllegalKeyOrValue              | try to insert or assign [key, value]-pair with illegal key or value (death test)              |
- * | MovedFromInsertOrAssignByKeyValuePair          | info object in the moved-from state (death test)                                              |
+ * | NullInsertOrAssignByKeyValuePair               | info object referring to MPI_INFO_NULL (death test)                                           |
  * | InsertOrAssignByIteratorRange                  | insert or assign all [key, value]-pairs from the iterator range                               |
  * | InsertOrAssignByIteratorRangeFromInfo          | insert or assign all [key, value]-pairs from the iterator range retrieved from an info object |
  * | InsertOrAssignByIllegalIteratorRange           | iterator range is not valid (death test)                                                      |
  * | InsertOrAssignByIllegalIteratorRangeKeyOrValue | key or value in the iterator range illegal (death test)                                       |
- * | MovedFromInsertOrAssignByIteratorRange         | info object in the moved-from state (death test)                                              |
+ * | NullInsertOrAssignByIteratorRange              | info object referring to MPI_INFO_NULL (death test)                                           |
  * | InsertOrAssignByInitializerList                | insert or assign all [key, value]-pairs from the initializer list                             |
  * | InsertOrAssignByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                                     |
- * | MovedFromInsertOrAssignByInitializerList       | info object in the moved-from state (death test)                                              |
+ * | NullInsertOrAssignByInitializerList            | info object referring to MPI_INFO_NULL (death test)                                           |
  */
 
 #include <string>
@@ -86,12 +86,11 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalKeyOrValue) {
     ASSERT_DEATH( info.insert_or_assign("key", "") , "");
 }
 
-TEST(ModifierDeathTest, MovedFromInsertOrAssignByKeyValuePair) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullInsertOrAssignByKeyValuePair) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling insert_or_assign() on an info object in the moved-from state is illegal
+    // calling insert_or_assign() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert_or_assign("key", "value") , "");
 }
 
@@ -188,15 +187,14 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalIteratorRangeKeyOrValue) {
     ASSERT_DEATH( info.insert_or_assign(vec.begin() + 3, vec.end()) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromInsertOrAssignByIteratorRange) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullInsertOrAssignByIteratorRange) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
     // create vector with [key, value]-pair
     std::vector<mpicxx::info::value_type> vec = { { "key", "value" } };
 
-    // calling insert_or_assign() on an info object in the moved-from state is illegal
+    // calling insert_or_assign() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert_or_assign(vec.begin(), vec.end()) , "");
 }
 
@@ -242,11 +240,10 @@ TEST(ModifierDeathTest, InsertOrAssignByIllegalInitializerListKeyOrValue) {
     ASSERT_DEATH( info.insert_or_assign({ { "key", ""   }  }) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromInsertOrAssignByInitializerList) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullInsertOrAssignByInitializerList) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling insert_or_assign() on an info object in the moved-from state is illegal
+    // calling insert_or_assign() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert_or_assign({ { "key", "value" } }) , "");
 }

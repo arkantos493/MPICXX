@@ -1,14 +1,14 @@
 /**
  * @file test/info/modifier/clear.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::clear() member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name | test case description                            |
- * |:---------------|:-------------------------------------------------|
- * | Clear          | remove all [key, value]-pairs from info object   |
- * | MovedFromClear | info object in the moved-from state (death test) |
+ * | test case name | test case description                               |
+ * |:---------------|:----------------------------------------------------|
+ * | Clear          | remove all [key, value]-pairs from info object      |
+ * | NullClear      | info object referring to MPI_INFO_NULL (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -42,11 +42,10 @@ TEST(ModifierTest, Clear) {
     EXPECT_EQ(nkeys, 0);
 }
 
-TEST(ModifierDeathTest, MovedFromClear) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullClear) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling clear() on an info object in the moved-from state is illegal
+    // calling clear() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.clear() , "");
 }

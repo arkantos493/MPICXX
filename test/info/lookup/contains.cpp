@@ -1,7 +1,7 @@
 /**
  * @file test/info/lookup/contains.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::contains(const std::string_view) const member function provided by the
  * @ref mpicxx::info class.
@@ -10,7 +10,7 @@
  * |:-----------------------|:--------------------------------------------------------------|
  * | ContainsExisting       | check for existing keys                                       |
  * | ContainsNonExisting    | check for non-existing key                                    |
- * | MovedFromContains      | info object in the moved-from state (death test)              |
+ * | NullContains           | info object referring to MPI_INFO_NULL (death test)           |
  * | ContainsWithIllegalKey | try to check for the existence of an illegal key (death test) |
  */
 
@@ -42,12 +42,11 @@ TEST(LookupTest, ContainsNonExisting) {
     EXPECT_FALSE(info.contains("key2"));
 }
 
-TEST(LookupDeathTest, MovedFromContains) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(LookupDeathTest, NullContains) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling contains() on an info object in the moved-from state is illegal
+    // calling contains() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] bool contains;
     ASSERT_DEATH( contains = info.contains("key") , "");
 }
