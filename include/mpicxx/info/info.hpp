@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-04-11
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -1061,7 +1061,7 @@ namespace mpicxx {
          * int MPI_Info_create(MPI_Info *info);     // exactly once
          * }
          */
-        info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
+        info(info&& other) : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
             // set other to the default-initialized state
             MPI_Info_create(&other.info_);
             other.is_freeable_ = true;
