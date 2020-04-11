@@ -1062,6 +1062,7 @@ namespace mpicxx {
          * }
          */
         info(info&& other) : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
+            // TODO 2020-04-11 20:39 breyerml: add conditional noexcept ?
             // set other to the default-initialized state
             MPI_Info_create(&other.info_);
             other.is_freeable_ = true;
