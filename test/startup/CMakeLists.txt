@@ -3,7 +3,7 @@ set(TEST_SOURCES
         finalize.cpp
         initialize.cpp
         thread_support.cpp
-        spawner.cpp
+        single_spawner.cpp
         multi_spawner.cpp
 )
 

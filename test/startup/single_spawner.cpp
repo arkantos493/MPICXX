@@ -1,5 +1,5 @@
 /**
- * @file test/startup/spawner.cpp
+ * @file test/startup/single_spawner.cpp
  * @author Marcel Breyer
  * @date 2020-04-12
  *
@@ -35,7 +35,7 @@
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/spawner.hpp>
+#include <mpicxx/startup/single_spawner.hpp>
 #include <mpicxx/startup/thread_support.hpp>
 
 using namespace std::string_literals;
