@@ -35,7 +35,7 @@ namespace mpicxx {
     // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
     /**
-     * @brief Spawner class which enables to spawn multiple different MPI processes at runtime.
+     * @brief Spawner class which enables to spawn (multiple) **different** MPI processes at runtime.
      */
     class multiple_spawner {
         /// the type of a single argv argument (including a key and a value)
