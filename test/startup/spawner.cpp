@@ -1,7 +1,7 @@
 /**
  * @file test/startup/spawner.cpp
  * @author Marcel Breyer
- * @date 2020-04-09
+ * @date 2020-04-12
  *
  * @brief Test cases for the @ref mpicxx::single_spawner class wrapping the *MPI_COMM_SPAWN* function.
  * @details Testsuite: *StartupTest*
@@ -27,6 +27,7 @@
  * | PrintErrcodesTo          | printing errcodes strings only allowed after a call to @ref mpicxx::single_spawner::spawn() (death test) |
  */
 
+#include <algorithm>
 #include <limits>
 #include <string>
 #include <utility>
@@ -39,24 +40,35 @@
 
 using namespace std::string_literals;
 
+int proc_count() {
+    void* ptr;
+    int flag;
+    MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
+    if (static_cast<bool>(flag)) {
+        return std::clamp(*reinterpret_cast<int*>(ptr), 1, 4);
+    } else {
+        return 1;
+    }
+}
+
 
 TEST(StartupTest, Command) {
     // create spawner
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     EXPECT_EQ(sp.command(), "a.out"s);
 }
 
 TEST(StartupDeathTest, EmptyCommand) {
     // create spawner with empty command
-    ASSERT_DEATH( mpicxx::spawner("", 2) , "");
+    ASSERT_DEATH( mpicxx::spawner("", proc_count()) , "");
 }
 
 TEST(StartupTest, Maxprocs) {
     // create spawner
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
-    EXPECT_EQ(sp.maxprocs(), 4);
+    EXPECT_EQ(sp.maxprocs(), proc_count());
 }
 
 TEST(StartupDeathTest, IllegalMaxprocs) {
@@ -67,7 +79,7 @@ TEST(StartupDeathTest, IllegalMaxprocs) {
 
 TEST(StartupDeathTest, NumberOfProcessesSpawned) {
     // call function before spawn()
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     [[maybe_unused]] int number;
     ASSERT_DEATH( number = sp.number_of_spawned_processes() , "");
@@ -75,7 +87,7 @@ TEST(StartupDeathTest, NumberOfProcessesSpawned) {
 
 TEST(StartupDeathTest, MaxprocsProcessesSpawned) {
     // call function before spawn()
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     [[maybe_unused]] bool flag;
     ASSERT_DEATH( flag = sp.maxprocs_processes_spanwed() , "");
@@ -87,13 +99,13 @@ TEST(StartupTest, UniverseSize) {
     int flag;
     MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &size, &flag);
     ASSERT_TRUE(flag);
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
     EXPECT_EQ(sp.universe_size(), *reinterpret_cast<int*>(size));
 }
 
 TEST(StartupTest, SetInfo) {
     // create spawn object and set info object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
     sp.set_spawn_info(mpicxx::info::env);
 
     // check if it has been set correctly
@@ -102,7 +114,7 @@ TEST(StartupTest, SetInfo) {
 
 TEST(StartupTest, SetRoot) {
     // create spawn object and set a legal root
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
     sp.set_root(0);
 
     // check if it has been set correctly
@@ -111,7 +123,7 @@ TEST(StartupTest, SetRoot) {
 
 TEST(StartupDeathTest, SetIllegalRoot) {
     // create spawn object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     // set a negative root
     ASSERT_DEATH( sp.set_root(-1) , "");
@@ -124,7 +136,7 @@ TEST(StartupDeathTest, SetIllegalRoot) {
 
 TEST(StartupTest, SetCommunicator) {
     // create spawn object an set a legal communicator
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
     sp.set_communicator(MPI_COMM_SELF);
 
     // check if it has been set correctly
@@ -133,7 +145,7 @@ TEST(StartupTest, SetCommunicator) {
 
 TEST(StartupDeathTest, SetIllegalCommunicator) {
     // create spawn object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     // set null communicator
     ASSERT_DEATH( sp.set_communicator(MPI_COMM_NULL) , "");
@@ -149,7 +161,7 @@ TEST(StartupDeathTest, SetIllegalCommunicator) {
 
 TEST(StartupTest, AddingArgv) {
     // create spawn object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     // add pair of strings without leading '-'
     sp.add_argv("key1"s, "value1"s);
@@ -164,7 +176,7 @@ TEST(StartupTest, AddingArgv) {
     // add duplicated key
     sp.add_argv("-key1", "value6");
 
-    // no 6 argcs should be present
+    // now 6 argcs should be present
     ASSERT_EQ(sp.argv().size(), 6);
 
     // create vector containing correct [key, value]-pairs
@@ -188,7 +200,7 @@ TEST(StartupTest, AddingArgv) {
 
 TEST(StartupTest, OutOfBounceArgv) {
     // create spawner object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     // try to access illegal element
     try {
@@ -203,7 +215,7 @@ TEST(StartupTest, OutOfBounceArgv) {
 
 TEST(StartupTest, ChainingCalls) {
     // create spawner object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     // chain function calls
     sp.set_communicator(MPI_COMM_SELF).set_root(0).set_spawn_info(mpicxx::info::env);
@@ -221,7 +233,7 @@ TEST(StartupTest, ChainingCalls) {
 
 TEST(StartupDeathTest, GetIntercommunicator) {
     // create spawner object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     [[maybe_unused]] MPI_Comm comm;
     ASSERT_DEATH( comm = sp.intercommunicator() , "");
@@ -229,7 +241,7 @@ TEST(StartupDeathTest, GetIntercommunicator) {
 
 TEST(StartupDeathTest, GetErrcodes) {
     // create spawner object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     [[maybe_unused]] std::vector<int> errcodes;
     ASSERT_DEATH( errcodes = sp.errcodes() , "");
@@ -237,7 +249,7 @@ TEST(StartupDeathTest, GetErrcodes) {
 
 TEST(StartupDeathTest, PrintErrcodesTo) {
     // create spawner object
-    mpicxx::spawner sp("a.out", 4);
+    mpicxx::spawner sp("a.out", proc_count());
 
     sp.print_errors_to();
 }
