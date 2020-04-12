@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multi_spawner.cpp
  * @author Marcel Breyer
- * @date 2020-04-09
+ * @date 2020-04-12
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner class wrapping the *MPI_COMM_SPAWN_MULTIPLE* function.
  * @details Testsuite: *StartupTest*
@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/spawn.hpp>
 #include <mpicxx/startup/thread_support.hpp>
 
 using namespace std::string_literals;
