@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-04-12
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -1018,6 +1018,8 @@ namespace mpicxx {
         /**
          * @brief Constructs an empty info object.
          *
+         * @post The newly constructed info object is in a valid state.
+         *
          * @calls{
          * int MPI_Info_create(MPI_Info *info);     // exactly once
          * }
@@ -1031,6 +1033,7 @@ namespace mpicxx {
          * @details Retains @p other's [key, value]-pair ordering.
          * @param[in] other another info object to be used as source to initialize the [key, value]-pairs of this info object with
          *
+         * @post The newly constructed info object is in a valid state iff @p other is in a valid state.
          * @attention Every copied info object (except if `other.get() == MPI_INFO_NULL`) is marked **freeable** independent of the
          * **freeable** state of make the copied-from info object.
          *
@@ -1054,18 +1057,25 @@ namespace mpicxx {
          * @details Retains @p other's [key, value]-pair ordering.
          * @param[in] other another info object to be used as source to initialize the [key, value]-pairs of this info object with
          *
-         * @post @p other is now in the default-initialized state.
+         * @post The newly constructed info object is in a valid state iff @p other is in a valid state.
+         * @post @p other is in the moved-from state, i.e. it refers to *MPI_INFO_NULL*.
          * @post All iterators referring to @p other remain valid, but now refer to `*this`.
+         * @attention Only a limited number of member functions can be called on an info object referring to *MPI_INFO_NULL* (aka moved-from state):
+         * - the destructor @ref ~info()
+         * - all assignment operators: @ref operator=(const info&), @ref operator=(info&&) and @ref operator=(std::initializer_list<value_type>)
+         * - the swap member function: @ref swap(info&)
+         * - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
+         * - all static member functions: @ref max_size(), @ref max_key_size() and @ref max_value_size()
+         * - all getters: @ref get(), @ref get() const and @ref freeable() const
          *
          * @calls{
          * int MPI_Info_create(MPI_Info *info);     // exactly once
          * }
          */
-        info(info&& other) : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
-            // TODO 2020-04-11 20:39 breyerml: add conditional noexcept ?
-            // set other to the default-initialized state
-            MPI_Info_create(&other.info_);
-            other.is_freeable_ = true;
+        info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
+            // set other to the moved-from state (referring to MPI_INFO_NULL)
+            other.info_ = MPI_INFO_NULL;
+            other.is_freeable_ = false;
         }
         /**
          * @brief Constructs the info object with the contents of the range [@p first, @p last).
@@ -1084,6 +1094,7 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
+         * @post The newly constructed info object is in a valid state.
          *
          * @assert_precondition{
          * If any key or value exceed their size limit. \n
@@ -1114,6 +1125,7 @@ namespace mpicxx {
          * @pre All @p keys and @p values **must** include the null-terminator.
          * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
          * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
+         * @post The newly constructed info object is in a valid state.
          *
          * @assert_precondition{ If any key or value exceed their size limit. }
          *
@@ -1133,6 +1145,7 @@ namespace mpicxx {
          * @param[in] is_freeable mark whether the *MPI_Info* object wrapped in this info object should be automatically
          * freed at the end of its lifetime
          *
+         * @post The newly constructed info object is in a valid state iff @p other isn't *MPI_INFO_NULL*.
          * @attention If @p is_freeable is set to `false`, **the user** has to ensure that the *MPI_Info* object @p other gets properly
          * freed (via a call to *MPI_Info_free*) at the end of its lifetime.
          * @attention Changing the underlying *MPI_Info* object **does not** change the value of `*this`!:
@@ -1184,6 +1197,7 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
+         * @post The assigned to info object is in a valid state iff @p other is in a valid state.
          * @attention Every copied info object (except if `other.get() == MPI_INFO_NULL`)  is marked **freeable** independent of the
          * **freeable** state of the copied-from info object.
          *
@@ -1228,8 +1242,15 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre No attempt to automatically free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this` **must** be made.
-         * @post `rhs` is in the default-initialized state.
+         * @post @p rhs is in the moved-from state, i.e. it refers to *MPI_INFO_NULL*.
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
+         * @attention Only a limited number of member functions can be called on an info object referring to *MPI_INFO_NULL* (aka moved-from state):
+         * - the destructor @ref ~info()
+         * - all assignment operators: @ref operator=(const info&), @ref operator=(info&&) and @ref operator=(std::initializer_list<value_type>)
+         * - the swap member function: @ref swap(info&)
+         * - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
+         * - all static member functions: @ref max_size(), @ref max_key_size() and @ref max_value_size()
+         * - all getters: @ref get(), @ref get() const and @ref freeable() const
          *
          * @assert_precondition{ If an attempt is made to free *MPI_INFO_NULL* or *MPI_INFO_ENV* as `*this`. }
          * @assert_sanity{ `*this` and @p rhs are the same info object. }
@@ -1252,9 +1273,9 @@ namespace mpicxx {
             // transfer ownership
             info_ = std::move(rhs.info_);
             is_freeable_ = std::move(rhs.is_freeable_);
-            // set rhs to the default-initialized state
-            MPI_Info_create(&rhs.info_);
-            rhs.is_freeable_ = true;
+            // set rhs to the moved-from state (referring to MPI_INFO_NULL)
+            rhs.info_ = MPI_INFO_NULL;
+            rhs.is_freeable_ = false;
             return *this;
         }
         /**
@@ -1548,7 +1569,7 @@ namespace mpicxx {
          * @attention This value typically reflects the theoretical limit on the size of the info object, at most
          * [`std::numeric_limits<`](https://en.cppreference.com/w/cpp/types/numeric_limits)@ref difference_type[`>::%max()`]
          * (https://en.cppreference.com/w/cpp/types/numeric_limits).
-         * At runtime, the size of the info object may be limited to a value smaller than max_size() by the amount of RAM available.
+         * At runtime, the size of the info object may be limited to a value smaller than @ref max_size() by the amount of RAM available.
          */
         [[nodiscard]] static constexpr size_type max_size() {
             return std::numeric_limits<difference_type>::max();
@@ -2127,6 +2148,7 @@ namespace mpicxx {
          * @details Does not invoke any move, copy, or swap operations on individual [key, value]-pairs.
          * @param[inout] other info object to exchange the contents with
          *
+         * @post `*this` is in a valid state iff @p other was in a valid state and vice versa.
          * @post All iterators remain valid, but now refer to the other info object.
          */
         void swap(info& other) noexcept {

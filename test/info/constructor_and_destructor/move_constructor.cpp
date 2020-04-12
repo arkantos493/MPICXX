@@ -1,7 +1,7 @@
 /**
  * @file info/constructor_and_destructor/move_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-04-12
  *
  * @brief Test cases for the @ref mpicxx::info::info(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
@@ -46,10 +46,9 @@ TEST(ConstructionTest, MoveConstructFromValidObject) {
     // be sure that info_moved has the same freeable state as the moved-from object
     EXPECT_EQ(info_move.freeable(), is_freeable);
 
-    // be sure moved_from object has released it's resources and is now in the default-initialized state
-    MPI_Info_get_nkeys(moved_from.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(moved_from.freeable());
+    // be sure moved_from object has released it's resources and is now in the moved-from state (referring to MPI_INFO_NULL)
+    EXPECT_EQ(moved_from.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(moved_from.freeable());
 }
 
 TEST(ConstructionTest, MoveConstructFromNullObject) {
@@ -59,11 +58,9 @@ TEST(ConstructionTest, MoveConstructFromNullObject) {
     // create new info object via the move constructor
     mpicxx::info valid(std::move(info_null));
 
-    // info_null should be in the default-initialized state
-    int nkeys;
-    MPI_Info_get_nkeys(info_null.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(info_null.freeable());
+    // info_null should be in the moved-from state (referring to MPI_INFO_NULL)
+    EXPECT_EQ(info_null.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null.freeable());
 
     // valid should refer to MPI_INFO_NULL
     EXPECT_EQ(valid.get(), MPI_INFO_NULL);
@@ -86,10 +83,9 @@ TEST(ConstructionTest, MoveConstructFromNonFreeable) {
     EXPECT_EQ(nkeys, 1);
     EXPECT_FALSE(info.freeable());
 
-    // non_freeable should be in the default-initialized state
-    MPI_Info_get_nkeys(non_freeable.get(), &nkeys);
-    EXPECT_EQ(nkeys, 0);
-    EXPECT_TRUE(non_freeable.freeable());
+    // non_freeable should be in the moved-from state (referring to MPI_INFO_NULL)
+    EXPECT_EQ(non_freeable.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(non_freeable.freeable());
 
     // -> if info would have been freed, the MPI runtime would crash
     MPI_Info_free(&mpi_info);
