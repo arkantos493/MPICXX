@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/spawner_base.hpp
  * @author Marcel Breyer
- * @date 2020-04-09
+ * @date 2020-04-12
  *
  * @brief Implements all common operations used in all spawner classes,
  * that are @ref mpicxx::single_spawner and @ref mpicxx::multiple_spawner.
@@ -24,7 +24,7 @@
 
 
 namespace mpicxx {
-    // forward declare spawner classes
+    // forward declare all spawner classes
     class single_spawner;
     class multiple_spawner;
 }
@@ -32,11 +32,12 @@ namespace mpicxx {
 namespace mpicxx::detail {
 
     // TODO 2020-03-22 19:04 marcel: change from MPI_Comm to mpicxx equivalent
-    // TODO 2020-03-23 12:56 marcel: errcode equivalent
+    // TODO 2020-03-23 12:56 marcel: change from int to mpicxx errcode equivalent
     // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
     // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
     /**
+     * @nosubgrouping
      * @brief This class implements all common operations used in all other spawner classes,
      * that are @ref mpicxx::single_spawner and @ref mpicxx::multiple_spawner.
      */
@@ -46,8 +47,13 @@ namespace mpicxx::detail {
         /// befriend @ref mpicxx::multiple_spawner
         friend class mpicxx::multiple_spawner;
 
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                constructor                                                 //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name constructor
+        ///@{
         /**
-         * @brief Create a new spawner_base.
+         * @brief Construct a new spawner_base object.
          * @param maxprocs the total number of spawned processes.
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
@@ -61,58 +67,15 @@ namespace mpicxx::detail {
 
             errcodes_ = std::vector<int>(maxprocs, -1);
         }
+        ///@}
 
-        /**
-         * @brief Returns the number of spawned processes.
-         * @details Two possible behaviours:
-         * 1. **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in an error
-         * (returning `0`).
-         * 2. **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed values for
-         * the number of spawned processes. If one of these allowed numbers of processes \f$ m_i \f$ can be spawned, the call to spawn
-         * succeeds (returning \f$ m_i \f$). If it isn't possible to spawn one of the allowed number of processes, the call to spawn results
-         * in an error (returning `0`).
-         * @return the number of spawned processes
-         *
-         * @pre @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() **must** already have been called.
-         *
-         * @assert_sanity{ If @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() hasn't been called yet. }
-         *
-         * @calls{
-         * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
-         * }
-         */
-        [[nodiscard]] int number_of_spawned_processes() const {
-            MPICXX_ASSERT_SANITY(this->already_spawned(), "Spawn not called, so can't query the number of spawned processes yet!");
 
-            if (intercomm_ != MPI_COMM_NULL) {
-                int size;
-                MPI_Comm_remote_size(intercomm_, &size);
-                return size;
-            } else {
-                return 0;
-            }
-        }
-        /**
-         * @brief Check whether it was possible to spawn `maxprocs` processes.
-         * @return `true` if `maxprocs` processes could be spawned, otherwise `false`
-         *
-         * @pre @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() **must** already have been called.
-         *
-         * @assert_sanity{ If @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() hasn't been called yet. }
-         *
-         * @calls{
-         * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
-         * }
-         */
-        [[nodiscard]] bool maxprocs_processes_spanwed() const {
-            MPICXX_ASSERT_SANITY(this->already_spawned(),
-                    "Spawn not called, so can't decide whether 'maxprocs' process have been spawned yet!");
-
-            return errcodes_.size() == static_cast<std::size_t>(this->number_of_spawned_processes());
-        }
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                           getter for spawn size                                            //
+        // ---------------------------------------------------------------------------------------------------------- //
         /**
          * @brief Returns the maximum possible number of processes.
-         * @return the maximum possible number of processes
+         * @return the maximum possible number of processes (`[[nodiscard]]`)
          *
          * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
          *
@@ -131,12 +94,18 @@ namespace mpicxx::detail {
             }
         }
 
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                      getter/setter spawn information                                       //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name manipulate spawn information
+        ///@{
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
          * @param[in] root the root process
          *
          * @pre @p root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_NULL*).
+         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          *
          * @assert_precondition{ If @p root isn't a legal root. }
          */
@@ -148,10 +117,9 @@ namespace mpicxx::detail {
         }
         /**
          * @brief Returns the rank of the root process.
-         * @return the root rank
+         * @return the root rank (`[[nodiscard]]`)
          */
         [[nodiscard]] int root() const noexcept { return root_; }
-
         /**
          * @brief Intracommunicator containing the group of spawning processes.
          * @param[in] comm an intracommunicator
@@ -171,14 +139,69 @@ namespace mpicxx::detail {
         }
         /**
          * @brief Returns the intracommunicator containing the group of spawning processes.
-         * @return the intracommunicator
+         * @return the intracommunicator (`[[nodiscard]]`)
          */
         [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
+        ///@}
 
 
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                   information after spawn has been called                                  //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name lookup (after process spawning)
+        /// (only meaningful if called after @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn())
+        ///@{
+        /**
+ * @brief Returns the number of spawned processes.
+ * @details Two possible behaviours:
+ * 1. **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in an error
+ * (returning `0`).
+ * 2. **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed values for
+ * the number of spawned processes. If one of these allowed numbers of processes \f$ m_i \f$ can be spawned, the call to spawn
+ * succeeds (returning \f$ m_i \f$). If it isn't possible to spawn one of the allowed number of processes, the call to spawn results
+ * in an error (returning `0`).
+ * @return the number of spawned processes (`[[nodiscard]]`)
+ *
+ * @pre @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() **must** already have been called.
+ *
+ * @assert_sanity{ If @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() hasn't been called yet. }
+ *
+ * @calls{
+ * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
+ * }
+ */
+        [[nodiscard]] int number_of_spawned_processes() const {
+            MPICXX_ASSERT_SANITY(this->already_spawned(), "Spawn not called, so can't query the number of spawned processes yet!");
+
+            if (intercomm_ != MPI_COMM_NULL) {
+                int size;
+                MPI_Comm_remote_size(intercomm_, &size);
+                return size;
+            } else {
+                return 0;
+            }
+        }
+        /**
+         * @brief Check whether it was possible to spawn `maxprocs` processes.
+         * @return `true` if `maxprocs` processes could be spawned, otherwise `false` (`[[nodiscard]]`)
+         *
+         * @pre @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() **must** already have been called.
+         *
+         * @assert_sanity{ If @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() hasn't been called yet. }
+         *
+         * @calls{
+         * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
+         * }
+         */
+        [[nodiscard]] bool maxprocs_processes_spanwed() const {
+            MPICXX_ASSERT_SANITY(this->already_spawned(),
+                                 "Spawn not called, so can't decide whether 'maxprocs' process have been spawned yet!");
+
+            return errcodes_.size() == static_cast<std::size_t>(this->number_of_spawned_processes());
+        }
         /**
          * @brief Returns the intercommunicator between the original group and the newly spawned group.
-         * @return the intercommunicator
+         * @return the intercommunicator (`[[nodiscard]]`)
          *
          * @pre @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() **must** already have been called.
          *
@@ -189,10 +212,9 @@ namespace mpicxx::detail {
 
             return intercomm_;
         }
-
         /**
-         * @brief Returns the error codes (one code per process) returned by the spawn call.
-         * @return the error codes
+         * @brief Returns the errcodes (one code per process) returned by the spawn call.
+         * @return the errcodes (`[[nodiscard]]`)
          *
          * @pre @ref single_spawner::spawn() resp. @ref multiple_spawner::spawn() **must** already have been called.
          *
@@ -242,6 +264,8 @@ namespace mpicxx::detail {
                 out << fmt::format("{:>5}x {}\n", count, std::string(error_string, resultlen));
             }
         }
+        ///@}
+
 
 #if ASSERTION_LEVEL > 0
         /*
@@ -291,14 +315,14 @@ namespace mpicxx::detail {
 }
 
 namespace mpicxx {
-    // TODO 2020-03-22 19:28 marcel: return type, docu
+
     /**
      * @brief Returns the parent intracommunicator of the current process if the process was started with *MPI_COMM_SPAWN* or
      * *MPI_COMM_SPAWN_MULTIPLE*.
      * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the parent intracommunicator or
-     * `std::nullopt`.
+     * `std::nullopt` (`[[nodiscard]]`)
      */
-    inline std::optional<MPI_Comm> parent_process() {
+    [[nodiscard]] inline std::optional<MPI_Comm> parent_process() {
         MPI_Comm intercomm;
         MPI_Comm_get_parent(&intercomm);
         if (intercomm != MPI_COMM_NULL) {
@@ -307,6 +331,7 @@ namespace mpicxx {
             return std::nullopt;
         }
     }
+
 }
 
 
