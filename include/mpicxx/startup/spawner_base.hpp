@@ -54,7 +54,7 @@ namespace mpicxx::detail {
         ///@{
         /**
          * @brief Construct a new spawner_base object.
-         * @param maxprocs the total number of spawned processes.
+         * @param[in] maxprocs the total number of spawned processes.
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
@@ -63,7 +63,7 @@ namespace mpicxx::detail {
          */
         spawner_base(const int maxprocs) {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
-                    "Can't spawn the given number of processes: 0 < {} <= {}.", maxprocs, spawner_base::universe_size());
+                    "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs, spawner_base::universe_size());
 
             errcodes_ = std::vector<int>(maxprocs, -1);
         }
