@@ -1067,10 +1067,6 @@ namespace mpicxx {
          * - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
          * - all static member functions: @ref max_size(), @ref max_key_size() and @ref max_value_size()
          * - all getters: @ref get(), @ref get() const and @ref freeable() const
-         *
-         * @calls{
-         * int MPI_Info_create(MPI_Info *info);     // exactly once
-         * }
          */
         info(info&& other) noexcept : info_(std::move(other.info_)), is_freeable_(std::move(other.is_freeable_)) {
             // set other to the moved-from state (referring to MPI_INFO_NULL)
@@ -1257,7 +1253,6 @@ namespace mpicxx {
          *
          * @calls{
          * int MPI_Info_free(MPI_info *info);       // at most once
-         * int MPI_Info_create(MPI_Info *info);     // exactly once
          * }
          */
         info& operator=(info&& rhs) {
