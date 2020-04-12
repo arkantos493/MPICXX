@@ -1,15 +1,15 @@
 /**
  * @file test/info/modifier/swap.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::swap(info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name            | test case description                                              |
- * |:--------------------------|:-------------------------------------------------------------------|
- * | SwapValidAndValid         | swap two info objects                                              |
- * | SwapValidAndMovedFrom     | swap two info objects where one of them is in the moved-from state |
- * | SwapMovedFromAndMovedFrom | swap two info objects where both are in the moved-from state       |
+ * | test case name    | test case description                                           |
+ * |:------------------|:----------------------------------------------------------------|
+ * | SwapValidAndValid | swap two info objects                                           |
+ * | SwapValidAndNull  | swap two info objects where one of them refers to MPI_INFO_NULL |
+ * | SwapNullAndNull   | swap two info objects where both refer to MPI_INFO_NULL         |
  */
 
 #include <gtest/gtest.h>
@@ -49,11 +49,11 @@ TEST(ModifierTest, SwapValidAndValid) {
     EXPECT_STREQ(value, "value1");
 }
 
-TEST(ModifierTest, SwapValidAndMovedFrom) {
-    // create two info objects and add [key, value]-pairs to one and set the other to the moved-from state
-    mpicxx::info info_1;
-    MPI_Info_set(info_1.get(), "key", "value");
-    mpicxx::info info_2(std::move(info_1));
+TEST(ModifierTest, SwapValidAndNull) {
+    // create info object and add [key, value]-pairs and another null info object
+    mpicxx::info info_1(MPI_INFO_NULL, false);
+    mpicxx::info info_2;
+    MPI_Info_set(info_2.get(), "key", "value");
 
     // swap both info objects
     info_1.swap(info_2);
@@ -61,7 +61,7 @@ TEST(ModifierTest, SwapValidAndMovedFrom) {
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
 
-    // check info_2 -> now in the moved-from state
+    // check info_2 -> now referring to MPI_INFO_NULL
     EXPECT_EQ(info_2.get(), MPI_INFO_NULL);
     EXPECT_FALSE(info_2.freeable());
 
@@ -76,7 +76,7 @@ TEST(ModifierTest, SwapValidAndMovedFrom) {
     // swap both info objects back
     info_1.swap(info_2);
 
-    // check info_1 -> now in the moved-from state
+    // check info_1 -> now referring to MPI_INFO_NULL
     EXPECT_EQ(info_1.get(), MPI_INFO_NULL);
     EXPECT_FALSE(info_1.freeable());
 
@@ -89,17 +89,17 @@ TEST(ModifierTest, SwapValidAndMovedFrom) {
     EXPECT_TRUE(info_2.freeable());
 }
 
-TEST(ModifierTest, SwapMovedFromAndMovedFrom) {
-    // create two info objects and set them to the moved-from state
-    mpicxx::info moved_from_1;
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info moved_from_2;
-    mpicxx::info dummy_2(std::move(moved_from_2));
+TEST(ModifierTest, SwapNullAndNull) {
+    // create two null info objects
+    mpicxx::info info_null_1(MPI_INFO_NULL, false);
+    mpicxx::info info_null_2(MPI_INFO_NULL, false);
 
-    // swap both moved-from info objects
-    moved_from_1.swap(moved_from_2);
+    // swap both info objects
+    info_null_1.swap(info_null_2);
 
-    // both are still in the moved-from state
-    EXPECT_EQ(moved_from_1.get(), MPI_INFO_NULL);
-    EXPECT_EQ(moved_from_2.get(), MPI_INFO_NULL);
+    // both are still referring to MPI_INFO_NULL
+    EXPECT_EQ(info_null_1.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null_1.freeable());
+    EXPECT_EQ(info_null_2.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null_2.freeable());
 }

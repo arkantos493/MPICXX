@@ -1,15 +1,15 @@
 /**
  * @file test/info/capacity/empty.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::empty() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *CapacityTest*
- * | test case name | test case description                            |
- * |:---------------|:-------------------------------------------------|
- * | Empty          | empty info object                                |
- * | NonEmpty       | non empty info object                            |
- * | MovedFromEmpty | info object in the moved-from state (death test) |
+ * | test case name | test case description                               |
+ * |:---------------|:----------------------------------------------------|
+ * | Empty          | empty info object                                   |
+ * | NonEmpty       | non empty info object                               |
+ * | NullEmpty      | info object referring to MPI_INFO_NULL (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -48,12 +48,11 @@ TEST(CapacityTest, NonEmpty) {
     EXPECT_TRUE(info.empty());
 }
 
-TEST(CapacityDeathTest, MovedFromEmpty) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(CapacityDeathTest, NullEmpty) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling empty() on an info object in the moved-from state is illegal
+    // calling empty() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] bool empty;
     ASSERT_DEATH( empty = info.empty() , "");
 }

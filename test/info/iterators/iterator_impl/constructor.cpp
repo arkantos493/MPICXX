@@ -1,17 +1,17 @@
 /**
  * @file test/info/iterators/iterator_impl/constructor.cpp
  * @author Marcel Breyer
- * @date 2020-02-19
+ * @date 2020-04-11
  *
  * @brief Test cases for the constructors of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
- * | test case name                 | test case description                                                                  |
- * |:-------------------------------|:---------------------------------------------------------------------------------------|
- * | DefaultConstruct               | default construct a singular iterator (death test)                                     |
- * | ConstructFromInfoObjectValid   | construct an iterator referring to an info object                                      |
- * | ConstructFromInfoObjectInvalid | construct an iterator referring to an info object in the moved-from state (death test) |
- * | CopyConstructValid             | construct an iterator from another, valid iterator                                     |
- * | CopyConstructInvalid           | construct an iterator from another, invalid iterator (death test)                      |
+ * | test case name                 | test case description                                                                     |
+ * |:-------------------------------|:------------------------------------------------------------------------------------------|
+ * | DefaultConstruct               | default construct a singular iterator (death test)                                        |
+ * | ConstructFromInfoObjectValid   | construct an iterator referring to an info object                                         |
+ * | ConstructFromInfoObjectInvalid | construct an iterator referring to an info object referring to MPI_INFO_NULL (death test) |
+ * | CopyConstructValid             | construct an iterator from another, valid iterator                                        |
+ * | CopyConstructInvalid           | construct an iterator from another, invalid iterator (death test)                         |
  */
 
 #include <gtest/gtest.h>
@@ -41,11 +41,11 @@ TEST(InfoIteratorImplTest, ConstructFromInfoObjectValid) {
 
 TEST(InfoIteratorImplDeathTest, ConstructFromInfoObjectInvalid) {
     // create info object
-    mpicxx::info moved_from;
-    mpicxx::info info(std::move(moved_from));
+    mpicxx::info info_null(MPI_INFO_NULL, false);
+    mpicxx::info info;
 
-    // construct iterator from info object in the moved-from state
-    EXPECT_DEATH( mpicxx::info::iterator(moved_from.get(), 0) , "");
+    // construct iterator from info object referring to MPI_INFO_NULL
+    EXPECT_DEATH( mpicxx::info::iterator(info_null.get(), 0) , "");
 
     // construct iterator with illegal start positions
     EXPECT_DEATH( mpicxx::info::const_iterator(info.get(), -1) , "");
@@ -74,14 +74,15 @@ TEST(InfoIteratorImplTest, CopyConstructValid) {
 
 TEST(InfoIteratorImplDeathTest, CopyConstructInvalid) {
     // create info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info info(std::move(moved_from));
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
+    mpicxx::info info;
 
     // copy construct from singular iterator
     mpicxx::info::iterator sit;
     EXPECT_DEATH( mpicxx::info::iterator it_1(sit) , "");
 
-    // copy construct iterator from an iterator that refers to an info object in the moved-from state
-    EXPECT_DEATH( mpicxx::info::iterator it_2(moved_from_it) , "");
+    // copy construct iterator from an iterator that refers to an info object referring to MPI_INFO_NULL
+    EXPECT_DEATH( mpicxx::info::iterator it_2(info_null_it) , "");
 }

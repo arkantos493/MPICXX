@@ -1,15 +1,15 @@
 /**
  * @file test/info/capacity/max_size.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::max_size() static member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *CapacityTest*
- * | test case name | test case description                                       |
- * |:---------------|:------------------------------------------------------------|
- * | MaxSize        | get max size through an info object                         |
- * | MovedMaxSize   | get max size through an info object in the moved-from state |
- * | StaticMaxSize  | get max_size through a static function call                 |
+ * | test case name | test case description                                          |
+ * |:---------------|:---------------------------------------------------------------|
+ * | MaxSize        | get max size through an info object                            |
+ * | NullMaxSize    | get max size through an info object referring to MPI_INFO_NULL |
+ * | StaticMaxSize  | get max_size through a static function call                    |
  */
 
 #include <limits>
@@ -28,12 +28,11 @@ TEST(CapacityTest, MaxSize) {
     EXPECT_EQ(info.max_size(), std::numeric_limits<typename mpicxx::info::difference_type>::max());
 }
 
-TEST(CapacityTest, MovedMaxSize) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(CapacityTest, NullMaxSize) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // call to max_size() from a moved-from info object is valid
+    // calling max_size() on an info object referring to MPI_INFO_NULL is valid
     EXPECT_EQ(info.max_size(), std::numeric_limits<typename mpicxx::info::difference_type>::max());
 }
 

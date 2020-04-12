@@ -1,7 +1,7 @@
 /**
  * @file test/info/lookup/equal_range.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::equal_range(const std::string_view) and
  * @ref mpicxx::info::equal_range(const std::string_view) const member function provided by the @ref mpicxx::info class.
@@ -12,8 +12,8 @@
  * | ConstEqualRangeExisting          | find key in const info object                                |
  * | EqualRangeNonExisting            | find non-existing key in info object                         |
  * | ConstEqualRangeNonExisting       | find non-existing key in const info object                   |
- * | MovedFromEqualRangeExisting      | info object in the moved-from state (death test)             |
- * | MovedFromConstEqualRangeExisting | const info object in the moved-from state (death test)       |
+ * | NullEqualRangeExisting           | info object referring to MPI_INFO_NULL (death test)          |
+ * | NullConstEqualRangeExisting      | const info object referring to MPI_INFO_NULL (death test)    |
  * | EqualRangeWithIllegalKey         | try to find an illegal key in info object (death test)       |
  * | ConstEqualRangeWithIllegalKey    | try to find an illegal key in const info object (death test) |
  */
@@ -93,21 +93,20 @@ TEST(LookupTest, ConstEqualRangeNonExisting) {
     EXPECT_EQ(it_pair.first, it_pair.second);
 }
 
-TEST(LookupDeathTest, MovedFromEqualRange) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(LookupDeathTest, NullEqualRange) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling equal_range() on an info object in the moved-from state is illegal
+    // calling equal_range() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] std::pair<mpicxx::info::iterator, mpicxx::info::iterator> it_pair;
     ASSERT_DEATH( it_pair = info.equal_range("key") , "");
 }
 
-TEST(LookupDeathTest, MovedFromConstEqualRange) {
-    // create const info object and set it to the moved-from state
+TEST(LookupDeathTest, NullConstEqualRange) {
+    // create const null info object
     const mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling equal_range() const on an info object in the moved-from state is illegal
+    // calling equal_range() const on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] std::pair<mpicxx::info::const_iterator, mpicxx::info::const_iterator> it_pair;
     ASSERT_DEATH( it_pair = info.equal_range("key") , "");
 }

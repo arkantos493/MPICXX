@@ -1,16 +1,16 @@
 /**
  * @file test/info/constructor_and_destructor/initializer_list_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-04-10
  *
  * @brief Test cases for the @ref mpicxx::info::info(std::initializer_list<value_type>) member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description                                               |
- * |:---------------------------------|:--------------------------------------------------------------------|
+ * | test case name                   | test case description                                                                                                    |
+ * |:---------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
  * | InitializerListConstruction      | construct info object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)       |
  * | EmptyInitializerListConstruction | construct empty info object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) |
- * | InitializerListIllegalKeyOrValue | try to construct info object from an illegal key/value (death test) |
+ * | InitializerListIllegalKeyOrValue | try to construct info object from an illegal key/value (death test)                                                      |
  */
 
 #include <string>

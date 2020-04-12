@@ -1,16 +1,16 @@
 /**
  * @file test/info/non-member_functions/erase_if.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-10
  *
  * @brief Test cases for the @ref mpicxx::info::erase_if(info&, Pred) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name   | test case description                              |
- * |:-----------------|:---------------------------------------------------|
- * | EraseIfNone      | erase nothing from the info object                 |
- * | EraseIfSome      | erase some [key, value]-pairs from the info object |
- * | EraseIfAll       | erase all [key, value]-pairs from the info object  |
- * | MovedFromEraseIf | info object in the moved-from state (death test)   |
+ * | test case name | test case description                                  |
+ * |:---------------|:-------------------------------------------------------|
+ * | EraseIfNone    | erase nothing from the info object                     |
+ * | EraseIfSome    | erase some [key, value]-pairs from the info object     |
+ * | EraseIfAll     | erase all [key, value]-pairs from the info object      |
+ * | NullEraseIf    | info object ireferring to *MPI_INFO_NULL* (death test) |
  */
 
 #include <gtest/gtest.h>
@@ -85,12 +85,11 @@ TEST(NonMemberFunctionTest, EraseIfAll) {
     EXPECT_EQ(nkeys, 0);
 }
 
-TEST(NonMemberFunctionDeathTest, MovedFromEraseIf) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(NonMemberFunctionDeathTest, NullEraseIf) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling erase_if() with an info object in the moved-from state is illegal
+    // calling erase_if() with an info object referring to MPI_INFO_NULL is illegal
     using std::erase_if;
     ASSERT_DEATH( erase_if(info, []([[maybe_unused]] const auto& pair) { return true; }) , "");
 }

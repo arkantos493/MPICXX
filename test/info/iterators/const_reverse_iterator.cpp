@@ -1,16 +1,16 @@
 /**
  * @file test/info/iterators/const_reverse_iterator.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::rbegin() const, @ref mpicxx::info::rend() const, @ref mpicxx::info::crbegin() const and
  * @ref mpicxx::info::crend() const member functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *IteratorsTest*
- * | test case name                | test case description                                         |
- * |:------------------------------|:--------------------------------------------------------------|
- * | ConstReverseIterator          | check for the correct iterator types                          |
- * | ConstReverseIteratorEmpty     | check whether `crbegin() == crend()` for an empty info object |
- * | MovedFromConstReverseIterator | info object in the moved-from state (death test)              |
+ * | test case name            | test case description                                         |
+ * |:--------------------------|:--------------------------------------------------------------|
+ * | ConstReverseIterator      | check for the correct iterator types                          |
+ * | ConstReverseIteratorEmpty | check whether `crbegin() == crend()` for an empty info object |
+ * | NullConstReverseIterator  | info object referring to MPI_INFO_NULL (death test)           |
  */
 
 #include <type_traits>
@@ -54,20 +54,19 @@ TEST(IteratorsTest, ConstReverseIteratorEmpty) {
     EXPECT_EQ(const_info.rbegin(), const_info.rend());
 }
 
-TEST(IteratorsDeathTest, MovedFromConstReverseIterator) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(IteratorsDeathTest, NullConstReverseIterator) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling crbegin() or crend() on an info object in the moved-from state is illegal
+    // calling crbegin() or crend() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] mpicxx::info::const_reverse_iterator it;
     ASSERT_DEATH( it = info.crbegin() , "");
     ASSERT_DEATH( it = info.crend() , "");
 
-    // create const info object and set it to the moved-from state
+    // create const null info object
     const mpicxx::info const_info(MPI_INFO_NULL, false);
 
-    // calling rbegin() const or rend() const on an info object in the moved-from state is illegal
+    // calling rbegin() const or rend() const on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( it = const_info.rbegin() , "");
     ASSERT_DEATH( it = const_info.rend() , "");
 }

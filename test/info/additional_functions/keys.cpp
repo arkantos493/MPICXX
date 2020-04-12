@@ -1,15 +1,15 @@
 /**
  * @file test/info/additional_functions/keys.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-10
  *
  * @brief Test cases for the @ref mpicxx::info::keys() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name | test case description                            |
- * |:---------------|:-------------------------------------------------|
- * | NoKeys         | empty info object                                |
- * | Keys           | info object with [key, value]-pairs              |
- * | MovedFromKeys  | info object in the moved-from state (death test) |
+ * | test case name | test case description                                 |
+ * |:---------------|:------------------------------------------------------|
+ * | NoKeys         | empty info object                                     |
+ * | Keys           | info object with [key, value]-pairs                   |
+ * | NullKeys       | info object referring to *MPI_INFO_NULL* (death test) |
  */
 
 #include <vector>
@@ -56,11 +56,10 @@ TEST(NonMemberFunctionTest, Keys) {
     }
 }
 
-TEST(NonMemberFunctionDeathTest, MovedFromKeys) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(NonMemberFunctionDeathTest, NullKeys) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling key() on an info object in the moved-from state is illegal
+    // calling key() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.keys() , "");
 }

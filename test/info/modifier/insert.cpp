@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/insert.cpp
  * @author Marcel Breyer
- * @date 2020-02-15
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::insert(const std::string_view, const std::string_view),
  * @ref mpicxx::info::insert(InputIt, InputIt) and @ref mpicxx::info::insert(std::initializer_list<value_type>) member functions provided
@@ -11,15 +11,15 @@
  * |:---------------------------------------|:------------------------------------------------------------------------------------|
  * | InsertByKeyValuePair                   | insert single [key, value]-pair                                                     |
  * | InsertByIllegalKeyOrValue              | try to insert [key, value]-pair with illegal key or value (death test)              |
- * | MovedFromInsertByKeyValuePair          | info object in the moved-from state (death test)                                    |
+ * | NullInsertByKeyValuePair               | info object referring to MPI_INFO_NULL (death test)                                 |
  * | InsertByIteratorRange                  | insert all [key, value]-pairs from the iterator range                               |
  * | InsertByIteratorRangeFromInfo          | insert all [key, value]-pairs from the iterator range retrieved from an info object |
  * | InsertByIllegalIteratorRange           | iterator range is not valid (death test)                                            |
  * | InsertByIllegalIteratorRangeKeyOrValue | key or value in the iterator range illegal (death test)                             |
- * | MovedFromInsertByIteratorRange         | info object in the moved-from state (death test)                                    |
+ * | NullInsertByIteratorRange              | info object referring to MPI_INFO_NULL (death test)                                 |
  * | InsertByInitializerList                | insert all [key, value]-pairs from the initializer list                             |
  * | InsertByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                           |
- * | MovedFromInsertByInitializerList       | info object in the moved-from state (death test)                                    |
+ * | NullInsertByInitializerList            | info object referring to MPI_INFO_NULL (death test)                                 |
  */
 
 #include <string>
@@ -86,12 +86,11 @@ TEST(ModifierDeathTest, InsertByIllegalKeyOrValue) {
     ASSERT_DEATH( info.insert("key", "") , "");
 }
 
-TEST(ModifierDeathTest, MovedFromInsertByKeyValuePair) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullInsertByKeyValuePair) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling insert() on an info object in the moved-from state is illegal
+    // calling insert() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert("key", "value") , "");
 }
 
@@ -188,15 +187,14 @@ TEST(ModifierDeathTest, InsertByIllegalIteratorRangeKeyOrValue) {
     ASSERT_DEATH( info.insert(vec.begin() + 3, vec.end()) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromInsertByIteratorRange) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullInsertByIteratorRange) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
     // create vector with [key, value]-pair
     std::vector<mpicxx::info::value_type> vec = { { "key", "value" } };
 
-    // calling insert() on an info object in the moved-from state is illegal
+    // calling insert() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert(vec.begin(), vec.end()) , "");
 }
 
@@ -242,11 +240,10 @@ TEST(ModifierDeathTest, InsertByIllegalInitializerListKeyOrValue) {
     ASSERT_DEATH( info.insert({ { "key", ""   }  }) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromInsertByInitializerList) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullInsertByInitializerList) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling insert() on an info object in the moved-from state is illegal
+    // calling insert() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert({ { "key", "value" } }) , "");
 }

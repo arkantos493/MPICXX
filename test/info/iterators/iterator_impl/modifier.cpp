@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/modifier.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the modifying operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -53,16 +53,16 @@ TEST(InfoIteratorImplDeathTest, PreIncrementInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to a moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to an info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     // incrementing a singular iterator is not permitted
     EXPECT_DEATH( ++sit , "");
 
-    // incrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH( ++moved_from_it , "");
+    // incrementing a iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( ++info_null_it , "");
 
     // incrementing a past-the-end iterator is not permitted
     EXPECT_DEATH( ++info.begin() , "");
@@ -97,16 +97,16 @@ TEST(InfoIteratorImplDeathTest, PostIncrementInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to a moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to an info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     // incrementing a singular iterator is not permitted
     EXPECT_DEATH( sit++ , "");
 
-    // incrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH( moved_from_it++ , "");
+    // incrementing a iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( info_null_it++ , "");
 
     // incrementing a past-the-end iterator is not permitted
     EXPECT_DEATH( (info.begin())++ , "");
@@ -185,10 +185,10 @@ TEST(InfoIteratorImplDeathTest, AdvanceInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to a moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to an info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] mpicxx::info::iterator it;
     // advancing a singular iterator is not permitted
@@ -196,10 +196,10 @@ TEST(InfoIteratorImplDeathTest, AdvanceInvalid) {
     EXPECT_DEATH( it = sit + 1 , "");
     EXPECT_DEATH( it = 1 + sit , "");
 
-    // advancing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH( it = moved_from_it += 1 , "");
-    EXPECT_DEATH( it = moved_from_it + 1 , "");
-    EXPECT_DEATH( it = 1 + moved_from_it , "");
+    // advancing a iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( it = info_null_it += 1 , "");
+    EXPECT_DEATH( it = info_null_it + 1 , "");
+    EXPECT_DEATH( it = 1 + info_null_it , "");
 
     // advancing a past-the-end iterator is not permitted
     EXPECT_DEATH( it = info.end() += 1 , "");
@@ -237,16 +237,16 @@ TEST(InfoIteratorImplDeathTest, PreDecrementInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to a moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to an info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     // decrementing a singular iterator is not permitted
     EXPECT_DEATH( --sit , "");
 
-    // decrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH( --moved_from_it , "");
+    // decrementing a iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( --info_null_it , "");
 
     // decrementing a start-of-sequence iterator is not permitted
     EXPECT_DEATH( --info.begin() , "");
@@ -281,16 +281,16 @@ TEST(InfoIteratorImplDeathTest, PostDecrementInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to a moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to an info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     // decrementing a singular iterator is not permitted
     EXPECT_DEATH(sit--, "");
 
-    // decrementing a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH(moved_from_it--, "");
+    // decrementing a iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH(info_null_it--, "");
 
     // decrementing a start-of-sequence iterator is not permitted
     EXPECT_DEATH((info.begin())--, "");
@@ -350,19 +350,19 @@ TEST(InfoIteratorImplDeathTest, RetreatInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to a moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to an info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] mpicxx::info::iterator it;
     // retreating a singular iterator is not permitted
     EXPECT_DEATH( it = sit -= 1 , "");
     EXPECT_DEATH( it = sit - 1 , "");
 
-    // retreating a iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH( it = moved_from_it -= 1 , "");
-    EXPECT_DEATH( it = moved_from_it - 1 , "");
+    // retreating a iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( it = info_null_it -= 1 , "");
+    EXPECT_DEATH( it = info_null_it - 1 , "");
 
     // retreating a start-of-sequence iterator is not permitted
     EXPECT_DEATH( it = info.end() -= 1 , "");
