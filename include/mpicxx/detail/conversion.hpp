@@ -16,6 +16,8 @@
 
 namespace mpicxx::detail {
 
+    /// @name conversion functions to std::string
+    ///@{
     /**
      * @brief Converts a boolean value to its string representation.
      * @param[in] val the boolean value
@@ -45,6 +47,7 @@ namespace mpicxx::detail {
         using std::to_string;
         return to_string(std::forward<T>(val));
     }
+    ///@}
 
 }
 

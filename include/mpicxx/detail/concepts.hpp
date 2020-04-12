@@ -14,6 +14,8 @@
 
 namespace mpicxx::detail {
 
+    /// @name custom internally used C++20 concepts
+    ///@{
     /**
      * @brief Concept that describes every *string* like type, i.e. [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string),
      * [`std::string_view`](https://en.cppreference.com/w/cpp/string/basic_string_view), `const char*` and `char[]`.
@@ -40,6 +42,7 @@ namespace mpicxx::detail {
      */
     template <typename T, typename... Args>
     concept main_args_pointer = std::is_invocable_r_v<int, T, int, char**, Args...>;
+    ///@}
 
 }
 
