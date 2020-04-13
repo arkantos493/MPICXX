@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-03-24
+ * @date 2020-04-13
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -2810,6 +2810,7 @@ namespace mpicxx {
             return static_cast<bool>(flag);
         }
 #if ASSERTION_LEVEL > 0
+        // TODO 2020-04-13 23:02 breyerml: add parameter and return value documentation
         /*
          * @brief Check whether `*this` refers to an info object in the moved-from state.
          */
