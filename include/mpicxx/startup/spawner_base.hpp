@@ -59,10 +59,10 @@ namespace mpicxx::detail {
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
-         * @assert_precondition{ If @p maxprocs is invalid. }
+         * @assert_sanity{ If @p maxprocs is invalid. }
          */
         spawner_base(const int maxprocs) {
-            MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs),
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
                     "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs, spawner_base::universe_size());
 
             errcodes_ = std::vector<int>(maxprocs, -1);
@@ -71,34 +71,9 @@ namespace mpicxx::detail {
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                           getter for spawn size                                            //
-        // ---------------------------------------------------------------------------------------------------------- //
-        /**
-         * @brief Returns the maximum possible number of processes.
-         * @return the maximum possible number of processes (`[[nodiscard]]`)
-         *
-         * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
-         *
-         * @calls{
-         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
-         * }
-         */
-        [[nodiscard]] static int universe_size() {
-            void* ptr;
-            int flag;
-            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
-            if (static_cast<bool>(flag)) {
-                return *reinterpret_cast<int*>(ptr);
-            } else {
-                return 0;
-            }
-        }
-
-
-        // ---------------------------------------------------------------------------------------------------------- //
         //                                      getter/setter spawn information                                       //
         // ---------------------------------------------------------------------------------------------------------- //
-        /// @name manipulate spawn information
+        /// @name modify spawn information
         ///@{
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
@@ -265,6 +240,31 @@ namespace mpicxx::detail {
             }
         }
         ///@}
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                           getter for spawn size                                            //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Returns the maximum possible number of processes.
+         * @return the maximum possible number of processes (`[[nodiscard]]`)
+         *
+         * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
+         *
+         * @calls{
+         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
+         * }
+         */
+        [[nodiscard]] static int universe_size() {
+            void* ptr;
+            int flag;
+            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
+            if (static_cast<bool>(flag)) {
+                return *reinterpret_cast<int*>(ptr);
+            } else {
+                return 0;
+            }
+        }
 
 
 #if ASSERTION_LEVEL > 0
