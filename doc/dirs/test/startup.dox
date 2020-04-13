@@ -6,3 +6,11 @@
  * @brief This directory contains all test cases for the functions related to the initialization or finalization of
  * the MPI runtime system.
  */
+
+/**
+ * @dir test/startup/single_spawner
+ * @author Marcel Breyer
+ * @date 2020-04-13
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::single_spawner class.
+ */
