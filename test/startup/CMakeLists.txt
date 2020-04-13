@@ -10,6 +10,9 @@ set(TEST_SOURCES
         single_spawner/command.cpp
         single_spawner/maxprocs.cpp
         single_spawner/spawn_info.cpp
+        single_spawner/argv.cpp
+        single_spawner/root.cpp
+        single_spawner/communicator.cpp
 )
 
 # create google test with MPI support

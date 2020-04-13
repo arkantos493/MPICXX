@@ -40,9 +40,12 @@ namespace mpicxx {
      * @brief Spawner class which enables to spawn (multiple) MPI processes at runtime.
      */
     class single_spawner {
-        /// The type of a single argv argument (represented by  a key and value).
-        using argv_type = std::pair<std::string, std::string>;
     public:
+        /// The type of a single argv argument (represented by  a key and value).
+        using argv_value_type = std::pair<std::string, std::string>;
+        /// Unsigned integer type.
+        using argv_size_type = std::size_t;
+
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
@@ -57,7 +60,7 @@ namespace mpicxx {
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
-         * @assert_precondition{
+         * @assert_sanity{
          * If @p command is empty. \n
          * If @p maxprocs is invalid.
          * }
@@ -65,7 +68,7 @@ namespace mpicxx {
         single_spawner(detail::string auto&& command, const int maxprocs)
             : base_(maxprocs), command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs)
         {
-            MPICXX_ASSERT_PRECONDITION(!command_.empty(), "No executable name given!");
+            MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
         }
         /**
          * @brief Construct a new single_spawner object.
@@ -77,7 +80,7 @@ namespace mpicxx {
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
-         * @assert_precondition{
+         * @assert_sanity{
          * If @p command is empty. \n
          * If @p maxprocs is invalid.
          * }
@@ -90,7 +93,7 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                       getter/setter spawn information                                      //
         // ---------------------------------------------------------------------------------------------------------- //
-        /// @name PLACEHOLDER
+        /// @name modify spawn information
         ///@{
         /**
          * @brief Set the name of the program to be spawned,
@@ -98,12 +101,12 @@ namespace mpicxx {
          *
          * @pre @p command **must not** be empty.
          *
-         * @assert_precondition{ If @p command is empty. }
+         * @assert_sanity{ If @p command is empty. }
          */
         single_spawner& set_command(detail::string auto&& command) {
             command_ = std::forward<decltype(command)>(command);
 
-            MPICXX_ASSERT_PRECONDITION(!command_.empty(), "No executable name given!");
+            MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
 
             return *this;
         }
@@ -120,10 +123,10 @@ namespace mpicxx {
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
-         * @assert_precondition{ If @p maxprocs is invalid. }
+         * @assert_sanity{ If @p maxprocs is invalid. }
          */
         single_spawner& set_maxprocs(const int maxprocs) {
-            MPICXX_ASSERT_PRECONDITION(base_.legal_maxprocs(maxprocs),
+            MPICXX_ASSERT_SANITY(base_.legal_maxprocs(maxprocs),
                     "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs, single_spawner::universe_size());
 
             maxprocs_ = maxprocs;
@@ -169,13 +172,18 @@ namespace mpicxx {
         [[nodiscard]] const info& spawn_info() const noexcept { return *info_; }
 
         /**
-         * @brief Adds an argument pair the the `argv` list which gets passed to the spawned program.
+         * @brief Adds an argument ([key, value]-pair) the the `argv` list which gets passed to the spawned program.
          * @details Adds a leading `-` to @p key if not already present.
          *
-         * Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
+         * Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
+         * @ref detail::convert_to_string().
          * @tparam T the type of the value
          * @param[in] key the argument key (e.g. `"-gridfile"` or `"gridfile"`)
          * @param[in] value the value associated with @p key
+         *
+         * @pre @p key **must not** only contain '-' (or '').
+         *
+         * @assert_sanity{ If @p key only contains '-' (or ''). }
          */
         template <typename T>
         single_spawner& add_argv(std::string key, T&& value) {
@@ -183,20 +191,30 @@ namespace mpicxx {
             if (!key.starts_with('-')) {
                 key.insert(0, 1, '-');
             }
-            // add [key, value]-argv-pair to argvs
+
+            MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Only '-' isn't a valid argument key!");
+
+            // add [key, value]-argv-pair to argv_
             argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
             return *this;
         }
         /**
-         * @brief Adds all elements from the range [@p first, @p last)  to the `argvs` list.
+         * @brief Adds all arguments ([key, value]-pairs) from the range [@p first, @p last)  to the `argvs` list which gets passed to the
+         * spawned program.
+         * @details Adds a leading `-` to all keys if not already present.
+         *
+         * Tries to convert all values to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
+         * @ref detail::convert_to_string().
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first `argv` in the range
          * @param[in] last iterator one-past the last `argv` in the range
          *
+         * @pre All keys **must not** only contain '-' (or '').
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid range. }
+         * @assert_sanity{ If any key only contains '-' (or ''). }
          */
         template <std::input_iterator InputIt>
         single_spawner& add_argv(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
@@ -204,25 +222,34 @@ namespace mpicxx {
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
             for (; first != last; ++first) {
-                auto&& pair = *first;
-                this->add_argv(std::forward<decltype(pair.first)>(pair.first), std::forward<decltype(pair.second)>(pair.second));
+                const auto& pair = *first;
+                this->add_argv(pair.first, pair.second);
             }
             return *this;
         }
         /**
-         * @brief Adds all elements from the initializer list @p ilist to the `argvs` list.
-         * @tparam T the type of the value
+         * @brief Adds all arguments ([key, value]-pairs) from the initializer list @p ilist to the `argvs` list which gets passed to the
+         * spawned program.
+         * @details Adds a leading `-` to all keys if not already present.
+         *
+         * Tries to convert all values to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
+         * @ref detail::convert_to_string().
+         * @tparam ValueType the type of the value
          * @param[in] ilist initializer list to insert the `argvs` from
+         *
+         * @pre All keys **must not** only contain '-' (or '').
+         *
+         * @assert_sanity{ If any key only contains '-' (or ''). }
          */
-        template <typename T>
-        single_spawner& add_argv(std::initializer_list<std::pair<std::string, T>> ilist) {
+        template <typename ValueType>
+        single_spawner& add_argv(std::initializer_list<std::pair<std::string, ValueType>> ilist) {
             return this->add_argv(ilist.begin(), ilist.end());
         }
         /**
          * @brief Returns the arguments which will be passed to `command`.
          * @return the arguments passed to `command` (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<argv_type>& argv() const noexcept { return argv_; }
+        [[nodiscard]] const std::vector<argv_value_type>& argv() const noexcept { return argv_; }
         /**
          * @brief Returns the i-th argument which will be passed to `command`.
          * @param[in] i the argv to return
@@ -230,19 +257,52 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i is an out-of-bounce access
          */
-        [[nodiscard]] const argv_type& argv(const std::size_t i) const {
+        [[nodiscard]] const argv_value_type& argv(const std::size_t i) const {
             if (i >= argv_.size()) {
                 throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, argv_.size()));
             }
 
             return argv_[i];
         }
+        /**
+         * @brief Returns the number of added arguments ([key, value]-pairs).
+         * @return the number of added `argvs` (`[[nodiscard]]`)
+         */
+        [[nodiscard]] argv_size_type argv_size() const noexcept {
+            return argv_.size();
+        }
+
+        /**
+         * @copydoc detail::spawner_base::set_root(const int)
+         */
+        single_spawner& set_root(const int root) noexcept {
+            base_.set_root(root);
+            return *this;
+        }
+        /**
+         * @copydoc detail::spawner_base::root()
+         */
+        [[nodiscard]] int root() const noexcept { return base_.root(); }
+
+        /**
+         * @copydoc detail::spawner_base::set_communicator(MPI_Comm)
+         */
+        single_spawner& set_communicator(MPI_Comm comm) noexcept {
+            base_.set_communicator(comm);
+            return *this;
+        }
+        /**
+         * @copydoc detail::spawner_base::communicator()
+         */
+        [[nodiscard]] MPI_Comm communicator() const noexcept { return base_.communicator(); }
         ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            spawn new process(es)                                           //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name spawn new process(es)
+        ///@{
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
          *
@@ -255,7 +315,8 @@ namespace mpicxx {
          * }
          */
         void spawn() {
-            MPICXX_ASSERT_PRECONDITION(info_ != nullptr, "The spawn info object went out-of-scope!");
+            // TODO 2020-04-13 16:47 breyerml: check all preconditions once again
+//            MPICXX_ASSERT_PRECONDITION(info_ != nullptr, "The spawn info object went out-of-scope!");
 
             if (argv_.empty()) {
                 // no additional arguments provided -> use MPI_ARGV_NULL
@@ -276,11 +337,15 @@ namespace mpicxx {
                                base_.root_, base_.comm_, &base_.intercomm_, base_.errcodes_.data());
             }
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                      functions provided by spawner_base                                    //
+        //                                   information after spawn has been called                                  //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name lookup (after process spawning)
+        /// (only meaningful if called after @ref single_spawner::spawn())
+        ///@{
         /**
          * @copydoc detail::spawner_base::number_of_spawned_processes()
          */
@@ -293,34 +358,7 @@ namespace mpicxx {
         [[nodiscard]] bool maxprocs_processes_spanwed() const {
             return base_.maxprocs_processes_spanwed();
         }
-        /**
-         * @copydoc detail::spawner_base::universe_size()
-         */
-        [[nodiscard]] static int universe_size() {
-            return detail::spawner_base::universe_size();
-        }
-        /**
-         * @copydoc detail::spawner_base::set_root(const int)
-         */
-        single_spawner& set_root(const int root) noexcept {
-            base_.set_root(root);
-            return *this;
-        }
-        /**
-         * @copydoc detail::spawner_base::root()
-         */
-        [[nodiscard]] int root() const noexcept { return base_.root(); }
-        /**
-         * @copydoc detail::spawner_base::set_communicator(MPI_Comm)
-         */
-        single_spawner& set_communicator(MPI_Comm comm) noexcept {
-            base_.set_communicator(comm);
-            return *this;
-        }
-        /**
-         * @copydoc detail::spawner_base::communicator()
-         */
-        [[nodiscard]] MPI_Comm communicator() const noexcept { return base_.communicator(); }
+
         /**
          * @copydoc detail::spawner_base::intercommunicator()
          */
@@ -337,6 +375,18 @@ namespace mpicxx {
         void print_errors_to(std::ostream& out = std::cout) const {
             base_.print_errors_to(out);
         }
+        ///@}
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                           getter for spawn size                                            //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @copydoc detail::spawner_base::universe_size()
+         */
+        [[nodiscard]] static int universe_size() {
+            return detail::spawner_base::universe_size();
+        }
 
 
     private:
@@ -346,15 +396,27 @@ namespace mpicxx {
          * @details Checks whether the distance bewteen @p first and @p last is not negative.
          */
         template <std::input_iterator InputIt>
-        bool legal_iterator_range(InputIt first, InputIt last) {
+        bool legal_iterator_range(InputIt first, InputIt last) const {
             return std::distance(first, last) >= 0;
+        }
+        /*
+         * @brief Check whether @p command is legal, i.e. it is **not** empty.
+         */
+        bool legal_command(const std::string& command) const noexcept {
+            return !command.empty();
+        }
+        /*
+         * @brief Check whether @p key is legal, i.e. it does **not** only contain a '-'.
+         */
+        bool legal_argv_key(const std::string& key) const noexcept {
+            return key.size() > 1;
         }
 #endif
         detail::spawner_base base_;
 
         std::string command_;
         int maxprocs_;
-        std::vector<argv_type> argv_;
+        std::vector<argv_value_type> argv_;
         const info* info_ = &mpicxx::info::null;
     };
 
