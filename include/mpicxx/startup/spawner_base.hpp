@@ -106,7 +106,7 @@ namespace mpicxx::detail {
          * @assert_sanity{ If the currently specified root isn't valid in @p comm. }
          */
         void set_communicator(MPI_Comm comm) noexcept {
-            MPICXX_ASSERT_PRECONDITION(comm != MPI_COMM_NULL, "Can't use null communicator!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm), "Can't use null communicator!");
             MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
                     "The previously set root '{}' isn't a valid root in the new communicator!", root_);
 
@@ -282,15 +282,23 @@ namespace mpicxx::detail {
          * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
          * @param[in] root the root
          * @param[in] comm the communicator
-         * @return `true` if @p root is legal, otherwise `false`
+         * @return `true` if @p root is legal, `false` otherwise
          */
         bool legal_root(const int root, const MPI_Comm comm) const {
             return 0 <= root && root < this->comm_size(comm);
         }
         /*
+         * @brief Checks whether @p comm is valid, i.e. it does **not** refer to *MPI_COMM_NULL*.
+         * @param[in] comm a intercommunicator
+         * @return `true` if @p comm is valid, `false` otherwise
+         */
+        bool legal_communicator(const MPI_Comm comm) const noexcept {
+            return comm != MPI_COMM_NULL;
+        }
+        /*
          * @brief Checks whether @p maxprocs is valid, i.e. @maxprocs is greater than `0` and less or equal than the current universe size.
          * @param[in] maxprocs the number of processes which should be spawned
-         * @return `true` if @p maxprocs is legal, otherwise `false`
+         * @return `true` if @p maxprocs is legal, `false` otherwise
          */
         bool legal_maxprocs(const int maxprocs) const {
             return 0 < maxprocs && maxprocs <= spawner_base::universe_size();
