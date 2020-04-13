@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-12
+ * @date 2020-04-13
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -36,6 +36,7 @@ namespace mpicxx {
     // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
     /**
+     * @nosubgrouping
      * @brief Spawner class which enables to spawn (multiple) MPI processes at runtime.
      */
     class single_spawner {
@@ -49,14 +50,14 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Construct a new single_spawner object.
-         * @param[in] command name of program to be spawned
+         * @param[in] command name of program to be spawned (must meet the requirements of the @p detail::string concept)
          * @param[in] maxprocs maximum number of processes to start
          *
          * @pre @p command **must not** be empty.
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
-         * @assert_sanity{
+         * @assert_precondition{
          * If @p command is empty. \n
          * If @p maxprocs is invalid.
          * }
@@ -64,8 +65,25 @@ namespace mpicxx {
         single_spawner(detail::string auto&& command, const int maxprocs)
             : base_(maxprocs), command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs)
         {
-            MPICXX_ASSERT_SANITY(!command_.empty(), "No executable name given!");
+            MPICXX_ASSERT_PRECONDITION(!command_.empty(), "No executable name given!");
         }
+        /**
+         * @brief Construct a new single_spawner object.
+         * @tparam T must meet the requirements of the @p detail::string concept
+         * @param[in] pair a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing the name of the program to be spawned
+         * and the maximum number of processes to start
+         *
+         * @pre @p command **must not** be empty.
+         * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_precondition{
+         * If @p command is empty. \n
+         * If @p maxprocs is invalid.
+         * }
+         */
+        template <detail::string T>
+        single_spawner(std::pair<T, int> pair) : single_spawner(std::forward<T>(pair.first), pair.second) { }
         ///@}
 
 
@@ -75,15 +93,48 @@ namespace mpicxx {
         /// @name PLACEHOLDER
         ///@{
         /**
+         * @brief Set the name of the program to be spawned,
+         * @param[in] command name of program to be spawned (must meet the requirements of the @p detail::string concept)
+         *
+         * @pre @p command **must not** be empty.
+         *
+         * @assert_precondition{ If @p command is empty. }
+         */
+        single_spawner& set_command(detail::string auto&& command) {
+            command_ = std::forward<decltype(command)>(command);
+
+            MPICXX_ASSERT_PRECONDITION(!command_.empty(), "No executable name given!");
+
+            return *this;
+        }
+        /**
          * @brief Returns the name of the executable which should get spawned.
          * @return the executable name (`[[nodiscard]]`)
          */
         [[nodiscard]] const std::string& command() const noexcept { return command_; }
+
+        /**
+         * @brief Set the maximum number of processes to start.
+         * @param[in] maxprocs maximum number of processes to start.
+         *
+         * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_precondition{ If @p maxprocs is invalid. }
+         */
+        single_spawner& set_maxprocs(const int maxprocs) {
+            MPICXX_ASSERT_PRECONDITION(base_.legal_maxprocs(maxprocs),
+                    "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs, single_spawner::universe_size());
+
+            maxprocs_ = maxprocs;
+            return *this;
+        }
         /**
          * @brief Returns the number of processes which should get spawned.
          * @return the number of processes (`[[nodiscard]]`)
          */
         [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
+
         /**
          * @brief Set the info object representing additional information for the runtime system where and how to spawn the processes.
          * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
@@ -108,10 +159,15 @@ namespace mpicxx {
             return *this;
         }
         /**
+         * @brief Delete the r-value overload to prevent some bugs in passing a temporary to @ref set_spawn_info().
+         */
+        single_spawner& set_spawn_info(info&&) = delete;
+        /**
          * @brief Returns the info object representing additional information for the runtime system where and how to spawn the processes.
          * @return the info object (`[[nodiscard]]`)
          */
         [[nodiscard]] const info& spawn_info() const noexcept { return *info_; }
+
         /**
          * @brief Adds an argument pair the the `argv` list which gets passed to the spawned program.
          * @details Adds a leading `-` to @p key if not already present.
