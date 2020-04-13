@@ -35,6 +35,8 @@ namespace mpicxx {
     // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
     // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
+    // TODO 2020-04-13 22:29 breyerml: PRECONDITION or SANITY checks???
+
     /**
      * @nosubgrouping
      * @brief Spawner class which enables to spawn (multiple) MPI processes at runtime.
@@ -316,7 +318,15 @@ namespace mpicxx {
          */
         void spawn() {
             // TODO 2020-04-13 16:47 breyerml: check all preconditions once again
-//            MPICXX_ASSERT_PRECONDITION(info_ != nullptr, "The spawn info object went out-of-scope!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
+                    "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
+            MPICXX_ASSERT_PRECONDITION(base_.legal_maxprocs(maxprocs_),
+                    "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs_, single_spawner::universe_size());
+            MPICXX_ASSERT_PRECONDITION(this->legal_spawn_info(info_), "Can't use nullptr!");
+            MPICXX_ASSERT_PRECONDITION(base_.legal_root(base_.root_, base_.comm_),
+                    "The previously set root '{}' isn't a valid root in the current communicator!", base_.root_);
+            MPICXX_ASSERT_PRECONDITION(base_.legal_communicator(base_.comm_), "Can't use null communicator!");
 
             if (argv_.empty()) {
                 // no additional arguments provided -> use MPI_ARGV_NULL
@@ -394,6 +404,9 @@ namespace mpicxx {
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
          * @details Checks whether the distance bewteen @p first and @p last is not negative.
+         * @param[in] first iterator to the first element of the range
+         * @param[in] last iterator to one-past the last element of the range
+         * @return `true` if @p first and @p last denote a valid range, `false` otherwise
          */
         template <std::input_iterator InputIt>
         bool legal_iterator_range(InputIt first, InputIt last) const {
@@ -401,15 +414,40 @@ namespace mpicxx {
         }
         /*
          * @brief Check whether @p command is legal, i.e. it is **not** empty.
+         * @param[in] command the command name
+         * @return `true` if @p command is a valid name, `false` otherwise
          */
         bool legal_command(const std::string& command) const noexcept {
             return !command.empty();
         }
         /*
          * @brief Check whether @p key is legal, i.e. it does **not** only contain a '-'.
+         * @param[in] key the argv key
+         * @return `true` if @p key is valid, `false` otherwise
          */
         bool legal_argv_key(const std::string& key) const noexcept {
             return key.size() > 1;
+        }
+        /*
+         * @brief Check whether all keys in @p argvs are legal, i.e. whether @ref legal_argv_key() yields `true` for all keys.
+         * @param[in] argvs a vector of multiple argument [key, value]-pairs
+         * @return `true` if all keys in @p argvs are valid, `false` otherwise
+         */
+        std::pair<bool, std::size_t> legal_argv_keys(const std::vector<argv_value_type>& argvs) const noexcept {
+            for (std::size_t i = 0; i < argvs.size(); ++i) {
+                if (!this->legal_argv_key(argvs[i].first)) {
+                    return std::make_pair(false, i);
+                }
+            }
+            return std::make_pair(true, argvs.size());
+        }
+        /*
+         * @brief Check whether @p info is a valid pointer to an @ref mpicxx::info object, i.e. it does **not** refer to nullptr.
+         * @param[in] info pointer to an @ref mpicxx::info object
+         * @return `true` if info is valid, `false` otherwise
+         */
+        bool legal_spawn_info(const info* info) const noexcept {
+            return info != nullptr;
         }
 #endif
         detail::spawner_base base_;
