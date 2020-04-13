@@ -59,10 +59,10 @@ namespace mpicxx::detail {
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
-         * @assert_sanity{ If @p maxprocs is invalid. }
+         * @assert_precondition{ If @p maxprocs is invalid. }
          */
         spawner_base(const int maxprocs) {
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
+            MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs),
                     "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs, spawner_base::universe_size());
 
             errcodes_ = std::vector<int>(maxprocs, -1);
