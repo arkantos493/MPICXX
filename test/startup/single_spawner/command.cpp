@@ -8,7 +8,7 @@
  * | test case name    | test case description                                     |
  * |:------------------|:----------------------------------------------------------|
  * | SetCommand        | set a new command name                                    |
- * | SetCommandInvalid | set a new illegal command name (death test)               |
+ * | SetInvalidCommand | set a new illegal command name (death test)               |
  * | ChainSetCommand   | chain calls to @ref mpicxx::single_spawner::set_command() |
  * | GetCommand        | get the current command name                              |
  */
@@ -34,7 +34,7 @@ TEST(SingleSpawnerTest, SetCommand) {
     EXPECT_EQ(ss.command(), "b.out");
 }
 
-TEST(SingleSpawnerDeathTest, SetCommandInvalid) {
+TEST(SingleSpawnerDeathTest, SetInvalidCommand) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 

@@ -8,7 +8,7 @@
  * | test case name     | test case description                                      |
  * |:-------------------|:-----------------------------------------------------------|
  * | SetMaxprocs        | set a new number of maxprocs                               |
- * | SetMaxprocsInvalid | set a new illegal number of maxprocs (death test)          |
+ * | SetInvalidMaxprocs | set a new illegal number of maxprocs (death test)          |
  * | ChainSetMaxprocs   | chain calls to @ref mpicxx::single_spawner::set_maxprocs() |
  * | GetMaxprocs        | get the current number of maxprocs                         |
  */
@@ -36,7 +36,7 @@ TEST(SingleSpawnerTest, SetMaxprocs) {
     EXPECT_EQ(ss.maxprocs(), 2);
 }
 
-TEST(SingleSpawnerDeathTest, SetMaxprocsInvalid) {
+TEST(SingleSpawnerDeathTest, SetInvalidMaxprocs) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
