@@ -1,7 +1,7 @@
 /**
  * @file test/startup/single_spawner/maxprocs.cpp
  * @author Marcel Breyer
- * @date 2020-04-13
+ * @date 2020-04-14
  *
  * @brief Test cases for the @ref mpicxx::single_spawner class maxprocs member functions.
  * @details Testsuite: *SingleSpawnerTest*
@@ -11,6 +11,7 @@
  * | SetInvalidMaxprocs | set a new illegal number of maxprocs (death test)          |
  * | ChainSetMaxprocs   | chain calls to @ref mpicxx::single_spawner::set_maxprocs() |
  * | GetMaxprocs        | get the current number of maxprocs                         |
+ * | GetUniverseSize    | get the available universe size                            |
  */
 
 #include <limits>
@@ -67,4 +68,9 @@ TEST(SingleSpawnerTest, GetMaxprocs) {
 
     // check getter
     EXPECT_EQ(ss.maxprocs(), 1);
+}
+
+TEST(SingleSpawnerTest, GetUniverseSize) {
+    // check universe size
+    EXPECT_NE(mpicxx::single_spawner::universe_size(), 0);
 }

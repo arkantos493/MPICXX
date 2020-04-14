@@ -254,7 +254,7 @@ namespace mpicxx {
          * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
          * }
          */
-        [[nodiscard]] static int universe_size() {
+        [[nodiscard]] static int universe_size() { // TODO 2020-04-14 22:52 breyerml: check for correctness
             void* ptr;
             int flag;
             MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
@@ -380,7 +380,7 @@ namespace mpicxx {
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
          * }
          */
-        spawn_result spawn() {
+        [[nodiscard]] spawn_result spawn() {
             MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
                     "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);

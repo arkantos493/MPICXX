@@ -11,8 +11,7 @@ set(TEST_SOURCES
         single_spawner/argv.cpp
         single_spawner/root.cpp
         single_spawner/communicator.cpp
-        single_spawner/universe_size.cpp
 )
 
 # create google test with MPI support
-add_mpi_test(startup "${TEST_SOURCES}" 2)
+add_mpi_test(startup "${TEST_SOURCES}" 1)
