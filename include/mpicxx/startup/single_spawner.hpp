@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-13
+ * @date 2020-04-14
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -307,17 +307,36 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
+         * @details After calling this function its valid to call other member functions:
+         * - @ref number_of_spawned_processes() const
+         * - @ref maxprocs_processes_spawned() const
+         * - @ref intercommunicator() const
+         * - @ref errcodes() const
+         * - @ref print_errors_to(std::ostream&) const
          *
-         * @pre The set info object **should not** be out-of-scope.
+         * @pre `command` **must not** be empty.
+         * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
+         * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The pointer to the spawn info object **must not** refer to `nullptr`.
+         * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre `comm` **must not** be *MPI_COMM_NULL*.
          *
-         * @assert_precondition{ If the info object is out-of-scope. }
+         * @assert_precondition{
+         * If the `command` is empty. \n
+         * If any key only contains '-' (or ''). \n
+         * If `maxprocs` is invalid. \n
+         * If the pointer to the spawn info object refers to `nullptr`. \n
+         * If `root` isn't a legal root. \n
+         * If `comm` is the null communicator (*MPI_COMM_NULL*).
+         * }
          *
          * @calls{
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
          * }
          */
         void spawn() {
-            // TODO 2020-04-13 16:47 breyerml: check all preconditions once again
             MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
                     "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
@@ -363,10 +382,10 @@ namespace mpicxx {
             return base_.number_of_spawned_processes();
         }
         /**
-         * @copydoc detail::spawner_base::maxprocs_processes_spanwed()
+         * @copydoc detail::spawner_base::maxprocs_processes_spawned()
          */
-        [[nodiscard]] bool maxprocs_processes_spanwed() const {
-            return base_.maxprocs_processes_spanwed();
+        [[nodiscard]] bool maxprocs_processes_spawned() const {
+            return base_.maxprocs_processes_spawned();
         }
 
         /**
@@ -429,7 +448,7 @@ namespace mpicxx {
             return key.size() > 1;
         }
         /*
-         * @brief Check whether all keys in @p argvs are legal, i.e. whether @ref legal_argv_key() yields `true` for all keys.
+         * @brief Check whether all keys in @p argvs are legal, i.e. whether @ref legal_argv_key() const yields `true` for all keys.
          * @param[in] argvs a vector of multiple argument [key, value]-pairs
          * @return `true` if all keys in @p argvs are valid, `false` otherwise
          */
