@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/spawner_base.hpp
  * @author Marcel Breyer
- * @date 2020-04-12
+ * @date 2020-04-14
  *
  * @brief Implements all common operations used in all spawner classes,
  * that are @ref mpicxx::single_spawner and @ref mpicxx::multiple_spawner.
@@ -102,7 +102,7 @@ namespace mpicxx::detail {
          * @pre @p comm **must not** be *MPI_COMM_NULL*.
          * @pre The currently specified rank (as returned by @ref root()) **must be** valid in @p comm.
          *
-         * @assert_precondition{ If @p comm is the null communicator. }
+         * @assert_precondition{ If @p comm is the null communicator (*MPI_COMM_NULL*). }
          * @assert_sanity{ If the currently specified root isn't valid in @p comm. }
          */
         void set_communicator(MPI_Comm comm) noexcept {
@@ -168,7 +168,7 @@ namespace mpicxx::detail {
          * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
          * }
          */
-        [[nodiscard]] bool maxprocs_processes_spanwed() const {
+        [[nodiscard]] bool maxprocs_processes_spawned() const {
             MPICXX_ASSERT_SANITY(this->already_spawned(),
                                  "Spawn not called, so can't decide whether 'maxprocs' process have been spawned yet!");
 
@@ -226,7 +226,7 @@ namespace mpicxx::detail {
             // count how often each error occurred
             std::map<int, int> counts;
             for (const int err : errcodes_) {
-                if (err != MPI_SUCCESS) {
+                if (err != MPI_SUCCESS && err != -1) {
                     ++counts[err];
                 }
             }
