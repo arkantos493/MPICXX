@@ -3,8 +3,6 @@ set(TEST_SOURCES
         finalize.cpp
         initialize.cpp
         thread_support.cpp
-#        single_spawner.cpp
-#        multi_spawner.cpp
 
         single_spawner/constructor.cpp
         single_spawner/command.cpp
