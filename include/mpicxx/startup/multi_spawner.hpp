@@ -24,7 +24,6 @@
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/detail/conversion.hpp>
 #include <mpicxx/info/info.hpp>
-#include <mpicxx/startup/spawner_base.hpp>
 
 
 namespace mpicxx {
@@ -54,7 +53,6 @@ namespace mpicxx {
 
             (add_to(std::forward<Args>(args)), ...);
 
-            base_ = spawner_base(std::reduce(maxprocs_.cbegin(), maxprocs_.cend()));
       }
 
         [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
@@ -86,8 +84,6 @@ namespace mpicxx {
 
 
     private:
-        spawner_base base_;
-
         std::vector<std::string> commands_;
         std::vector<int> maxprocs_;
         std::vector<std::vector<argv_type>> argvs_;

@@ -13,7 +13,6 @@ set(TEST_SOURCES
         single_spawner/argv.cpp
         single_spawner/root.cpp
         single_spawner/communicator.cpp
-        single_spawner/lookup_after_process_spawning.cpp
         single_spawner/universe_size.cpp
 )
 
