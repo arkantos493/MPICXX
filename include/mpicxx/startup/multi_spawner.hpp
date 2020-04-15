@@ -81,6 +81,12 @@ namespace mpicxx {
         void spawn() {
 
         }
+        /**
+         * @brief DOC
+         */
+        void spawn_with_errcodes() {
+
+        }
 
 
     private:

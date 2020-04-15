@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/spawn_result.hpp
  * @author Marcel Breyer
- * @date 2020-04-14
+ * @date 2020-04-15
  *
  * @brief Implements the class which gets returned from @ref mpicxx::single_spawner::spawn() resp. @ref mpicxx::multiple_spawner::spawn().
  */
@@ -34,10 +34,11 @@ namespace mpicxx {
 
     /**
      * @nosubgrouping
-     * @brief This class implements all functions that can be called on the result of @ref mpicxx::single_spawner::spawn() resp.
-     * @ref mpicxx::multiple_spawner::spawn().
+     * @brief This class implements all functions that can be called on the result of @ref mpicxx::single_spawner::spawn_with_errcodes()
+     * resp. @ref mpicxx::multiple_spawner::spawn_with_errcodes().
+     * @details Same as @ref mpicxx::spawn_result but also contains error codes.
      */
-    class spawn_result {
+    class spawn_result_with_errcodes {
         /// befriend @ref mpicxx::single_spawner
         friend class mpicxx::single_spawner;
         /// befriend @ref mpicxx::multiple_spawner
@@ -48,12 +49,12 @@ namespace mpicxx {
         //                                                constructor                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /*
-         * @brief Construct a new spawner_base object.
+         * @brief Construct a new spawn_result_with_errcodes object.
          * @param[in] maxprocs the total number of spawned processes.
          *
          * @assert_sanity{ If @p maxprocs is invalid. }
          */
-        spawn_result(const int maxprocs) : errcodes_(maxprocs, -1) { }
+        spawn_result_with_errcodes(const int maxprocs) : errcodes_(maxprocs, -1) { }
 
 
     public:
@@ -146,8 +147,87 @@ namespace mpicxx {
 
 
     private:
-        MPI_Comm intercomm_;
         std::vector<int> errcodes_;
+        MPI_Comm intercomm_ = MPI_COMM_NULL;
+    };
+
+
+    /**
+     * @nosubgrouping
+     * @brief This class implements all functions that can be called on the result of @ref mpicxx::single_spawner::spawn() resp.
+     * @ref mpicxx::multiple_spawner::spawn().
+     * @details Unlike @ref mpicxx::spawn_result_with_errcodes this class does **not** contain error codes.
+     */
+    class spawn_result {
+        /// befriend @ref mpicxx::single_spawner
+        friend class mpicxx::single_spawner;
+        /// befriend @ref mpicxx::multiple_spawner
+        friend class mpicxx::multiple_spawner;
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                                constructor                                                 //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /*
+         * @brief Construct a new spawn_result object.
+         * @param[in] maxprocs the total number of spawned processes.
+         *
+         * @assert_sanity{ If @p maxprocs is invalid. }
+         */
+        spawn_result(const int maxprocs) : maxprocs_(maxprocs) { }
+
+
+    public:
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                          lookup spawn information                                          //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /**
+         * @brief Returns the number of spawned processes.
+         * @details Two possible behaviours:
+         * 1. **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in an error
+         * (returning `0`).
+         * 2. **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed values for
+         * the number of spawned processes. If one of these allowed numbers of processes \f$ m_i \f$ can be spawned, the call to spawn
+         * succeeds (returning \f$ m_i \f$). If it isn't possible to spawn one of the allowed number of processes, the call to spawn results
+         * in an error (returning `0`).
+         * @return the number of spawned processes (`[[nodiscard]]`)
+         *
+         * @calls{
+         * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
+         * }
+         */
+        [[nodiscard]] int number_of_spawned_processes() const {
+            if (intercomm_ != MPI_COMM_NULL) {
+                int size;
+                MPI_Comm_remote_size(intercomm_, &size);
+                return size;
+            } else {
+                return 0;
+            }
+        }
+        /**
+         * @brief Check whether it was possible to spawn the requested number of processes.
+         * @return `true` if the requested number of processes could be spawned, `false` otherwise (`[[nodiscard]]`)
+         *
+         * @calls{
+         * int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once
+         * }
+         */
+        [[nodiscard]] bool maxprocs_processes_spawned() const {
+            return maxprocs_ == this->number_of_spawned_processes();
+        }
+        /**
+         * @brief Returns the intercommunicator between the original group and the newly spawned group.
+         * @return the intercommunicator (`[[nodiscard]]`)
+         */
+        [[nodiscard]] MPI_Comm intercommunicator() const noexcept {
+            return intercomm_;
+        }
+
+
+    private:
+        int maxprocs_;
+        MPI_Comm intercomm_ = MPI_COMM_NULL;
     };
 
 

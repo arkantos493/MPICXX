@@ -358,6 +358,9 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
+         * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
+         *
+         * The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
          * @return a @ref mpicxx::spawn_result object holding the result of the @ref spawn() invocation (i.e. communicator and errcodes)
          *
          * @pre `command` **must not** be empty.
@@ -383,44 +386,124 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]] spawn_result spawn() {
+            return this->spawn_impl<spawn_result>();
+        }
+        /**
+         * @brief Spawns a number of MPI processes according to the previously set options.
+         * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
+         *
+         * The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
+         * possibly occurring error codes.
+         * @return a @ref mpicxx::spawn_result_with_errcodes object holding the result of the @ref spawn_with_errcodes() invocation
+         * (i.e. communicator and errcodes)
+         *
+         * @pre `command` **must not** be empty.
+         * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
+         * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The pointer to the spawn info object **must not** refer to `nullptr`.
+         * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre `comm` **must not** be *MPI_COMM_NULL*.
+         *
+         * @assert_precondition{
+         * If the `command` is empty. \n
+         * If any key only contains '-' (or ''). \n
+         * If `maxprocs` is invalid. \n
+         * If the pointer to the spawn info object refers to `nullptr`. \n
+         * If `root` isn't a legal root. \n
+         * If `comm` is the null communicator (*MPI_COMM_NULL*).
+         * }
+         *
+         * @calls{
+         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * }
+         */
+        [[nodiscard]] spawn_result_with_errcodes spawn_with_errcodes() {
+            return this->spawn_impl<spawn_result_with_errcodes>();
+        }
+        ///@}
+
+
+    private:
+
+        /*
+         * @brief Spawns a number of MPI processes according to the previously set options.
+         * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
+         *
+         * Same as @ref spawn() but also returns error codes.
+         * @tparam return_type either @ref mpicxx::spawn_result or @ref mpicxx::spawn_result_with_errcodes
+         * @return the result of the spawn invocation
+         *
+         * @pre `command` **must not** be empty.
+         * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
+         * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The pointer to the spawn info object **must not** refer to `nullptr`.
+         * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre `comm` **must not** be *MPI_COMM_NULL*.
+         *
+         * @assert_precondition{
+         * If the `command` is empty. \n
+         * If any key only contains '-' (or ''). \n
+         * If `maxprocs` is invalid. \n
+         * If the pointer to the spawn info object refers to `nullptr`. \n
+         * If `root` isn't a legal root. \n
+         * If `comm` is the null communicator (*MPI_COMM_NULL*).
+         * }
+         *
+         * @calls{
+         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * }
+         */
+        template <typename return_type>
+        return_type spawn_impl() {
             MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
-                    "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
+                                       "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
-                    "Can't spawn the given number of processes: 0 < {} <= {}",
-                    maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                                       "Can't spawn the given number of processes: 0 < {} <= {}",
+                                       maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
             MPICXX_ASSERT_PRECONDITION(this->legal_spawn_info(info_), "Can't use nullptr!");
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
-                    "The previously set root '{}' isn't a valid root in the current communicator!", root_);
+                                       "The previously set root '{}' isn't a valid root in the current communicator!", root_);
             MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use null communicator!");
 
-            spawn_result res(maxprocs_);
+            return_type res(maxprocs_);
+
+            // determine whether the placeholder MPI_ERRCODES_IGNORE shall be used or a "real" std::vector
+            auto errcode = [&res]() {
+                if constexpr (std::is_same_v<return_type, spawn_result_with_errcodes>) {
+                    return res.errcodes_.data();
+                } else {
+                    return MPI_ERRCODES_IGNORE;
+                }
+            }();
 
             if (argv_.empty()) {
                 // no additional arguments provided -> use MPI_ARGV_NULL
                 MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_->get(),
-                               root_, comm_, &res.intercomm_, res.errcodes_.data());
+                               root_, comm_, &res.intercomm_, errcode);
             } else {
                 // convert additional arguments to char**
                 std::vector<char*> argv_ptr;
                 argv_ptr.reserve(argv_.size() * 2 + 1);
                 for (auto& [key, value] : argv_) {
                     argv_ptr.emplace_back(key.data());
-                    argv_ptr.emplace_back(value.data());
+                    if (!value.empty()) {
+                        argv_ptr.emplace_back(value.data());
+                    }
                 }
                 // add null termination
                 argv_ptr.emplace_back(nullptr);
 
                 MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_->get(),
-                               root_, comm_, &res.intercomm_, res.errcodes_.data());
+                               root_, comm_, &res.intercomm_, errcode);
             }
             return res;
         }
-        // TODO 2020-04-14 21:27 breyerml: spawn() without return spawn_result???
-        ///@}
 
-
-    private:
 #if ASSERTION_LEVEL > 0
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
