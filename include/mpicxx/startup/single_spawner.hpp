@@ -506,17 +506,6 @@ namespace mpicxx {
 
 #if ASSERTION_LEVEL > 0
         /*
-         * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
-         * @details Checks whether the distance bewteen @p first and @p last is not negative.
-         * @param[in] first iterator to the first element of the range
-         * @param[in] last iterator to one-past the last element of the range
-         * @return `true` if @p first and @p last denote a valid range, `false` otherwise
-         */
-        template <std::input_iterator InputIt>
-        bool legal_iterator_range(InputIt first, InputIt last) const {
-            return std::distance(first, last) >= 0;
-        }
-        /*
          * @brief Check whether @p command is legal, i.e. it is **not** empty.
          * @param[in] command the command name
          * @return `true` if @p command is a valid name, `false` otherwise
@@ -533,6 +522,17 @@ namespace mpicxx {
             return key.size() > 1;
         }
         /*
+         * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
+         * @details Checks whether the distance bewteen @p first and @p last is not negative.
+         * @param[in] first iterator to the first element of the range
+         * @param[in] last iterator to one-past the last element of the range
+         * @return `true` if @p first and @p last denote a valid range, `false` otherwise
+         */
+        template <std::input_iterator InputIt>
+        bool legal_iterator_range(InputIt first, InputIt last) const {
+            return std::distance(first, last) >= 0;
+        }
+        /*
          * @brief Check whether all keys in @p argvs are legal, i.e. whether @ref legal_argv_key() const yields `true` for all keys.
          * @param[in] argvs a vector of multiple argument [key, value]-pairs
          * @return `true` if all keys in @p argvs are valid, `false` otherwise
@@ -544,41 +544,6 @@ namespace mpicxx {
                 }
             }
             return std::make_pair(true, argvs.size());
-        }
-        /*
-         * @brief Check whether @p info is a valid pointer to an @ref mpicxx::info object, i.e. it does **not** refer to nullptr.
-         * @param[in] info pointer to an @ref mpicxx::info object
-         * @return `true` if info is valid, `false` otherwise
-         */
-        bool legal_spawn_info(const info* info) const noexcept {
-            return info != nullptr;
-        }
-        /*
-         * @brief Returns the size of @p comm.
-         * @param[in] comm an intracommunicator
-         * @return the size of @p comm
-         */
-        int comm_size(const MPI_Comm comm) const {
-            int size;
-            MPI_Comm_size(comm, &size);
-            return size;
-        }
-        /*
-         * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
-         * @param[in] root the root
-         * @param[in] comm the communicator
-         * @return `true` if @p root is legal, `false` otherwise
-         */
-        bool legal_root(const int root, const MPI_Comm comm) const {
-            return 0 <= root && root < this->comm_size(comm);
-        }
-        /*
-         * @brief Checks whether @p comm is valid, i.e. it does **not** refer to *MPI_COMM_NULL*.
-         * @param[in] comm a intercommunicator
-         * @return `true` if @p comm is valid, `false` otherwise
-         */
-        bool legal_communicator(const MPI_Comm comm) const noexcept {
-            return comm != MPI_COMM_NULL;
         }
         /*
          * @brief Checks whether @p maxprocs is valid.
@@ -595,6 +560,42 @@ namespace mpicxx {
                 return 0 < maxprocs;
             }
         }
+        /*
+         * @brief Check whether @p info is a valid pointer to an @ref mpicxx::info object, i.e. it does **not** refer to nullptr.
+         * @param[in] info pointer to an @ref mpicxx::info object
+         * @return `true` if info is valid, `false` otherwise
+         */
+        bool legal_spawn_info(const info* info) const noexcept {
+            return info != nullptr;
+        }
+        /*
+         * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
+         * @param[in] root the root
+         * @param[in] comm the communicator
+         * @return `true` if @p root is legal, `false` otherwise
+         */
+        bool legal_root(const int root, const MPI_Comm comm) const {
+            return 0 <= root && root < this->comm_size(comm);
+        }
+        /*
+         * @brief Returns the size of @p comm.
+         * @param[in] comm an intracommunicator
+         * @return the size of @p comm
+         */
+        int comm_size(const MPI_Comm comm) const {
+            int size;
+            MPI_Comm_size(comm, &size);
+            return size;
+        }
+        /*
+         * @brief Checks whether @p comm is valid, i.e. it does **not** refer to *MPI_COMM_NULL*.
+         * @param[in] comm a intercommunicator
+         * @return `true` if @p comm is valid, `false` otherwise
+         */
+        bool legal_communicator(const MPI_Comm comm) const noexcept {
+            return comm != MPI_COMM_NULL;
+        }
+
 #endif
         std::string command_;
         std::vector<argv_value_type> argv_;
