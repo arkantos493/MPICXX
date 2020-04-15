@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-14
+ * @date 2020-04-15
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -234,7 +234,8 @@ namespace mpicxx {
          */
         single_spawner& set_maxprocs(const int maxprocs) {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
-                    "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs, single_spawner::universe_size());
+                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    maxprocs, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             maxprocs_ = maxprocs;
             return *this;
@@ -246,7 +247,8 @@ namespace mpicxx {
         [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
         /**
          * @brief Returns the maximum possible number of processes.
-         * @return the maximum possible number of processes (`[[nodiscard]]`)
+         * @return an optional containing the maximum possible number of processes or `std::nullopt` if no value could be retrieved
+         * (`[[nodiscard]]`)
          *
          * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
          *
@@ -254,14 +256,14 @@ namespace mpicxx {
          * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
          * }
          */
-        [[nodiscard]] static int universe_size() { // TODO 2020-04-14 22:52 breyerml: check for correctness
+        [[nodiscard]] static std::optional<int> universe_size() {
             void* ptr;
             int flag;
             MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
             if (static_cast<bool>(flag)) {
-                return *reinterpret_cast<int*>(ptr);
+                return std::make_optional(*reinterpret_cast<int*>(ptr));
             } else {
-                return 0;
+                return std::nullopt;
             }
         }
 
@@ -385,7 +387,8 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
                     "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
-                    "Can't spawn the given number of processes: 0 < {} <= {}", maxprocs_, single_spawner::universe_size());
+                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
             MPICXX_ASSERT_PRECONDITION(this->legal_spawn_info(info_), "Can't use nullptr!");
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
                     "The previously set root '{}' isn't a valid root in the current communicator!", root_);
@@ -495,12 +498,19 @@ namespace mpicxx {
             return comm != MPI_COMM_NULL;
         }
         /*
-         * @brief Checks whether @p maxprocs is valid, i.e. @maxprocs is greater than `0` and less or equal than the current universe size.
+         * @brief Checks whether @p maxprocs is valid.
+         * @details Checks whether @p maxprocs is greater than `0`. In addition, if the universe size could be queried, it's checked
+         * whether @p maxprocs is less or equal than the universe size.
          * @param[in] maxprocs the number of processes which should be spawned
          * @return `true` if @p maxprocs is legal, `false` otherwise
          */
         bool legal_maxprocs(const int maxprocs) const {
-            return 0 < maxprocs && maxprocs <= single_spawner::universe_size();
+            std::optional<int> universe_size = single_spawner::universe_size();
+            if (universe_size.has_value()) {
+                return 0 < maxprocs && maxprocs <= universe_size.value();
+            } else {
+                return 0 < maxprocs;
+            }
         }
 #endif
         std::string command_;
