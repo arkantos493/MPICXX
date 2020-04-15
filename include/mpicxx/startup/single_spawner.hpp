@@ -385,7 +385,7 @@ namespace mpicxx {
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
          * }
          */
-        [[nodiscard]] spawn_result spawn() {
+        spawn_result spawn() {
             return this->spawn_impl<spawn_result>();
         }
         /**
@@ -419,7 +419,7 @@ namespace mpicxx {
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
          * }
          */
-        [[nodiscard]] spawn_result_with_errcodes spawn_with_errcodes() {
+        spawn_result_with_errcodes spawn_with_errcodes() {
             return this->spawn_impl<spawn_result_with_errcodes>();
         }
         ///@}
