@@ -14,4 +14,4 @@ set(TEST_SOURCES
 )
 
 # create google test with MPI support
-add_mpi_test(startup "${TEST_SOURCES}" 1)
+add_mpi_test(startup "${TEST_SOURCES}" 2)
