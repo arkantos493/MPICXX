@@ -65,12 +65,18 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
             const auto size = std::distance(first, last);
+            // set command and maxprocs according to passed values
             commands_.reserve(size);
             maxprocs_.reserve(size);
             for (; first != last; ++first) {
                 const auto& pair = *first;
                 commands_.emplace_back(pair.first);
                 maxprocs_.emplace_back(pair.second);
+            }
+            // set info objects to default values
+            infos_.reserve(size);
+            for (std::remove_cv_t<decltype(size)> i = 0; i < size; ++i) {
+                infos_.emplace_back(mpicxx::info::null);
             }
         }
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
@@ -81,21 +87,79 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name modify spawn information
         ///@{
+        /**
+         * @brief Replaces the old executable names with the from the range [@p first, @p last).
+         * @param[in] first iterator to the first executable name in the range
+         * @param[in] last iterator one-past the last executable name in the range
+         * @return `*this`
+         *
+         * @pre The size of the range [@p first, @p last) **must** match the size of the constructed range.
+         * @pre All commands in the range [@p first, @p last) **must not** be empty.
+         *
+         * @assert_sanity{
+         * If the sizes mismatch. \n
+         * If any command is empty.
+         * }
+         */
         template <std::input_iterator InputIt>
-        requires std::is_constructible_v<std::string_view, std::decay_t<typename std::iterator_traits<InputIt>::value_type>>
         multiple_spawner& set_command(InputIt first, InputIt last) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
-            // TODO 2020-04-16 15:11 marcel: impl revise
+
             commands_.clear();
             commands_.insert(commands_.cbegin(), first, last);
+
+            MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
+                    "No executable name given!: wrong name at: {}", this->legal_commands(commands_).second);
+
             return *this;
         }
+        /**
+         * @brief Replaces the old executable names with the from the initializer list @p ilist.
+         * @param[in] ilist the new executable names
+         * @return `*this`
+         *
+         * @pre The size of @p ilist **must** match the size of the constructed range.
+         * @pre All commands in @p ilist **must not** be empty.
+         *
+         * @assert_sanity{
+         * If the sizes mismatch. \n
+         * If any command is empty.
+         * }
+         */
         multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
-            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
-            // TODO 2020-04-16 15:11 marcel: impl revise
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
+                    "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+
             commands_.clear();
             commands_.insert(commands_.cbegin(), ilist);
+
+            MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
+                    "No executable name given!: wrong name at: {}", this->legal_commands(commands_).second);
+
+            return *this;
+        }
+        /**
+         * @brief Set the i-th name of the program to be spawned.
+         * @param[in] i the i-th command
+         * @param[in] command name of executable to be spawned (must meet the requirements of the @p detail::string concept)
+         * @return `*this`
+         *
+         * @pre @p command **must not** be empty.
+         *
+         * @assert_sanity{ If @p command is empty. }
+         *
+         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         */
+        multiple_spawner& set_command(const std::size_t i, detail::string auto&& command) {
+            if (i >= commands_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, commands_.size()));
+            }
+
+            commands_[i] = std::forward<decltype(command)>(command);
+
+            MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "No executable name given!: wrong name at: {}", i);
+
             return *this;
         }
         /**
@@ -105,6 +169,7 @@ namespace mpicxx {
         [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
         /**
          * @brief Returns the name of the i-th executable which should get spawned.
+         * @param[in] i the i-th command
          * @return the i-th executable name  (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i is an out-of-bounce access
@@ -117,23 +182,90 @@ namespace mpicxx {
             return commands_[i];
         }
 
+
         // TODO 2020-04-15 22:14 breyerml: argvs
 
+
+        /**
+         * @brief Replaces the old number of processes with the from the range [@p first, @p last).
+         * @param[in] first iterator to the first number of processes in the range
+         * @param[in] last iterator one-past the last number of processes in the range
+         * @return `*this`
+         *
+         * @pre The size of the range [@p first, @p last) **must** match the size of the constructed range.
+         * @pre All number of processes in the range [@p first, @p last) **must not** be less or equal than `0` or greater than the maximum
+         * possible number of processes (@ref universe_size()).
+         *
+         * @assert_sanity{
+         * If the sizes mismatch. \n
+         * If any number of processes is invalid.
+         * }
+         */
         template <std::input_iterator InputIt>
-        requires std::is_same_v<std::decay_t<typename std::iterator_traits<InputIt>::value_type>, int>
         multiple_spawner& set_maxprocs(InputIt first, InputIt last) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
-            // TODO 2020-04-16 15:11 marcel: impl revise
+
             maxprocs_.clear();
             maxprocs_.insert(maxprocs_.cbegin(), first, last);
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
+                    "Can't spawn the given (at pos: {}) number of processes: 0 < {} <= {}",
+                    this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
+                    multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
             return *this;
         }
-        multiple_spawner& set_command(std::initializer_list<int> ilist) {
+        /**
+         * @brief Replaces the old number of processes with the from the initializer list @p ilist.
+         * @param[in] ilist the new number of processes
+         * @return `*this`
+         *
+         * @pre The size of @p ilist **must** match the size of the constructed range.
+         * @pre All number of processes in i@p ilist **must not** be less or equal than `0` or greater than the maximum possible number
+         * of processes (@ref universe_size()).
+         *
+         * @assert_sanity{
+         * If the sizes mismatch. \n
+         * If any number of processes is invalid.
+         * }
+         */
+        multiple_spawner& set_maxprocs(std::initializer_list<int> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
-            // TODO 2020-04-16 15:11 marcel: impl revise
+
             maxprocs_.clear();
             maxprocs_.insert(maxprocs_.cbegin(), ilist);
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
+                     "Can't spawn the given (at pos: {}) number of processes: 0 < {} <= {}",
+                     this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
+                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
+            return *this;
+        }
+        /**
+         * @brief Set the i-th number of processes to be spawned.
+         * @param[in] i the i-th number of processes
+         * @param[in] maxprocs maximum number of processes to start
+         * @return `*this`
+         *
+         * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_sanity{ If @p maxprocs is invalid. }
+         *
+         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         */
+        multiple_spawner& set_maxprocs(const std::size_t i, const int maxprocs) {
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
+                    "Can't spawn the given number of processes!:  0 < {} <= {}",
+                    maxprocs, multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
+            if (i >= maxprocs_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, maxprocs_.size()));
+            }
+
+            maxprocs_[i] = maxprocs;
             return *this;
         }
         /**
@@ -144,6 +276,8 @@ namespace mpicxx {
         /**
          * @brief Returns the i-th number of processes which should get spawned.
          * @return the i-th number of processes (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i is an out-of-bounce access
          */
         [[nodiscard]] int maxprocs(const std::size_t i) const {
             if (i >= maxprocs_.size()) {
@@ -152,20 +286,56 @@ namespace mpicxx {
 
             return maxprocs_[i];
         }
+        /**
+         * @brief Returns the maximum possible number of processes.
+         * @return an optional containing the maximum possible number of processes or `std::nullopt` if no value could be retrieved
+         * (`[[nodiscard]]`)
+         *
+         * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
+         *
+         * @calls{
+         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
+         * }
+         */
+        [[nodiscard]] static std::optional<int> universe_size() {
+            void* ptr;
+            int flag;
+            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
+            if (static_cast<bool>(flag)) {
+                return std::make_optional(*reinterpret_cast<int*>(ptr));
+            } else {
+                return std::nullopt;
+            }
+        }
+
 
         // TODO 2020-04-15 22:14 breyerml: infos
-        template <typename... Infos>
-        requires (std::is_same_v<std::decay_t<Infos>, info> && ...)
-        void set_spawn_info(Infos... infos) noexcept(std::is_nothrow_copy_assignable_v<info>) {
-            // TODO 2020-03-24 17:29 marcel: asserts?, parameter type?, calls?
-            const auto add_to = [&]<typename T>(T&& arg) {
-                infos_.emplace_back(std::forward<T>(arg));
-            };
-            (add_to(std::forward<Infos>(infos)), ...);
-        }
-//        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
-//        [[nodiscard]] const info& spawn_info(const std::size_t i) const noexcept { return infos_[i]; }
 
+        template <std::input_iterator InputIt>
+        multiple_spawner& set_spawn_info(InputIt first, InputIt last) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
+                    "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
+
+            infos_.clear();
+            infos_.insert(infos_.cbegin(), first, last);
+            return *this;
+        }
+        multiple_spawner& set_spawn_info(std::initializer_list<info> ilist) noexcept { // TODO 2020-04-16 21:51 breyerml: noexcept
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+
+            infos_.clear();
+            infos_.insert(infos_.cbegin(), ilist);
+            return *this;
+        }
+        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
+        [[nodiscard]] const info& spawn_info(const std::size_t i) const {
+            if (i >= infos_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, infos_.size()));
+            }
+
+            return infos_[i];
+        }
+        // TODO 2020-04-17 00:11 breyerml: single spawner info same ???
 
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
@@ -252,13 +422,55 @@ namespace mpicxx {
         }
 
 #if ASSERTION_LEVEL > 0
+
         template <std::input_iterator InputIt>
         bool legal_number_of_values(InputIt first, InputIt last) {
-            return std::distance(first, last) == commands_.size();
+            using difference_type = typename std::iterator_traits<InputIt>::difference_type;
+            return std::distance(first, last) == static_cast<difference_type>(commands_.size());
         }
         template <typename T>
         bool legal_number_of_values(const std::initializer_list<T> ilist) const {
             return ilist.size() == commands_.size();
+        }
+
+        /*
+         * @brief Check whether @p command is legal, i.e. it is **not** empty.
+         * @param[in] command the command name
+         * @return `true` if @p command is a valid name, `false` otherwise
+         */
+        bool legal_command(const std::string& command) const noexcept {
+            return !command.empty();
+        }
+        std::pair<bool, std::size_t> legal_commands(const std::vector<std::string>& commands) const noexcept {
+            for (std::size_t i = 0; i < commands.size(); ++i) {
+                if (!this->legal_command(commands[i])) {
+                    return std::make_pair(false, i);
+                }
+            }
+            return std::make_pair(true, commands.size());
+        }
+        /*
+         * @brief Checks whether @p maxprocs is valid.
+         * @details Checks whether @p maxprocs is greater than `0`. In addition, if the universe size could be queried, it's checked
+         * whether @p maxprocs is less or equal than the universe size.
+         * @param[in] maxprocs the number of processes which should be spawned
+         * @return `true` if @p maxprocs is legal, `false` otherwise
+         */
+        bool legal_maxprocs(const int maxprocs) const {
+            std::optional<int> universe_size = multiple_spawner::universe_size();
+            if (universe_size.has_value()) {
+                return 0 < maxprocs && maxprocs <= universe_size.value();
+            } else {
+                return 0 < maxprocs;
+            }
+        }
+        std::pair<bool, std::size_t> legal_maxprocs(const std::vector<int>& maxprocs) const {
+            for (std::size_t i = 0; i < maxprocs.size(); ++i) {
+                if (!this->legal_maxprocs(maxprocs[i])) {
+                    return std::make_pair(false, i);
+                }
+            }
+            return std::make_pair(true, maxprocs.size());
         }
         /*
          * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
@@ -292,7 +504,7 @@ namespace mpicxx {
         std::vector<std::string> commands_;
         std::vector<std::vector<argv_value_type>> argvs_;
         std::vector<int> maxprocs_;
-        std::vector<const info*> infos_;
+        std::vector<info> infos_;
         int root_ = 0;
         MPI_Comm comm_ = MPI_COMM_WORLD;
     };
