@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-15
+ * @date 2020-04-16
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -48,20 +48,32 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
-        template <typename... Args>
-        requires ( (detail::string<typename Args::first_type> && std::is_same_v<std::decay_t<typename Args::second_type>, int>) && ...)
-        multiple_spawner(Args&&... args) {
-            commands_.reserve(sizeof...(Args));
-            maxprocs_.reserve(sizeof...(Args));
-
-            const auto add_to = [&]<typename T>(T&& arg) {
-                commands_.emplace_back(std::forward<typename T::first_type>(arg.first));
-                maxprocs_.emplace_back(arg.second);
-            };
-
-            (add_to(std::forward<Args>(args)), ...);
-
-      }
+//        template <typename... Args>
+//        requires ( (detail::string<typename Args::first_type> && std::is_same_v<std::decay_t<typename Args::second_type>, int>) && ...)
+//        multiple_spawner(Args&&... args) {
+//            commands_.reserve(sizeof...(Args));
+//            maxprocs_.reserve(sizeof...(Args));
+//
+//            const auto add_to = [&]<typename T>(T&& arg) {
+//                commands_.emplace_back(std::forward<typename T::first_type>(arg.first));
+//                maxprocs_.emplace_back(arg.second);
+//            };
+//
+//            (add_to(std::forward<Args>(args)), ...);
+//
+//        }
+        template <std::input_iterator InputIt>
+        multiple_spawner(InputIt first, InputIt last) {
+            const auto size = std::distance(first, last);
+            commands_.reserve(size);
+            maxprocs_.reserve(size);
+            for (; first != last; ++first) {
+                const auto& pair = *first;
+                commands_.emplace_back(pair.first);
+                maxprocs_.emplace_back(pair.second);
+            }
+        }
+        multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -69,8 +81,21 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name modify spawn information
         ///@{
-        multiple_spawner& set_command() {
-            // TODO 2020-04-15 22:15 breyerml: implement
+        template <std::input_iterator InputIt>
+        requires std::is_constructible_v<std::string_view, std::decay_t<typename std::iterator_traits<InputIt>::value_type>>
+        multiple_spawner& set_command(InputIt first, InputIt last) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
+                    "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
+            // TODO 2020-04-16 15:11 marcel: impl revise
+            commands_.clear();
+            commands_.insert(commands_.cbegin(), first, last);
+            return *this;
+        }
+        multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+            // TODO 2020-04-16 15:11 marcel: impl revise
+            commands_.clear();
+            commands_.insert(commands_.cbegin(), ilist);
             return *this;
         }
         /**
@@ -94,8 +119,21 @@ namespace mpicxx {
 
         // TODO 2020-04-15 22:14 breyerml: argvs
 
-        multiple_spawner& set_maxprocs() {
-            // TODO 2020-04-15 22:15 breyerml: implement
+        template <std::input_iterator InputIt>
+        requires std::is_same_v<std::decay_t<typename std::iterator_traits<InputIt>::value_type>, int>
+        multiple_spawner& set_maxprocs(InputIt first, InputIt last) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
+                    "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
+            // TODO 2020-04-16 15:11 marcel: impl revise
+            maxprocs_.clear();
+            maxprocs_.insert(maxprocs_.cbegin(), first, last);
+            return *this;
+        }
+        multiple_spawner& set_command(std::initializer_list<int> ilist) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+            // TODO 2020-04-16 15:11 marcel: impl revise
+            maxprocs_.clear();
+            maxprocs_.insert(maxprocs_.cbegin(), ilist);
             return *this;
         }
         /**
@@ -214,6 +252,14 @@ namespace mpicxx {
         }
 
 #if ASSERTION_LEVEL > 0
+        template <std::input_iterator InputIt>
+        bool legal_number_of_values(InputIt first, InputIt last) {
+            return std::distance(first, last) == commands_.size();
+        }
+        template <typename T>
+        bool legal_number_of_values(const std::initializer_list<T> ilist) const {
+            return ilist.size() == commands_.size();
+        }
         /*
          * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
          * @param[in] root the root
