@@ -97,8 +97,8 @@ namespace mpicxx {
         /// @name modify spawn information
         ///@{
         /**
-         * @brief Set the name of the program to be spawned,
-         * @param[in] command name of program to be spawned (must meet the requirements of the @p detail::string concept)
+         * @brief Set the name of the executable to be spawned.
+         * @param[in] command name of executable to be spawned (must meet the requirements of the @p detail::string concept)
          * @return `*this`
          *
          * @pre @p command **must not** be empty.
@@ -224,7 +224,7 @@ namespace mpicxx {
 
         /**
          * @brief Set the maximum number of processes to start.
-         * @param[in] maxprocs maximum number of processes to start.
+         * @param[in] maxprocs maximum number of processes to start
          * @return `*this`
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
