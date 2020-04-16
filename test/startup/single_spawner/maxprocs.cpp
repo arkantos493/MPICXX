@@ -72,5 +72,8 @@ TEST(SingleSpawnerTest, GetMaxprocs) {
 
 TEST(SingleSpawnerTest, GetUniverseSize) {
     // check universe size
-    EXPECT_NE(mpicxx::single_spawner::universe_size().value(), 0);
+    std::optional<int> universe_size = mpicxx::single_spawner::universe_size();
+    if (universe_size.has_value() {
+        EXPECT_NE(universe_size.value(), 0);
+    }
 }
