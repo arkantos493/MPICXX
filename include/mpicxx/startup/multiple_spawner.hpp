@@ -48,20 +48,6 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
-//        template <typename... Args>
-//        requires ( (detail::string<typename Args::first_type> && std::is_same_v<std::decay_t<typename Args::second_type>, int>) && ...)
-//        multiple_spawner(Args&&... args) {
-//            commands_.reserve(sizeof...(Args));
-//            maxprocs_.reserve(sizeof...(Args));
-//
-//            const auto add_to = [&]<typename T>(T&& arg) {
-//                commands_.emplace_back(std::forward<typename T::first_type>(arg.first));
-//                maxprocs_.emplace_back(arg.second);
-//            };
-//
-//            (add_to(std::forward<Args>(args)), ...);
-//
-//        }
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
             const auto size = std::distance(first, last);
@@ -74,10 +60,7 @@ namespace mpicxx {
                 maxprocs_.emplace_back(pair.second);
             }
             // set info objects to default values
-            infos_.reserve(size);
-            for (std::remove_cv_t<decltype(size)> i = 0; i < size; ++i) {
-                infos_.emplace_back(mpicxx::info::null);
-            }
+            infos_.assign(size, mpicxx::info::null);
         }
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
 
@@ -98,7 +81,7 @@ namespace mpicxx {
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any command is empty.
+         * If any new command is empty.
          * }
          */
         template <std::input_iterator InputIt>
@@ -106,11 +89,10 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
 
-            commands_.clear();
-            commands_.insert(commands_.cbegin(), first, last);
+            commands_.assign(first, last);
 
             MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
-                    "No executable name given!: wrong name at: {}", this->legal_commands(commands_).second);
+                    "No executable name given at {}!", this->legal_commands(commands_).second);
 
             return *this;
         }
@@ -124,24 +106,23 @@ namespace mpicxx {
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any command is empty.
+         * If any new command is empty.
          * }
          */
         multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
                     "Illegal number of values! {} == {}", ilist.size(), commands_.size());
 
-            commands_.clear();
-            commands_.insert(commands_.cbegin(), ilist);
+            commands_.assign(ilist);
 
             MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
-                    "No executable name given!: wrong name at: {}", this->legal_commands(commands_).second);
+                    "No executable name given at {}!", this->legal_commands(commands_).second);
 
             return *this;
         }
         /**
-         * @brief Set the i-th name of the program to be spawned.
-         * @param[in] i the i-th command
+         * @brief Set the i-th name of the executable to be spawned.
+         * @param[in] i the i-th executable name
          * @param[in] command name of executable to be spawned (must meet the requirements of the @p detail::string concept)
          * @return `*this`
          *
@@ -158,7 +139,7 @@ namespace mpicxx {
 
             commands_[i] = std::forward<decltype(command)>(command);
 
-            MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "No executable name given!: wrong name at: {}", i);
+            MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "No executable name given at {}!", i);
 
             return *this;
         }
@@ -187,7 +168,7 @@ namespace mpicxx {
 
 
         /**
-         * @brief Replaces the old number of processes with the from the range [@p first, @p last).
+         * @brief Replaces the old number of processes with the ones from the range [@p first, @p last).
          * @param[in] first iterator to the first number of processes in the range
          * @param[in] last iterator one-past the last number of processes in the range
          * @return `*this`
@@ -198,7 +179,7 @@ namespace mpicxx {
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any number of processes is invalid.
+         * If any new number of processes is invalid.
          * }
          */
         template <std::input_iterator InputIt>
@@ -206,18 +187,17 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
 
-            maxprocs_.clear();
-            maxprocs_.insert(maxprocs_.cbegin(), first, last);
+            maxprocs_.assign(first, last);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
-                    "Can't spawn the given (at pos: {}) number of processes: 0 < {} <= {}",
+                    "Can't spawn the given number of processes at {}!: 0 < {} <= {}",
                     this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
         /**
-         * @brief Replaces the old number of processes with the from the initializer list @p ilist.
+         * @brief Replaces the old number of processes with the ones from the initializer list @p ilist.
          * @param[in] ilist the new number of processes
          * @return `*this`
          *
@@ -227,17 +207,17 @@ namespace mpicxx {
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any number of processes is invalid.
+         * If any new number of processes is invalid.
          * }
          */
         multiple_spawner& set_maxprocs(std::initializer_list<int> ilist) {
-            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
+                    "Illegal number of values! {} == {}", ilist.size(), commands_.size());
 
-            maxprocs_.clear();
-            maxprocs_.insert(maxprocs_.cbegin(), ilist);
+            maxprocs_.assign(ilist);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
-                     "Can't spawn the given (at pos: {}) number of processes: 0 < {} <= {}",
+                     "Can't spawn the given number of processes at {}!: 0 < {} <= {}",
                      this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
                      multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
