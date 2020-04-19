@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-16
+ * @date 2020-04-19
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -23,6 +23,7 @@
 #include <mpicxx/detail/assert.hpp>
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/detail/conversion.hpp>
+#include <mpicxx/detail/utility.hpp>
 #include <mpicxx/info/info.hpp>
 #include <mpicxx/startup/spawn_result.hpp>
 
@@ -44,6 +45,7 @@ namespace mpicxx {
         using argv_value_type = std::pair<std::string, std::string>;
         /// Unsigned integer type.
         using argv_size_type = std::size_t;
+        using size_type = std::size_t;
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
@@ -61,6 +63,8 @@ namespace mpicxx {
             }
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
+            // set argvs objects to default values
+            argvs_.assign(size, std::vector<argv_value_type>());
         }
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
 
@@ -87,7 +91,7 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         multiple_spawner& set_command(InputIt first, InputIt last) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
-                    "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
+                    "Illegal number of values! {} == {}", std::distance(first, last), this->size());
 
             commands_.assign(first, last);
 
@@ -111,7 +115,7 @@ namespace mpicxx {
          */
         multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
-                    "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+                    "Illegal number of values! {} == {}", ilist.size(), this->size());
 
             commands_.assign(ilist);
 
@@ -134,7 +138,7 @@ namespace mpicxx {
          */
         multiple_spawner& set_command(const std::size_t i, detail::string auto&& command) {
             if (i >= commands_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, commands_.size()));
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
             }
 
             commands_[i] = std::forward<decltype(command)>(command);
@@ -164,7 +168,51 @@ namespace mpicxx {
         }
 
 
+
         // TODO 2020-04-15 22:14 breyerml: argvs
+        template <typename ValueType>
+        multiple_spawner& add_argv(const std::size_t i, std::string key, ValueType&& value) {
+            if (i >= argvs_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+            }
+
+            // add leading '-' if necessary
+            if (!key.starts_with('-')) {
+                key.insert(0, 1, '-');
+            }
+
+            MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Only '-' isn't a valid argument key!");
+
+            // add [key, value]-argv-pair to argv_ at pos i
+            argvs_[i].emplace_back(std::move(key), detail::convert_to_string(std::forward<ValueType>(value)));
+            return *this;
+        }
+
+        [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept {
+            return argvs_;
+        }
+        [[nodiscard]] const std::vector<argv_value_type>& argv(const std::size_t i) const {
+            if (i >= argvs_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+            }
+
+            return argvs_[i];
+        }
+        [[nodiscard]] const argv_value_type& argv(const std::size_t i, const std::size_t j) const {
+            if (i >= argvs_.size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access (i)!: {} < {}", i, this->size()));
+            } else if (j >= argvs_[i].size()) {
+                throw std::out_of_range(fmt::format("Out-of-bounce access (j)!: {} < {}", j, argvs_[i].size()));
+            }
+
+            return argvs_[i][j];
+        }
+        [[nodiscard]] std::vector<argv_size_type> argv_size() const {
+            std::vector<argv_size_type> sizes(this->size());
+            std::transform(argvs_.cbegin(), argvs_.cend(), sizes.begin(),
+                    [](const std::vector<argv_value_type>& argvs) { return argvs.size(); });
+            return sizes;
+        }
 
 
         /**
@@ -185,7 +233,7 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         multiple_spawner& set_maxprocs(InputIt first, InputIt last) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
-                    "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
+                    "Illegal number of values! {} == {}", std::distance(first, last), this->size());
 
             maxprocs_.assign(first, last);
 
@@ -212,7 +260,7 @@ namespace mpicxx {
          */
         multiple_spawner& set_maxprocs(std::initializer_list<int> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
-                    "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+                    "Illegal number of values! {} == {}", ilist.size(), this->size());
 
             maxprocs_.assign(ilist);
 
@@ -242,7 +290,7 @@ namespace mpicxx {
                     maxprocs, multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             if (i >= maxprocs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, maxprocs_.size()));
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
             }
 
             maxprocs_[i] = maxprocs;
@@ -261,7 +309,7 @@ namespace mpicxx {
          */
         [[nodiscard]] int maxprocs(const std::size_t i) const {
             if (i >= maxprocs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, maxprocs_.size()));
+                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
             }
 
             return maxprocs_[i];
@@ -296,15 +344,16 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
 
-            infos_.clear();
-            infos_.insert(infos_.cbegin(), first, last);
+            infos_.assign(first, last);
+
             return *this;
         }
         multiple_spawner& set_spawn_info(std::initializer_list<info> ilist) noexcept { // TODO 2020-04-16 21:51 breyerml: noexcept
-            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist), "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
+                    "Illegal number of values! {} == {}", ilist.size(), commands_.size());
 
-            infos_.clear();
-            infos_.insert(infos_.cbegin(), ilist);
+            infos_.assign(ilist);
+            
             return *this;
         }
         [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
@@ -325,10 +374,10 @@ namespace mpicxx {
          * @pre @p root **must not** be less than `0` and greater or equal than the size of the communicator (set via
          * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          *
-         * @assert_precondition{ If @p root isn't a legal root. }
+         * @assert_sanity{ If @p root isn't a legal root. }
          */
         multiple_spawner& set_root(const int root) noexcept {
-            MPICXX_ASSERT_PRECONDITION(this->legal_root(root, comm_),
+            MPICXX_ASSERT_SANITY(this->legal_root(root, comm_),
                     "The root can't be used in the provided communicator!: 0 <= {} < {}", root, this->comm_size(comm_));
 
             root_ = root;;
@@ -348,13 +397,15 @@ namespace mpicxx {
          * @pre @p comm **must not** be *MPI_COMM_NULL*.
          * @pre The currently specified rank (as returned by @ref root()) **must be** valid in @p comm.
          *
-         * @assert_precondition{ If @p comm is the null communicator (*MPI_COMM_NULL*). }
-         * @assert_sanity{ If the currently specified root isn't valid in @p comm. }
+         * @assert_sanity{
+         * If @p comm is the null communicator (*MPI_COMM_NULL*). \n
+         * If the currently specified root isn't valid in @p comm.
+         * }
          */
         multiple_spawner& set_communicator(MPI_Comm comm) noexcept {
-            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm), "Can't use null communicator!");
+            MPICXX_ASSERT_SANITY(this->legal_communicator(comm), "Can't use null communicator!");
             MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
-                                 "The previously set root '{}' isn't a valid root in the new communicator!", root_);
+                    "The previously set root '{}' isn't a valid root in the new communicator!", root_);
 
             comm_ = comm;
             return *this;
@@ -365,6 +416,14 @@ namespace mpicxx {
          */
         [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
         ///@}
+
+
+        [[nodiscard]] size_type size() const noexcept {
+            MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec1, const auto& vec2) { return vec1.size() == vec2.size(); },
+                    commands_, argvs_, maxprocs_, infos_), "Sizes differ!");
+
+            return commands_.size();
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -428,6 +487,14 @@ namespace mpicxx {
                 }
             }
             return std::make_pair(true, commands.size());
+        }
+        /*
+         * @brief Check whether @p key is legal, i.e. it does **not** only contain a '-'.
+         * @param[in] key the argv key
+         * @return `true` if @p key is valid, `false` otherwise
+         */
+        bool legal_argv_key(const std::string& key) const noexcept {
+            return key.size() > 1;
         }
         /*
          * @brief Checks whether @p maxprocs is valid.
