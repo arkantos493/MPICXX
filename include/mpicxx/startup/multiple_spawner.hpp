@@ -27,6 +27,14 @@
 #include <mpicxx/info/info.hpp>
 #include <mpicxx/startup/spawn_result.hpp>
 
+template <typename T>
+struct is_pair : std::false_type { };
+
+template <typename T, typename U>
+struct is_pair<std::pair<T, U>> : std::true_type { };
+
+template <typename T>
+constexpr bool is_pair_v = is_pair<T>::value;
 
 namespace mpicxx {
 
@@ -40,6 +48,12 @@ namespace mpicxx {
      * @brief Spawner class which enables to spawn (multiple) **different** MPI processes at runtime.
      */
     class multiple_spawner {
+        template <typename SpawnerType>
+        static constexpr bool is_single_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, single_spawner>;
+        template <typename SpawnerType>
+        static constexpr bool is_multiple_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, multiple_spawner>;
+        template <typename SpawnerType>
+        static constexpr bool is_spawner_v = is_single_spawner_v<SpawnerType> || is_multiple_spawner_v<SpawnerType>;
     public:
         /// The type of a single argv argument (represented by  a key and value).
         using argv_value_type = std::pair<std::string, std::string>;
@@ -52,6 +66,8 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
+            MPICXX_ASSERT_PRECONDITION(std::distance(first, last) > 0, "No parametes given!");
+
             const auto size = std::distance(first, last);
             // set command and maxprocs according to passed values
             commands_.reserve(size);
@@ -67,6 +83,58 @@ namespace mpicxx {
             argvs_.assign(size, std::vector<argv_value_type>());
         }
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
+
+        template <typename... Args>
+        requires (is_pair_v<Args> && ...)
+        multiple_spawner(Args&&... args) {
+            MPICXX_ASSERT_PRECONDITION(sizeof...(Args) > 0, "No values given!");
+
+            constexpr std::size_t size = sizeof...(Args);
+            commands_.reserve(size);
+            maxprocs_.reserve(size);
+
+            ([&] (auto&& arg) {
+                using first_t = typename std::remove_cvref_t<decltype(arg)>::first_type;
+                using second_t = typename std::remove_cvref_t<decltype(arg)>::second_type;
+                commands_.emplace_back(std::forward<first_t>(arg.first));
+                maxprocs_.emplace_back(std::forward<second_t>(arg.second));
+            }(args), ...);
+
+            // set info objects to default values
+            infos_.assign(size, mpicxx::info::null);
+            // set argvs objects to default values
+            argvs_.assign(size, std::vector<argv_value_type>());
+        }
+
+        template <typename... Args>
+        requires (is_spawner_v<Args> && ...)
+        multiple_spawner(const Args&... args) {
+            MPICXX_ASSERT_PRECONDITION(sizeof...(Args) > 0, "No spawner given!");
+            MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...), "Different root processes!");
+            MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.communicator(); }, args...), "Different communicators!");
+
+            const auto loop = [&] (const auto& arg) {
+                if constexpr (is_single_spawner_v<decltype(arg)>) {
+                    commands_.emplace_back(arg.command());
+                    argvs_.emplace_back(arg.argv());
+                    maxprocs_.emplace_back(arg.maxprocs());
+                    // TODO 2020-04-19 19:39 breyerml: spawn_info
+                    infos_.emplace_back(mpicxx::info::null);
+                } else if constexpr (is_multiple_spawner_v<decltype(arg)>) {
+                    for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
+                        commands_.emplace_back(arg.command(i));
+                        argvs_.emplace_back(arg.argv(i));
+                        maxprocs_.emplace_back(arg.maxprocs(i));
+                        // TODO 2020-04-19 20:23 breyerml: spawn_info
+                        infos_.emplace_back(mpicxx::info::null);
+                    }
+                }
+                root_ = arg.root();
+                comm_ = arg.communicator();
+            };
+            (loop(args), ...);
+        }
+
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -171,6 +239,33 @@ namespace mpicxx {
 
         // TODO 2020-04-15 22:14 breyerml: argvs
         template <typename ValueType>
+        multiple_spawner& add_argv(std::initializer_list<std::initializer_list<std::pair<std::string, ValueType>>> ilist) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
+                    "Illegal number of values! {} == {}", ilist.size(), this->size());
+
+            for (std::size_t i = 0; auto list : ilist) {
+                this->add_argv(i, list);
+                ++i;
+            }
+
+            return *this;
+        }
+
+        template <std::input_iterator InputIt>
+        multiple_spawner& add_argv(InputIt first, InputIt last) {
+            MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
+
+            for (; first != last; ++first) {
+                const auto& cont = *first;
+                this->add_argv(cont.begin(), cont.end());
+            }
+
+            return *this;
+        }
+
+
+        template <typename ValueType>
         multiple_spawner& add_argv(const std::size_t i, std::string key, ValueType&& value) {
             if (i >= argvs_.size()) {
                 throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
@@ -186,6 +281,24 @@ namespace mpicxx {
             // add [key, value]-argv-pair to argv_ at pos i
             argvs_[i].emplace_back(std::move(key), detail::convert_to_string(std::forward<ValueType>(value)));
             return *this;
+        }
+
+        template <std::input_iterator InputIt>
+        requires (!std::is_constructible_v<std::string, InputIt>)
+        multiple_spawner& add_argv(const std::size_t i, InputIt first, InputIt last) {
+            MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
+
+            for (; first != last; ++first) {
+                const auto& pair = *first;
+                this->add_argv(i, pair.first, pair.second);
+            }
+            return *this;
+        }
+
+        template <typename ValueType>
+        multiple_spawner& add_argv(const std::size_t i, std::initializer_list<std::pair<std::string, ValueType>> ilist) {
+            return this->add_argv(i, ilist.begin(), ilist.end());
         }
 
         [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept {
@@ -366,6 +479,8 @@ namespace mpicxx {
         }
         // TODO 2020-04-17 00:11 breyerml: single spawner info same ???
 
+
+
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
          * @param[in] root the root process
@@ -418,11 +533,19 @@ namespace mpicxx {
         ///@}
 
 
+        // additional
         [[nodiscard]] size_type size() const noexcept {
             MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec1, const auto& vec2) { return vec1.size() == vec2.size(); },
                     commands_, argvs_, maxprocs_, infos_), "Sizes differ!");
 
             return commands_.size();
+        }
+        [[nodiscard]] int total_maxprocs() const noexcept {
+            int total = 0;
+            for (const int i : maxprocs_) {
+                total += i;
+            }
+            return total;
         }
 
 
@@ -471,7 +594,17 @@ namespace mpicxx {
         bool legal_number_of_values(const std::initializer_list<T> ilist) const {
             return ilist.size() == commands_.size();
         }
-
+        /*
+         * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
+         * @details Checks whether the distance bewteen @p first and @p last is not negative.
+         * @param[in] first iterator to the first element of the range
+         * @param[in] last iterator to one-past the last element of the range
+         * @return `true` if @p first and @p last denote a valid range, `false` otherwise
+         */
+        template <std::input_iterator InputIt>
+        bool legal_iterator_range(InputIt first, InputIt last) const {
+            return std::distance(first, last) >= 0;
+        }
         /*
          * @brief Check whether @p command is legal, i.e. it is **not** empty.
          * @param[in] command the command name
