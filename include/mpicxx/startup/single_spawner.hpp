@@ -124,7 +124,7 @@ namespace mpicxx {
          *
          * Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
          * @ref detail::convert_to_string().
-         * @tparam T the type of the value
+         * @tparam ValueType the type of the value
          * @param[in] key the argument key (e.g. `"-gridfile"` or `"gridfile"`)
          * @param[in] value the value associated with @p key
          * @return `*this`
@@ -133,8 +133,8 @@ namespace mpicxx {
          *
          * @assert_sanity{ If @p key only contains '-' (or ''). }
          */
-        template <typename T>
-        single_spawner& add_argv(std::string key, T&& value) {
+        template <typename ValueType>
+        single_spawner& add_argv(std::string key, ValueType&& value) {
             // add leading '-' if necessary
             if (!key.starts_with('-')) {
                 key.insert(0, 1, '-');
@@ -143,7 +143,7 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Only '-' isn't a valid argument key!");
 
             // add [key, value]-argv-pair to argv_
-            argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
+            argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<ValueType>(value)));
             return *this;
         }
         /**
