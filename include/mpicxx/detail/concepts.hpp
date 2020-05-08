@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/concepts.hpp
  * @author Marcel Breyer
- * @date 2020-03-15
+ * @date 2020-05-09
  *
  * @brief Defines concepts used in the mpicxx library.
  */
@@ -9,7 +9,9 @@
 #ifndef MPICXX_CONCEPTS_HPP
 #define MPICXX_CONCEPTS_HPP
 
+#include <string_view>
 #include <type_traits>
+#include <utility>
 
 
 namespace mpicxx::detail {
@@ -42,6 +44,16 @@ namespace mpicxx::detail {
      */
     template <typename T, typename... Args>
     concept main_args_pointer = std::is_invocable_r_v<int, T, int, char**, Args...>;
+
+    /**
+     * @brief Concept that describes a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair).
+     * @tparam T the compared to type
+     */
+    template <typename T>
+    concept is_pair = requires (T p) {
+        { p.first }  -> std::convertible_to<typename T::first_type>;
+        { p.second } -> std::convertible_to<typename T::second_type>;
+    };
     ///@}
 
 }
