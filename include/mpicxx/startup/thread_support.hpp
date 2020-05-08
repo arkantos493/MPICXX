@@ -25,14 +25,14 @@ namespace mpicxx {
      * @brief Enum class for the different levels of thread support provided by MPI.
      * @details The values are monotonic: single < funneled < serialized < multiple.
      */
-    enum thread_support {
+    enum class thread_support {
         /** only one thread will execute */
         single = MPI_THREAD_SINGLE,
         /** the process may be multi-threaded, but the application must ensure that only the main thread makes MPI calls (see @ref mpicxx::is_main_thread()) */
         funneled = MPI_THREAD_FUNNELED,
         /** the process may be multi-threaded, and multiple threads may make MPI calls, but only one at a time */
         serialized = MPI_THREAD_SERIALIZED,
-        /** multiple threads may call MPI, with no restrictions */
+        /** multiple threads may make MPI calls, with no restrictions */
         multiple = MPI_THREAD_MULTIPLE,
     };
 
