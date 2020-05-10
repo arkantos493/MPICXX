@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-15
+ * @date 2020-05-10
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -54,6 +54,7 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Construct a new single_spawner object.
+         * @tparam T must meet the requirements of the @p detail::string concept
          * @param[in] command name of program to be spawned (must meet the requirements of the @p detail::string concept)
          * @param[in] maxprocs maximum number of processes to start
          *
@@ -66,9 +67,8 @@ namespace mpicxx {
          * If @p maxprocs is invalid.
          * }
          */
-        single_spawner(detail::string auto&& command, const int maxprocs)
-            : command_(std::forward<decltype(command)>(command)), maxprocs_(maxprocs)
-        {
+         template <detail::string T>
+        single_spawner(T&& command, const int maxprocs) : command_(std::forward<T>(command)), maxprocs_(maxprocs) {
             MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
         }
         /**
@@ -98,6 +98,7 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Set the name of the executable to be spawned.
+         * @tparam T must meet the requirements of the @p detail::string concept
          * @param[in] command name of executable to be spawned (must meet the requirements of the @p detail::string concept)
          * @return `*this`
          *
@@ -105,8 +106,9 @@ namespace mpicxx {
          *
          * @assert_sanity{ If @p command is empty. }
          */
-        single_spawner& set_command(detail::string auto&& command) {
-            command_ = std::forward<decltype(command)>(command);
+        template <detail::string T>
+        single_spawner& set_command(T&& command) {
+            command_ = std::forward<T>(command);
 
             MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
 
