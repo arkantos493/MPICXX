@@ -286,22 +286,16 @@ namespace mpicxx {
          * functionality described.
          * @param[in] additional_info copy of the info object
          * @return `*this`
-         *
-         * @attention The user **has to ensure** that @p additional_info doesn't go out-of-scope before @ref spawn() gets called.
          */
-        single_spawner& set_spawn_info(const info& additional_info) noexcept {
-            info_ = &additional_info;
+        single_spawner& set_spawn_info(info additional_info) noexcept {
+            info_ = std::move(additional_info);
             return *this;
         }
-        /**
-         * @brief Delete the r-value overload to prevent some bugs in passing a temporary to @ref set_spawn_info().
-         */
-        single_spawner& set_spawn_info(info&&) = delete;
         /**
          * @brief Returns the info object representing additional information for the runtime system where and how to spawn the processes.
          * @return the info object (`[[nodiscard]]`)
          */
-        [[nodiscard]] const info& spawn_info() const noexcept { return *info_; }
+        [[nodiscard]] const info& spawn_info() const noexcept { return info_; }
 
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
@@ -369,7 +363,6 @@ namespace mpicxx {
          * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
          * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
-         * @pre The pointer to the spawn info object **must not** refer to `nullptr`.
          * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
          * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          * @pre `comm` **must not** be *MPI_COMM_NULL*.
@@ -378,7 +371,6 @@ namespace mpicxx {
          * If the `command` is empty. \n
          * If any key only contains '-' (or ''). \n
          * If `maxprocs` is invalid. \n
-         * If the pointer to the spawn info object refers to `nullptr`. \n
          * If `root` isn't a legal root. \n
          * If `comm` is the null communicator (*MPI_COMM_NULL*).
          * }
@@ -403,7 +395,6 @@ namespace mpicxx {
          * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
          * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
-         * @pre The pointer to the spawn info object **must not** refer to `nullptr`.
          * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
          * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          * @pre `comm` **must not** be *MPI_COMM_NULL*.
@@ -412,7 +403,6 @@ namespace mpicxx {
          * If the `command` is empty. \n
          * If any key only contains '-' (or ''). \n
          * If `maxprocs` is invalid. \n
-         * If the pointer to the spawn info object refers to `nullptr`. \n
          * If `root` isn't a legal root. \n
          * If `comm` is the null communicator (*MPI_COMM_NULL*).
          * }
@@ -441,7 +431,6 @@ namespace mpicxx {
          * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
          * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
-         * @pre The pointer to the spawn info object **must not** refer to `nullptr`.
          * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
          * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          * @pre `comm` **must not** be *MPI_COMM_NULL*.
@@ -450,7 +439,6 @@ namespace mpicxx {
          * If the `command` is empty. \n
          * If any key only contains '-' (or ''). \n
          * If `maxprocs` is invalid. \n
-         * If the pointer to the spawn info object refers to `nullptr`. \n
          * If `root` isn't a legal root. \n
          * If `comm` is the null communicator (*MPI_COMM_NULL*).
          * }
@@ -465,9 +453,8 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
                                        "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
-                                       "Can't spawn the given number of processes: 0 < {} <= {}",
-                                       maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
-            MPICXX_ASSERT_PRECONDITION(this->legal_spawn_info(info_), "Can't use nullptr!");
+                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
                                        "The previously set root '{}' isn't a valid root in the current communicator!", root_);
             MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use null communicator!");
@@ -485,7 +472,7 @@ namespace mpicxx {
 
             if (argv_.empty()) {
                 // no additional arguments provided -> use MPI_ARGV_NULL
-                MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_->get(),
+                MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_.get(),
                                root_, comm_, &res.intercomm_, errcode);
             } else {
                 // convert additional arguments to char**
@@ -500,7 +487,7 @@ namespace mpicxx {
                 // add null termination
                 argv_ptr.emplace_back(nullptr);
 
-                MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_->get(),
+                MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_.get(),
                                root_, comm_, &res.intercomm_, errcode);
             }
             return res;
@@ -563,14 +550,6 @@ namespace mpicxx {
             }
         }
         /*
-         * @brief Check whether @p info is a valid pointer to an @ref mpicxx::info object, i.e. it does **not** refer to nullptr.
-         * @param[in] info pointer to an @ref mpicxx::info object
-         * @return `true` if info is valid, `false` otherwise
-         */
-        bool legal_spawn_info(const info* info) const noexcept {
-            return info != nullptr;
-        }
-        /*
          * @brief Checks whether @p root is valid in @p comm, i.e. @p root is greater and equal than `0` and less than @p comm's size.
          * @param[in] root the root
          * @param[in] comm the communicator
@@ -602,7 +581,7 @@ namespace mpicxx {
         std::string command_;
         std::vector<argv_value_type> argv_;
         int maxprocs_;
-        const info* info_ = &mpicxx::info::null;
+        info info_ = mpicxx::info::null;
         int root_ = 0;
         MPI_Comm comm_ = MPI_COMM_WORLD;
     };
