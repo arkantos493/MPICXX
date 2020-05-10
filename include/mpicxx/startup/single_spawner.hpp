@@ -70,6 +70,9 @@ namespace mpicxx {
          template <detail::string T>
         single_spawner(T&& command, const int maxprocs) : command_(std::forward<T>(command)), maxprocs_(maxprocs) {
             MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_),
+                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
         }
         /**
          * @brief Construct a new single_spawner object.
@@ -87,7 +90,7 @@ namespace mpicxx {
          * }
          */
         template <detail::string T>
-        single_spawner(std::pair<T, int> pair) : single_spawner(std::forward<T>(pair.first), pair.second) { }
+        single_spawner(std::pair<T, int> pair) : single_spawner(std::move(pair.first), pair.second) { }
         ///@}
 
 
@@ -170,7 +173,7 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         single_spawner& add_argv(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
-                                       "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
             for (; first != last; ++first) {
                 const auto& pair = *first;
@@ -451,12 +454,12 @@ namespace mpicxx {
         return_type spawn_impl() {
             MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
-                                       "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
+                    "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
                     "Can't spawn the given number of processes: 0 < {} <= {}",
                     maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
-                                       "The previously set root '{}' isn't a valid root in the current communicator!", root_);
+                    "The previously set root '{}' isn't a valid root in the current communicator!", root_);
             MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use null communicator!");
 
             return_type res(maxprocs_);
