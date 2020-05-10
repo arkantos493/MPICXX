@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/concepts.hpp
  * @author Marcel Breyer
- * @date 2020-05-09
+ * @date 2020-05-10
  *
  * @brief Defines concepts used in the mpicxx library.
  */
@@ -51,8 +51,8 @@ namespace mpicxx::detail {
      */
     template <typename T>
     concept is_pair = requires (T p) {
-        { p.first }  -> std::convertible_to<typename T::first_type>;
-        { p.second } -> std::convertible_to<typename T::second_type>;
+        { p.first }  -> std::convertible_to<typename std::remove_cvref_t<T>::first_type>;
+        { p.second } -> std::convertible_to<typename std::remove_cvref_t<T>::second_type>;
     };
     ///@}
 
