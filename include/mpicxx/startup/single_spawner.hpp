@@ -30,11 +30,8 @@
 
 namespace mpicxx {
 
-    // TODO 2020-03-22 19:04 marcel: change from MPI_Comm to mpicxx equivalent
+    // TODO 2020-05-10 23:31 breyerml: change from MPI_Comm to mpicxx equivalent -> copy/move constructor/assignment
     // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
-    // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
-
-    // TODO 2020-04-13 22:29 breyerml: PRECONDITION or SANITY checks???
 
     /**
      * @nosubgrouping
