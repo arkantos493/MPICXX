@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-12
+ * @date 2020-05-13
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -36,17 +36,16 @@ namespace mpicxx {
     // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
     // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
 
+
     /**
      * @nosubgrouping
      * @brief Spawner class which enables to spawn (multiple) **different** MPI processes at runtime.
      */
     class multiple_spawner {
+        // TODO 2020-05-13 00:21 breyerml: remove as soon as GCC bug has been fixed
         template <typename SpawnerType>
-        static constexpr bool is_single_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, single_spawner>;
-        template <typename SpawnerType>
-        static constexpr bool is_multiple_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, multiple_spawner>;
-        template <typename SpawnerType>
-        static constexpr bool is_spawner_v = is_single_spawner_v<SpawnerType> || is_multiple_spawner_v<SpawnerType>;
+        static constexpr bool is_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, single_spawner>
+                || std::is_same_v<std::remove_cvref_t<SpawnerType>, multiple_spawner>;
 
     public:
         /// The type of a single argv argument (represented by  a key and value).
@@ -59,11 +58,34 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
+        /// @name constructor
+        ///@{
+        /**
+         * @brief Constructs the multiple_spawner object with the contents of the range [@p first, @p last).
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @param[in] first iterator to the first pair in the range
+         * @param[in] last iterator one-past the last pair in the range
+         *
+         * @pre @p first and @p last **must** refer to the same container.
+         * @pre @p first and @p last **must** form a valid, non-empty range, i.e. @p first must be strictly less than @p last.
+         * @pre **Any** command **must not** be empty.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_precondition{ If @p first and @p last don't denote a valid, non-empty iterator range. }
+         * @assert_sanity{
+         * If any command name is empty.\n
+         * If any number of maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
+         * }
+         */
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
             const auto size = std::distance(first, last);
 
-            MPICXX_ASSERT_PRECONDITION(0 < size, "No values given! 0 < {}", size);
+            MPICXX_ASSERT_PRECONDITION(this->legal_non_empty_iterator_range(first, last), "No values given! 0 < {}", size);
 
             // set command and maxprocs according to passed values
             commands_.reserve(size);
@@ -93,9 +115,43 @@ namespace mpicxx {
             argvs_.assign(size, std::vector<argv_value_type>());
         }
 
+        /**
+         * @brief Constructs the multiple_spawner object with the contents of the initializer list @p ilist.
+         * @param[in] ilist initializer list to initialize the multiple_spawner object with
+         *
+         * @pre @p first and @p last **must** form a non-empty range, i.e. @p first must be strictly less than @p last.
+         * @pre **Any** command **must not** be empty.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_precondition{ If @p first and @p last don't denote a non-empty iterator range. }
+         * @assert_sanity{
+         * If any command name is empty.\n
+         * If any number of maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
+         * }
+         */
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
 
-
+        /**
+         * @brief Constructs the multiple_spawner object with the contents of the parameter pack @p args.
+         * @tparam Pairs an arbitrary number of pairs meeting the @ref detail::is_pair requirements.
+         * @param[in] args the parameter pack to initializer the multiple_spawner object with
+         *
+         * @pre **Any** command **must not** be empty.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_sanity{
+         * If any command name is empty.\n
+         * If any number of maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
+         * }
+         */
         template <detail::is_pair... Pairs>
         multiple_spawner(Pairs&&... args) requires (sizeof...(Pairs) > 0) {
             // set command and maxprocs according to passed values
@@ -127,19 +183,37 @@ namespace mpicxx {
         }
 
         // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
-        template <typename... Spawner, std::enable_if_t<(is_spawner_v<Spawner> && ...), int> = 0>
+        /**
+         * @brief Constructs the multiple_spawner object with the spawner object(s) of the parameter pack @p args.
+         * @tparam Spawner an arbitrary number of spawners meeting the @ref detail::is_spawner requirements.
+         * @param[in] args the parameter pack to initializer the multiple_spawner object with
+         *
+         * @pre **All** roots **must** be equal.
+         * @pre **All** communicators **must** be equal.
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_precondition{
+         * If not all roots are equivalent. \n
+         * If not all communicators are equivalent.
+         * }
+         * @assert_sanity{ If the total number of maxprocs is invalid. }
+         */
+        template <typename... Spawner, std::enable_if_t<(is_spawner_v<Spawner> && ...) && (sizeof...(Spawner) > 0), int> = 0>
         multiple_spawner(Spawner&&... args) requires (sizeof...(Spawner) > 0) {
-            MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...), "Different root processes!");
-            MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.communicator(); }, args...), "Different communicators!");
+            MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...),
+                    "Different root processes!");
+            MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.communicator(); }, args...),
+                    "Different communicators!");
 
             ([&] (auto&& arg) {
                 using spawner_t = decltype(arg);
-                if constexpr (is_single_spawner_v<spawner_t>) {
+                if constexpr (std::is_same_v<std::remove_cvref_t<spawner_t>, single_spawner>) {
                     commands_.emplace_back(std::forward<spawner_t>(arg).command());
                     argvs_.emplace_back(std::forward<spawner_t>(arg).argv());
                     maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs());
                     infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info());
-                } else if constexpr (is_multiple_spawner_v<spawner_t>) {
+                } else if constexpr (std::is_same_v<std::remove_cvref_t<spawner_t>, multiple_spawner>) {
                     for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
                         commands_.emplace_back(std::forward<spawner_t>(arg).command(i));
                         argvs_.emplace_back(std::forward<spawner_t>(arg).argv(i));
@@ -156,6 +230,7 @@ namespace mpicxx {
                     std::reduce(maxprocs_.begin(), maxprocs_.end()),
                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -604,7 +679,11 @@ namespace mpicxx {
             return res;
         }
 
-#if ASSERTION_LEVEL > 0
+//#if ASSERTION_LEVEL > 0
+        template <std::input_iterator InputIt>
+        bool legal_non_empty_iterator_range(InputIt first, InputIt last) {
+            return std::distance(first, last) > 0;
+        }
 
         template <std::input_iterator InputIt>
         bool legal_number_of_values(InputIt first, InputIt last) {
@@ -700,7 +779,7 @@ namespace mpicxx {
         bool legal_communicator(const MPI_Comm comm) const noexcept {
             return comm != MPI_COMM_NULL;
         }
-#endif
+//#endif
 
         std::vector<std::string> commands_;
         std::vector<std::vector<argv_value_type>> argvs_;
