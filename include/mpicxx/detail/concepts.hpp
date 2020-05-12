@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/concepts.hpp
  * @author Marcel Breyer
- * @date 2020-05-10
+ * @date 2020-05-12
  *
  * @brief Defines concepts used in the mpicxx library.
  */
@@ -14,9 +14,15 @@
 #include <utility>
 
 
+// forward declare spawner classes
+namespace mpicxx {
+    class single_spawner;
+    class multiple_spawner;
+}
+
 namespace mpicxx::detail {
 
-    /// @name custom internally used C++20 concepts
+    /// @name custom, internally used, C++20 concepts
     ///@{
     /**
      * @brief Concept that describes every *string* like type, i.e. [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string),
@@ -54,6 +60,14 @@ namespace mpicxx::detail {
         { p.first }  -> std::convertible_to<typename std::remove_cvref_t<T>::first_type>;
         { p.second } -> std::convertible_to<typename std::remove_cvref_t<T>::second_type>;
     };
+
+    /**
+     * @brief Concept that describes a spawner class, i.e. either @ref mpicxx::single_spawner or @ref mpicxx::multiple_spawner.
+     * @tparam T the compared to type
+     */
+    template <typename T>
+    concept is_spawner = std::is_same_v<std::remove_cvref_t<T>, mpicxx::single_spawner>
+                      || std::is_same_v<std::remove_cvref_t<T>, mpicxx::multiple_spawner>;
     ///@}
 
 }
