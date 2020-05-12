@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-04-19
+ * @date 2020-05-12
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -25,16 +25,9 @@
 #include <mpicxx/detail/conversion.hpp>
 #include <mpicxx/detail/utility.hpp>
 #include <mpicxx/info/info.hpp>
+#include <mpicxx/startup/single_spawner.hpp>
 #include <mpicxx/startup/spawn_result.hpp>
 
-template <typename T>
-struct is_pair : std::false_type { };
-
-template <typename T, typename U>
-struct is_pair<std::pair<T, U>> : std::true_type { };
-
-template <typename T>
-constexpr bool is_pair_v = is_pair<T>::value;
 
 namespace mpicxx {
 
@@ -54,11 +47,13 @@ namespace mpicxx {
         static constexpr bool is_multiple_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, multiple_spawner>;
         template <typename SpawnerType>
         static constexpr bool is_spawner_v = is_single_spawner_v<SpawnerType> || is_multiple_spawner_v<SpawnerType>;
+
     public:
         /// The type of a single argv argument (represented by  a key and value).
         using argv_value_type = std::pair<std::string, std::string>;
-        /// Unsigned integer type.
+        /// Unsigned integer type for argv.
         using argv_size_type = std::size_t;
+        /// Unsigned integer type.
         using size_type = std::size_t;
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -66,39 +61,64 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
-            MPICXX_ASSERT_PRECONDITION(std::distance(first, last) > 0, "No parametes given!");
-
             const auto size = std::distance(first, last);
+
+            MPICXX_ASSERT_PRECONDITION(0 < size, "No values given! 0 < {}", size);
+
             // set command and maxprocs according to passed values
             commands_.reserve(size);
             maxprocs_.reserve(size);
+
             for (; first != last; ++first) {
                 const auto& pair = *first;
+
+                MPICXX_ASSERT_SANITY(this->legal_command(pair.first), "No executable name given at {}!", size - std::distance(first, last));
+                MPICXX_ASSERT_SANITY(this->legal_maxprocs(pair.second),
+                        "Can't spawn the given number of processes at {}!: 0 < {} <= {}",
+                        size - std::distance(first, last), pair.second,
+                        multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
                 commands_.emplace_back(pair.first);
                 maxprocs_.emplace_back(pair.second);
             }
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                    "Can't spawn total number of processes!: 0 < {} <= {}",
+                    std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
             // set argvs objects to default values
             argvs_.assign(size, std::vector<argv_value_type>());
         }
+
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
 
-        template <typename... Args>
-        requires (is_pair_v<Args> && ...)
-        multiple_spawner(Args&&... args) {
-            MPICXX_ASSERT_PRECONDITION(sizeof...(Args) > 0, "No values given!");
 
-            constexpr std::size_t size = sizeof...(Args);
+        template <detail::is_pair... Pairs>
+        multiple_spawner(Pairs&&... args) requires (sizeof...(Pairs) > 0) {
+            // set command and maxprocs according to passed values
+            constexpr auto size = sizeof...(Pairs);
             commands_.reserve(size);
             maxprocs_.reserve(size);
 
             ([&] (auto&& arg) {
-                using first_t = typename std::remove_cvref_t<decltype(arg)>::first_type;
-                using second_t = typename std::remove_cvref_t<decltype(arg)>::second_type;
-                commands_.emplace_back(std::forward<first_t>(arg.first));
-                maxprocs_.emplace_back(std::forward<second_t>(arg.second));
-            }(args), ...);
+
+                MPICXX_ASSERT_SANITY(this->legal_command(arg.first), "No executable name given!");
+                MPICXX_ASSERT_SANITY(this->legal_maxprocs(arg.second),
+                        "Can't spawn the given number of processes!: 0 < {} <= {}",
+                        arg.second, multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
+                using pair_t = decltype(arg);
+                commands_.emplace_back(std::forward<pair_t>(arg).first);
+                maxprocs_.emplace_back(std::forward<pair_t>(arg).second);
+            }(std::forward<Pairs>(args)), ...);
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                    "Can't spawn total number of processes!: 0 < {} <= {}",
+                    std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
@@ -106,35 +126,36 @@ namespace mpicxx {
             argvs_.assign(size, std::vector<argv_value_type>());
         }
 
-        template <typename... Args>
-        requires (is_spawner_v<Args> && ...)
-        multiple_spawner(const Args&... args) {
-            MPICXX_ASSERT_PRECONDITION(sizeof...(Args) > 0, "No spawner given!");
+        // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
+        template <typename... Spawner, std::enable_if_t<(is_spawner_v<Spawner> && ...), int> = 0>
+        multiple_spawner(Spawner&&... args) requires (sizeof...(Spawner) > 0) {
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...), "Different root processes!");
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.communicator(); }, args...), "Different communicators!");
 
-            const auto loop = [&] (const auto& arg) {
-                if constexpr (is_single_spawner_v<decltype(arg)>) {
-                    commands_.emplace_back(arg.command());
-                    argvs_.emplace_back(arg.argv());
-                    maxprocs_.emplace_back(arg.maxprocs());
-                    // TODO 2020-04-19 19:39 breyerml: spawn_info
-                    infos_.emplace_back(mpicxx::info::null);
-                } else if constexpr (is_multiple_spawner_v<decltype(arg)>) {
+            ([&] (auto&& arg) {
+                using spawner_t = decltype(arg);
+                if constexpr (is_single_spawner_v<spawner_t>) {
+                    commands_.emplace_back(std::forward<spawner_t>(arg).command());
+                    argvs_.emplace_back(std::forward<spawner_t>(arg).argv());
+                    maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs());
+                    infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info());
+                } else if constexpr (is_multiple_spawner_v<spawner_t>) {
                     for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
-                        commands_.emplace_back(arg.command(i));
-                        argvs_.emplace_back(arg.argv(i));
-                        maxprocs_.emplace_back(arg.maxprocs(i));
-                        // TODO 2020-04-19 20:23 breyerml: spawn_info
-                        infos_.emplace_back(mpicxx::info::null);
+                        commands_.emplace_back(std::forward<spawner_t>(arg).command(i));
+                        argvs_.emplace_back(std::forward<spawner_t>(arg).argv(i));
+                        maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs(i));
+                        infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info(i));
                     }
                 }
                 root_ = arg.root();
                 comm_ = arg.communicator();
-            };
-            (loop(args), ...);
-        }
+            }(std::forward<Spawner>(args)), ...);
 
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                    "Can't spawn total number of processes!: 0 < {} <= {}",
+                    std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+        }
 
 
         // ---------------------------------------------------------------------------------------------------------- //
