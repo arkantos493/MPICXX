@@ -14,3 +14,19 @@
  *
  * @brief This directory contains all test cases for the @ref mpicxx::single_spawner class.
  */
+
+/**
+ * @dir test/startup/multiple_spawner
+ * @author Marcel Breyer
+ * @date 2020-05-12
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/constructor
+ * @author Marcel Breyer
+ * @date 2020-05-12
+ *
+ * @brief This directory contains all test cases for the constructors of the @ref mpicxx::multiple_spawner class.
+ */
