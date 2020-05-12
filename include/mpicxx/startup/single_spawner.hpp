@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-10
+ * @date 2020-05-12
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -68,7 +68,7 @@ namespace mpicxx {
         single_spawner(T&& command, const int maxprocs) : command_(std::forward<T>(command)), maxprocs_(maxprocs) {
             MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_),
-                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    "Can't spawn the given number of processes!: 0 < {} <= {}",
                     maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
         }
         /**
@@ -236,7 +236,7 @@ namespace mpicxx {
          */
         single_spawner& set_maxprocs(const int maxprocs) {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
-                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    "Can't spawn the given number of processes!: 0 < {} <= {}",
                     maxprocs, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             maxprocs_ = maxprocs;
@@ -453,7 +453,7 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
                     "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
-                    "Can't spawn the given number of processes: 0 < {} <= {}",
+                    "Can't spawn the given number of processes!: 0 < {} <= {}",
                     maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
                     "The previously set root '{}' isn't a valid root in the current communicator!", root_);
