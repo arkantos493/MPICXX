@@ -114,7 +114,6 @@ namespace mpicxx {
             // set argvs objects to default values
             argvs_.assign(size, std::vector<argv_value_type>());
         }
-
         /**
          * @brief Constructs the multiple_spawner object with the contents of the initializer list @p ilist.
          * @param[in] ilist initializer list to initialize the multiple_spawner object with
@@ -134,10 +133,9 @@ namespace mpicxx {
          * }
          */
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
-
         /**
          * @brief Constructs the multiple_spawner object with the contents of the parameter pack @p args.
-         * @tparam Pairs an arbitrary number of pairs meeting the @ref detail::is_pair requirements.
+         * @tparam T an arbitrary number of pairs meeting the @ref detail::is_pair requirements.
          * @param[in] args the parameter pack to initializer the multiple_spawner object with
          *
          * @pre **Any** command **must not** be empty.
@@ -152,10 +150,10 @@ namespace mpicxx {
          * If the total number of maxprocs is invalid.
          * }
          */
-        template <detail::is_pair... Pairs>
-        multiple_spawner(Pairs&&... args) requires (sizeof...(Pairs) > 0) {
+        template <detail::is_pair... T>
+        multiple_spawner(T&&... args) requires (sizeof...(T) > 0) {
             // set command and maxprocs according to passed values
-            constexpr auto size = sizeof...(Pairs);
+            constexpr auto size = sizeof...(T);
             commands_.reserve(size);
             maxprocs_.reserve(size);
 
@@ -169,7 +167,7 @@ namespace mpicxx {
                 using pair_t = decltype(arg);
                 commands_.emplace_back(std::forward<pair_t>(arg).first);
                 maxprocs_.emplace_back(std::forward<pair_t>(arg).second);
-            }(std::forward<Pairs>(args)), ...);
+            }(std::forward<T>(args)), ...);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
                     "Can't spawn total number of processes!: 0 < {} <= {}",
@@ -181,11 +179,10 @@ namespace mpicxx {
             // set argvs objects to default values
             argvs_.assign(size, std::vector<argv_value_type>());
         }
-
         // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
         /**
          * @brief Constructs the multiple_spawner object with the spawner object(s) of the parameter pack @p args.
-         * @tparam Spawner an arbitrary number of spawners meeting the @ref detail::is_spawner requirements.
+         * @tparam T an arbitrary number of spawners meeting the @ref detail::is_spawner requirements.
          * @param[in] args the parameter pack to initializer the multiple_spawner object with
          *
          * @pre **All** roots **must** be equal.
@@ -199,8 +196,8 @@ namespace mpicxx {
          * }
          * @assert_sanity{ If the total number of maxprocs is invalid. }
          */
-        template <typename... Spawner, std::enable_if_t<(is_spawner_v<Spawner> && ...) && (sizeof...(Spawner) > 0), int> = 0>
-        multiple_spawner(Spawner&&... args) requires (sizeof...(Spawner) > 0) {
+        template <typename... T, std::enable_if_t<(is_spawner_v<T> && ...), int> = 0>
+        multiple_spawner(T&&... args) requires (sizeof...(T) > 0) {
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...),
                     "Different root processes!");
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.communicator(); }, args...),
@@ -223,7 +220,7 @@ namespace mpicxx {
                 }
                 root_ = arg.root();
                 comm_ = arg.communicator();
-            }(std::forward<Spawner>(args)), ...);
+            }(std::forward<T>(args)), ...);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
                     "Can't spawn total number of processes!: 0 < {} <= {}",
