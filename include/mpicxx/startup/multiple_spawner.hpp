@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-13
+ * @date 2020-05-14
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -9,6 +9,7 @@
 #ifndef MPICXX_MULTIPLE_SPAWNER_HPP
 #define MPICXX_MULTIPLE_SPAWNER_HPP
 
+#include <cstddef>
 #include <iostream>
 #include <numeric>
 #include <stdexcept>
@@ -68,7 +69,7 @@ namespace mpicxx {
          *
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid, non-empty range, i.e. @p first must be strictly less than @p last.
-         * @pre **Any** command **must not** be empty.
+         * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
@@ -76,7 +77,7 @@ namespace mpicxx {
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid, non-empty iterator range. }
          * @assert_sanity{
-         * If any command name is empty.\n
+         * If any executable name is empty.\n
          * If any number of maxprocs is invalid.\n
          * If the total number of maxprocs is invalid.
          * }
@@ -119,7 +120,7 @@ namespace mpicxx {
          * @param[in] ilist initializer list to initialize the multiple_spawner object with
          *
          * @pre @p first and @p last **must** form a non-empty range, i.e. @p first must be strictly less than @p last.
-         * @pre **Any** command **must not** be empty.
+         * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
@@ -127,7 +128,7 @@ namespace mpicxx {
          *
          * @assert_precondition{ If @p first and @p last don't denote a non-empty iterator range. }
          * @assert_sanity{
-         * If any command name is empty.\n
+         * If any executable name is empty.\n
          * If any number of maxprocs is invalid.\n
          * If the total number of maxprocs is invalid.
          * }
@@ -138,14 +139,14 @@ namespace mpicxx {
          * @tparam T an arbitrary number of pairs meeting the @ref detail::is_pair requirements.
          * @param[in] args the parameter pack to initializer the multiple_spawner object with
          *
-         * @pre **Any** command **must not** be empty.
+         * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
          *
          * @assert_sanity{
-         * If any command name is empty.\n
+         * If any executable name is empty.\n
          * If any number of maxprocs is invalid.\n
          * If the total number of maxprocs is invalid.
          * }
@@ -242,9 +243,10 @@ namespace mpicxx {
          * @param[in] last iterator one-past the last executable name in the range
          * @return `*this`
          *
-         * @pre The size of the range [@p first, @p last) **must** match the size of the this @ref multiple_spawner.
+         * @pre The size of the range [@p first, @p last) **must** match the size of the this @ref multiple_spawner and thus must be legal.
          * @pre All executable names in the range [@p first, @p last) **must not** be empty.
          *
+         * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
          * @assert_sanity{
          * If the sizes mismatch. \n
          * If any new executable name is empty.
@@ -252,6 +254,8 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         multiple_spawner& set_command(InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
+            MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), this->size());
 
