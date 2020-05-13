@@ -236,17 +236,17 @@ namespace mpicxx {
         /// @name modify spawn information
         ///@{
         /**
-         * @brief Replaces the old executable names with the from the range [@p first, @p last).
+         * @brief Replaces the old executable names with the new names from the range [@p first, @p last).
          * @param[in] first iterator to the first executable name in the range
          * @param[in] last iterator one-past the last executable name in the range
          * @return `*this`
          *
-         * @pre The size of the range [@p first, @p last) **must** match the size of the constructed range.
-         * @pre All commands in the range [@p first, @p last) **must not** be empty.
+         * @pre The size of the range [@p first, @p last) **must** match the size of the this @ref multiple_spawner.
+         * @pre All executable names in the range [@p first, @p last) **must not** be empty.
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any new command is empty.
+         * If any new executable name is empty.
          * }
          */
         template <std::input_iterator InputIt>
@@ -262,16 +262,16 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Replaces the old executable names with the from the initializer list @p ilist.
+         * @brief Replaces the old executable names with the new names from the initializer list @p ilist.
          * @param[in] ilist the new executable names
          * @return `*this`
          *
-         * @pre The size of @p ilist **must** match the size of the constructed range.
-         * @pre All commands in @p ilist **must not** be empty.
+         * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
+         * @pre All executable names in @p ilist **must not** be empty.
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any new command is empty.
+         * If any new executable name is empty.
          * }
          */
         multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
@@ -286,43 +286,76 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Set the i-th name of the executable to be spawned.
-         * @param[in] i the i-th executable name
-         * @param[in] command name of executable to be spawned (must meet the requirements of the @p detail::string concept)
+         * @brief Replaces the old executable names with the new names from the parameter pack @p args.
+         * @tparam T an arbitrary number of string like objects meeting @p detail::is_string requirements.
+         * @param args the parameter pack containing the new executable names
          * @return `*this`
          *
-         * @pre @p command **must not** be empty.
+         * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
+         * @pre All executable names in the parameter pack @p args **must not** be empty.
          *
-         * @assert_sanity{ If @p command is empty. }
-         *
-         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         * @assert_sanity{
+         * If the sizes mismatch. \n
+         * If any new executable name is empty.
+         * }
          */
-        multiple_spawner& set_command(const std::size_t i, detail::string auto&& command) {
-            if (i >= commands_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+        template <detail::is_string... T>
+        multiple_spawner& set_command(T&&... args) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
+                    "Illegal number of values! {} == {}", sizeof...(T), this->size());
+
+            commands_.clear();
+            (commands_.emplace_back(std::forward<T>(args)), ...);
+
+            MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
+                    "No executable name given at {}!", this->legal_commands(commands_).second);
+
+            return *this;
+        }
+        /**
+         * @brief Change the i-th executable name to @p name.
+         * @tparam T must meet the @p detail::is_string requirements.
+         * @param[in] i the index of the executable name to be changed
+         * @param[in] name new name of the i-th executable
+         * @return `*this`
+         *
+         * @pre @p name **must not** be empty.
+         *
+         * @assert_sanity{ If @p name is empty. }
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        template <detail::is_string T>
+        multiple_spawner& set_command(const std::size_t i, T&& name) {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::set_command(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
             }
 
-            commands_[i] = std::forward<decltype(command)>(command);
+            commands_[i] = std::forward<T>(command);
 
             MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "No executable name given at {}!", i);
 
             return *this;
         }
         /**
-         * @brief Returns the name of the executables which should get spawned.
+         * @brief Returns all executable names.
          * @return the executable names (`[[nodiscard]]`)
          */
         [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
         /**
          * @brief Returns the name of the i-th executable which should get spawned.
-         * @param[in] i the i-th command
-         * @return the i-th executable name  (`[[nodiscard]]`)
+         * @param[in] i the index of the executable name to be retrieved
+         * @return the i-th executable name (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i is an out-of-bounce access
          */
         [[nodiscard]] const std::string& command(const std::size_t i) const {
-            if (i >= commands_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, commands_.size()));
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::command(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
             }
 
             return commands_[i];
