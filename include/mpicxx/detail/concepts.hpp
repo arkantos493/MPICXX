@@ -41,6 +41,12 @@ namespace mpicxx::detail {
     template <typename T>
     concept is_string = std::is_constructible_v<std::string_view, T>;
 
+    /**
+     * @brief Concept that describes a c-style string, i.e. `const char*` and `char*`.
+     * @tparam T  the compared to type
+     */
+    template <typename T>
+    concept is_c_string = std::is_same_v<std::decay_t<T>, const char*> || std::is_same_v<std::decay_t<T>, char*>;
 
     /**
      * @brief Concept that describes a function that accepts any number of parameters (including none) and returns an `int`.
