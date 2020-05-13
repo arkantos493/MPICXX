@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/constructor/iterator_range_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-12
+ * @date 2020-05-14
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(InputIt, InputIt) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -10,7 +10,7 @@
  * |:-----------------------------------------------|:----------------------------------------------------------------------------------------------|
  * | ConstructFromIteratorRange                     | construct a multiple_spawner object from an iterator range                                    |
  * | ConstructFromInvalidIteratorRange              | illegal iterator range (death test)                                                           |
- * | ConstructFromIteratorRangeInvalidCommand       | try to construct a multiple_spawner object with an illegal command name (death test)          |
+ * | ConstructFromIteratorRangeInvalidName          | try to construct a multiple_spawner object with an illegal executable name (death test)       |
  * | ConstructFromIteratorRangeInvalidMaxprocs      | try to construct a multiple_spawner object with an illegal maxprocs number (death test)       |
  * | ConstructFromIteratorRangeInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total mayprocs number (death test) |
  */
@@ -50,8 +50,8 @@ TEST(MultipleSpawnerDeathTest, ConstructFromInvalidIteratorRange) {
     ASSERT_DEATH( mpicxx::multiple_spawner ms(vec.end(), vec.begin()) , "");
 }
 
-TEST(MultipleSpawnerDeathTest, ConstructFromIteratorRangeInvalidCommand) {
-    // try to create new multiple_spawner with an empty command name
+TEST(MultipleSpawnerDeathTest, ConstructFromIteratorRangeInvalidName) {
+    // try to create new multiple_spawner with an empty executable name
     std::vector<std::pair<std::string, int>> vec = { { "", 1 } };
     ASSERT_DEATH( mpicxx::multiple_spawner ms(vec.begin(), vec.end()) , "");
 }

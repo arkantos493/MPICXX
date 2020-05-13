@@ -9,7 +9,7 @@
  * | test case name                           | test case description                                                                         |
  * |:-----------------------------------------|:----------------------------------------------------------------------------------------------|
  * | ConstructFromSpawner                     | construct a multiple_spawner object from an parameter pack (variadic template)                |
- * | ConstructFromSpawnerInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total mayprocs number (death test) |
+ * | ConstructFromSpawnerInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test) |
  */
 
 #include <utility>

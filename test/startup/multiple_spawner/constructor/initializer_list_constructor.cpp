@@ -1,15 +1,15 @@
 /**
  * @file test/startup/multiple_spawner/constructor/initializer_list_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-12
+ * @date 2020-05-14
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(std::initializer_list<std::pair<std::string, int>>) member function provided by the
  * @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                                   | test case description                                                                        |
  * |:-------------------------------------------------|:---------------------------------------------------------------------------------------------|
- * | ConstructFromInitializerList                     | construct a multiple_spawner object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)                                    |
- * | ConstructFromInitializerListInvalidCommand       | try to construct a multiple_spawner object with an illegal command name (death test)         |
+ * | ConstructFromInitializerList                     | construct a multiple_spawner object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) |
+ * | ConstructFromInitializerListInvalidName          | try to construct a multiple_spawner object with an illegal executable name (death test)      |
  * | ConstructFromInitializerListInvalidMaxprocs      | try to construct a multiple_spawner object with an illegal maxprocs number (death test)      |
  * | ConstructFromInitializerListInvalidTotalMaxprocs | ry to construct a multiple_spawner object with an illegal total mayprocs number (death test) |
  */
@@ -32,8 +32,8 @@ TEST(MultipleSpawnerTest, ConstructFromInitializerList) {
     });
 }
 
-TEST(MultipleSpawnerDeathTest, ConstructFromInitializerListInvalidCommand) {
-    // try to create new multiple_spawner with an empty command name
+TEST(MultipleSpawnerDeathTest, ConstructFromInitializerListInvalidName) {
+    // try to create new multiple_spawner with an empty executable name
     ASSERT_DEATH( mpicxx::multiple_spawner ms({ { "", 1 } }) , "");
 }
 
