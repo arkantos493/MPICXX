@@ -257,12 +257,13 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
-                    "Illegal number of values! {} == {}", std::distance(first, last), this->size());
+                    "Illegal number of values: std::distance(first, last) (which is {}) != this->size() (which is {})",
+                    std::distance(first, last), this->size());
 
             commands_.assign(first, last);
 
             MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
-                    "No executable name given at {}!", this->legal_commands(commands_).second);
+                    "Attempt to set the {}-th executable name to the empty string!", this->legal_commands(commands_).second);
 
             return *this;
         }
@@ -281,12 +282,13 @@ namespace mpicxx {
          */
         multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
-                    "Illegal number of values! {} == {}", ilist.size(), this->size());
+                    "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
+                    ilist.size(), this->size());
 
             commands_.assign(ilist);
 
             MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
-                    "No executable name given at {}!", this->legal_commands(commands_).second);
+                    "Attempt to set the {}-th executable name to the empty string!", this->legal_commands(commands_).second);
 
             return *this;
         }
@@ -307,13 +309,13 @@ namespace mpicxx {
         template <detail::is_string... T>
         multiple_spawner& set_command(T&&... args) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
-                    "Illegal number of values! {} == {}", sizeof...(T), this->size());
+                    "Illegal number of values: sizeof...(T) (which is {}) != this->size() (which is {})", sizeof...(T), this->size());
 
             commands_.clear();
             (commands_.emplace_back(std::forward<T>(args)), ...);
 
             MPICXX_ASSERT_SANITY(this->legal_commands(commands_).first,
-                    "No executable name given at {}!", this->legal_commands(commands_).second);
+                    "Attempt to set the {}-th executable name to the empty string!", this->legal_commands(commands_).second);
 
             return *this;
         }
@@ -340,7 +342,7 @@ namespace mpicxx {
 
             commands_[i] = std::forward<T>(name);
 
-            MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "No executable name given at {}!", i);
+            MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "Attempt to set the {}-th executable name to the empty string!", i);
 
             return *this;
         }
