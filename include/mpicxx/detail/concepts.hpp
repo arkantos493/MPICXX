@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/concepts.hpp
  * @author Marcel Breyer
- * @date 2020-05-12
+ * @date 2020-05-13
  *
  * @brief Defines concepts used in the mpicxx library.
  */
@@ -31,6 +31,16 @@ namespace mpicxx::detail {
      */
     template <typename T>
     concept string = std::is_constructible_v<std::string_view, T>;
+
+    // TODO 2020-05-13 21:10 breyerml: change usages of string to is_string
+    /**
+     * @brief Concept that describes every *string* like type, i.e. [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string),
+     * [`std::string_view`](https://en.cppreference.com/w/cpp/string/basic_string_view), `const char*` and `char[]`.
+     * @tparam T the compared to type
+     */
+    template <typename T>
+    concept is_string = std::is_constructible_v<std::string_view, T>;
+
 
     /**
      * @brief Concept that describes a function that accepts any number of parameters (including none) and returns an `int`.
