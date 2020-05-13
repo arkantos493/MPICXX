@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/constructor/spawner_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-12
+ * @date 2020-05-14
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(Spawner&&...) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -20,7 +20,7 @@
 #include <mpicxx/startup/multiple_spawner.hpp>
 
 
-TEST(MultipleSpanwerTest, ConstructFromSpawner) {
+TEST(MultipleSpawnerTest, ConstructFromSpawner) {
     // create new multiple_spawner using other spawners
     mpicxx::single_spawner ss1("foo", 1);
     mpicxx::multiple_spawner ms1({ {"bar", 1} });
