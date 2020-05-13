@@ -237,6 +237,7 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Replaces the old executable names with the new names from the range [@p first, @p last).
+         * @tparam InputIt must meet [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements.
          * @param[in] first iterator to the first executable name in the range
          * @param[in] last iterator one-past the last executable name in the range
          * @return `*this`
@@ -250,7 +251,7 @@ namespace mpicxx {
          * }
          */
         template <std::input_iterator InputIt>
-        multiple_spawner& set_command(InputIt first, InputIt last) {
+        multiple_spawner& set_command(InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
                     "Illegal number of values! {} == {}", std::distance(first, last), this->size());
 
@@ -333,7 +334,7 @@ namespace mpicxx {
                         i, this->size()));
             }
 
-            commands_[i] = std::forward<T>(command);
+            commands_[i] = std::forward<T>(name);
 
             MPICXX_ASSERT_SANITY(this->legal_command(commands_[i]), "No executable name given at {}!", i);
 
