@@ -463,46 +463,61 @@ namespace mpicxx {
 
 
         /**
-         * @brief Replaces the old number of processes with the ones from the range [@p first, @p last).
+         * @brief Replaces the old number of processes with the new numbers from the range [@p first, @p last).
+         * @tparam InputIt must meet [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements.
          * @param[in] first iterator to the first number of processes in the range
          * @param[in] last iterator one-past the last number of processes in the range
          * @return `*this`
          *
-         * @pre The size of the range [@p first, @p last) **must** match the size of the constructed range.
-         * @pre All number of processes in the range [@p first, @p last) **must not** be less or equal than `0` or greater than the maximum
-         * possible number of processes (@ref universe_size()).
+         * @pre The size of the range [@p first, @p last) **must** match the size of this @ref multiple_spawner and thus must be legal.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
          *
+         * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any new number of processes is invalid.
+         * If any number of maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
          * }
          */
         template <std::input_iterator InputIt>
         multiple_spawner& set_maxprocs(InputIt first, InputIt last) {
+            MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
-                    "Illegal number of values! {} == {}", std::distance(first, last), this->size());
+                    "Illegal number of values: std::distance(first, last) (which is {}) != this->size() (which is {})",
+                    std::distance(first, last), this->size());
 
             maxprocs_.assign(first, last);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
-                    "Can't spawn the given number of processes at {}!: 0 < {} <= {}",
+                    "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                     this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                    "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                    fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
         /**
-         * @brief Replaces the old number of processes with the ones from the initializer list @p ilist.
+         * @brief Replaces the old number of processes with the new numbers from the initializer list @p ilist.
          * @param[in] ilist the new number of processes
          * @return `*this`
          *
-         * @pre The size of @p ilist **must** match the size of the constructed range.
-         * @pre All number of processes in i@p ilist **must not** be less or equal than `0` or greater than the maximum possible number
-         * of processes (@ref universe_size()).
+         * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
-         * If any new number of processes is invalid.
+         * If any number of maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
          * }
          */
         multiple_spawner& set_maxprocs(std::initializer_list<int> ilist) {
@@ -512,51 +527,109 @@ namespace mpicxx {
             maxprocs_.assign(ilist);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
-                     "Can't spawn the given number of processes at {}!: 0 < {} <= {}",
+                     "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                      this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
                      multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
         /**
-         * @brief Set the i-th number of processes to be spawned.
-         * @param[in] i the i-th number of processes
-         * @param[in] maxprocs maximum number of processes to start
+         * @brief Replaces the old number of processes with the new numbers from the parameter pack @p args.
+         * @tparam T an arbitrary number of integral objects meeting the
+         * [`std::integral`](https://en.cppreference.com/w/cpp/concepts/integral) requirements.
+         * @param args the parameter pack containing the new number of processes
+         * @return `*this`
+         *
+         * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
+         *
+         * @assert_sanity{
+         * If the sizes mismatch. \n
+         * If any number of maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
+         * }
+         */
+        template <std::integral... T>
+        multiple_spawner& set_maxprocs(T... args) requires (sizeof...(T) > 0) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
+                     "Illegal number of values: sizeof...(T) (which is {}) != this->size() (which is {})", sizeof...(T), this->size());
+
+            maxprocs_.clear();
+            (maxprocs_.emplace_back(std::forward<T>(args)), ...);
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
+                     "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                     this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
+                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
+            return *this;
+        }
+        /**
+         * @brief Change the i-th number of processes to @p maxprocs.
+         * @param[in] i the index of the number of processes to be changed
+         * @param[in] maxprocs the new maximum number of processes
          * @return `*this`
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          * (@ref universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         * (@ref universe_size()).
          *
-         * @assert_sanity{ If @p maxprocs is invalid. }
+         * @assert_sanity{
+         * If @p maxprocs is invalid.\n
+         * If the total number of maxprocs is invalid.
+         * }
          *
-         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         * @throws std::out_of_range if the index @p i falls outside the valid range
          */
         multiple_spawner& set_maxprocs(const std::size_t i, const int maxprocs) {
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
-                    "Can't spawn the given number of processes!:  0 < {} <= {}",
-                    maxprocs, multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
-
-            if (i >= maxprocs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::set_maxprocs(const std::size_t, const int) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
             }
 
             maxprocs_[i] = maxprocs;
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
+                     "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                     this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
+                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+
             return *this;
         }
         /**
-         * @brief Returns the number of processes which should get spawned.
+         * @brief Returns all numbers of processes.
          * @return the number of processes (`[[nodiscard]]`)
          */
         [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
         /**
          * @brief Returns the i-th number of processes which should get spawned.
+         * @param[in] i the index of the number of processes to be retrieved
          * @return the i-th number of processes (`[[nodiscard]]`)
          *
-         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         * @throws std::out_of_range if the index @p i falls outside the valid range
          */
         [[nodiscard]] int maxprocs(const std::size_t i) const {
-            if (i >= maxprocs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::command(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
             }
 
             return maxprocs_[i];
