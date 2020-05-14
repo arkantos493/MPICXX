@@ -84,20 +84,21 @@ namespace mpicxx {
          */
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
-            const auto size = std::distance(first, last);
-
-            MPICXX_ASSERT_PRECONDITION(this->legal_non_empty_iterator_range(first, last), "No values given! 0 < {}", size);
+            MPICXX_ASSERT_PRECONDITION(this->legal_non_empty_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be strictly less than 'last')!");
 
             // set command and maxprocs according to passed values
+            const auto size = std::distance(first, last);
             commands_.reserve(size);
             maxprocs_.reserve(size);
 
             for (; first != last; ++first) {
                 const auto& pair = *first;
 
-                MPICXX_ASSERT_SANITY(this->legal_command(pair.first), "No executable name given at {}!", size - std::distance(first, last));
+                MPICXX_ASSERT_SANITY(this->legal_command(pair.first),
+                        "Attempt to set the {}-th executable name to the empty string!", size - std::distance(first, last));
                 MPICXX_ASSERT_SANITY(this->legal_maxprocs(pair.second),
-                        "Can't spawn the given number of processes at {}!: 0 < {} <= {}",
+                        "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                         size - std::distance(first, last), pair.second,
                         multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
@@ -106,8 +107,8 @@ namespace mpicxx {
             }
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
-                    "Can't spawn total number of processes!: 0 < {} <= {}",
-                    std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                    "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                    fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
@@ -160,9 +161,9 @@ namespace mpicxx {
 
             ([&] (auto&& arg) {
 
-                MPICXX_ASSERT_SANITY(this->legal_command(arg.first), "No executable name given!");
+                MPICXX_ASSERT_SANITY(this->legal_command(arg.first), "Attempt to set an executable name to the empty string!");
                 MPICXX_ASSERT_SANITY(this->legal_maxprocs(arg.second),
-                        "Can't spawn the given number of processes!: 0 < {} <= {}",
+                        "Attempt to set the a maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                         arg.second, multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
                 using pair_t = decltype(arg);
@@ -171,8 +172,8 @@ namespace mpicxx {
             }(std::forward<T>(args)), ...);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
-                    "Can't spawn total number of processes!: 0 < {} <= {}",
-                    std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                    "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                    fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
@@ -200,9 +201,9 @@ namespace mpicxx {
         template <typename... T, std::enable_if_t<(is_spawner_v<T> && ...), int> = 0>
         multiple_spawner(T&&... args) requires (sizeof...(T) > 0) {
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...),
-                    "Different root processes!");
+                    "Attempt to use different root processes!");
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.communicator(); }, args...),
-                    "Different communicators!");
+                    "Attempt to use different communicators!");
 
             ([&] (auto&& arg) {
                 using spawner_t = decltype(arg);
@@ -224,9 +225,9 @@ namespace mpicxx {
             }(std::forward<T>(args)), ...);
 
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
-                    "Can't spawn total number of processes!: 0 < {} <= {}",
-                    std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
+                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
         }
         ///@}
 
