@@ -30,3 +30,19 @@
  *
  * @brief This directory contains all test cases for the constructors of the @ref mpicxx::multiple_spawner class.
  */
+
+/**
+ * @dir test/startup/multiple_spawner/command
+ * @author Marcel Breyer
+ * @date 2020-05-15
+ *
+ * @brief This directory contains all test cases for the command functions of the @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/maxprocs
+ * @author Marcel Breyer
+ * @date 2020-05-15
+ *
+ * @brief This directory contains all test cases for the maxprocs functions of the @ref mpicxx::multiple_spawner class.
+ */
