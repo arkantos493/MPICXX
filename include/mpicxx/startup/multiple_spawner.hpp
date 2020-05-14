@@ -308,7 +308,7 @@ namespace mpicxx {
          * }
          */
         template <detail::is_string... T>
-        multiple_spawner& set_command(T&&... args) {
+        multiple_spawner& set_command(T&&... args) requires (sizeof...(T) > 0) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
                     "Illegal number of values: sizeof...(T) (which is {}) != this->size() (which is {})", sizeof...(T), this->size());
 
@@ -324,7 +324,7 @@ namespace mpicxx {
          * @brief Change the i-th executable name to @p name.
          * @tparam T must meet the @p detail::is_string requirements.
          * @param[in] i the index of the executable name to be changed
-         * @param[in] name new name of the i-th executable
+         * @param[in] name the new name of the i-th executable
          * @return `*this`
          *
          * @pre @p name **must not** be empty.
@@ -357,7 +357,7 @@ namespace mpicxx {
          * @param[in] i the index of the executable name to be retrieved
          * @return the i-th executable name (`[[nodiscard]]`)
          *
-         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         * @throws std::out_of_range if the index @p i falls outside the valid range
          */
         [[nodiscard]] const std::string& command(const std::size_t i) const {
             if (i >= this->size()) {
