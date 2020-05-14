@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/command/iterator_range.cpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-05-15
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(InputIt, InputIt) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -61,7 +61,7 @@ TEST(MultipleSpawnerDeathTest, SetExecutableNamesViaIteratorRangeInvalidName) {
     // create new multiple_spawner object
     mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
 
-    // set new executable names with different size
+    // set new executable names with illegal name
     std::vector<std::string> vec = { "baz", "" };
     ASSERT_DEATH( ms.set_command(vec.begin(), vec.end()), "");
 }

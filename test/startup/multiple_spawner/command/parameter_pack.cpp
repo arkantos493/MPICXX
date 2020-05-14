@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/command/parameter_pack.cpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-05-15
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(T&&...) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -49,6 +49,6 @@ TEST(MultipleSpawnerDeathTest, SetExecutableNamesViaParameterPackInvalidName) {
     // create new multiple_spawner object
     mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
 
-    // set new executable names with different size
+    // set new executable names with illegal name
     ASSERT_DEATH( ms.set_command("baz", ""), "");
 }
