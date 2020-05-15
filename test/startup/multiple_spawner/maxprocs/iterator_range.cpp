@@ -35,7 +35,7 @@ TEST(MultipleSpawnerTest, SetMaxprocsViaIteratorRange) {
     ASSERT_EQ(ms.command().size(), 2);
     for (std::size_t i = 0; i < 2; ++i) {
         SCOPED_TRACE(i);
-        EXPECT_EQ(ms.maxprocs(i), vec[i]);
+        EXPECT_EQ(ms.maxprocs_at(i), vec[i]);
     }
 }
 

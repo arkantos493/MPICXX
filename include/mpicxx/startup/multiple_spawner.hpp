@@ -522,7 +522,8 @@ namespace mpicxx {
          */
         multiple_spawner& set_maxprocs(std::initializer_list<int> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
-                    "Illegal number of values! {} == {}", ilist.size(), this->size());
+                     "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
+                     ilist.size(), this->size());
 
             maxprocs_.assign(ilist);
 
@@ -593,10 +594,10 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        multiple_spawner& set_maxprocs(const std::size_t i, const int maxprocs) {
+        multiple_spawner& set_maxprocs_at(const std::size_t i, const int maxprocs) {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::set_maxprocs(const std::size_t, const int) range check: i (which is {}) >= this->size() (which is {})",
+                        "multiple_spawner::set_maxprocs_at(const std::size_t, const int) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
 
@@ -625,10 +626,10 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] int maxprocs(const std::size_t i) const {
+        [[nodiscard]] int maxprocs_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::command(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
 

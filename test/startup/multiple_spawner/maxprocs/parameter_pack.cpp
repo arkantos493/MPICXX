@@ -29,8 +29,8 @@ TEST(MultipleSpawnerTest, SetMaxprocsViaParameterPack) {
 
     // check if names were set correctly
     ASSERT_EQ(ms.maxprocs().size(), 2);
-    EXPECT_EQ(ms.maxprocs(0), 1);
-    EXPECT_EQ(ms.maxprocs(1), 1);
+    EXPECT_EQ(ms.maxprocs_at(0), 1);
+    EXPECT_EQ(ms.maxprocs_at(1), 1);
 }
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaParameterPackInvalidSize) {
