@@ -72,7 +72,7 @@ TEST(MultipleSpawnerDeathTest, SetMaxprocsViaIteratorRangeInvalidTotalValue) {
     // create new multiple_spawner object
     mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
 
-    // set new executable names with illegal total value
+    // set new number of processes with illegal total value
     std::vector<int> vec = { 2, 2 };
     ASSERT_DEATH( ms.set_maxprocs(vec.begin(), vec.end()), "");
 }
