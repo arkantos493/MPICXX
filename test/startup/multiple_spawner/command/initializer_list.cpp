@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/command/initializer_list.cpp
  * @author Marcel Breyer
- * @date 2020-05-15
+ * @date 2020-05-16
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(std::initializer_list<std::string>) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -32,8 +32,8 @@ TEST(MultipleSpawnerTest, SetExecutableNamesViaInitializerList) {
 
     // check if names were set correctly
     ASSERT_EQ(ms.command().size(), 2);
-    EXPECT_EQ(ms.command(0), "baz"s);
-    EXPECT_EQ(ms.command(1), "qux"s);
+    EXPECT_EQ(ms.command_at(0), "baz"s);
+    EXPECT_EQ(ms.command_at(1), "qux"s);
 }
 
 TEST(MultipleSpawnerDeathTest, SetExecutableNamesViaInitializerListInvalidSize) {

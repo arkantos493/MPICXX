@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/command/iterator_range.cpp
  * @author Marcel Breyer
- * @date 2020-05-15
+ * @date 2020-05-16
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(InputIt, InputIt) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -34,7 +34,7 @@ TEST(MultipleSpawnerTest, SetExecutableNamesViaIteratorRange) {
     ASSERT_EQ(ms.command().size(), 2);
     for (std::size_t i = 0; i < 2; ++i) {
         SCOPED_TRACE(i);
-        EXPECT_EQ(ms.command(i), vec[i]);
+        EXPECT_EQ(ms.command_at(i), vec[i]);
     }
 }
 

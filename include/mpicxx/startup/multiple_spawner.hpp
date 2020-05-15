@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-05-16
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -214,7 +214,7 @@ namespace mpicxx {
                     infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info());
                 } else if constexpr (std::is_same_v<std::remove_cvref_t<spawner_t>, multiple_spawner>) {
                     for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
-                        commands_.emplace_back(std::forward<spawner_t>(arg).command(i));
+                        commands_.emplace_back(std::forward<spawner_t>(arg).command_at(i));
                         argvs_.emplace_back(std::forward<spawner_t>(arg).argv(i));
                         maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs(i));
                         infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info(i));
@@ -334,10 +334,10 @@ namespace mpicxx {
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
         template <detail::is_string T>
-        multiple_spawner& set_command(const std::size_t i, T&& name) {
+        multiple_spawner& set_command_at(const std::size_t i, T&& name) {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::set_command(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
+                        "multiple_spawner::set_command_at(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
 
@@ -359,10 +359,10 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const std::string& command(const std::size_t i) const {
+        [[nodiscard]] const std::string& command_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::command(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        "multiple_spawner::command_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
 

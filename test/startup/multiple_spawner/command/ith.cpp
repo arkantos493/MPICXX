@@ -1,9 +1,9 @@
 /**
  * @file test/startup/multiple_spawner/command/ith.cpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-05-16
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(const std::size_t, T&&) member function provided by the
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command_at(const std::size_t, T&&) member function provided by the
  * @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                   | test case description                                            |
@@ -30,13 +30,13 @@ TEST(MultipleSpawnerTest, SetIthExecutableName) {
     mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
 
     // set i-th executable name
-    ms.set_command(0, "baz");
-    ms.set_command(1, "qux");
+    ms.set_command_at(0, "baz");
+    ms.set_command_at(1, "qux");
 
     // check if names were set correctly
     ASSERT_EQ(ms.command().size(), 2);
-    EXPECT_EQ(ms.command(0), "baz"s);
-    EXPECT_EQ(ms.command(1), "qux"s);
+    EXPECT_EQ(ms.command_at(0), "baz"s);
+    EXPECT_EQ(ms.command_at(1), "qux"s);
 }
 
 TEST(MultipleSpawnerTest, SetIthExecutableNameInvalidIndex) {
@@ -45,22 +45,22 @@ TEST(MultipleSpawnerTest, SetIthExecutableNameInvalidIndex) {
 
     // try setting i-th executable name
     try {
-        ms.set_command(-1, "baz");
+        ms.set_command_at(-1, "baz");
         FAIL() << "expected std::out_of_range exception";
     } catch(const std::out_of_range& e) {
         std::string expected_msg = fmt::format(
-                "multiple_spawner::set_command(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
+                "multiple_spawner::set_command_at(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
                 static_cast<std::size_t>(-1), 2);
         EXPECT_STREQ(e.what(), expected_msg.c_str());
     } catch(...) {
         FAIL() << "expected std::out_of_range exception";
     }
     try {
-        ms.set_command(2, "qux");
+        ms.set_command_at(2, "qux");
         FAIL() << "expected std::out_of_range exception";
     } catch(const std::out_of_range& e) {
         std::string expected_msg = fmt::format(
-                "multiple_spawner::set_command(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
+                "multiple_spawner::set_command_at(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
                 2, 2);
         EXPECT_STREQ(e.what(), expected_msg.c_str());
     } catch(...) {
@@ -73,5 +73,5 @@ TEST(MultipleSpawnerDeathTest, SetIthExecutableNameInvalidName) {
     mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
 
     // try setting i-th executable name
-    ASSERT_DEATH( ms.set_command(0, "") , "");
+    ASSERT_DEATH( ms.set_command_at(0, "") , "");
 }
