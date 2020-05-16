@@ -4,7 +4,7 @@
  * @date 2020-05-16
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::command() const and
- * qref mpicxx::multiple_spawner::command_at(const std::sze_t) const member function provided by the @ref mpicxx::multiple_spawner class.
+ * qref mpicxx::multiple_spawner::command_at(const std::size_t) const member function provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                   | test case description    |
  * |:---------------------------------|:-------------------------|
