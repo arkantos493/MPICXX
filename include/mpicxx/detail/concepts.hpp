@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/concepts.hpp
  * @author Marcel Breyer
- * @date 2020-05-13
+ * @date 2020-05-17
  *
  * @brief Defines concepts used in the mpicxx library.
  */
@@ -14,10 +14,11 @@
 #include <utility>
 
 
-// forward declare spawner classes
+// forward declare mpicxx classes
 namespace mpicxx {
     class single_spawner;
     class multiple_spawner;
+    class info;
 }
 
 namespace mpicxx::detail {
@@ -84,6 +85,13 @@ namespace mpicxx::detail {
     template <typename T>
     concept is_spawner = std::is_same_v<std::remove_cvref_t<T>, mpicxx::single_spawner>
                       || std::is_same_v<std::remove_cvref_t<T>, mpicxx::multiple_spawner>;
+
+    /**
+     * @brief Concept that describes the @ref mpicxx::info class.
+     * @tparam T  the compared to type
+     */
+    template <typename T>
+    concept is_info = std::is_same_v<std::remove_cvref_t<T>, mpicxx::info>;
     ///@}
 
 }
