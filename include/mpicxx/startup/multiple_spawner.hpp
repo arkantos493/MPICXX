@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-16
+ * @date 2020-05-17
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -216,8 +216,8 @@ namespace mpicxx {
                     for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
                         commands_.emplace_back(std::forward<spawner_t>(arg).command_at(i));
                         argvs_.emplace_back(std::forward<spawner_t>(arg).argv(i));
-                        maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs(i));
-                        infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info(i));
+                        maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs_at(i));
+                        infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info_at(i));
                     }
                 }
                 root_ = arg.root();
@@ -658,29 +658,100 @@ namespace mpicxx {
         }
 
 
-        // TODO 2020-04-15 22:14 breyerml: infos
-
+        /**
+         * @brief Replaces the old spawn info with the new info from the range [@p first, @p last).
+         * @tparam InputIt must meet [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements.
+         * @param[in] first iterator to the first spawn info in the range
+         * @param[in] last iterator one-past the last spawn info in the range
+         * @return `*this`
+         *
+         * @pre The size of the range [@p first, @p last) **must** match the size of this @ref multiple_spawner and thus must be legal.
+         *
+         * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
+         * @assert_sanity{ If the sizes mismatch. }
+         */
         template <std::input_iterator InputIt>
         multiple_spawner& set_spawn_info(InputIt first, InputIt last) {
+            MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
-                    "Illegal number of values! {} == {}", std::distance(first, last), commands_.size());
+                    "Illegal number of values: std::distance(first, last) (which is {}) != this->size() (which is {})",
+                    std::distance(first, last), this->size());
 
             infos_.assign(first, last);
-
             return *this;
         }
-        multiple_spawner& set_spawn_info(std::initializer_list<info> ilist) noexcept { // TODO 2020-04-16 21:51 breyerml: noexcept
+        /**
+         * @brief Replaces the old spawn info with the new info from the initializer list @p ilist.
+         * @param[in] ilist the new spawn info
+         * @return `*this`
+         *
+         * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
+         *
+         * @assert_sanity{ If the sizes mismatch. }
+         */
+        multiple_spawner& set_spawn_info(std::initializer_list<info> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
-                    "Illegal number of values! {} == {}", ilist.size(), commands_.size());
+                    "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
+                    ilist.size(), this->size());
 
             infos_.assign(ilist);
-            
             return *this;
         }
+        /**
+         * @brief Replaces the old spawn info with the new info from the parameter pack @p args.
+         * @tparam T an arbitrary number of @ref mpicxx::info objects meeting the æref detail::is_info requirements.
+         * @param args the parameter pack containing the new spawn info
+         * @return `*this`
+         *
+         * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
+         *
+         * @assert_sanity{ If the sizes mismatch. }
+         */
+        template <detail::is_info... T>
+        multiple_spawner& set_spawn_info(T&&... args) requires (sizeof...(T) > 0) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
+                    "Illegal number of values: sizeof...(T) (which is {}) != this->size() (which is {})", sizeof...(T), this->size());
+
+            infos_.clear();
+            (infos_.emplace_back(std::forward<T>(args)), ...);
+            return *this;
+        }
+        /**
+         * @brief Change the i-th spawn info to @p spawn_info.
+         * @param[in] i the index of the spawn info to be changed
+         * @param[in] spawn_info the new spawn info
+         * @return `*this`
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        multiple_spawner& set_spawn_info_at(const std::size_t i, info spawn_info) {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::set_spawn_info_at(const std::size_t, info) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            infos_[i] = std::move(spawn_info);
+            return *this;
+        }
+        /**
+         * @brief Returns all spawn info.
+         * @return the info object used to spawn the executables (`[[nodiscard]]`)
+         */
         [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
-        [[nodiscard]] const info& spawn_info(const std::size_t i) const {
-            if (i >= infos_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, infos_.size()));
+        /**
+         * @brief Returns the i-th spawn info used to spawn the executables.
+         * @param[in] i the index of the spawn info to be retrieved
+         * @return the i-th spawn info (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] const info& spawn_info_at(const std::size_t i) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::spawn_info_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
             }
 
             return infos_[i];
