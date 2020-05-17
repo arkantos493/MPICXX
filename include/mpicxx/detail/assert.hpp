@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-05-17
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into three levels:
@@ -22,16 +22,16 @@
  *
  * New assertion syntax and example output:
  * @code
- * MPICXX_ASSERT_PRECONDITION(n > 0, "Parameter can't be negative! : n = %i", n);
+ * MPICXX_ASSERT_PRECONDITION(n >= 0, "Parameter can't be negative!: n = {}", n);
  * // alternative: MPICXX_ASSERT_SANITY
  *
  *
- * Precondition assertion 'n > 0' failed on rank 1
+ * Precondition assertion 'n >= 0' failed on rank 1
  *   in file ./example.cpp
  *   in function 'int test(int)'
  *   @ line 42
  *
- * Parameter can't be negative! : n = -1
+ * Parameter can't be negative!: n = -1
  *
  * stack trace:
  *   #7    ./output.s: test(int) [+0x3]
@@ -46,22 +46,54 @@
  * [*clang*](https://clang.llvm.org/)) is added if and only if the ASSERTION_LEVEL is greater than 0.
  * [*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/) currently doesn't print a stack trace at all.
  *
- * In addition the assertions call ``MPI_Abort`` if the assertion is executed within an active MPI environment.
+ * In addition the assertions call `MPI_Abort` if the assertion is executed within an active MPI environment,
+ * [`std::abort`](https://en.cppreference.com/w/cpp/utility/program/abort) otherwise.
  */
 
 #ifndef MPICXX_ASSERT_HPP
 #define MPICXX_ASSERT_HPP
 
-#include <iostream>
-#include <sstream>
+#include <cstdio>
+#include <cstring>
+#include <string>
 #include <utility>
 
 #include <mpi.h>
 #include <fmt/format.h>
+#include <fmt/color.h>
+#include <fmt/ostream.h>
 
 #include <mpicxx/detail/source_location.hpp>
 
 namespace mpicxx::detail {
+
+    /**
+     * @brief Enum class for the different assertion categories.
+     */
+    enum class assertion_category {
+        /** precondition assertion */
+        precondition,
+        /** sanity assertion */
+        sanity
+    };
+    /**
+     * @brief Stream-insertion operator overload for the mpicxx::detail::assertion_category enum class.
+     * @param[inout] out an output stream
+     * @param[in] category the enum class value
+     * @return the output stream
+     */
+    inline std::ostream& operator<<(std::ostream& out, const assertion_category category) {
+        switch (category) {
+            case assertion_category::precondition:
+                out << "PRECONDITION";
+                break;
+            case assertion_category::sanity:
+                out << "SANITY";
+                break;
+        }
+        return out;
+    }
+
     /**
      * @brief This function gets called by the `MPICXX_ASSERT_...` macros and does the actual assertion checking.
      * @details If the assert condition @p cond evaluates to ``false``, the condition, location, custom message and stack trace are printed
@@ -69,40 +101,50 @@ namespace mpicxx::detail {
      * [`std::abort`](https://en.cppreference.com/w/cpp/utility/program/abort) respectively.
      *
      * @tparam Args parameter pack for the placeholder types
-     * @param cond the assert condition, halts the program if evaluated to ``false``
-     * @param cond_str the assert condition as string for a better assert message
-     * @param assertion_category the assertion category (one of: *PRECONDITION*, *SANITY*)
-     * @param loc the location where the assertion appeared
-     * @param msg the custom message printed after the assertion location
-     * @param args the arguments used to fill the ``printf`` like placeholders in the custom message
+     * @param[in] cond the assert condition, aborts the program if evaluated to ``false``
+     * @param[in] cond_str the assert condition as string for a better assert message
+     * @param[in] category the mpicxx::detail::assertion_category
+     * @param[in] loc the location where the assertion appeared
+     * @param[in] msg the custom message printed after the assertion location (using the [**{fmt}**](https://github.com/fmtlib/fmt) syntax)
+     * @param[in] args the arguments used to fill the [**{fmt}**](https://github.com/fmtlib/fmt) placeholders in the custom message
+     *
+     * @calls{
+     * int MPI_Abort(MPI_Comm comm, int errorcode);     // at most once
+     * }
      */
     template <typename... Args>
-    inline void check(const bool cond, const char* cond_str, const char* assertion_category, const source_location& loc,
-            const char* msg, Args&&... args) {
+    inline void check(const bool cond, const char* cond_str, const assertion_category category, const source_location& loc,
+            const char* msg, Args&&... args)
+    {
+        using namespace std::string_literals;
         // check if the assertion holds
         if (!cond) {
-            std::stringstream ss;
-            ss << assertion_category << " assertion '" << cond_str << "' failed";
-            // if we are in an active MPI environment, print current rank
-            if (loc.rank().has_value()) {
-                ss << " on rank " << loc.rank().value();
-            }
-            ss << "\n"
-               << "  in file " << loc.file_name() << "\n"
-               << "  in function '" << loc.function_name() << "'\n"
-               << "  @ line " << loc.line() << "\n\n";
+            fmt::memory_buffer buf;
 
-            // TODO 2020-02-07 22:24 marcel: change from fmt::format to std::format
-            ss << fmt::format(msg, std::forward<Args>(args)...) << "\n\n";
+            // format assertion message
+            auto assertion_color = category == assertion_category::precondition ? fmt::fg(fmt::color::red) : fmt::fg(fmt::rgb(214, 136, 0));
+            fmt::format_to(buf, "{} assertion {} failed {}\n",
+                   fmt::format(assertion_color, "{}", category),
+                   fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::green), "'{}'", cond_str),
+                   (loc.rank().has_value() ? fmt::format("on rank {}", loc.rank().value()) : "without a running MPI environment"s));
 
-            // write stacktrace into the string stream
-            loc.stack_trace(ss);
+            // format source location
+            fmt::format_to(buf, "  in file {}\n  inf function {}\n  @ line {}\n\n", loc.file_name(), loc.function_name(), loc.line());
 
-            // print whole message at once to prevent race conditions
-            std::cerr << ss.str();
+            // format custom assertion message
+            fmt::format_to(buf, "{}\n\n", fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::red), msg, std::forward<Args>(args)...));
+
+            // get stack trace
+            fmt::format_to(buf, "{}", loc.stack_trace());
+
+            // print full assertion message
+            using std::to_string;
+            fmt::print(stderr, to_string(buf));
+
 
             // call MPI_Abort only if we are currently in the MPI environment
             // i.e. MPI_Init has already been called, but MPI_Finalize not
+            // TODO 2020-05-17 15:49 marcel: change to mpicxx::running()?
             if (loc.rank().has_value()) {
                 // we are currently in an active MPI environment
                 // -> call MPI_Abort
@@ -131,13 +173,14 @@ namespace mpicxx::detail {
  *
  * An example is to check whether an iterator can be safely dereference or not.
  *
- * @param cond the assert condition
- * @param msg the custom assert message
- * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
+ * @param[in] cond the assert condition
+ * @param[in] msg the custom assert message
+ * @param[in] ... varying number of parameters to fill the [**{fmt}**](https://github.com/fmtlib/fmt) placeholders in
+ * the custom assert message
  */
 #if ASSERTION_LEVEL > 0
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, mpicxx::detail::assertion_category::precondition, mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...)
 #endif
@@ -151,13 +194,14 @@ namespace mpicxx::detail {
  *
  * An example is the check whether an attempt is made to increment a past-the-end iterator.
  *
- * @param cond the assert condition
- * @param msg the custom assert message
- * @param ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
+ * @param[in] cond the assert condition
+ * @param[in] msg the custom assert message
+ * @param[in] ... varying number of parameters to fill the [**{fmt}**](https://github.com/fmtlib/fmt) placeholders in
+ * the custom assert message
  */
 #if ASSERTION_LEVEL > 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg, ##__VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, mpicxx::detail::assertion_category::sanity, mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define MPICXX_ASSERT_SANITY(cond, msg, ...)
 #endif
