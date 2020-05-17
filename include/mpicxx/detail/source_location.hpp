@@ -116,8 +116,8 @@ namespace mpicxx::detail {
          * @attention The stack trace report is only available under [*GCC*](https://gcc.gnu.org/) and [*clang*](https://clang.llvm.org/)
          * (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
          */
-        static inline std::string stack_trace(const int max_call_stack_size = 64) {
-#ifdef __GNUG__
+        static inline std::string stack_trace([[maybe_unused]] const int max_call_stack_size = 64) {
+#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
             using std::to_string;
             fmt::memory_buffer buf;
             fmt::format_to(buf, "stack trace:\n");
@@ -178,8 +178,12 @@ namespace mpicxx::detail {
                 }
             }
             return fmt::format("{}\n", to_string(buf));
-#else
+#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+// stack traces enabled but not supported
             return std::string("No stack trace supported!");
+#else
+// stack traces not supported
+            return std::string{};
 #endif
         }
 

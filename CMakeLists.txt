@@ -22,7 +22,7 @@ option(ENABLE_TESTS "Generate tests" OFF)
 cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
                        "ENABLE_TESTS" OFF)
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
-
+option(ENABLE_STACK_TRACE "Enables the generation of stack traces in the source_location class" ON)
 
 # set assertion level
 set(max_assertion_level 2)
@@ -83,17 +83,22 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 # set general compiler flags
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # using Clang or GCC
-    message(STATUS "Enabled '-Wall Wextra -pedantic' compiler flags to catch more potential errors")
+    message(STATUS "Enabled '-Wall -Wextra -pedantic' compiler flags to catch more potential errors")
     add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
 # set compiler linker flag for better stack traces
-if (NOT (active_assertion_categories EQUAL 0))
+if (ENABLE_STACK_TRACE)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE ENABLE_STACK_TRACE)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC
-        message(STATUS "Enabled '-rdynamic' linker flag for better stack traces in assertions")
+        message(STATUS "Enabled stack traces using the '-rdynamic' linker flag")
         add_link_options(-rdynamic)
+    else()
+        message(STATUS "Stack traces not supported")
     endif()
+else()
+    message(STATUS "Disabled stack traces")
 endif ()
 
 # set targets to install
