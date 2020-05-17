@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-04-12
+ * @date 2020-05-17
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -1615,7 +1615,6 @@ namespace mpicxx {
             // check whether the key exists
             if (!this->key_exists(key)) {
                 // key doesn't exist
-                // TODO 2020-02-14 20:32 marcel: change from fmt::format to std::format
                 throw std::out_of_range(fmt::format("{} doesn't exist!", std::forward<decltype(key)>(key)));
             }
             // create proxy object and forward key
@@ -1661,7 +1660,6 @@ namespace mpicxx {
             // check whether the key exists
             if (!static_cast<bool>(flag)) {
                 // key doesn't exist
-                // TODO 2020-02-14 20:32 marcel: change from fmt::format to std::format
                 throw std::out_of_range(fmt::format("{} doesn't exist!", std::forward<decltype(key)>(key)));
             }
             // get the value associated with key
