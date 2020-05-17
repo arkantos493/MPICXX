@@ -772,7 +772,8 @@ namespace mpicxx {
          */
         multiple_spawner& set_root(const int root) noexcept {
             MPICXX_ASSERT_SANITY(this->legal_root(root, comm_),
-                    "The root can't be used in the provided communicator!: 0 <= {} < {}", root, this->comm_size(comm_));
+                    "Attempt to set the root process (which is {}), which falls outside the valid range [0, {})!",
+                    root, this->comm_size(comm_));
 
             root_ = root;;
             return *this;
@@ -783,6 +784,7 @@ namespace mpicxx {
          */
         [[nodiscard]] int root() const noexcept { return root_; }
 
+        // TODO 2020-05-17 23:36 breyerml: replace assertion message with mpicxx equivalent
         /**
          * @brief Intracommunicator containing the group of spawning processes.
          * @param[in] comm an intracommunicator
@@ -797,9 +799,9 @@ namespace mpicxx {
          * }
          */
         multiple_spawner& set_communicator(MPI_Comm comm) noexcept {
-            MPICXX_ASSERT_SANITY(this->legal_communicator(comm), "Can't use null communicator!");
+            MPICXX_ASSERT_SANITY(this->legal_communicator(comm), "Attempt to set the communicator to MPI_COMM_NULL!");
             MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
-                    "The previously set root '{}' isn't a valid root in the new communicator!", root_);
+                    "The previously set root (which is {}) isn't a valid root in the new communicator anymore!", root_);
 
             comm_ = comm;
             return *this;
