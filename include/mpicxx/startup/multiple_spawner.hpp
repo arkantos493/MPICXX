@@ -26,17 +26,14 @@
 #include <mpicxx/detail/conversion.hpp>
 #include <mpicxx/detail/utility.hpp>
 #include <mpicxx/info/info.hpp>
+#include <mpicxx/info/runtime_info.hpp>
 #include <mpicxx/startup/single_spawner.hpp>
 #include <mpicxx/startup/spawn_result.hpp>
 
 
 namespace mpicxx {
 
-    // TODO 2020-03-22 19:04 marcel: change from MPI_Comm to mpicxx equivalent
-    // TODO 2020-03-23 12:56 marcel: errcode equivalent
-    // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
-    // TODO 2020-03-23 17:37 marcel: copy/move constructor/assignment
-
+    // TODO 2020-05-17 23:36 breyerml: replace with mpicxx equivalent
 
     /**
      * @nosubgrouping
@@ -56,6 +53,7 @@ namespace mpicxx {
         /// Unsigned integer type.
         using size_type = std::size_t;
 
+
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
         // ---------------------------------------------------------------------------------------------------------- //
@@ -71,9 +69,9 @@ namespace mpicxx {
          * @pre @p first and @p last **must** form a valid, non-empty range, i.e. @p first must be strictly less than @p last.
          * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid, non-empty iterator range. }
          * @assert_sanity{
@@ -100,16 +98,16 @@ namespace mpicxx {
                 MPICXX_ASSERT_SANITY(this->legal_maxprocs(pair.second),
                         "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                         size - std::distance(first, last), pair.second,
-                        multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                        mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
                 commands_.emplace_back(pair.first);
                 maxprocs_.emplace_back(pair.second);
             }
 
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                    fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                    fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
@@ -123,9 +121,9 @@ namespace mpicxx {
          * @pre @p first and @p last **must** form a non-empty range, i.e. @p first must be strictly less than @p last.
          * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_precondition{ If @p first and @p last don't denote a non-empty iterator range. }
          * @assert_sanity{
@@ -142,9 +140,9 @@ namespace mpicxx {
          *
          * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_sanity{
          * If any executable name is empty.\n
@@ -164,17 +162,17 @@ namespace mpicxx {
                 MPICXX_ASSERT_SANITY(this->legal_command(arg.first), "Attempt to set an executable name to the empty string!");
                 MPICXX_ASSERT_SANITY(this->legal_maxprocs(arg.second),
                         "Attempt to set the a maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
-                        arg.second, multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                        arg.second, mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
                 using pair_t = decltype(arg);
                 commands_.emplace_back(std::forward<pair_t>(arg).first);
                 maxprocs_.emplace_back(std::forward<pair_t>(arg).second);
             }(std::forward<T>(args)), ...);
 
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                    fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                    fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
@@ -190,7 +188,7 @@ namespace mpicxx {
          * @pre **All** roots **must** be equal.
          * @pre **All** communicators **must** be equal.
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_precondition{
          * If not all roots are equivalent. \n
@@ -224,16 +222,16 @@ namespace mpicxx {
                 comm_ = arg.communicator();
             }(std::forward<T>(args)), ...);
 
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                      "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                     fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
         }
         ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                       getter/setter spawn information                                      //
+        //                                          modify spawn information                                          //
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name modify spawn information
         ///@{
@@ -347,27 +345,6 @@ namespace mpicxx {
 
             return *this;
         }
-        /**
-         * @brief Returns all executable names.
-         * @return the executable names (`[[nodiscard]]`)
-         */
-        [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
-        /**
-         * @brief Returns the name of the i-th executable which should get spawned.
-         * @param[in] i the index of the executable name to be retrieved
-         * @return the i-th executable name (`[[nodiscard]]`)
-         *
-         * @throws std::out_of_range if the index @p i falls outside the valid range
-         */
-        [[nodiscard]] const std::string& command_at(const std::size_t i) const {
-            if (i >= this->size()) {
-                throw std::out_of_range(fmt::format(
-                        "multiple_spawner::command_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
-                        i, this->size()));
-            }
-
-            return commands_[i];
-        }
 
 
 
@@ -471,9 +448,9 @@ namespace mpicxx {
          *
          * @pre The size of the range [@p first, @p last) **must** match the size of this @ref multiple_spawner and thus must be legal.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
          * @assert_sanity{
@@ -495,11 +472,11 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
                     "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                     this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
-                    multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                     "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                    fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                    single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                    fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
@@ -510,9 +487,9 @@ namespace mpicxx {
          *
          * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
@@ -530,11 +507,11 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
                      "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                      this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
-                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                      "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                     fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
@@ -547,9 +524,9 @@ namespace mpicxx {
          *
          * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_sanity{
          * If the sizes mismatch. \n
@@ -568,11 +545,11 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
                      "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                      this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
-                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                      "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                     fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
@@ -583,9 +560,9 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * (@ref mpicxx::universe_size()).
          *
          * @assert_sanity{
          * If @p maxprocs is invalid.\n
@@ -606,11 +583,11 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_).first,
                      "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
                      this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
-                     multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(std::reduce(maxprocs_.begin(), maxprocs_.end())),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
                      "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
-                     fmt::join(maxprocs_, " + "), std::reduce(maxprocs_.begin(), maxprocs_.end()),
-                     single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                     fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
         }
@@ -693,30 +670,6 @@ namespace mpicxx {
             infos_[i] = std::move(spawn_info);
             return *this;
         }
-        /**
-         * @brief Returns all spawn info.
-         * @return the info object used to spawn the executables (`[[nodiscard]]`)
-         */
-        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
-        /**
-         * @brief Returns the i-th spawn info used to spawn the executables.
-         * @param[in] i the index of the spawn info to be retrieved
-         * @return the i-th spawn info (`[[nodiscard]]`)
-         *
-         * @throws std::out_of_range if the index @p i falls outside the valid range
-         */
-        [[nodiscard]] const info& spawn_info_at(const std::size_t i) const {
-            if (i >= this->size()) {
-                throw std::out_of_range(fmt::format(
-                        "multiple_spawner::spawn_info_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
-                        i, this->size()));
-            }
-
-            return infos_[i];
-        }
-        // TODO 2020-04-17 00:11 breyerml: single spawner info same ???
-
-
 
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
@@ -736,13 +689,7 @@ namespace mpicxx {
             root_ = root;;
             return *this;
         }
-        /**
-         * @brief Returns the rank of the root process.
-         * @return the root rank (`[[nodiscard]]`)
-         */
-        [[nodiscard]] int root() const noexcept { return root_; }
 
-        // TODO 2020-05-17 23:36 breyerml: replace assertion message with mpicxx equivalent
         /**
          * @brief Intracommunicator containing the group of spawning processes.
          * @param[in] comm an intracommunicator
@@ -764,28 +711,118 @@ namespace mpicxx {
             comm_ = comm;
             return *this;
         }
+        ///@}
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                            get spawn information                                           //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name get spawn information
+        ///@{
+        // TODO 2020-05-18 00:49 breyerml: move other getter down here
+        /**
+         * @brief Returns all executable names.
+         * @return the executable names (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
+        /**
+         * @brief Returns the name of the i-th executable which should get spawned.
+         * @param[in] i the index of the executable name to be retrieved
+         * @return the i-th executable name (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] const std::string& command_at(const std::size_t i) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::command_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            return commands_[i];
+        }
+
+        /**
+         * @brief Returns all numbers of processes.
+         * @return the number of processes (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
+        /**
+         * @brief Returns the i-th number of processes which should get spawned.
+         * @param[in] i the index of the number of processes to be retrieved
+         * @return the i-th number of processes (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] int maxprocs_at(const std::size_t i) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            return maxprocs_[i];
+        }
+
+        /**
+         * @brief Returns all spawn info.
+         * @return the info object used to spawn the executables (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
+        /**
+         * @brief Returns the i-th spawn info used to spawn the executables.
+         * @param[in] i the index of the spawn info to be retrieved
+         * @return the i-th spawn info (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] const info& spawn_info_at(const std::size_t i) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::spawn_info_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            return infos_[i];
+        }
+
+        /**
+         * @brief Returns the rank of the root process.
+         * @return the root rank (`[[nodiscard]]`)
+         */
+        [[nodiscard]] int root() const noexcept { return root_; }
+
         /**
          * @brief Returns the intracommunicator containing the group of spawning processes.
          * @return the intracommunicator (`[[nodiscard]]`)
          */
         [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
-        ///@}
 
-
-        // additional
+        /**
+         * @brief Returns the size of this @ref mpicxx::multiple_spawner object, i.e. the number of spawned executables
+         * (**not** the total number of processes to spawn).
+         * @return the size if this @ref mpicxx::multiple_spawner (`[[nodiscard]]`)
+         */
         [[nodiscard]] size_type size() const noexcept {
-            MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec1, const auto& vec2) { return vec1.size() == vec2.size(); },
-                    commands_, argvs_, maxprocs_, infos_), "Sizes differ!");
+            MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec) { return vec.size(); }, commands_, argvs_, maxprocs_, infos_),
+                    "Attempt to retrieve the size while the sizes of the members (commands = {}, argvs = {}, maxprocs = {}, infos = {}) differ!",
+                    commands_.size(), argvs_.size(), maxprocs_.size(), infos_.size());
 
             return commands_.size();
         }
+        /**
+         * @brief Returns the total number of process that will get spawned.
+         * @return the total number of processes (`[[nodiscard]]`)
+         */
         [[nodiscard]] int total_maxprocs() const noexcept {
+            // custom implementation because std::reduce/std::accumulate aren't noexcept
             int total = 0;
             for (const int i : maxprocs_) {
                 total += i;
             }
             return total;
         }
+        ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
@@ -817,7 +854,7 @@ namespace mpicxx {
         template <typename return_type>
         return_type spawn_impl() {
 
-            return_type res(std::reduce(maxprocs_.cbegin(), maxprocs_.cend()));
+            return_type res(this->total_maxprocs());
 
             return res;
         }
@@ -836,6 +873,10 @@ namespace mpicxx {
         template <typename T>
         bool legal_number_of_values(const std::initializer_list<T> ilist) const {
             return ilist.size() == commands_.size();
+        }
+        template <typename... T>
+        bool legal_number_of_values(T&&... args) const {
+            return sizeof...(args) == commands_.size();
         }
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
@@ -880,7 +921,7 @@ namespace mpicxx {
          * @return `true` if @p maxprocs is legal, `false` otherwise
          */
         bool legal_maxprocs(const int maxprocs) const {
-            std::optional<int> universe_size = multiple_spawner::universe_size();
+            std::optional<int> universe_size = mpicxx::universe_size();
             if (universe_size.has_value()) {
                 return 0 < maxprocs && maxprocs <= universe_size.value();
             } else {
