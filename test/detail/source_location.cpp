@@ -67,13 +67,16 @@ TEST(DetailTest, SourceStackTrace) {
 
     std::string trace = loc.stack_trace();
 
-#ifdef __GNUG__
+#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
     // stack trace should be present
     EXPECT_FALSE(trace.empty());
-#else
+#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+    // no stack trace supported
     using namespace std::string_literals;
-    // no stack trace  supported
-    EXPECT_EQ(ss.str(), "No stack trace supported!"s);
+    EXPECT_EQ(trace, "No stack trace supported!"s)
+#else
+    // no stack trace requested
+    EXPECT_TRUE(trace.empty());
 #endif
 
 }
