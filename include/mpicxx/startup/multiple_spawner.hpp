@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-05-18
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -613,48 +613,6 @@ namespace mpicxx {
                      single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
 
             return *this;
-        }
-        /**
-         * @brief Returns all numbers of processes.
-         * @return the number of processes (`[[nodiscard]]`)
-         */
-        [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
-        /**
-         * @brief Returns the i-th number of processes which should get spawned.
-         * @param[in] i the index of the number of processes to be retrieved
-         * @return the i-th number of processes (`[[nodiscard]]`)
-         *
-         * @throws std::out_of_range if the index @p i falls outside the valid range
-         */
-        [[nodiscard]] int maxprocs_at(const std::size_t i) const {
-            if (i >= this->size()) {
-                throw std::out_of_range(fmt::format(
-                        "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
-                        i, this->size()));
-            }
-
-            return maxprocs_[i];
-        }
-        /**
-         * @brief Returns the maximum possible number of processes.
-         * @return an optional containing the maximum possible number of processes or `std::nullopt` if no value could be retrieved
-         * (`[[nodiscard]]`)
-         *
-         * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
-         *
-         * @calls{
-         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
-         * }
-         */
-        [[nodiscard]] static std::optional<int> universe_size() {
-            void* ptr;
-            int flag;
-            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
-            if (static_cast<bool>(flag)) {
-                return std::make_optional(*reinterpret_cast<int*>(ptr));
-            } else {
-                return std::nullopt;
-            }
         }
 
 

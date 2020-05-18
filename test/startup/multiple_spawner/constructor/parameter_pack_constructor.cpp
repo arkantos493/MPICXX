@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/constructor/parameter_pack_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-05-18
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(Pairs&&...) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -42,7 +42,7 @@ TEST(MultipleSpawnerDeathTest, ConstructFromParameterPackInvalidMaxprocs) {
 
 TEST(MultipleSpawnerDeathTest, ConstructFromParameterPackInvalidTotalMaxprocs) {
     // try to create a new multiple_spawner with an invalid total number of maxprocs
-    const auto max = mpicxx::multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max() - 4);
+    const auto max = mpicxx::universe_size().value_or(std::numeric_limits<int>::max() - 4);
     ASSERT_DEATH( mpicxx::multiple_spawner ms(std::make_pair("foo", max / 4 + 1), std::make_pair("bar", max / 4 + 1),
                           std::make_pair("baz", max / 4 + 1), std::make_pair("qux", max / 4 + 1)) , "");
 }

@@ -1,7 +1,7 @@
 /**
  * @file test/startup/multiple_spawner/constructor/initializer_list_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-05-18
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(std::initializer_list<std::pair<std::string, int>>) member function provided by the
  * @ref mpicxx::multiple_spawner class.
@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 
+#include <mpicxx/info/runtime_info.hpp>
 #include <mpicxx/startup/multiple_spawner.hpp>
 
 using namespace std::string_literals;
@@ -46,7 +47,7 @@ TEST(MultipleSpawnerDeathTest, ConstructFromInitializerListInvalidMaxprocs) {
 
 TEST(MultipleSpawnerDeathTest, ConstructFromInitializerListInvalidTotalMaxprocs) {
     // try to create a new multiple_spawner with an invalid total number of maxprocs
-    const auto max = mpicxx::multiple_spawner::universe_size().value_or(std::numeric_limits<int>::max() - 4);
+    const auto max = mpicxx::universe_size().value_or(std::numeric_limits<int>::max() - 4);
     ASSERT_DEATH( mpicxx::multiple_spawner ms({ { "foo", max / 4 + 1 }, { "bar", max / 4 + 1 },
                                                 { "baz", max / 4 + 1 }, { "qux", max / 4 + 1 } }) , "");
 }
