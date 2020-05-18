@@ -10,11 +10,11 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Prerequisites
 
-- a C++ compiler supporting C++20 concepts (e.g. [GCC](https://gcc.gnu.org/) trunk (10.0.0))
+- at least [GCC 10.1](https://gcc.gnu.org/gcc-10/)
 - [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
-- cmake (minimum required 3.5)
+- [CMake](https://cmake.org/) (minimum required 3.5)
+- [{fmt}](https://github.com/fmtlib/fmt) formatting library
 - [Doxygen](http://www.doxygen.nl/) (for documentation only)
-- [fmt formatting library](https://github.com/fmtlib/fmt) (until `std::format` is supported)
 
 ### Installing
 
@@ -41,6 +41,8 @@ Supported configuration options are:
   - `0`: no assertions are active
   - `1`: only precondition assertions are active
   - `2`: additional sanity checks are activated
+  
+- `-DENABLE_STACK_TRACEON/OFF`: enable stack traces for the source location implementation (default: `ON`)
 
 ## Running the tests
 
@@ -63,7 +65,7 @@ To use this library simple add the following lines to your `CMakeLists.txt` file
 ```cmake
 # find the library
 find_package(mpicxx CONFIG REQUIRED)
-find_package(fmt REQUIRED) # until std::format is supported
+find_package(fmt REQUIRED)
 
 # link it against your target
 target_link_libraries(target mpicxx::mpicxx)
