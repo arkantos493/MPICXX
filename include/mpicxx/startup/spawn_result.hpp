@@ -231,6 +231,7 @@ namespace mpicxx {
     };
 
 
+    // TODO 2020-05-18 01:57 breyerml: move to including header?
     /**
      * @brief Returns the parent intracommunicator of the current process if the process was started with *MPI_COMM_SPAWN* or
      * *MPI_COMM_SPAWN_MULTIPLE*.

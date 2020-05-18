@@ -269,6 +269,7 @@ namespace mpicxx {
             }
         }
 
+        // TODO 2020-04-17 00:11 breyerml: single spawner info same ???
         /**
          * @brief Set the info object representing additional information for the runtime system where and how to spawn the processes.
          * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
