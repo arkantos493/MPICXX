@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-18
+ * @date 2020-05-20
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -213,7 +213,7 @@ namespace mpicxx {
                 } else if constexpr (std::is_same_v<std::remove_cvref_t<spawner_t>, multiple_spawner>) {
                     for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
                         commands_.emplace_back(std::forward<spawner_t>(arg).command_at(i));
-                        argvs_.emplace_back(std::forward<spawner_t>(arg).argv(i));
+                        argvs_.emplace_back(std::forward<spawner_t>(arg).argv_at(i));
                         maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs_at(i));
                         infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info_at(i));
                     }
@@ -347,96 +347,113 @@ namespace mpicxx {
         }
 
 
-
-        // TODO 2020-04-15 22:14 breyerml: argvs
-        template <typename ValueType>
-        multiple_spawner& add_argv(std::initializer_list<std::initializer_list<std::pair<std::string, ValueType>>> ilist) {
-            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
-                    "Illegal number of values! {} == {}", ilist.size(), this->size());
-
-            for (std::size_t i = 0; auto list : ilist) {
-                this->add_argv(i, list);
-                ++i;
-            }
-
-            return *this;
-        }
+        // TODO 2020-05-18 23:07 breyerml: assertions ??
 
         template <std::input_iterator InputIt>
         multiple_spawner& add_argv(InputIt first, InputIt last) {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(first, last),
+                    "Illegal number of values: std::distance(first, last) (which is {}) != this->size() (which is {})",
+                    std::distance(first, last), this->size());
 
-            for (; first != last; ++first) {
-                const auto& cont = *first;
-                this->add_argv(cont.begin(), cont.end());
+            for (std::size_t i = 0; first != last; ++first, ++i) {
+                const auto& vec = *first;
+                this->add_argv_at(i, vec.begin(), vec.end());
             }
-
             return *this;
         }
+        template <detail::is_string KeyType, typename ValueType>
+        multiple_spawner& add_argv(std::initializer_list<std::vector<std::pair<KeyType, ValueType>>> ilist) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
+                    "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
+                    ilist.size(), this->size());
 
-
-        template <typename ValueType>
-        multiple_spawner& add_argv(const std::size_t i, std::string key, ValueType&& value) {
-            if (i >= argvs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+            for (std::size_t i = 0; const auto& v : ilist) {
+                this->add_argv_at(i++, v.begin(), v.end());
             }
+            return *this;
+        }
+        template <typename... T>
+        multiple_spawner& add_argv(T&&... args) requires (sizeof...(T) > 0) {
+            MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
+                    "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
+                    sizeof...(T), this->size());
 
-            // add leading '-' if necessary
-            if (!key.starts_with('-')) {
-                key.insert(0, 1, '-');
-            }
-
-            MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Only '-' isn't a valid argument key!");
-
-            // add [key, value]-argv-pair to argv_ at pos i
-            argvs_[i].emplace_back(std::move(key), detail::convert_to_string(std::forward<ValueType>(value)));
+            std::size_t i = 0;
+            ([&](auto&& arg) {
+                this->add_argv_at(i++, arg.begin(), arg.end());
+            }(std::forward<T>(args)), ...);
             return *this;
         }
 
         template <std::input_iterator InputIt>
-        requires (!std::is_constructible_v<std::string, InputIt>)
-        multiple_spawner& add_argv(const std::size_t i, InputIt first, InputIt last) {
+        multiple_spawner& add_argv_at(const std::size_t i, InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
             for (; first != last; ++first) {
                 const auto& pair = *first;
-                this->add_argv(i, pair.first, pair.second);
+                this->add_argv_at(i, pair.first, pair.second);
             }
             return *this;
         }
-
-        template <typename ValueType>
-        multiple_spawner& add_argv(const std::size_t i, std::initializer_list<std::pair<std::string, ValueType>> ilist) {
-            return this->add_argv(i, ilist.begin(), ilist.end());
+        template <detail::is_string KeyType, typename ValueType>
+        multiple_spawner& add_argv_at(const std::size_t i, std::initializer_list<std::pair<KeyType, ValueType>> ilist) {
+            return this->add_argv_at(i, ilist.begin(), ilist.end());
+        }
+        /**
+         * @brief Adds all given pairs in the parameter pack @p args to the @p i-th process.
+         * @tparam T an arbitrary number of [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) meeting the
+         *           @ref detail::is_pair requirements
+         * @param i the index of the process to add the new argvs to
+         * @param args the parameter pack containing the argvs to add
+         * @return `*this`
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        template <detail::is_pair... T>
+        multiple_spawner& add_argv_at(const std::size_t i, T&&... args) requires (sizeof...(T) > 0) {
+            ([&](auto&& arg) {
+                using pair_t = decltype(arg);
+                this->add_argv_at(i, std::forward<pair_t>(arg).first, std::forward<pair_t>(arg).second);
+            }(std::forward<T>(args)), ...);
+            return *this;
         }
 
-        [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept {
-            return argvs_;
-        }
-        [[nodiscard]] const std::vector<argv_value_type>& argv(const std::size_t i) const {
-            if (i >= argvs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, this->size()));
+        // TODO 2020-05-20 01:33 breyerml: example
+        /**
+         * @brief Adds the given @p key and @p value to the argvs of the @p i-th process.
+         * @details If the argv @p key doesn't contain a leading '-', one is added.
+         * @tparam T the type of value, should be convertible to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+         *           via @ref detail::convert_to_string
+         * @param[in] i the index of the process to add the new argv to
+         * @param[in] key the argv @p key to add
+         * @param[in] value the argv @p value to add
+         * @return `*this`
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        template <typename T>
+        multiple_spawner& add_argv_at(const std::size_t i, std::string key, T&& value) {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::add_argv_at(const std::size_t, std::string, T&&) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+            // TODO 2020-05-20 01:18 breyerml: double -- ???
+            // add leading '-' if necessary
+            if (!key.starts_with('-')) {
+                key.insert(0, 1, '-');
             }
 
-            return argvs_[i];
-        }
-        [[nodiscard]] const argv_value_type& argv(const std::size_t i, const std::size_t j) const {
-            if (i >= argvs_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access (i)!: {} < {}", i, this->size()));
-            } else if (j >= argvs_[i].size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access (j)!: {} < {}", j, argvs_[i].size()));
-            }
+            MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Attempt to set an argv key to only contain '-'!");
 
-            return argvs_[i][j];
+            // add [key, value]-argv-pair to argv_ at pos i
+            argvs_[i].emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
+            return *this;
         }
-        [[nodiscard]] std::vector<argv_size_type> argv_size() const {
-            std::vector<argv_size_type> sizes(this->size());
-            std::transform(argvs_.cbegin(), argvs_.cend(), sizes.begin(),
-                    [](const std::vector<argv_value_type>& argvs) { return argvs.size(); });
-            return sizes;
-        }
+        // TODO 2020-05-20 01:12 breyerml: remove argv at ???
 
 
         /**
@@ -719,7 +736,6 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name get spawn information
         ///@{
-        // TODO 2020-05-18 00:49 breyerml: move other getter down here
         /**
          * @brief Returns all executable names.
          * @return the executable names (`[[nodiscard]]`)
@@ -740,6 +756,80 @@ namespace mpicxx {
             }
 
             return commands_[i];
+        }
+
+        /**
+         * @brief Returns all added argvs.
+         * @return the argvs of all processes (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept {
+            return argvs_;
+        }
+        /**
+         * @brief Returns all added argvs of the @p i-th process.
+         * @param[in] i the index of the argvs to be retrieved
+         * @return the @p i-th argvs (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] const std::vector<argv_value_type>& argv_at(const std::size_t i) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::argv_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            return argvs_[i];
+        }
+        /**
+         * @brief Returns the @p j-th argv of the @p i-th process.
+         * @param[in] i the index of the argvs to be retrieved
+         * @param[in] j the index of the argv in the retrieved argvs
+         * @return the @p j-th argv of the @p i-th process (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the indices @p i or @p j fall outside their valid ranges
+         */
+        [[nodiscard]] const argv_value_type& argv_at(const std::size_t i, const std::size_t j) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::argv_at(const std::size_t, const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+            if (j >= argvs_[i].size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::argv_at(const std::size_t, const std::size_t) range check: j (which is {}) >= argvs_[i].size() (which is {})",
+                        j, argvs_[i].size()));
+            }
+
+            return argvs_[i][j];
+        }
+        /**
+         * @brief Returns the number of added argvs per process.
+         * @return a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing the number of added
+         * argvs (`[[nodiscard]]`)
+         *
+         * @note Creates a new [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) on each invocation.
+         */
+        [[nodiscard]] std::vector<argv_size_type> argv_size() const {
+            std::vector<argv_size_type> sizes(this->size());
+            std::transform(argvs_.cbegin(), argvs_.cend(), sizes.begin(), [](const auto& v) { return v.size(); });
+            return sizes;
+        }
+        /**
+         * @brief Returns the number of added argvs of the @p i-th process.
+         * @param[in] i the index of the number of added argvs to be retrieved
+         * @return the @p i-th number of added argvs (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] argv_size_type argv_size_at(const std::size_t i) const {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::size_t(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            return argvs_[i].size();
         }
 
         /**
@@ -837,7 +927,7 @@ namespace mpicxx {
             return this->spawn_impl<spawn_result>();
         }
         /**
-         * @brief @brief TODO
+         * @brief TODO
          * @return
          */
         spawn_result_with_errcodes spawn_with_errcodes() {
