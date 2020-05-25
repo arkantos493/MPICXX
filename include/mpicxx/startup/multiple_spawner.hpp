@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-20
+ * @date 2020-05-25
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -424,7 +424,8 @@ namespace mpicxx {
         // TODO 2020-05-20 01:33 breyerml: example
         /**
          * @brief Adds the given @p key and @p value to the argvs of the @p i-th process.
-         * @details If the argv @p key doesn't contain a leading '-', one is added.
+         * @details If the argv @p key doesn't contain a leading '-', one is added. This means if a command line options requires two
+         *          leading '--', both **must** be specified explicitly.
          * @tparam T the type of value, should be convertible to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
          *           via @ref detail::convert_to_string
          * @param[in] i the index of the process to add the new argv to
@@ -441,7 +442,7 @@ namespace mpicxx {
                         "multiple_spawner::add_argv_at(const std::size_t, std::string, T&&) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
-            // TODO 2020-05-20 01:18 breyerml: double -- ???
+
             // add leading '-' if necessary
             if (!key.starts_with('-')) {
                 key.insert(0, 1, '-');
@@ -453,7 +454,45 @@ namespace mpicxx {
             argvs_[i].emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
             return *this;
         }
+
+
         // TODO 2020-05-20 01:12 breyerml: remove argv at ???
+        /**
+         * @brief Removes all argvs of the @p i-th process.
+         * @param i the index of the process to remove the argvs from
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        void remove_argv_at(const std::size_t i) {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::remove_argv_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+
+            std::vector<argv_value_type>().swap(argvs_[i]);
+        }
+        /**
+         * @brief Removes the @p j-th argv of the @p i-th process.
+         * @param i the index of the process to remove the argv from
+         * @param j the index of the argv to remove
+         *
+         * @throws std::out_of_range if the indices @p i or @p j fall outside their valid range
+         */
+        void remove_argv_at(const std::size_t i, const std::size_t j) {
+            if (i >= this->size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::remove_argv_at(const std::size_t, const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        i, this->size()));
+            }
+            if (j >= argvs_[i].size()) {
+                throw std::out_of_range(fmt::format(
+                        "multiple_spawner::remove_argv_at(const std::size_t, const std::size_t) range check: j (which is {}) >= argvs_[i].size() (which is {})",
+                        j, argvs_[i].size()));
+            }
+
+            argvs_[i].erase(argvs_[i].begin() + j);
+        }
 
 
         /**
@@ -762,9 +801,7 @@ namespace mpicxx {
          * @brief Returns all added argvs.
          * @return the argvs of all processes (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept {
-            return argvs_;
-        }
+        [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept { return argvs_; }
         /**
          * @brief Returns all added argvs of the @p i-th process.
          * @param[in] i the index of the argvs to be retrieved
