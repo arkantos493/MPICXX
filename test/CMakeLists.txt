@@ -12,6 +12,8 @@ function(add_mpi_test name test_files num_mpi_procs)
     endif()
     # link test against own library and gtest
     target_link_libraries(${name} ${PROJECT_NAME} gtest)
+    # set include directory
+    target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/test/)
     # add MPI parameter for the number of used processors
     set(test_parameters ${MPIEXEC_NUMPROC_FLAG} ${num_mpi_procs} "./${name}")
     # add test to run with MPI    
