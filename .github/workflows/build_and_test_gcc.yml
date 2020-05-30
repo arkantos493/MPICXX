@@ -216,3 +216,16 @@ jobs:
                 -DASSERTION_LEVEL=2 ..
           make -j
           ctest --output-on-failure
+
+  delete-artifacts-gcc:
+    needs: [test-openmpi-gcc, test-mpich-gcc]
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Delete all artifacts
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            GCC
+            OpenMPI-GCC
+            MPICH-GCC
+            fmt-GCC
