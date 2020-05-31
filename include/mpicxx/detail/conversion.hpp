@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/conversion.hpp
  * @author Marcel Breyer
- * @date 2020-03-23
+ * @date 2020-05-31
  *
  * @brief Defines conversion functions used in the mpicxx library.
  */
@@ -26,6 +26,14 @@ namespace mpicxx::detail {
     inline std::string convert_to_string(const bool val) {
         using namespace std::string_literals;
         return val ? "true"s : "false"s;
+    }
+    /**
+     * @brief Converts a single character to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
+     * @param[in] c the character value
+     * @return a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) with the same content as @p c
+     */
+    inline std::string convert_to_string(const char c) {
+        return std::string(1, c);
     }
     /**
      * @brief Converts every *string* like type to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
