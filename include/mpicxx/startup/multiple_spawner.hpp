@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-25
+ * @date 2020-05-31
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -34,6 +34,8 @@
 namespace mpicxx {
 
     // TODO 2020-05-17 23:36 breyerml: replace with mpicxx equivalent
+    // TODO 2020-05-31 17:47 breyerml: change a.begin() to std::begin(a)
+    // TODO 2020-05-31 22:46 breyerml: test examples
 
     /**
      * @nosubgrouping
@@ -46,8 +48,6 @@ namespace mpicxx {
                 || std::is_same_v<std::remove_cvref_t<SpawnerType>, multiple_spawner>;
 
     public:
-        /// The type of a single argv argument (represented by  a key and value).
-        using argv_value_type = std::pair<std::string, std::string>;
         /// Unsigned integer type for argv.
         using argv_size_type = std::size_t;
         /// Unsigned integer type.
@@ -112,7 +112,7 @@ namespace mpicxx {
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
             // set argvs objects to default values
-            argvs_.assign(size, std::vector<argv_value_type>());
+            argvs_.assign(size, std::vector<std::string>());
         }
         /**
          * @brief Constructs the multiple_spawner object with the contents of the initializer list @p ilist.
@@ -177,7 +177,7 @@ namespace mpicxx {
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
             // set argvs objects to default values
-            argvs_.assign(size, std::vector<argv_value_type>());
+            argvs_.assign(size, std::vector<std::string>());
         }
         // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
         /**
@@ -349,6 +349,26 @@ namespace mpicxx {
 
         // TODO 2020-05-18 23:07 breyerml: assertions ??
 
+        /**
+         * @brief Adds all command line arguments in the range [@p first, @p last) to the respective executable.
+         * @details `std::begin(*first)` and `std::end(*first)` must be valid statements (which holds e.g. for a two-dimensional
+         *          [`std::vector`](https://en.cppreference.com/w/cpp/container/vector)).
+         *
+         *          Example: @snippet examples/startup/multiple_spawner.cpp add_argv version with iterator range
+         * @tparam InputIt must meet the [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements.
+         * @param[in] first iterator to the first command line arguments list in the range
+         * @param[in] last iterator one-past the last command line arguments list in the range
+         * @return `*this`
+         *
+         * @pre @p first and @p last **must** refer to the same container.
+         * @pre The size of the range [@p first, @p last) **must** match the size of this @ref multiple_spawner
+         *      and thus **must** be legal.
+         * @pre All command line arguments **must not** be empty.
+         *
+         * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any command line argument is empty. }
+         */
         template <std::input_iterator InputIt>
         multiple_spawner& add_argv(InputIt first, InputIt last) {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
@@ -357,101 +377,148 @@ namespace mpicxx {
                     "Illegal number of values: std::distance(first, last) (which is {}) != this->size() (which is {})",
                     std::distance(first, last), this->size());
 
-            for (std::size_t i = 0; first != last; ++first, ++i) {
-                const auto& vec = *first;
-                this->add_argv_at(i, vec.begin(), vec.end());
+            for (std::size_t i = 0; first != last; ++first) {
+                const auto& container = *first;
+                this->add_argv_at(i++, std::begin(container), std::end(container));
             }
             return *this;
         }
-        template <detail::is_string KeyType, typename ValueType>
-        multiple_spawner& add_argv(std::initializer_list<std::vector<std::pair<KeyType, ValueType>>> ilist) {
+        /**
+         * @brief Adds all command line arguments of the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist to the respective
+         *        executable.
+         * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv version with initializer_list
+         * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+         *           via @ref detail::convert_to_string.
+         * @param[in] ilist the lists of the (additional) command line arguments
+         * @return `*this`
+         *
+         * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
+         * @pre All command line arguments **must not** be empty.
+         *
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any command line argument is empty. }
+         */
+        template <typename T = std::string>
+        multiple_spawner& add_argv(std::initializer_list<std::initializer_list<T>> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
                     "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
                     ilist.size(), this->size());
 
-            for (std::size_t i = 0; const auto& v : ilist) {
-                this->add_argv_at(i++, v.begin(), v.end());
+            for (std::size_t i = 0; const auto l : ilist) {
+                this->add_argv_at(i++, l);
             }
             return *this;
         }
+        /**
+         * @brief Adds all command line arguments of the parameter pack @p args to the respective executable.
+         * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv version with parameter pack
+         * @tparam T must be a container type or C-style array type.
+         * @param[in] args the lists of the (additional) command line arguments
+         * @return `*this`
+         *
+         * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
+         * @pre All command line arguments **must not** be empty.
+         *
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any command line argument is empty. }
+         */
         template <typename... T>
         multiple_spawner& add_argv(T&&... args) requires (sizeof...(T) > 0) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
-                    "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
+                    "Illegal number of values: sizeof...(T) (which is {}) != this->size() (which is {})",
                     sizeof...(T), this->size());
 
             std::size_t i = 0;
             ([&](auto&& arg) {
-                this->add_argv_at(i++, arg.begin(), arg.end());
+                this->add_argv_at(i++, std::begin(arg), std::end(arg));
             }(std::forward<T>(args)), ...);
             return *this;
         }
 
+        /**
+         * @brief Adds all command line arguments in the range [@p first, @p last) to the @p i-th executable.
+         * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv_at version with iterator range
+         * @tparam InputIt must meet the [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements.
+         * @param[in] i the index of the executable
+         * @param[in] first iterator to the first command line argument in the range
+         * @param[in] last iterator one-past the last command line argument in the range
+         * @return `*this`
+         *
+         * @pre @p first and @p last **must** refer to the same container.
+         * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
+         * @pre All command line arguments **must not** be empty.
+         *
+         * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
+         * @assert_sanity{ If any command line argument is empty. }
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
         template <std::input_iterator InputIt>
         multiple_spawner& add_argv_at(const std::size_t i, InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
             for (; first != last; ++first) {
-                const auto& pair = *first;
-                this->add_argv_at(i, pair.first, pair.second);
+                this->add_argv_at(i, *first);
             }
             return *this;
         }
-        template <detail::is_string KeyType, typename ValueType>
-        multiple_spawner& add_argv_at(const std::size_t i, std::initializer_list<std::pair<KeyType, ValueType>> ilist) {
-            return this->add_argv_at(i, ilist.begin(), ilist.end());
-        }
         /**
-         * @brief Adds all given pairs in the parameter pack @p args to the @p i-th process.
-         * @tparam T an arbitrary number of [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) meeting the
-         *           @ref detail::is_pair requirements
-         * @param i the index of the process to add the new argvs to
-         * @param args the parameter pack containing the argvs to add
+         * @brief Adds all command line arguments in the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist to the @p i-th executable.
+         * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv_at version with initializer_list
+         * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+         *           via @ref detail::convert_to_string.
+         * @param[in] i the index of the executable
+         * @param[in] ilist the (additional) command line arguments
          * @return `*this`
+         *
+         * @pre All command line arguments **must not** be empty.
+         *
+         * @assert_sanity{ If any command line argument is empty. }
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        template <detail::is_pair... T>
-        multiple_spawner& add_argv_at(const std::size_t i, T&&... args) requires (sizeof...(T) > 0) {
-            ([&](auto&& arg) {
-                using pair_t = decltype(arg);
-                this->add_argv_at(i, std::forward<pair_t>(arg).first, std::forward<pair_t>(arg).second);
-            }(std::forward<T>(args)), ...);
+        template <typename T = std::string>
+        multiple_spawner& add_argv_at(const std::size_t i, std::initializer_list<T> ilist) {
+            for (const auto& val : ilist) {
+                this->add_argv_at(i, val);
+            }
             return *this;
         }
-
-        // TODO 2020-05-20 01:33 breyerml: example
         /**
-         * @brief Adds the given @p key and @p value to the argvs of the @p i-th process.
-         * @details If the argv @p key doesn't contain a leading '-', one is added. This means if a command line options requires two
-         *          leading '--', both **must** be specified explicitly.
-         * @tparam T the type of value, should be convertible to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
-         *           via @ref detail::convert_to_string
-         * @param[in] i the index of the process to add the new argv to
-         * @param[in] key the argv @p key to add
-         * @param[in] value the argv @p value to add
+         * @brief Adds all command line arguments in the parameter pack @p args to the @p i-th executable.
+         * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv_at version with parameter pack
+         * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+         *           via @ref detail::convert_to_string.
+         * @param[in] i the index of the executable
+         * @param[in] args the (additional) command line arguments
          * @return `*this`
+         *
+         * @pre All command line arguments **must not** be empty.
+         *
+         * @assert_sanity{ If any command line argument is empty. }
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        template <typename T>
-        multiple_spawner& add_argv_at(const std::size_t i, std::string key, T&& value) {
+        template <typename... T>
+        multiple_spawner& add_argv_at(const std::size_t i, T&&... args) requires (sizeof...(T) > 0) {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::add_argv_at(const std::size_t, std::string, T&&) range check: i (which is {}) >= this->size() (which is {})",
+                        "multiple_spawner::add_argv_at(const std::size_t, T&&) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
 
-            // add leading '-' if necessary
-            if (!key.starts_with('-')) {
-                key.insert(0, 1, '-');
-            }
+            ([&](auto&& arg) {
+                // convert argument to a std::string
+                std::string argv = detail::convert_to_string(std::forward<T>(arg));
 
-            MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Attempt to set an argv key to only contain '-'!");
+                MPICXX_ASSERT_SANITY(this->legal_argv_key(argv), "Attempt to set an empty command line argument!");
 
-            // add [key, value]-argv-pair to argv_ at pos i
-            argvs_[i].emplace_back(std::move(key), detail::convert_to_string(std::forward<T>(value)));
+                // add command line argument at position i
+                argvs_[i].emplace_back(std::move(argv));
+            }(std::forward<T>(args)), ...);
             return *this;
         }
 
@@ -470,7 +537,7 @@ namespace mpicxx {
                         i, this->size()));
             }
 
-            std::vector<argv_value_type>().swap(argvs_[i]);
+            std::vector<std::string>().swap(argvs_[i]);
         }
         /**
          * @brief Removes the @p j-th argv of the @p i-th process.
@@ -801,7 +868,7 @@ namespace mpicxx {
          * @brief Returns all added argvs.
          * @return the argvs of all processes (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<std::vector<argv_value_type>>& argv() const noexcept { return argvs_; }
+        [[nodiscard]] const std::vector<std::vector<std::string>>& argv() const noexcept { return argvs_; }
         /**
          * @brief Returns all added argvs of the @p i-th process.
          * @param[in] i the index of the argvs to be retrieved
@@ -809,7 +876,7 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const std::vector<argv_value_type>& argv_at(const std::size_t i) const {
+        [[nodiscard]] const std::vector<std::string>& argv_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::argv_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -826,7 +893,7 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the indices @p i or @p j fall outside their valid ranges
          */
-        [[nodiscard]] const argv_value_type& argv_at(const std::size_t i, const std::size_t j) const {
+        [[nodiscard]] const std::string& argv_at(const std::size_t i, const std::size_t j) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::argv_at(const std::size_t, const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -1037,8 +1104,8 @@ namespace mpicxx {
          * @param[in] key the argv key
          * @return `true` if @p key is valid, `false` otherwise
          */
-        bool legal_argv_key(const std::string& key) const noexcept {
-            return key.size() > 1;
+        bool legal_argv_key(const std::string& arg) const noexcept {
+            return !arg.empty();
         }
         /*
          * @brief Checks whether @p maxprocs is valid.
@@ -1093,7 +1160,7 @@ namespace mpicxx {
 //#endif
 
         std::vector<std::string> commands_;
-        std::vector<std::vector<argv_value_type>> argvs_;
+        std::vector<std::vector<std::string>> argvs_;
         std::vector<int> maxprocs_;
         std::vector<info> infos_;
         int root_ = 0;

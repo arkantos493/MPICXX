@@ -18,7 +18,6 @@
  */
 
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -29,17 +28,16 @@
 
 TEST(MultipleSpawnerTest, AddArgvsViaIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
-    // add argvs
-    std::vector<mpicxx::multiple_spawner::argv_value_type> argvs_1 = { { "-foo", "bar" }, { "-baz", "qux" }, { "--quux", "" } };
-    std::vector<mpicxx::multiple_spawner::argv_value_type> argvs_2 = { { "-bar", "foo" }, { "-qux", "baz" }, { "--foobar", "" } };
-    std::vector<std::vector<mpicxx::multiple_spawner::argv_value_type>> vec = { argvs_1, argvs_2 };
+    // add command line arguments
+    std::vector<std::string> argvs_1 = { "-foo", "bar", "-baz", "qux", "--quux" };
+    std::vector<std::string> argvs_2 = { "-bar", "foo", "-qux", "baz", "--foobar" };
+    std::vector<std::vector<std::string>> vec = { argvs_1, argvs_2 };
 
     ms.add_argv(vec.begin(), vec.end());
 
-
-    // check if the argvs were added correctly
+    // check if the command line arguments were added correctly
     ASSERT_EQ(ms.argv().size(), 2);
     for (std::size_t i = 0; i < 2; ++i) {
         SCOPED_TRACE(i);
@@ -52,19 +50,19 @@ TEST(MultipleSpawnerTest, AddArgvsViaIteratorRange) {
 
 TEST(MultipleSpawnerDeathTest, AddArgvsViaInvalidIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ {"foo", 1 }, { "bar", 1 } });
 
-    // add argvs with illegal iterator range
-    std::vector<std::vector<mpicxx::multiple_spawner::argv_value_type>> vec(2);
+    // add command line arguments with illegal iterator range
+    std::vector<std::vector<std::string>> vec(2);
     ASSERT_DEATH( ms.add_argv(vec.end(), vec.begin()) , "");
 }
 
 TEST(MultipleSpawnerDeathTest, AddArgvsViaIteratorRangeInvalidSize) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
-    // add argvs with different size
-    std::vector<std::vector<mpicxx::multiple_spawner::argv_value_type>> vec(3);
+    // add command line arguments with different size
+    std::vector<std::vector<std::string>> vec(3);
     ASSERT_DEATH( ms.add_argv(vec.begin(), vec.begin() + 1) , "");
     ASSERT_DEATH( ms.add_argv(vec.begin(), vec.end()) , "");
 }
@@ -72,18 +70,17 @@ TEST(MultipleSpawnerDeathTest, AddArgvsViaIteratorRangeInvalidSize) {
 
 TEST(MultipleSpawnerTest, AddArgvsAtViaIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
-    // add argvs
-    std::vector<mpicxx::multiple_spawner::argv_value_type> argvs_1 = { { "-foo", "bar" }, { "-baz", "qux" }, { "--quux", "" } };
-    std::vector<mpicxx::multiple_spawner::argv_value_type> argvs_2 = { { "-bar", "foo" }, { "-qux", "baz" }, { "--foobar", "" } };
-    std::vector<std::vector<mpicxx::multiple_spawner::argv_value_type>> vec = { argvs_1, argvs_2 };
+    // add command line arguments
+    std::vector<std::string> argvs_1 = { "-foo", "bar", "-baz", "qux", "--quux" };
+    std::vector<std::string> argvs_2 = { "-bar", "foo", "-qux", "baz", "--foobar" };
+    std::vector<std::vector<std::string>> vec = { argvs_1, argvs_2 };
 
     ms.add_argv_at(0, vec[0].begin(), vec[0].end());
     ms.add_argv_at(1, vec[1].begin(), vec[1].end());
 
-
-    // check if the argvs were added correctly
+    // check if the command line arguments were added correctly
     ASSERT_EQ(ms.argv().size(), 2);
     for (std::size_t i = 0; i < 2; ++i) {
         SCOPED_TRACE(i);
@@ -96,17 +93,17 @@ TEST(MultipleSpawnerTest, AddArgvsAtViaIteratorRange) {
 
 TEST(MultipleSpawnerTest, AddArgvsAtViaIteratorRangeOutOfBounce) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
-    // try adding argvs at an illegal index
-    std::vector<mpicxx::multiple_spawner::argv_value_type> vec(1);
+    // try adding command line arguments at an illegal index
+    std::vector<std::string> vec = { "foo" };
     EXPECT_THROW_WHAT(
             ms.add_argv_at(2, vec.begin(), vec.end()),
             std::out_of_range,
-            "multiple_spawner::add_argv_at(const std::size_t, std::string, T&&) range check: i (which is 2) >= this->size() (which is 2)");
+            "multiple_spawner::add_argv_at(const std::size_t, T&&) range check: i (which is 2) >= this->size() (which is 2)");
 
     std::string expected_msg =
-            fmt::format("multiple_spawner::add_argv_at(const std::size_t, std::string, T&&) range check: "
+            fmt::format("multiple_spawner::add_argv_at(const std::size_t, T&&) range check: "
                         "i (which is {}) >= this->size() (which is 2)", static_cast<std::size_t>(-1));
     EXPECT_THROW_WHAT(
             ms.add_argv_at(-1, vec.begin(), vec.end()),
@@ -116,9 +113,9 @@ TEST(MultipleSpawnerTest, AddArgvsAtViaIteratorRangeOutOfBounce) {
 
 TEST(MultipleSpawnerDeathTest, AddArgvsAtViaInvalidIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
-    // try adding argvs via an invalid iterator ramge
-    std::vector<mpicxx::multiple_spawner::argv_value_type> vec = { { "foo", "bar" } };
+    // try adding command line arguments via an invalid iterator range
+    std::vector<std::string> vec = { "foo", "bar" };
     ASSERT_DEATH( ms.add_argv_at(0, vec.end(), vec.begin()) , "");
 }
