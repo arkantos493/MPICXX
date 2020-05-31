@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/argvs/iterator_range.cpp
  * @author Marcel Breyer
- * @date 2020-05-30
+ * @date 2020-05-31
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::add_argv(InputIt, InputIt) member and
- *        @ref mpicxx::multiple_spawner::add_argv_at(std::size_t, InputIt, InputIt) function provided by the
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::add_argv(InputIt, InputIt) and
+ *        @ref mpicxx::multiple_spawner::add_argv_at(std::size_t, InputIt, InputIt) member functions provided by the
  *        @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                        | test case description                                                             |
