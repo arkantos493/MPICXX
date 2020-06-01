@@ -48,6 +48,15 @@
  */
 
 /**
+ * @dir test/startup/multiple_spawner/argvs
+ * @author Marcel Breyer
+ * @date 2020-06-02
+ *
+ * @brief This directory contains all test cases for the command line argument manipulating functions of the
+ * @ref mpicxx::multiple_spawner class.
+ */
+
+/**
  * @dir test/startup/multiple_spawner/spawn_info
  * @author Marcel Breyer
  * @date 2020-05-17
