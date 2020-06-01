@@ -1,7 +1,7 @@
 /**
- * @file test/startup/multiple_spawner/argvs/initializer_list.cpp
+ * @file test/startup/multiple_spawner/argvs/parameter_pack.cpp
  * @author Marcel Breyer
- * @date 2020-05-31
+ * @date 2020-06-02
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::add_argv(T&&...) and
  *        @ref mpicxx::multiple_spawner::add_argv_at(const std::size_t, T&&...) member
