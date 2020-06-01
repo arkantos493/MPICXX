@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-31
+ * @date 2020-06-02
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -522,15 +522,22 @@ namespace mpicxx {
             return *this;
         }
 
-
-        // TODO 2020-05-20 01:12 breyerml: remove argv at ???
         /**
-         * @brief Removes all argvs of the @p i-th process.
-         * @param i the index of the process to remove the argvs from
+         * @brief Removes all command line arguments.
+         * @return `*this`
+         */
+        multiple_spawner& remove_argv() {
+            std::vector<std::vector<std::string>>(this->size()).swap(argvs_);
+            return *this;
+        }
+        /**
+         * @brief Removes all command line arguments of the @p i-th executable.
+         * @param[in] i the index of the executable
+         * @return `*this`
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        void remove_argv_at(const std::size_t i) {
+        multiple_spawner& remove_argv_at(const std::size_t i) {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::remove_argv_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -538,15 +545,17 @@ namespace mpicxx {
             }
 
             std::vector<std::string>().swap(argvs_[i]);
+            return *this;
         }
         /**
-         * @brief Removes the @p j-th argv of the @p i-th process.
-         * @param i the index of the process to remove the argv from
-         * @param j the index of the argv to remove
+         * @brief Removes the @p j-th command line argument of the @p i-th executable.
+         * @param[in] i the index of the executable
+         * @param[in] j the index of the command line argument
+         * @return `*this`
          *
          * @throws std::out_of_range if the indices @p i or @p j fall outside their valid range
          */
-        void remove_argv_at(const std::size_t i, const std::size_t j) {
+        multiple_spawner& remove_argv_at(const std::size_t i, const std::size_t j) {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::remove_argv_at(const std::size_t, const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -554,11 +563,12 @@ namespace mpicxx {
             }
             if (j >= argvs_[i].size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::remove_argv_at(const std::size_t, const std::size_t) range check: j (which is {}) >= argvs_[i].size() (which is {})",
-                        j, argvs_[i].size()));
+                        "multiple_spawner::remove_argv_at(const std::size_t, const std::size_t) range check: j (which is {}) >= argvs_[{}].size() (which is {})",
+                        j, i, argvs_[i].size()));
             }
 
             argvs_[i].erase(argvs_[i].begin() + j);
+            return *this;
         }
 
 
@@ -865,14 +875,14 @@ namespace mpicxx {
         }
 
         /**
-         * @brief Returns all added argvs.
-         * @return the argvs of all processes (`[[nodiscard]]`)
+         * @brief Returns all added command line arguments.
+         * @return the command line arguments of all executables (`[[nodiscard]]`)
          */
         [[nodiscard]] const std::vector<std::vector<std::string>>& argv() const noexcept { return argvs_; }
         /**
-         * @brief Returns all added argvs of the @p i-th process.
-         * @param[in] i the index of the argvs to be retrieved
-         * @return the @p i-th argvs (`[[nodiscard]]`)
+         * @brief Returns all added command line arguments of the @p i-th executable.
+         * @param[in] i the index of the executable
+         * @return the command line arguments of the @p i-th executable (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
@@ -886,10 +896,10 @@ namespace mpicxx {
             return argvs_[i];
         }
         /**
-         * @brief Returns the @p j-th argv of the @p i-th process.
-         * @param[in] i the index of the argvs to be retrieved
-         * @param[in] j the index of the argv in the retrieved argvs
-         * @return the @p j-th argv of the @p i-th process (`[[nodiscard]]`)
+         * @brief Returns the @p j-th command line argument of the @p i-th executable.
+         * @param[in] i the index of the executable
+         * @param[in] j the index of the command line argument
+         * @return the @p j-th command line argument of the @p i-th executable (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the indices @p i or @p j fall outside their valid ranges
          */
@@ -901,16 +911,15 @@ namespace mpicxx {
             }
             if (j >= argvs_[i].size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::argv_at(const std::size_t, const std::size_t) range check: j (which is {}) >= argvs_[i].size() (which is {})",
-                        j, argvs_[i].size()));
+                        "multiple_spawner::argv_at(const std::size_t, const std::size_t) range check: j (which is {}) >= argvs_[{}].size() (which is {})",
+                        j, i, argvs_[i].size()));
             }
 
             return argvs_[i][j];
         }
         /**
-         * @brief Returns the number of added argvs per process.
-         * @return a [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) containing the number of added
-         * argvs (`[[nodiscard]]`)
+         * @brief Returns the number of added command line arguments per executable.
+         * @return the number of command line arguments per executable (`[[nodiscard]]`)
          *
          * @note Creates a new [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) on each invocation.
          */
@@ -920,16 +929,16 @@ namespace mpicxx {
             return sizes;
         }
         /**
-         * @brief Returns the number of added argvs of the @p i-th process.
-         * @param[in] i the index of the number of added argvs to be retrieved
-         * @return the @p i-th number of added argvs (`[[nodiscard]]`)
+         * @brief Returns the number of added command line arguments of the @p i-th exectuable.
+         * @param[in] i the index of the executable
+         * @return the number of command line arguments of the @p i-th executable (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
         [[nodiscard]] argv_size_type argv_size_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
-                        "multiple_spawner::size_t(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
+                        "multiple_spawner::argv_size_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
                         i, this->size()));
             }
 
