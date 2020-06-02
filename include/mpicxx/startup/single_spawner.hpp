@@ -122,12 +122,9 @@ namespace mpicxx {
 
         /**
          * @brief Adds an argument ([key, value]-pair) the the `argv` list which gets passed to the spawned program.
-         * @details Adds a leading `-` to @p key if not already present.
-         *
-         * Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
+         * @details Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
          * @ref detail::convert_to_string().
          * @tparam ValueType the type of the value
-         * @param[in] key the argument key (e.g. `"-gridfile"` or `"gridfile"`)
          * @param[in] value the value associated with @p key
          * @return `*this`
          *
@@ -135,17 +132,14 @@ namespace mpicxx {
          *
          * @assert_sanity{ If @p key only contains '-' (or ''). }
          */
-        template <typename ValueType>
-        single_spawner& add_argv(std::string key, ValueType&& value) {
-            // add leading '-' if necessary
-            if (!key.starts_with('-')) {
-                key.insert(0, 1, '-');
-            }
+        template <typename T>
+        single_spawner& add_argv(T&& value) {
+            std::string argv = detail::convert_to_string(std::forward<T>(value));
 
-            MPICXX_ASSERT_SANITY(this->legal_argv_key(key), "Only '-' isn't a valid argument key!");
+            MPICXX_ASSERT_SANITY(this->legal_argv_key(argv), "Attempt to set an empty command line argument!");
 
-            // add [key, value]-argv-pair to argv_
-            argv_.emplace_back(std::move(key), detail::convert_to_string(std::forward<ValueType>(value)));
+            // add command line argument
+            argv_.emplace_back(std::move(argv));
             return *this;
         }
         /**
@@ -201,7 +195,7 @@ namespace mpicxx {
          * @brief Returns the arguments which will be passed to `command`.
          * @return the arguments passed to `command` (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<argv_value_type>& argv() const noexcept { return argv_; }
+        [[nodiscard]] const std::vector<std::string>& argv() const noexcept { return argv_; }
         /**
          * @brief Returns the i-th argument which will be passed to `command`.
          * @param[in] i the argv to return
@@ -209,7 +203,7 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i is an out-of-bounce access
          */
-        [[nodiscard]] const argv_value_type& argv(const std::size_t i) const {
+        [[nodiscard]] const std::string& argv(const std::size_t i) const {
             if (i >= argv_.size()) {
                 throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, argv_.size()));
             }
@@ -452,7 +446,7 @@ namespace mpicxx {
         return_type spawn_impl() {
             MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
             MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
-                    "Only '-' isn't a valid argument key!: wrong key at: {}", this->legal_argv_keys(argv_).second);
+                    "An empty command line argument isn't valid!: wrong key at: {}", this->legal_argv_keys(argv_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
                     "Can't spawn the given number of processes!: 0 < {} <= {}",
                     maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
@@ -478,12 +472,9 @@ namespace mpicxx {
             } else {
                 // convert additional arguments to char**
                 std::vector<char*> argv_ptr;
-                argv_ptr.reserve(argv_.size() * 2 + 1);
-                for (auto& [key, value] : argv_) {
-                    argv_ptr.emplace_back(key.data());
-                    if (!value.empty()) {
-                        argv_ptr.emplace_back(value.data());
-                    }
+                argv_ptr.reserve(argv_.size() + 1);
+                for (auto& str : argv_) {
+                    argv_ptr.emplace_back(str.data());
                 }
                 // add null termination
                 argv_ptr.emplace_back(nullptr);
@@ -508,8 +499,8 @@ namespace mpicxx {
          * @param[in] key the argv key
          * @return `true` if @p key is valid, `false` otherwise
          */
-        bool legal_argv_key(const std::string& key) const noexcept {
-            return key.size() > 1;
+        bool legal_argv_key(const std::string& argv) const noexcept {
+            return !argv.empty();
         }
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
@@ -527,9 +518,9 @@ namespace mpicxx {
          * @param[in] argvs a vector of multiple argument [key, value]-pairs
          * @return `true` if all keys in @p argvs are valid, `false` otherwise
          */
-        std::pair<bool, std::size_t> legal_argv_keys(const std::vector<argv_value_type>& argvs) const noexcept {
+        std::pair<bool, std::size_t> legal_argv_keys(const std::vector<std::string>& argvs) const noexcept {
             for (std::size_t i = 0; i < argvs.size(); ++i) {
-                if (!this->legal_argv_key(argvs[i].first)) {
+                if (!this->legal_argv_key(argvs[i])) {
                     return std::make_pair(false, i);
                 }
             }
@@ -580,7 +571,7 @@ namespace mpicxx {
 
 #endif
         std::string command_;
-        std::vector<argv_value_type> argv_;
+        std::vector<std::string> argv_;
         int maxprocs_;
         info info_ = mpicxx::info::null;
         int root_ = 0;

@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/constructor/spawner_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-14
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(Spawner&&...) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(T&&...) member function provided by the
+ *        @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                           | test case description                                                                         |
  * |:-----------------------------------------|:----------------------------------------------------------------------------------------------|
@@ -12,6 +12,7 @@
  * | ConstructFromSpawnerInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test) |
  */
 
+#include <initializer_list>
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -23,7 +24,7 @@
 TEST(MultipleSpawnerTest, ConstructFromSpawner) {
     // create new multiple_spawner using other spawners
     mpicxx::single_spawner ss1("foo", 1);
-    mpicxx::multiple_spawner ms1({ {"bar", 1} });
+    mpicxx::multiple_spawner ms1({ { "bar", 1 } });
 
     mpicxx::multiple_spawner ms(ss1, ms1);
 }
@@ -36,3 +37,5 @@ TEST(MultipleSpawnerDeathTest, ConstructFromSpawnerInvalidTotalMaxprocs) {
 
     ASSERT_DEATH( mpicxx::multiple_spawner ms(ss1, ss2, ss3) , "");
 }
+
+// TODO 2020-06-02 21:38 breyerml: test with different communicators

@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/root.cpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-02
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_root(const int) and @ref mpicxx::multiple_spawner::root() const member
- * function provided by the @ref mpicxx::multiple_spawner class.
+ *        function provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name | test case description                       |
  * |:---------------|:--------------------------------------------|
@@ -13,6 +13,9 @@
  * | GetRoot        | get the current root process                |
  */
 
+#include <initializer_list>
+#include <utility>
+
 #include <gtest/gtest.h>
 
 #include <mpicxx/startup/multiple_spawner.hpp>
@@ -20,7 +23,7 @@
 
 TEST(MultipleSpawnerTest, SetRoot) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set a new root
     ms.set_root(1);
@@ -31,7 +34,7 @@ TEST(MultipleSpawnerTest, SetRoot) {
 
 TEST(MultipleSpawnerDeathTest, SetInvalidRoot) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set a new illegal root
     ASSERT_DEATH( ms.set_root(-1) , "");
@@ -40,7 +43,7 @@ TEST(MultipleSpawnerDeathTest, SetInvalidRoot) {
 
 TEST(MultipleSpawnerTest, GetRoot) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // check getter
     EXPECT_EQ(ms.root(), 0);

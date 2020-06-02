@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/spawn_info/iterator_range.cpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::set_spawn_info(InputIt, InputIt) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::set_spawn_info(InputIt, InputIt) member function provided
+ *        by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                          | test case description                         |
  * |:----------------------------------------|:----------------------------------------------|
@@ -13,6 +13,9 @@
  * | SetSpawnInfoViaIteratorRangeInvalidSize | iterator range with illegal size (death test) |
  */
 
+#include <cstddef>
+#include <initializer_list>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -23,7 +26,7 @@
 
 TEST(MultipleSpawnerTest, SetSpawnInfoViaIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new spawn info
     std::vector<mpicxx::info> vec = { mpicxx::info::env, mpicxx::info::env };
@@ -39,7 +42,7 @@ TEST(MultipleSpawnerTest, SetSpawnInfoViaIteratorRange) {
 
 TEST(MultipleSpawnerDeathTest, SetSpawnInfoViaInvalidIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new spawn info with illegal iterator range
     std::vector<mpicxx::info> vec = { mpicxx::info::env, mpicxx::info::env };
@@ -48,7 +51,7 @@ TEST(MultipleSpawnerDeathTest, SetSpawnInfoViaInvalidIteratorRange) {
 
 TEST(MultipleSpawnerDeathTest, SetSpawnInfoViaIteratorRangeInvalidSize) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new spawn info with different size
     std::vector<mpicxx::info> vec = { mpicxx::info::env, mpicxx::info::env, mpicxx::info::env };

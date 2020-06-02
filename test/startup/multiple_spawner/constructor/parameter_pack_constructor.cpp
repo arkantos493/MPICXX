@@ -1,20 +1,23 @@
 /**
  * @file test/startup/multiple_spawner/constructor/parameter_pack_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-18
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(Pairs&&...) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(T&&...) member function provided by the
+ *        @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                                 | test case description                                                                         |
  * |:-----------------------------------------------|:----------------------------------------------------------------------------------------------|
  * | ConstructFromParameterPack                     | construct a multiple_spawner object from an parameter pack (variadic template)                |
  * | ConstructFromParameterPackInvalidName          | try to construct a multiple_spawner object with an illegal executable name (death test)       |
  * | ConstructFromParameterPackInvalidMaxprocs      | try to construct a multiple_spawner object with an illegal maxprocs number (death test)       |
- * | ConstructFromParameterPackInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total mayprocs number (death test) |
+ * | ConstructFromParameterPackInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test) |
  */
 
+#include <initializer_list>
 #include <limits>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include <gtest/gtest.h>

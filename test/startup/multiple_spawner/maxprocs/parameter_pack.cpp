@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/maxprocs/parameter_pack.cpp
  * @author Marcel Breyer
- * @date 2020-05-15
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::set_maxprocs(T...) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::set_maxprocs(T...) member function provided
+ *        by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                               | test case description                                                       |
  * |:---------------------------------------------|:----------------------------------------------------------------------------|
@@ -14,6 +14,8 @@
  * | SetMaxprocsViaParameterPackInvalidTotalValue | try to set new number of processes with an invalid total value (death test) |
  */
 
+#include <initializer_list>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -22,12 +24,12 @@
 
 TEST(MultipleSpawnerTest, SetMaxprocsViaParameterPack) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes
     ms.set_maxprocs(1, 1);
 
-    // check if names were set correctly
+    // check if the values were set correctly
     ASSERT_EQ(ms.maxprocs().size(), 2);
     EXPECT_EQ(ms.maxprocs_at(0), 1);
     EXPECT_EQ(ms.maxprocs_at(1), 1);
@@ -35,17 +37,17 @@ TEST(MultipleSpawnerTest, SetMaxprocsViaParameterPack) {
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaParameterPackInvalidSize) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes with different size
     ASSERT_DEATH( ms.set_maxprocs(1) , "");
-    int i = 1;
+    const int i = 1;
     ASSERT_DEATH( ms.set_maxprocs(1, 1, i) , "");
 }
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaParameterPackInvalidName) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes with illegal value
     ASSERT_DEATH( ms.set_maxprocs(1, 3), "");
@@ -55,7 +57,7 @@ TEST(MultipleSpawnerDeathTest, SetMaxprocsViaParameterPackInvalidName) {
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaParameterpackInvalidTotalValue) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes with illegal total value
     ASSERT_DEATH( ms.set_maxprocs(2, 2), "");

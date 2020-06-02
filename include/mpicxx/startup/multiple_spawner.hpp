@@ -34,7 +34,6 @@
 namespace mpicxx {
 
     // TODO 2020-05-17 23:36 breyerml: replace with mpicxx equivalent
-    // TODO 2020-05-31 17:47 breyerml: change a.begin() to std::begin(a)
     // TODO 2020-05-31 22:46 breyerml: test examples
 
     /**
@@ -69,16 +68,14 @@ namespace mpicxx {
          * @pre @p first and @p last **must** form a valid, non-empty range, i.e. @p first must be strictly less than @p last.
          * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid, non-empty iterator range. }
-         * @assert_sanity{
-         * If any executable name is empty.\n
-         * If any number of maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_sanity{ If any executable name is empty. \n
+         *                 If any number of maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
          */
         template <std::input_iterator InputIt>
         multiple_spawner(InputIt first, InputIt last) {
@@ -111,44 +108,41 @@ namespace mpicxx {
 
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
-            // set argvs objects to default values
+            // set command line arguments to default values
             argvs_.assign(size, std::vector<std::string>());
         }
         /**
-         * @brief Constructs the multiple_spawner object with the contents of the initializer list @p ilist.
-         * @param[in] ilist initializer list to initialize the multiple_spawner object with
+         * @brief Constructs the multiple_spawner object with the contents of the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) list @p ilist.
+         * @param[in] ilist the list of executable names and maxprocs pairs
          *
-         * @pre @p first and @p last **must** form a non-empty range, i.e. @p first must be strictly less than @p last.
+         * @pre @p ilist **must not** be empty.
          * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_precondition{ If @p first and @p last don't denote a non-empty iterator range. }
-         * @assert_sanity{
-         * If any executable name is empty.\n
-         * If any number of maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_precondition{ If @p ilist is empty. }
+         * @assert_sanity{ If any executable name is empty. \n
+         *                 If any number of maxprocs is invalid.\n
+         *                 If the total number of maxprocs is invalid. }
          */
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
         /**
          * @brief Constructs the multiple_spawner object with the contents of the parameter pack @p args.
          * @tparam T an arbitrary number of pairs meeting the @ref detail::is_pair requirements.
-         * @param[in] args the parameter pack to initializer the multiple_spawner object with
+         * @param[in] args the list of executable names and maxprocs pairs
          *
          * @pre **Any** executable name **must not** be empty.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_sanity{
-         * If any executable name is empty.\n
-         * If any number of maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_sanity{ If any executable name is empty. \n
+         *                 If any number of maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
          */
         template <detail::is_pair... T>
         multiple_spawner(T&&... args) requires (sizeof...(T) > 0) {
@@ -176,24 +170,22 @@ namespace mpicxx {
 
             // set info objects to default values
             infos_.assign(size, mpicxx::info::null);
-            // set argvs objects to default values
+            // set command line arguments to default values
             argvs_.assign(size, std::vector<std::string>());
         }
         // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
         /**
          * @brief Constructs the multiple_spawner object with the spawner object(s) of the parameter pack @p args.
          * @tparam T an arbitrary number of spawners meeting the @ref detail::is_spawner requirements.
-         * @param[in] args the parameter pack to initializer the multiple_spawner object with
+         * @param[in] args the spawners which should get merged into this multiple_spawner
          *
          * @pre **All** roots **must** be equal.
          * @pre **All** communicators **must** be equal.
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_precondition{
-         * If not all roots are equivalent. \n
-         * If not all communicators are equivalent.
-         * }
+         * @assert_precondition{ If not all roots are equivalent. \n
+         *                       If not all communicators are equivalent. }
          * @assert_sanity{ If the total number of maxprocs is invalid. }
          */
         template <typename... T, std::enable_if_t<(is_spawner_v<T> && ...), int> = 0>
@@ -246,10 +238,8 @@ namespace mpicxx {
          * @pre All executable names in the range [@p first, @p last) **must not** be empty.
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
-         * @assert_sanity{
-         * If the sizes mismatch. \n
-         * If any new executable name is empty.
-         * }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any new executable name is empty. }
          */
         template <std::input_iterator InputIt>
         multiple_spawner& set_command(InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
@@ -267,17 +257,16 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Replaces the old executable names with the new names from the initializer list @p ilist.
+         * @brief Replaces the old executable names with the new names from the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist.
          * @param[in] ilist the new executable names
          * @return `*this`
          *
          * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
          * @pre All executable names in @p ilist **must not** be empty.
          *
-         * @assert_sanity{
-         * If the sizes mismatch. \n
-         * If any new executable name is empty.
-         * }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any new executable name is empty. }
          */
         multiple_spawner& set_command(std::initializer_list<std::string> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
@@ -294,16 +283,14 @@ namespace mpicxx {
         /**
          * @brief Replaces the old executable names with the new names from the parameter pack @p args.
          * @tparam T an arbitrary number of string like objects meeting @p detail::is_string requirements.
-         * @param args the parameter pack containing the new executable names
+         * @param[in] args the new executable names
          * @return `*this`
          *
          * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
          * @pre All executable names in the parameter pack @p args **must not** be empty.
          *
-         * @assert_sanity{
-         * If the sizes mismatch. \n
-         * If any new executable name is empty.
-         * }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any new executable name is empty. }
          */
         template <detail::is_string... T>
         multiple_spawner& set_command(T&&... args) requires (sizeof...(T) > 0) {
@@ -321,7 +308,7 @@ namespace mpicxx {
         /**
          * @brief Change the i-th executable name to @p name.
          * @tparam T must meet the @p detail::is_string requirements.
-         * @param[in] i the index of the executable name to be changed
+         * @param[in] i the index of the executable name
          * @param[in] name the new name of the i-th executable
          * @return `*this`
          *
@@ -345,9 +332,6 @@ namespace mpicxx {
 
             return *this;
         }
-
-
-        // TODO 2020-05-18 23:07 breyerml: assertions ??
 
         /**
          * @brief Adds all command line arguments in the range [@p first, @p last) to the respective executable.
@@ -581,16 +565,14 @@ namespace mpicxx {
          *
          * @pre The size of the range [@p first, @p last) **must** match the size of this @ref multiple_spawner and thus must be legal.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid iterator range. }
-         * @assert_sanity{
-         * If the sizes mismatch. \n
-         * If any number of maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any number of maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
          */
         template <std::input_iterator InputIt>
         multiple_spawner& set_maxprocs(InputIt first, InputIt last) {
@@ -614,21 +596,20 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Replaces the old number of processes with the new numbers from the initializer list @p ilist.
+         * @brief Replaces the old number of processes with the new numbers from the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist.
          * @param[in] ilist the new number of processes
          * @return `*this`
          *
          * @pre The size of @p ilist **must** match the size of this @ref multiple_spawner.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_sanity{
-         * If the sizes mismatch. \n
-         * If any number of maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any number of maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
          */
         multiple_spawner& set_maxprocs(std::initializer_list<int> ilist) {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(ilist),
@@ -651,21 +632,19 @@ namespace mpicxx {
         /**
          * @brief Replaces the old number of processes with the new numbers from the parameter pack @p args.
          * @tparam T an arbitrary number of integral objects meeting the
-         * [`std::integral`](https://en.cppreference.com/w/cpp/concepts/integral) requirements.
-         * @param args the parameter pack containing the new number of processes
+         *           [`std::integral`](https://en.cppreference.com/w/cpp/concepts/integral) requirements.
+         * @param[in] args the parameter pack containing the new number of processes
          * @return `*this`
          *
          * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
          * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_sanity{
-         * If the sizes mismatch. \n
-         * If any number of maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_sanity{ If the sizes mismatch. \n
+         *                 If any number of maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
          */
         template <std::integral... T>
         multiple_spawner& set_maxprocs(T... args) requires (sizeof...(T) > 0) {
@@ -687,20 +666,18 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Change the i-th number of processes to @p maxprocs.
-         * @param[in] i the index of the number of processes to be changed
+         * @brief Change the @p i-th number of processes to @p maxprocs.
+         * @param[in] i the index of the executable
          * @param[in] maxprocs the new maximum number of processes
          * @return `*this`
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref mpicxx::universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_sanity{
-         * If @p maxprocs is invalid.\n
-         * If the total number of maxprocs is invalid.
-         * }
+         * @assert_sanity{ If @p maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
@@ -750,7 +727,8 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Replaces the old spawn info with the new info from the initializer list @p ilist.
+         * @brief Replaces the old spawn info with the new info from the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist.
          * @param[in] ilist the new spawn info
          * @return `*this`
          *
@@ -769,7 +747,7 @@ namespace mpicxx {
         /**
          * @brief Replaces the old spawn info with the new info from the parameter pack @p args.
          * @tparam T an arbitrary number of @ref mpicxx::info objects meeting the æref detail::is_info requirements.
-         * @param args the parameter pack containing the new spawn info
+         * @param[in] args the new spawn info
          * @return `*this`
          *
          * @pre The size of the parameter pack @p args **must** match the size of this @ref multiple_spawner.
@@ -786,8 +764,8 @@ namespace mpicxx {
             return *this;
         }
         /**
-         * @brief Change the i-th spawn info to @p spawn_info.
-         * @param[in] i the index of the spawn info to be changed
+         * @brief Change the @p i-th spawn info to @p spawn_info.
+         * @param[in] i the index of the executable
          * @param[in] spawn_info the new spawn info
          * @return `*this`
          *
@@ -810,7 +788,7 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre @p root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          *
          * @assert_sanity{ If @p root isn't a legal root. }
          */
@@ -831,10 +809,8 @@ namespace mpicxx {
          * @pre @p comm **must not** be *MPI_COMM_NULL*.
          * @pre The currently specified rank (as returned by @ref root()) **must be** valid in @p comm.
          *
-         * @assert_sanity{
-         * If @p comm is the null communicator (*MPI_COMM_NULL*). \n
-         * If the currently specified root isn't valid in @p comm.
-         * }
+         * @assert_sanity{ If @p comm is the null communicator (*MPI_COMM_NULL*). \n
+         *                 If the currently specified root isn't valid in @p comm. }
          */
         multiple_spawner& set_communicator(MPI_Comm comm) noexcept {
             MPICXX_ASSERT_SANITY(this->legal_communicator(comm), "Attempt to set the communicator to MPI_COMM_NULL!");
@@ -858,9 +834,9 @@ namespace mpicxx {
          */
         [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
         /**
-         * @brief Returns the name of the i-th executable which should get spawned.
-         * @param[in] i the index of the executable name to be retrieved
-         * @return the i-th executable name (`[[nodiscard]]`)
+         * @brief Returns the name of the @p i-th executable.
+         * @param[in] i the index of the executable
+         * @return the @p i-th executable name (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
@@ -951,9 +927,9 @@ namespace mpicxx {
          */
         [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
         /**
-         * @brief Returns the i-th number of processes which should get spawned.
-         * @param[in] i the index of the number of processes to be retrieved
-         * @return the i-th number of processes (`[[nodiscard]]`)
+         * @brief Returns the @p i-th number of processes.
+         * @param[in] i the index of the executable
+         * @return the @p i-th number of processes (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
@@ -969,13 +945,13 @@ namespace mpicxx {
 
         /**
          * @brief Returns all spawn info.
-         * @return the info object used to spawn the executables (`[[nodiscard]]`)
+         * @return the info objects used to spawn the executables (`[[nodiscard]]`)
          */
         [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
         /**
-         * @brief Returns the i-th spawn info used to spawn the executables.
-         * @param[in] i the index of the spawn info to be retrieved
-         * @return the i-th spawn info (`[[nodiscard]]`)
+         * @brief Returns the @p i-th spawn info used to spawn the executables.
+         * @param[in] i the index of the executable
+         * @return the @p i-th spawn info (`[[nodiscard]]`)
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
@@ -1003,7 +979,7 @@ namespace mpicxx {
 
         /**
          * @brief Returns the size of this @ref mpicxx::multiple_spawner object, i.e. the number of spawned executables
-         * (**not** the total number of processes to spawn).
+         *        (**not** the total number of processes to spawn).
          * @return the size if this @ref mpicxx::multiple_spawner (`[[nodiscard]]`)
          */
         [[nodiscard]] size_type size() const noexcept {

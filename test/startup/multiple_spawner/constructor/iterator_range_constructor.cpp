@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/constructor/iterator_range_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-05-18
+ * @date 2020-06-02
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(InputIt, InputIt) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ *        @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                                 | test case description                                                                         |
  * |:-----------------------------------------------|:----------------------------------------------------------------------------------------------|
@@ -12,10 +12,13 @@
  * | ConstructFromInvalidIteratorRange              | illegal iterator range (death test)                                                           |
  * | ConstructFromIteratorRangeInvalidName          | try to construct a multiple_spawner object with an illegal executable name (death test)       |
  * | ConstructFromIteratorRangeInvalidMaxprocs      | try to construct a multiple_spawner object with an illegal maxprocs number (death test)       |
- * | ConstructFromIteratorRangeInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total mayprocs number (death test) |
+ * | ConstructFromIteratorRangeInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test) |
  */
 
+#include <initializer_list>
 #include <limits>
+#include <optional>
+#include <string>
 #include <utility>
 #include <vector>
 

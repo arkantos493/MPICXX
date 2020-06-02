@@ -1,25 +1,28 @@
 /**
  * @file test/startup/multiple_spawner/argvs/initializer_list.cpp
  * @author Marcel Breyer
- * @date 2020-05-31
+ * @date 2020-06-02
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::add_argv(std::initializer_list<std::initializer_list<T>>) and
  *        @ref mpicxx::multiple_spawner::add_argv_at(const std::size_t, std::initializer_list<T>) member
  *        functions provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
- * | test case name                          | test case description                      |
- * |:----------------------------------------|:-------------------------------------------|
- * | AddArgvsViaInitializerList              | add argvs from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) to all processes |
- * | AddArgvsViaInitializerListInvalidSize   | [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) with illegal size while adding argvs to all processes (death test) |
- * | AddArgvsAtViaInitializerList            | add argvs from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) to the i-th process |
- * | AddArgvsAtViaInitializerListOutOfBounce | try adding argvs at an out of bounce index |
+ * | test case name                          | test case description                                                                                                                                                       |
+ * |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | AddArgvsViaInitializerList              | add command line arguments from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) to all executables                                  |
+ * | AddArgvsViaInitializerListInvalidSize   | [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) with illegal size while adding command line arguments to all executables (death test) |
+ * | AddArgvsAtViaInitializerList            | add command line arguments from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) to the i-th executable                              |
+ * | AddArgvsAtViaInitializerListOutOfBounce | try adding command line arguments at an out of bounce index                                                                                                                 |
  */
 
+#include <cstddef>
 #include <initializer_list>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <test_utility.hpp>
 

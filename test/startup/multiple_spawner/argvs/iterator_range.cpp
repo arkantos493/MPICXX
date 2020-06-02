@@ -1,25 +1,30 @@
 /**
  * @file test/startup/multiple_spawner/argvs/iterator_range.cpp
  * @author Marcel Breyer
- * @date 2020-05-31
+ * @date 2020-06-02
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::add_argv(InputIt, InputIt) and
  *        @ref mpicxx::multiple_spawner::add_argv_at(std::size_t, InputIt, InputIt) member functions provided by the
  *        @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
- * | test case name                        | test case description                                                             |
- * |:--------------------------------------|:----------------------------------------------------------------------------------|
- * | AddArgvsViaIteratorRange              | add argvs from an iterator range to all processes                                 |
- * | AddArgvsViaInvalidIteratorRange       | illegal iterator range while adding argvs to all processes (death test)           |
- * | AddArgvsViaIteratorRangeInvalidSize   | iterator range with illegal size while adding argvs to all processes (death test) |
- * | AddArgvsAtViaIteratorRange            | add argvs from an iterator range to the i-th process                              |
- * | AddArgvsAtViaIteratorRangeOutOfBounce | try adding argvs at an out of bounce index                                        |
- * | AddArgvsAtViaInvalidIteratorRange     | illegal iterator range while adding argvs to the i-th process (death test)        |
+ * | test case name                        | test case description                                                                                |
+ * |:--------------------------------------|:-----------------------------------------------------------------------------------------------------|
+ * | AddArgvsViaIteratorRange              | add command line arguments from an iterator range to all executables                                 |
+ * | AddArgvsViaInvalidIteratorRange       | illegal iterator range while adding command line arguments to all executables (death test)           |
+ * | AddArgvsViaIteratorRangeInvalidSize   | iterator range with illegal size while adding command line arguments to all executables (death test) |
+ * | AddArgvsAtViaIteratorRange            | add command line arguments from an iterator range to the i-th executable                             |
+ * | AddArgvsAtViaIteratorRangeOutOfBounce | try adding command line arguments at an out of bounce index                                          |
+ * | AddArgvsAtViaInvalidIteratorRange     | illegal iterator range while adding command line arguments to the i-th executable (death test)       |
  */
 
+#include <cstddef>
+#include <initializer_list>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <test_utility.hpp>
 

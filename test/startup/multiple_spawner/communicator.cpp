@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/communicator.cpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-02
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_communicator(MPI_Comm) and
- * @ref mpicxx::multiple_spawner::communicator() const member function provided by the @ref mpicxx::multiple_spawner class.
+ *        @ref mpicxx::multiple_spawner::communicator() const member function provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name         | test case description                            |
  * |:-----------------------|:-------------------------------------------------|
@@ -13,6 +13,9 @@
  * | GetCommunicator        | get the current intracommunicator                |
  */
 
+#include <initializer_list>
+#include <utility>
+
 #include <gtest/gtest.h>
 
 #include <mpicxx/startup/multiple_spawner.hpp>
@@ -20,14 +23,14 @@
 
 TEST(MultipleSpawnerTest, SetCommunicator) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // TODO 2020-04-13 21:30 breyerml: use mpicxx communicator equivalent
 }
 
 TEST(MultipleSpawnerDeathTest, SetInvalidCommunicator) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set a new illegal communicator
     ASSERT_DEATH( ms.set_communicator(MPI_COMM_NULL) , "");
@@ -36,7 +39,7 @@ TEST(MultipleSpawnerDeathTest, SetInvalidCommunicator) {
 
 TEST(MultipleSpawnerTest, GetCommunicator) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // check getter
     EXPECT_EQ(ms.communicator(), MPI_COMM_WORLD);

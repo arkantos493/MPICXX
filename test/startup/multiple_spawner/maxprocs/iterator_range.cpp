@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/maxprocs/iterator_range.cpp
  * @author Marcel Breyer
- * @date 2020-05-15
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::set_maxprocs(InputIt, InputIt) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::set_maxprocs(InputIt, InputIt) member function provided
+ *        by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                               | test case description                                                    |
  * |:---------------------------------------------|:-------------------------------------------------------------------------|
@@ -15,7 +15,10 @@
  * | SetMaxprocsViaIteratorRangeInvalidTotalValue | try to set new number of processes with illegal total value (death test) |
  */
 
+#include <cstddef>
+#include <initializer_list>
 #include <limits>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -25,7 +28,7 @@
 
 TEST(MultipleSpawnerTest, SetMaxprocsViaIteratorRange) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set number of processes
     std::vector<int> vec = { 1, 1 };
@@ -50,7 +53,7 @@ TEST(MultipleSpawnerDeathTest, SetMaxprocsViaInvalidIteratorRange) {
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaIteratorRangeInvalidSize) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes with different size
     std::vector<int> vec = { 1, 1, 1 };
@@ -60,7 +63,7 @@ TEST(MultipleSpawnerDeathTest, SetMaxprocsViaIteratorRangeInvalidSize) {
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaIteratorRangeInvalidValue) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes with illegal value
     std::vector<int> vec = { 1, 0, 1, std::numeric_limits<int>::max() };
@@ -70,7 +73,7 @@ TEST(MultipleSpawnerDeathTest, SetMaxprocsViaIteratorRangeInvalidValue) {
 
 TEST(MultipleSpawnerDeathTest, SetMaxprocsViaIteratorRangeInvalidTotalValue) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new number of processes with illegal total value
     std::vector<int> vec = { 2, 2 };

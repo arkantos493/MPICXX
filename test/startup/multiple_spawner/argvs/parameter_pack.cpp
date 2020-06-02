@@ -7,20 +7,23 @@
  *        @ref mpicxx::multiple_spawner::add_argv_at(const std::size_t, T&&...) member
  *        functions provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
- * | test case name                        | test case description                                                             |
- * |:--------------------------------------|:----------------------------------------------------------------------------------|
- * | AddArgvsViaParameterPack              | add argvs from a parameter pack to all processes                                  |
- * | AddArgvsViaParameterPackSize          | parameter pack with illegal size while adding argvs to all processes (death test) |
- * | AddArgvsAtViaParameterPack            | add argvs from a parameter pack to the i-th process                               |
- * | AddArgvsAtViaParameterPackOutOfBounce | try adding argvs at an out of bounce index                                        |
+ * | test case name                        | test case description                                                                                |
+ * |:--------------------------------------|:-----------------------------------------------------------------------------------------------------|
+ * | AddArgvsViaParameterPack              | add command line arguments from a parameter pack to all executables                                  |
+ * | AddArgvsViaParameterPackSize          | parameter pack with illegal size while adding command line arguments to all executables (death test) |
+ * | AddArgvsAtViaParameterPack            | add command line arguments from a parameter pack to the i-th executable                              |
+ * | AddArgvsAtViaParameterPackOutOfBounce | try adding command line arguments at an out of bounce index                                          |
  */
 
 #include <array>
+#include <cstddef>
 #include <initializer_list>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <test_utility.hpp>
 

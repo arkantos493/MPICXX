@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/command/parameter_pack.cpp
  * @author Marcel Breyer
- * @date 2020-05-16
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(T&&...) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(T&&...) member function provided
+ *        by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name                                | test case description                                             |
  * |:----------------------------------------------|:------------------------------------------------------------------|
@@ -13,7 +13,9 @@
  * | SetExecutableNamesViaParameterPackInvalidName | try to set new executable names with an invalid name (death test) |
  */
 
+#include <initializer_list>
 #include <string>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -24,7 +26,7 @@ using namespace std::string_literals;
 
 TEST(MultipleSpawnerTest, SetExecutableNamesViaParameterPack) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new executable names
     ms.set_command("baz", "qux"s);
@@ -37,7 +39,7 @@ TEST(MultipleSpawnerTest, SetExecutableNamesViaParameterPack) {
 
 TEST(MultipleSpawnerDeathTest, SetExecutableNamesViaParameterPackInvalidSize) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new executable names with different size
     ASSERT_DEATH( ms.set_command("baz") , "");
@@ -47,7 +49,7 @@ TEST(MultipleSpawnerDeathTest, SetExecutableNamesViaParameterPackInvalidSize) {
 
 TEST(MultipleSpawnerDeathTest, SetExecutableNamesViaParameterPackInvalidName) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // set new executable names with illegal name
     ASSERT_DEATH( ms.set_command("baz", ""), "");

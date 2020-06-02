@@ -3,18 +3,21 @@
  * @author Marcel Breyer
  * @date 2020-05-18
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(std::initializer_list<std::pair<std::string, int>>) member function provided by the
- * @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(std::initializer_list<std::pair<std::string, int>>) member
+ *        function provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
- * | test case name                                   | test case description                                                                        |
- * |:-------------------------------------------------|:---------------------------------------------------------------------------------------------|
+ * | test case name                                   | test case description                                                                                                            |
+ * |:-------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
  * | ConstructFromInitializerList                     | construct a multiple_spawner object from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) |
- * | ConstructFromInitializerListInvalidName          | try to construct a multiple_spawner object with an illegal executable name (death test)      |
- * | ConstructFromInitializerListInvalidMaxprocs      | try to construct a multiple_spawner object with an illegal maxprocs number (death test)      |
- * | ConstructFromInitializerListInvalidTotalMaxprocs | ry to construct a multiple_spawner object with an illegal total mayprocs number (death test) |
+ * | ConstructFromInitializerListInvalidName          | try to construct a multiple_spawner object with an illegal executable name (death test)                                          |
+ * | ConstructFromInitializerListInvalidMaxprocs      | try to construct a multiple_spawner object with an illegal maxprocs number (death test)                                          |
+ * | ConstructFromInitializerListInvalidTotalMaxprocs | ry to construct a multiple_spawner object with an illegal total maxprocs number (death test)                                     |
  */
 
+#include <initializer_list>
 #include <limits>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include <gtest/gtest.h>

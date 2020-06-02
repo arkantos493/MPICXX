@@ -1,10 +1,10 @@
 /**
  * @file test/startup/multiple_spawner/maxprocs/getter.cpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-02
  *
- * @brief Test cases for the @ref mpicxx::multiple_spawner::command() const and
- * qref mpicxx::multiple_spawner::command_at(const std::size_t) const member function provided by the @ref mpicxx::multiple_spawner class.
+ * @brief Test cases for the @ref mpicxx::multiple_spawner::maxprocs() const and
+ * @ref mpicxx::multiple_spawner::maxprocs_at(const std::size_t) const member function provided by the @ref mpicxx::multiple_spawner class.
  * @details Testsuite: *MultipleSpawnerTest*
  * | test case name             | test case description        |
  * |:---------------------------|:-----------------------------|
@@ -13,16 +13,22 @@
  * | GetIthMaxprocsInvalidIndex | illegal index                |
  */
 
+#include <initializer_list>
+#include <stdexcept>
+#include <string>
+#include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
+#include <test_utility.hpp>
 
 #include <mpicxx/startup/multiple_spawner.hpp>
 
 
 TEST(MultipleSpawnerTest, GetMaxprocs) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // check getter for correctness
     std::vector<int> vec = ms.maxprocs();
@@ -32,7 +38,7 @@ TEST(MultipleSpawnerTest, GetMaxprocs) {
 
 TEST(MultipleSpawnerTest, GetIthMaxprocss) {
     // create new multiple_spawner object
-    mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
+    mpicxx::multiple_spawner ms({ { "foo", 1 }, { "bar", 1 } });
 
     // check getter for correctness
     EXPECT_EQ(ms.maxprocs_at(0), 1);
@@ -44,26 +50,17 @@ TEST(MultipleSpawnerTest, GetIthMaxprocsInvalidIndex) {
     mpicxx::multiple_spawner ms({ {"foo", 1}, {"bar", 1} });
 
     // try getting i-th number of processes
-    try {
-        [[maybe_unused]] const int i = ms.maxprocs_at(-1);
-        FAIL() << "expected std::out_of_range exception";
-    } catch(const std::out_of_range& e) {
-        std::string expected_msg = fmt::format(
-                "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
-                static_cast<std::size_t>(-1), 2);
-        EXPECT_STREQ(e.what(), expected_msg.c_str());
-    } catch(...) {
-        FAIL() << "expected std::out_of_range exception";
-    }
-    try {
-        [[maybe_unused]] const int i = ms.maxprocs_at(2);
-        FAIL() << "expected std::out_of_range exception";
-    } catch(const std::out_of_range& e) {
-        std::string expected_msg = fmt::format(
-                "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
-                2, 2);
-        EXPECT_STREQ(e.what(), expected_msg.c_str());
-    } catch(...) {
-        FAIL() << "expected std::out_of_range exception";
-    }
+    [[maybe_unused]] int i;
+    EXPECT_THROW_WHAT(
+            i = ms.maxprocs_at(2),
+            std::out_of_range,
+            "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is 2) >= this->size() (which is 2)");
+
+    std::string expected_msg =
+            fmt::format("multiple_spawner::maxprocs_at(const std::size_t) range check: "
+                        "i (which is {}) >= this->size() (which is 2)", static_cast<std::size_t>(-1));
+    EXPECT_THROW_WHAT(
+            i = ms.maxprocs_at(-1),
+            std::out_of_range,
+            expected_msg);
 }
