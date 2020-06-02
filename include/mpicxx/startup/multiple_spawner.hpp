@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-06-03
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -498,7 +498,7 @@ namespace mpicxx {
                 // convert argument to a std::string
                 std::string argv = detail::convert_to_string(std::forward<T>(arg));
 
-                MPICXX_ASSERT_SANITY(this->legal_argv_key(argv), "Attempt to set an empty command line argument!");
+                MPICXX_ASSERT_SANITY(this->legal_argv(argv), "Attempt to set an empty command line argument!");
 
                 // add command line argument at position i
                 argvs_[i].emplace_back(std::move(argv));
@@ -1038,28 +1038,44 @@ namespace mpicxx {
             return res;
         }
 
-//#if ASSERTION_LEVEL > 0
-        template <std::input_iterator InputIt>
-        bool legal_non_empty_iterator_range(InputIt first, InputIt last) {
-            return std::distance(first, last) > 0;
-        }
-
+#if ASSERTION_LEVEL > 0
+        /*
+         * @brief Checks whether the size of the iterator range [@p first, @p last) equals the size of this multiple_spawner.
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @param[in] first iterator to the first element of the range
+         * @param[in] last iterator one-past the last element of the range
+         * @return `true` if both sizes are equal, `false` otherwise
+         */
         template <std::input_iterator InputIt>
         bool legal_number_of_values(InputIt first, InputIt last) {
             using difference_type = typename std::iterator_traits<InputIt>::difference_type;
             return std::distance(first, last) == static_cast<difference_type>(commands_.size());
         }
+        /*
+         * @brief Checks whether the size of the [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)
+         *        @p ilist equals the size of this multiple_spawner.
+         * @tparam T an arbitrary type.
+         * @param[in] ilist the [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)
+         * @return `true` if both sizes are equal, `false` otherwise
+         */
         template <typename T>
         bool legal_number_of_values(const std::initializer_list<T> ilist) const {
             return ilist.size() == commands_.size();
         }
+        /*
+         * @brief Checks whether the size of the parameter pack @p args equals the size of this multiple_spawner.
+         * @tparam T an arbitrary type.
+         * @param[in] args the parameter pack
+         * @return `true` if both sizes are equal, `false` otherwise
+         */
         template <typename... T>
         bool legal_number_of_values(T&&... args) const {
             return sizeof...(args) == commands_.size();
         }
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
-         * @details Checks whether the distance bewteen @p first and @p last is not negative.
+         * @details Checks whether the distance between @p first and @p last is not negative.
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
          * @param[in] first iterator to the first element of the range
          * @param[in] last iterator to one-past the last element of the range
          * @return `true` if @p first and @p last denote a valid range, `false` otherwise
@@ -1069,13 +1085,30 @@ namespace mpicxx {
             return std::distance(first, last) >= 0;
         }
         /*
+         * @brief Check whether @p first and @p last denote a valid, non-empty range, i.e. @p first is less than @p last.
+         * @details Checks whether the distance between @p first and @p last is greater than `0`.
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @param[in] first iterator to the first element of the range
+         * @param[in] last iterator to one-past the last element of the range
+         * @return `true` if @p first and @p last denote a valid, non-empty range, `false` otherwise
+         */
+        template <std::input_iterator InputIt>
+        bool legal_non_empty_iterator_range(InputIt first, InputIt last) {
+            return std::distance(first, last) > 0;
+        }
+        /*
          * @brief Check whether @p command is legal, i.e. it is **not** empty.
-         * @param[in] command the command name
-         * @return `true` if @p command is a valid name, `false` otherwise
+         * @param[in] command the executable name
+         * @return `true` if @p command is a valid executable name, `false` otherwise
          */
         bool legal_command(const std::string& command) const noexcept {
             return !command.empty();
         }
+        /*
+         * @brief Checks whether all executable names in @p commands are valid.
+         * @param[in] commands the list of executable names
+         * @return `true` if all executable names in @p commands are valid, `false` otherwise
+         */
         std::pair<bool, std::size_t> legal_commands(const std::vector<std::string>& commands) const noexcept {
             for (std::size_t i = 0; i < commands.size(); ++i) {
                 if (!this->legal_command(commands[i])) {
@@ -1085,18 +1118,18 @@ namespace mpicxx {
             return std::make_pair(true, commands.size());
         }
         /*
-         * @brief Check whether @p key is legal, i.e. it does **not** only contain a '-'.
-         * @param[in] key the argv key
-         * @return `true` if @p key is valid, `false` otherwise
+         * @brief Check whether @p arg is legal, i.e. it isn't empty.
+         * @param[in] arg the command line argument
+         * @return `true` if @p arg is valid, `false` otherwise
          */
-        bool legal_argv_key(const std::string& arg) const noexcept {
+        bool legal_argv(const std::string& arg) const noexcept {
             return !arg.empty();
         }
         /*
          * @brief Checks whether @p maxprocs is valid.
          * @details Checks whether @p maxprocs is greater than `0`. In addition, if the universe size could be queried, it's checked
-         * whether @p maxprocs is less or equal than the universe size.
-         * @param[in] maxprocs the number of processes which should be spawned
+         *          whether @p maxprocs is less or equal than the universe size.
+         * @param[in] maxprocs the number of processes
          * @return `true` if @p maxprocs is legal, `false` otherwise
          */
         bool legal_maxprocs(const int maxprocs) const {
@@ -1107,6 +1140,11 @@ namespace mpicxx {
                 return 0 < maxprocs;
             }
         }
+        /*
+         * @brief Checks whether all number of process in @p maxprocs are legal.
+         * @param[in] maxprocs the list of number of maxprocs
+         * @return `true` if all number of processes in @p maxprocs are legal, `false` otherwise
+         */
         std::pair<bool, std::size_t> legal_maxprocs(const std::vector<int>& maxprocs) const {
             for (std::size_t i = 0; i < maxprocs.size(); ++i) {
                 if (!this->legal_maxprocs(maxprocs[i])) {
@@ -1142,7 +1180,7 @@ namespace mpicxx {
         bool legal_communicator(const MPI_Comm comm) const noexcept {
             return comm != MPI_COMM_NULL;
         }
-//#endif
+#endif
 
         std::vector<std::string> commands_;
         std::vector<std::vector<std::string>> argvs_;
