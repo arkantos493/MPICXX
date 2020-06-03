@@ -83,18 +83,18 @@ namespace mpicxx {
                     "Attempt to pass an illegal iterator range ('first' must be strictly less than 'last')!");
 
             // set command and maxprocs according to passed values
-            const auto size = std::distance(first, last);
-            commands_.reserve(size);
-            maxprocs_.reserve(size);
+            size_ = std::distance(first, last);
+            commands_.reserve(size_);
+            maxprocs_.reserve(size_);
 
             for (; first != last; ++first) {
                 const auto& pair = *first;
 
                 MPICXX_ASSERT_SANITY(this->legal_command(pair.first),
-                        "Attempt to set the {}-th executable name to the empty string!", size - std::distance(first, last));
+                        "Attempt to set the {}-th executable name to the empty string!", size_ - std::distance(first, last));
                 MPICXX_ASSERT_SANITY(this->legal_maxprocs(pair.second),
                         "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
-                        size - std::distance(first, last), pair.second,
+                        size_ - std::distance(first, last), pair.second,
                         mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
                 commands_.emplace_back(pair.first);
@@ -107,9 +107,9 @@ namespace mpicxx {
                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
-            infos_.assign(size, mpicxx::info::null);
+            info_.assign(size_, mpicxx::info::null);
             // set command line arguments to default values
-            argvs_.assign(size, std::vector<std::string>());
+            argvs_.assign(size_, std::vector<std::string>());
         }
         /**
          * @brief Constructs the multiple_spawner object with the contents of the
@@ -147,9 +147,9 @@ namespace mpicxx {
         template <detail::is_pair... T>
         multiple_spawner(T&&... args) requires (sizeof...(T) > 0) {
             // set command and maxprocs according to passed values
-            constexpr auto size = sizeof...(T);
-            commands_.reserve(size);
-            maxprocs_.reserve(size);
+            size_ = sizeof...(T);
+            commands_.reserve(size_);
+            maxprocs_.reserve(size_);
 
             ([&] (auto&& arg) {
 
@@ -169,9 +169,9 @@ namespace mpicxx {
                     mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             // set info objects to default values
-            infos_.assign(size, mpicxx::info::null);
+            info_.assign(size_, mpicxx::info::null);
             // set command line arguments to default values
-            argvs_.assign(size, std::vector<std::string>());
+            argvs_.assign(size_, std::vector<std::string>());
         }
         // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
         /**
@@ -198,16 +198,18 @@ namespace mpicxx {
             ([&] (auto&& arg) {
                 using spawner_t = decltype(arg);
                 if constexpr (std::is_same_v<std::remove_cvref_t<spawner_t>, single_spawner>) {
+                    ++size_;
                     commands_.emplace_back(std::forward<spawner_t>(arg).command());
                     argvs_.emplace_back(std::forward<spawner_t>(arg).argv());
                     maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs());
-                    infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info());
+                    info_.emplace_back(std::forward<spawner_t>(arg).spawn_info());
                 } else if constexpr (std::is_same_v<std::remove_cvref_t<spawner_t>, multiple_spawner>) {
+                    size_ += arg.size();
                     for (multiple_spawner::size_type i = 0; i < arg.size(); ++i) {
                         commands_.emplace_back(std::forward<spawner_t>(arg).command_at(i));
                         argvs_.emplace_back(std::forward<spawner_t>(arg).argv_at(i));
                         maxprocs_.emplace_back(std::forward<spawner_t>(arg).maxprocs_at(i));
-                        infos_.emplace_back(std::forward<spawner_t>(arg).spawn_info_at(i));
+                        info_.emplace_back(std::forward<spawner_t>(arg).spawn_info_at(i));
                     }
                 }
                 root_ = arg.root();
@@ -723,7 +725,7 @@ namespace mpicxx {
                     "Illegal number of values: std::distance(first, last) (which is {}) != this->size() (which is {})",
                     std::distance(first, last), this->size());
 
-            infos_.assign(first, last);
+            info_.assign(first, last);
             return *this;
         }
         /**
@@ -741,7 +743,7 @@ namespace mpicxx {
                     "Illegal number of values: ilist.size() (which is {}) != this->size() (which is {})",
                     ilist.size(), this->size());
 
-            infos_.assign(ilist);
+            info_.assign(ilist);
             return *this;
         }
         /**
@@ -759,8 +761,8 @@ namespace mpicxx {
             MPICXX_ASSERT_SANITY(this->legal_number_of_values(args...),
                     "Illegal number of values: sizeof...(T) (which is {}) != this->size() (which is {})", sizeof...(T), this->size());
 
-            infos_.clear();
-            (infos_.emplace_back(std::forward<T>(args)), ...);
+            info_.clear();
+            (info_.emplace_back(std::forward<T>(args)), ...);
             return *this;
         }
         /**
@@ -778,7 +780,7 @@ namespace mpicxx {
                         i, this->size()));
             }
 
-            infos_[i] = std::move(spawn_info);
+            info_[i] = std::move(spawn_info);
             return *this;
         }
 
@@ -947,7 +949,7 @@ namespace mpicxx {
          * @brief Returns all spawn info.
          * @return the info objects used to spawn the executables (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return infos_; }
+        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return info_; }
         /**
          * @brief Returns the @p i-th spawn info used to spawn the executables.
          * @param[in] i the index of the executable
@@ -962,7 +964,7 @@ namespace mpicxx {
                         i, this->size()));
             }
 
-            return infos_[i];
+            return info_[i];
         }
 
         /**
@@ -983,11 +985,11 @@ namespace mpicxx {
          * @return the size if this @ref mpicxx::multiple_spawner (`[[nodiscard]]`)
          */
         [[nodiscard]] size_type size() const noexcept {
-            MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec) { return vec.size(); }, commands_, argvs_, maxprocs_, infos_),
-                    "Attempt to retrieve the size while the sizes of the members (commands = {}, argvs = {}, maxprocs = {}, infos = {}) differ!",
-                    commands_.size(), argvs_.size(), maxprocs_.size(), infos_.size());
+            MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec) { return vec.size(); }, commands_, argvs_, maxprocs_, info_),
+                    "Attempt to retrieve the size while the sizes of the members (commands = {}, argvs = {}, maxprocs = {}, info = {}) differ!",
+                    commands_.size(), argvs_.size(), maxprocs_.size(), info_.size());
 
-            return commands_.size();
+            return size_;
         }
         /**
          * @brief Returns the total number of process that will get spawned.
@@ -1007,17 +1009,75 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            spawn new process(es)                                           //
         // ---------------------------------------------------------------------------------------------------------- //
+        // TODO 2020-06-04 00:09 breyerml: example ???
+
         /// @name spawn new process(es)
         ///@{
         /**
-         * @brief TODO
+         * @brief Spawns a number of MPI processes associated with multiple executables according to the previously set options.
+         * @details The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
+         * @return the result of the spawn invocation
+         *
+         * @pre The number of executables **must** match the size of this @ref multiple_spawner.
+         * @pre All executable name **must not** be empty.
+         * @pre The number of command line argument lists **must** match the size of this @ref multiple_spawner.
+         * @pre All command line arguments **must not** be empty.
+         * @pre The number of maxprocs **must** match the size of this @ref multiple_spawner.
+         * @pre All maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The number of spawn info **must** match the size of this @ref multiple_spawner.
+         * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre comm **must not** be *MPI_COMM_NULL*.
+         *
+         * @assert_precondition{ If **any** size mismatches. \n
+         *                       If any executable name is empty. \n
+         *                       If any command line argument is empty. \n
+         *                       If any number of maxprocs is invalid. \n
+         *                       If the total number of maxprocs is invalid. \n
+         *                       If root isn't a legal root. \n
+         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
+         *
+         * @calls{
+         * int MPI_Comm_spawn_multiple(int count, char *array_of_commands[], char **array_of_argv[], const int array_of_maxprocs[], const MPI_Info array_of_info[], int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * }
          */
         spawn_result spawn() {
             return this->spawn_impl<spawn_result>();
         }
         /**
-         * @brief TODO
-         * @return
+         * @brief Spawns a number of MPI processes associated with multiple executables according to the previously set options.
+         * @details The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
+         *          possibly occurring error codes.
+         * @return the result of the spawn invocation
+         *
+         * @pre The number of executables **must** match the size of this @ref multiple_spawner.
+         * @pre All executable name **must not** be empty.
+         * @pre The number of command line argument lists **must** match the size of this @ref multiple_spawner.
+         * @pre All command line arguments **must not** be empty.
+         * @pre The number of maxprocs **must** match the size of this @ref multiple_spawner.
+         * @pre All maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The number of spawn info **must** match the size of this @ref multiple_spawner.
+         * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre comm **must not** be *MPI_COMM_NULL*.
+         *
+         * @assert_precondition{ If **any** size mismatches. \n
+         *                       If any executable name is empty. \n
+         *                       If any command line argument is empty. \n
+         *                       If any number of maxprocs is invalid. \n
+         *                       If the total number of maxprocs is invalid. \n
+         *                       If root isn't a legal root. \n
+         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
+         *
+         * @calls{
+         * int MPI_Comm_spawn_multiple(int count, char *array_of_commands[], char **array_of_argv[], const int array_of_maxprocs[], const MPI_Info array_of_info[], int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * }
          */
         spawn_result_with_errcodes spawn_with_errcodes() {
             return this->spawn_impl<spawn_result_with_errcodes>();
@@ -1028,12 +1088,113 @@ namespace mpicxx {
     private:
 
         /*
-         * @brief
+         * @brief Spawns a number of MPI processes associated with multiple executables according to the previously set options.
+         * @tparam return_type either @ref mpicxx::spawn_result or @ref mpicxx::spawn_result_with_errcodes
+         * @return the result of the spawn invocation
+         *
+         * @pre The number of executables **must** match the size of this @ref multiple_spawner.
+         * @pre All executable name **must not** be empty.
+         * @pre The number of command line argument lists **must** match the size of this @ref multiple_spawner.
+         * @pre All command line arguments **must not** be empty.
+         * @pre The number of maxprocs **must** match the size of this @ref multiple_spawner.
+         * @pre All maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The number of spawn info **must** match the size of this @ref multiple_spawner.
+         * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre comm **must not** be *MPI_COMM_NULL*.
+         *
+         * @assert_precondition{ If **any** size mismatches. \n
+         *                       If any executable name is empty. \n
+         *                       If any command line argument is empty. \n
+         *                       If any number of maxprocs is invalid. \n
+         *                       If the total number of maxprocs is invalid. \n
+         *                       If root isn't a legal root. \n
+         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
+         *
+         * @calls{
+         * int MPI_Comm_spawn_multiple(int count, char *array_of_commands[], char **array_of_argv[], const int array_of_maxprocs[], const MPI_Info array_of_info[], int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * }
          */
         template <typename return_type>
         return_type spawn_impl() {
+            MPICXX_ASSERT_PRECONDITION(this->legal_number_of_values(commands_),
+                    "Illegal number of values: commands_.size() (which is {}) != this->size() (which is {})",
+                    commands_.size(), this->size());
+            MPICXX_ASSERT_PRECONDITION(this->legal_commands(commands_).first,
+                    "Attempt to use the {}-th executable name which is only an empty string!", this->legal_commands(commands_).second);
+            MPICXX_ASSERT_PRECONDITION(this->legal_number_of_values(argvs_),
+                    "illegal number of values: argvs_.size() (which is {}) != this->size() (which is {})",
+                    argvs_.size(), this->size());
+            MPICXX_ASSERT_PRECONDITION(this->legal_argv(argvs_), "Attempt to use an empty command line argument!",);
+            MPICXX_ASSERT_PRECONDITION(this->legal_number_of_values(maxprocs_),
+                    "Illegal number of values: maxprocs_.size() (which is {}) != this->size() (which is {})",
+                    maxprocs_.size(), this->size());
+            MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_).first,
+                    "Attempt to use the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                    this->legal_maxprocs(maxprocs_).second, maxprocs_[this->legal_maxprocs(maxprocs_).second],
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(this->total_maxprocs()),
+                    "Attempt to use the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                    fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_PRECONDITION(this->legal_number_of_values(info_),
+                    "Illegal number of values: info_.size() (which is {}) != this->size() (which is {})",
+                    info_.size(), this->size());
+            MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
+                    "The previously set root '{}' isn't a valid root in the current communicator!", root_);
+            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use null communicator!");
 
             return_type res(this->total_maxprocs());
+
+            // determine whether the placeholder MPI_ERRCODES_IGNORE shall be used or a "real" std::vector
+            auto errcode = [&res]() {
+                if constexpr (std::is_same_v<return_type, spawn_result_with_errcodes>) {
+                    return res.errcodes_.data();
+                } else {
+                    return MPI_ERRCODES_IGNORE;
+                }
+            }();
+
+            // convert vector of std::strings to vector of char*
+            std::vector<char*> commands_ptr;
+            commands_ptr.reserve(commands_.size());
+            for (std::size_t i = 0; i < commands_.size(); ++i) {
+                commands_ptr.emplace_back(commands_[i].data());
+            }
+            // convert vector of mpicxx::info to vector of MPI_INFO TODO: test
+            std::vector<MPI_Info> info_ptr;
+            info_ptr.reserve(info_.size());
+            for (std::size_t i = 0; i < info_.size(); ++i) {
+                info_ptr.emplace_back(info_[i].get());
+            }
+
+            if (std::all_of(argvs_.cbegin(), argvs_.cend(), [](const auto& vec) { return vec.empty(); })) {
+                // no additional arguments provided -> use MPI_ARGVS_NULL
+                MPI_Comm_spawn_multiple(static_cast<int>(this->size()), commands_ptr.data(), MPI_ARGVS_NULL, maxprocs_.data(),
+                                        info_ptr.data(), root_, comm_, &res.intercomm_, errcode);
+            } else {
+                // convert command line arguments to char***
+                char*** argv_ptr = new char**[argvs_.size()];
+                for (std::size_t i = 0; i < argvs_.size(); ++i) {
+                    argv_ptr[i] = new char*[argvs_[i].size() + 1];
+                    for (std::size_t j = 0; j < argvs_[i].size(); ++j) {
+                        argv_ptr[i][j] = argvs_[i][j].data();
+                    }
+                    argv_ptr[i][argvs_[i].size()] = nullptr;
+                }
+
+                MPI_Comm_spawn_multiple(static_cast<int>(this->size()), commands_ptr.data(), argv_ptr, maxprocs_.data(),
+                                        info_ptr.data(), root_, comm_, &res.intercomm_, errcode);
+
+                // delete char***
+                for (std::size_t i = 0; i < argvs_.size(); ++i) {
+                    delete[] argv_ptr[i];
+                }
+                delete[] argv_ptr;
+            }
 
             return res;
         }
@@ -1049,7 +1210,7 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         bool legal_number_of_values(InputIt first, InputIt last) {
             using difference_type = typename std::iterator_traits<InputIt>::difference_type;
-            return std::distance(first, last) == static_cast<difference_type>(commands_.size());
+            return std::distance(first, last) == static_cast<difference_type>(size_);
         }
         /*
          * @brief Checks whether the size of the [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)
@@ -1060,7 +1221,7 @@ namespace mpicxx {
          */
         template <typename T>
         bool legal_number_of_values(const std::initializer_list<T> ilist) const {
-            return ilist.size() == commands_.size();
+            return ilist.size() == size_;
         }
         /*
          * @brief Checks whether the size of the parameter pack @p args equals the size of this multiple_spawner.
@@ -1070,7 +1231,18 @@ namespace mpicxx {
          */
         template <typename... T>
         bool legal_number_of_values(T&&... args) const {
-            return sizeof...(args) == commands_.size();
+            return sizeof...(args) == size_;
+        }
+        /*
+         * @brief Checks whether the size of the [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) @p vec equals
+         *        the size of this multiple_spawner.
+         * @tparam T an arbitrary type.
+         * @param[in] vec the [`std::vector`](https://en.cppreference.com/w/cpp/container/vector)
+         * @return `true` if both sizes are equal, `false` otherwise
+         */
+        template <typename T>
+        bool legal_number_of_values(const std::vector<T>& vec) const {
+            return vec.size() == size_;
         }
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
@@ -1124,6 +1296,16 @@ namespace mpicxx {
          */
         bool legal_argv(const std::string& arg) const noexcept {
             return !arg.empty();
+        }
+        bool legal_argv(const std::vector<std::vector<std::string>>& argvs) const noexcept {
+            for (std::size_t i = 0; i < argvs.size(); ++i) {
+                for (std::size_t j = 0; j < argvs[i].size(); ++j) {
+                    if (!this->legal_argv(argvs[i][j])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
         /*
          * @brief Checks whether @p maxprocs is valid.
@@ -1182,10 +1364,11 @@ namespace mpicxx {
         }
 #endif
 
+        std::size_t size_ = 0;
         std::vector<std::string> commands_;
         std::vector<std::vector<std::string>> argvs_;
         std::vector<int> maxprocs_;
-        std::vector<info> infos_;
+        std::vector<info> info_;
         int root_ = 0;
         MPI_Comm comm_ = MPI_COMM_WORLD;
     };
