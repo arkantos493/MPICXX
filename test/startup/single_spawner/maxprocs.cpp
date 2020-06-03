@@ -1,7 +1,7 @@
 /**
  * @file test/startup/single_spawner/maxprocs.cpp
  * @author Marcel Breyer
- * @date 2020-04-15
+ * @date 2020-06-04
  *
  * @brief Test cases for the @ref mpicxx::single_spawner class maxprocs member functions.
  * @details Testsuite: *SingleSpawnerTest*
@@ -72,7 +72,7 @@ TEST(SingleSpawnerTest, GetMaxprocs) {
 
 TEST(SingleSpawnerTest, GetUniverseSize) {
     // check universe size
-    std::optional<int> universe_size = mpicxx::single_spawner::universe_size();
+    std::optional<int> universe_size = mpicxx::universe_size();
     if (universe_size.has_value()) {
         EXPECT_NE(universe_size.value(), 0);
     }

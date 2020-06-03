@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-05-12
+ * @date 2020-06-04
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -9,9 +9,7 @@
 #ifndef MPICXX_SINGLE_SPAWNER_HPP
 #define MPICXX_SINGLE_SPAWNER_HPP
 
-#include <iostream>
-#include <iterator>
-#include <numeric>
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -25,13 +23,13 @@
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/detail/conversion.hpp>
 #include <mpicxx/info/info.hpp>
+#include <mpicxx/info/runtime_info.hpp>
 #include <mpicxx/startup/spawn_result.hpp>
 
 
 namespace mpicxx {
 
     // TODO 2020-05-10 23:31 breyerml: change from MPI_Comm to mpicxx equivalent -> copy/move constructor/assignment
-    // TODO 2020-03-23 12:56 marcel: change from fmt::format to std::format
 
     /**
      * @nosubgrouping
@@ -39,10 +37,8 @@ namespace mpicxx {
      */
     class single_spawner {
     public:
-        /// The type of a single argv argument (represented by  a key and value).
-        using argv_value_type = std::pair<std::string, std::string>;
         /// Unsigned integer type.
-        using argv_size_type = std::size_t;
+        using argvs_size_type = std::size_t;
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
@@ -50,225 +46,156 @@ namespace mpicxx {
         /// @name constructor
         ///@{
         /**
-         * @brief Construct a new single_spawner object.
-         * @tparam T must meet the requirements of the @p detail::string concept
-         * @param[in] command name of program to be spawned (must meet the requirements of the @p detail::string concept)
-         * @param[in] maxprocs maximum number of processes to start
+         * @brief Construct a new @ref single_spawner object.
+         * @tparam T must meet the @p detail::is_string requirements.
+         * @param[in] command name of the executable
+         * @param[in] maxprocs maximum number of processes
          *
          * @pre @p command **must not** be empty.
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_sanity{
-         * If @p command is empty. \n
-         * If @p maxprocs is invalid.
-         * }
+         * @assert_sanity{ If @p command is empty. \n
+         *                 If @p maxprocs is invalid. }
          */
-         template <detail::string T>
+        template <detail::is_string T>
         single_spawner(T&& command, const int maxprocs) : command_(std::forward<T>(command)), maxprocs_(maxprocs) {
-            MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
+            MPICXX_ASSERT_SANITY(this->legal_command(command_), "Attempt to set executable name to the empty string!");
             MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_),
-                    "Can't spawn the given number of processes!: 0 < {} <= {}",
-                    maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                    "Attempt to set the maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                    maxprocs, mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
         }
         /**
-         * @brief Construct a new single_spawner object.
-         * @tparam T must meet the requirements of the @p detail::string concept
-         * @param[in] pair a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing the name of the program to be spawned
-         * and the maximum number of processes to start
+         * @brief Construct a new @ref single_spawner object.
+         * @tparam T must meet the @p detail::is_string requirements.
+         * @param[in] pair a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing the executable name and the
+         *                 maximum number of processes
          *
-         * @pre @p command **must not** be empty.
-         * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         * @pre command (@p pair.first) **must not** be empty.
+         * @pre maxprocs (@p pair.second **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
          *
-         * @assert_sanity{
-         * If @p command is empty. \n
-         * If @p maxprocs is invalid.
-         * }
+         * @assert_sanity{ If command (@p pair.first) is empty. \n
+         *                 If maxprocs (@p pair.second) is invalid. }
          */
-        template <detail::string T>
+        template <detail::is_string T>
         single_spawner(std::pair<T, int> pair) : single_spawner(std::move(pair.first), pair.second) { }
         ///@}
 
 
         // ---------------------------------------------------------------------------------------------------------- //
-        //                                       getter/setter spawn information                                      //
+        //                                          modify spawn information                                          //
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name modify spawn information
         ///@{
         /**
-         * @brief Set the name of the executable to be spawned.
-         * @tparam T must meet the requirements of the @p detail::string concept
-         * @param[in] command name of executable to be spawned (must meet the requirements of the @p detail::string concept)
+         * @brief Replace the old executable name with the new executable name @p command.
+         * @tparam T must meet the @p detail::is_string requirements.
+         * @param[in] command the new executable name
          * @return `*this`
          *
          * @pre @p command **must not** be empty.
          *
          * @assert_sanity{ If @p command is empty. }
          */
-        template <detail::string T>
+        template <detail::is_string T>
         single_spawner& set_command(T&& command) {
             command_ = std::forward<T>(command);
 
-            MPICXX_ASSERT_SANITY(this->legal_command(command_), "No executable name given!");
+            MPICXX_ASSERT_SANITY(this->legal_command(command_), "Attempt to set executable name to the empty string!");
 
             return *this;
         }
-        /**
-         * @brief Returns the name of the executable which should get spawned.
-         * @return the executable name (`[[nodiscard]]`)
-         */
-        [[nodiscard]] const std::string& command() const noexcept { return command_; }
 
         /**
-         * @brief Adds an argument ([key, value]-pair) the the `argv` list which gets passed to the spawned program.
-         * @details Tries to convert @p val to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
-         * @ref detail::convert_to_string().
-         * @tparam ValueType the type of the value
-         * @param[in] value the value associated with @p key
-         * @return `*this`
-         *
-         * @pre @p key **must not** only contain '-' (or '').
-         *
-         * @assert_sanity{ If @p key only contains '-' (or ''). }
-         */
-        template <typename T>
-        single_spawner& add_argv(T&& value) {
-            std::string argv = detail::convert_to_string(std::forward<T>(value));
-
-            MPICXX_ASSERT_SANITY(this->legal_argv_key(argv), "Attempt to set an empty command line argument!");
-
-            // add command line argument
-            argv_.emplace_back(std::move(argv));
-            return *this;
-        }
-        /**
-         * @brief Adds all arguments ([key, value]-pairs) from the range [@p first, @p last)  to the `argvs` list which gets passed to the
-         * spawned program.
-         * @details Adds a leading `-` to all keys if not already present.
-         *
-         * Tries to convert all values to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
-         * @ref detail::convert_to_string().
+         * @brief Adds all command line arguments in the range [@p first, @p last) to the executable.
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
-         * @param[in] first iterator to the first `argv` in the range
-         * @param[in] last iterator one-past the last `argv` in the range
+         * @param[in] first iterator to the first command line argument in the range
+         * @param[in] last iterator one-past the last command line argument in the range
          * @return `*this`
          *
-         * @pre All keys **must not** only contain '-' (or '').
          * @pre @p first and @p last **must** refer to the same container.
          * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
+         * @pre All command line arguments **must not** be empty.
          *
          * @assert_precondition{ If @p first and @p last don't denote a valid range. }
-         * @assert_sanity{ If any key only contains '-' (or ''). }
+         * @assert_sanity{ If any command line argument is empty. }
          */
         template <std::input_iterator InputIt>
-        single_spawner& add_argv(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
+        single_spawner& add_argv(InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
                     "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
 
             for (; first != last; ++first) {
-                const auto& pair = *first;
-                this->add_argv(pair.first, pair.second);
+                this->add_argv(*first);
             }
             return *this;
         }
         /**
-         * @brief Adds all arguments ([key, value]-pairs) from the initializer list @p ilist to the `argvs` list which gets passed to the
-         * spawned program.
-         * @details Adds a leading `-` to all keys if not already present.
-         *
-         * Tries to convert all values to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using
-         * @ref detail::convert_to_string().
-         * @tparam ValueType the type of the value
-         * @param[in] ilist initializer list to insert the `argvs` from
+         * @brief Adds all command line arguments in the
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist to the executable.
+         * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+         *           via @ref detail::convert_to_string.
+         * @param[in] ilist the (additional) command line arguments
          * @return `*this`
          *
-         * @pre All keys **must not** only contain '-' (or '').
+         * @pre All command line arguments **must not** be empty.
          *
-         * @assert_sanity{ If any key only contains '-' (or ''). }
+         * @assert_sanity{ If any command line argument is empty. }
          */
-        template <typename ValueType>
-        single_spawner& add_argv(std::initializer_list<std::pair<std::string, ValueType>> ilist) {
+        template <typename T = std::string>
+        single_spawner& add_argv(std::initializer_list<T> ilist) {
             return this->add_argv(ilist.begin(), ilist.end());
         }
         /**
-         * @brief Returns the arguments which will be passed to `command`.
-         * @return the arguments passed to `command` (`[[nodiscard]]`)
-         */
-        [[nodiscard]] const std::vector<std::string>& argv() const noexcept { return argv_; }
-        /**
-         * @brief Returns the i-th argument which will be passed to `command`.
-         * @param[in] i the argv to return
-         * @return the i-th argument (`[[nodiscard]]`)
+         * @brief Adds all command line arguments in the parameter pack @p args to the executable.
+         * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+         *           via @ref detail::convert_to_string.
+         * @param[in] args the (additional) command line arguments
+         * @return `*this`
          *
-         * @throws std::out_of_range if the index @p i is an out-of-bounce access
+         * @pre All command line arguments in @p args **must not** be empty.
+         *
+         * @assert_sanity{ If any command line argument is empty. }
          */
-        [[nodiscard]] const std::string& argv(const std::size_t i) const {
-            if (i >= argv_.size()) {
-                throw std::out_of_range(fmt::format("Out-of-bounce access!: {} < {}", i, argv_.size()));
-            }
+        template <typename... T>
+        single_spawner& add_argv(T&&... args) requires (sizeof...(T) > 0) {
+            ([&](auto&& arg) {
+                // convert argument to a std::string
+                std::string argv = detail::convert_to_string(std::forward<T>(args));
 
-            return argv_[i];
-        }
-        /**
-         * @brief Returns the number of added arguments ([key, value]-pairs).
-         * @return the number of added `argvs` (`[[nodiscard]]`)
-         */
-        [[nodiscard]] argv_size_type argv_size() const noexcept {
-            return argv_.size();
+                MPICXX_ASSERT_SANITY(this->legal_argv(argv), "Attempt to set an empty command line argument!");
+
+                // add command line argument
+                argvs_.emplace_back(std::move(argv));
+            }(std::forward<T>(args)), ...);
+            return *this;
         }
 
         /**
-         * @brief Set the maximum number of processes to start.
-         * @param[in] maxprocs maximum number of processes to start
+         * @brief Replaces the old number of processes with the new number of processes @p maxprocs.
+         * @param[in] maxprocs the new number of processes
          * @return `*this`
          *
          * @pre @p maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
+         *      (@ref mpicxx::universe_size()).
          *
          * @assert_sanity{ If @p maxprocs is invalid. }
          */
         single_spawner& set_maxprocs(const int maxprocs) {
-            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs),
-                    "Can't spawn the given number of processes!: 0 < {} <= {}",
-                    maxprocs, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_),
+                    "Attempt to set the maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                    maxprocs, mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
 
             maxprocs_ = maxprocs;
             return *this;
         }
-        /**
-         * @brief Returns the number of processes which should get spawned.
-         * @return the number of processes (`[[nodiscard]]`)
-         */
-        [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
-        /**
-         * @brief Returns the maximum possible number of processes.
-         * @return an optional containing the maximum possible number of processes or `std::nullopt` if no value could be retrieved
-         * (`[[nodiscard]]`)
-         *
-         * @note It may be possible that less than `universe_size` processes can be spawned if processes are already running.
-         *
-         * @calls{
-         * int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);       // exactly once
-         * }
-         */
-        [[nodiscard]] static std::optional<int> universe_size() {
-            void* ptr;
-            int flag;
-            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_UNIVERSE_SIZE, &ptr, &flag);
-            if (static_cast<bool>(flag)) {
-                return std::make_optional(*reinterpret_cast<int*>(ptr));
-            } else {
-                return std::nullopt;
-            }
-        }
 
-        // TODO 2020-04-17 00:11 breyerml: single spawner info same ???
         /**
          * @brief Set the info object representing additional information for the runtime system where and how to spawn the processes.
          * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
          *
-         *  key | description
+         * key  | description
          * :----| :--------------------------------------------------------------------------------------------------------------------------------------------------|
          * host | a hostname                                                                                                                                         |
          * arch | an architecture name                                                                                                                               |
@@ -278,19 +205,14 @@ namespace mpicxx {
          * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
          *
          * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
-         * functionality described.
-         * @param[in] additional_info copy of the info object
+         *       functionality described.
+         * @param[in] spawn_info copy of the @ref info object
          * @return `*this`
          */
-        single_spawner& set_spawn_info(info additional_info) noexcept {
-            info_ = std::move(additional_info);
+        single_spawner& set_spawn_info(info spawn_info) noexcept {
+            info_ = std::move(spawn_info);
             return *this;
         }
-        /**
-         * @brief Returns the info object representing additional information for the runtime system where and how to spawn the processes.
-         * @return the info object (`[[nodiscard]]`)
-         */
-        [[nodiscard]] const info& spawn_info() const noexcept { return info_; }
 
         /**
          * @brief Set the rank of the root process (from which the other processes are spawned).
@@ -298,22 +220,18 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre @p root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
          *
-         * @assert_precondition{ If @p root isn't a legal root. }
+         * @assert_sanity{ If @p root isn't a legal root. }
          */
         single_spawner& set_root(const int root) noexcept {
-            MPICXX_ASSERT_PRECONDITION(this->legal_root(root, comm_),
-                    "The root can't be used in the provided communicator!: 0 <= {} < {}", root, this->comm_size(comm_));
+            MPICXX_ASSERT_SANITY(this->legal_root(root, comm_),
+                    "Attempt to set the root process (which is {}), which falls outside the valid range [0, {})!",
+                    root, this->comm_size(comm_));
 
             root_ = root;;
             return *this;
         }
-        /**
-         * @brief Returns the rank of the root process.
-         * @return the root rank (`[[nodiscard]]`)
-         */
-        [[nodiscard]] int root() const noexcept { return root_; }
 
         /**
          * @brief Intracommunicator containing the group of spawning processes.
@@ -327,13 +245,74 @@ namespace mpicxx {
          * @assert_sanity{ If the currently specified root isn't valid in @p comm. }
          */
         single_spawner& set_communicator(MPI_Comm comm) noexcept {
-            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm), "Can't use null communicator!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm), "Attempt to set the communicator to MPI_COMM_NULL!");
             MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
-                    "The previously set root '{}' isn't a valid root in the new communicator!", root_);
+                    "The previously set root (which is {}) isn't a valid root in the new communicator anymore!", root_);
 
             comm_ = comm;
             return *this;
         }
+        ///@}
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                            get spawn information                                           //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name get spawn information
+        ///@{
+        /**
+         * @brief Returns the name of the executable which should get spawned.
+         * @return the executable name (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const std::string& command() const noexcept { return command_; }
+
+        /**
+         * @brief Returns all command line arguments.
+         * @return the command line arguments (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const std::vector<std::string>& argv() const noexcept { return argvs_; }
+        /**
+         * @brief Returns the @p i-th command line argument.
+         * @param[in] i the index of the command line argument
+         * @return the @p i-th command line argument (`[[nodiscard]]`)
+         *
+         * @throws std::out_of_range if the index @p i falls outside the valid range
+         */
+        [[nodiscard]] const std::string& argvs_at(const std::size_t i) const {
+            if (i >= argvs_.size()) {
+                throw std::out_of_range(fmt::format(
+                        "single_spawner::argvs_at(const std::size_t) range check: i (which is {}) >= argvs_.size() (which is {})",
+                        i, argvs_.size()));
+            }
+
+            return argvs_[i];
+        }
+        /**
+         * @brief Returns the number of command line arguments.
+         * @return the number of command line arguments (`[[nodiscard]]`)
+         */
+        [[nodiscard]] argvs_size_type argvs_size() const noexcept {
+            return argvs_.size();
+        }
+
+        /**
+         * @brief Returns the number of processes.
+         * @return the number of processes (`[[nodiscard]]`)
+         */
+        [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
+
+        /**
+         * @brief Returns the info object.
+         * @return the info object (`[[nodiscard]]`)
+         */
+        [[nodiscard]] const info& spawn_info() const noexcept { return info_; }
+
+        /**
+         * @brief Returns the rank of the root process.
+         * @return the root rank (`[[nodiscard]]`)
+         */
+        [[nodiscard]] int root() const noexcept { return root_; }
+
         /**
          * @brief Returns the intracommunicator containing the group of spawning processes.
          * @return the intracommunicator (`[[nodiscard]]`)
@@ -349,26 +328,22 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
-         * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
+         * @details The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
+         * @return the result of the spawn invocation
          *
-         * The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
-         * @return a @ref mpicxx::spawn_result object holding the result of the @ref spawn() invocation (i.e. communicator and errcodes)
+         * @pre The executable name **must not** be empty.
+         * @pre All command line arguments **must not** be empty.
+         * @pre maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre comm **must not** be *MPI_COMM_NULL*.
          *
-         * @pre `command` **must not** be empty.
-         * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
-         * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
-         * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
-         * @pre `comm` **must not** be *MPI_COMM_NULL*.
-         *
-         * @assert_precondition{
-         * If the `command` is empty. \n
-         * If any key only contains '-' (or ''). \n
-         * If `maxprocs` is invalid. \n
-         * If `root` isn't a legal root. \n
-         * If `comm` is the null communicator (*MPI_COMM_NULL*).
-         * }
+         * @assert_precondition{ If the executable name is empty. \n
+         *                       If any command line argument is empty. \n
+         *                       If maxprocs is invalid. \n
+         *                       If root isn't a legal root. \n
+         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
          *
          * @calls{
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
@@ -379,28 +354,23 @@ namespace mpicxx {
         }
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
-         * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
+         * @details The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
+         *          possibly occurring error codes.
+         * @return the result of the spawn invocation
          *
-         * The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
-         * possibly occurring error codes.
-         * @return a @ref mpicxx::spawn_result_with_errcodes object holding the result of the @ref spawn_with_errcodes() invocation
-         * (i.e. communicator and errcodes)
+         * @pre The executable name **must not** be empty.
+         * @pre All command line arguments **must not** be empty.
+         * @pre maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre comm **must not** be *MPI_COMM_NULL*.
          *
-         * @pre `command` **must not** be empty.
-         * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
-         * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
-         * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
-         * @pre `comm` **must not** be *MPI_COMM_NULL*.
-         *
-         * @assert_precondition{
-         * If the `command` is empty. \n
-         * If any key only contains '-' (or ''). \n
-         * If `maxprocs` is invalid. \n
-         * If `root` isn't a legal root. \n
-         * If `comm` is the null communicator (*MPI_COMM_NULL*).
-         * }
+         * @assert_precondition{ If the executable name is empty. \n
+         *                       If any command line argument is empty. \n
+         *                       If maxprocs is invalid. \n
+         *                       If root isn't a legal root. \n
+         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
          *
          * @calls{
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
@@ -417,26 +387,22 @@ namespace mpicxx {
         /*
          * @brief Spawns a number of MPI processes according to the previously set options.
          * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
-         *
-         * Same as @ref spawn() but also returns error codes.
          * @tparam return_type either @ref mpicxx::spawn_result or @ref mpicxx::spawn_result_with_errcodes
          * @return the result of the spawn invocation
          *
-         * @pre `command` **must not** be empty.
-         * @pre All keys added to the `argvs` **must not** only contain '-' (or '').
-         * @pre `maxprocs` **must not** be less or equal than `0` or greater than the maximum possible number of processes
-         * (@ref universe_size()).
-         * @pre `root` **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         * @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
-         * @pre `comm` **must not** be *MPI_COMM_NULL*.
+         * @pre The executable name **must not** be empty.
+         * @pre All command line arguments **must not** be empty.
+         * @pre maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
+         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         * @pre comm **must not** be *MPI_COMM_NULL*.
          *
-         * @assert_precondition{
-         * If the `command` is empty. \n
-         * If any key only contains '-' (or ''). \n
-         * If `maxprocs` is invalid. \n
-         * If `root` isn't a legal root. \n
-         * If `comm` is the null communicator (*MPI_COMM_NULL*).
-         * }
+         * @assert_precondition{ If the executable name is empty. \n
+         *                       If any command line argument is empty. \n
+         *                       If maxprocs is invalid. \n
+         *                       If root isn't a legal root. \n
+         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
          *
          * @calls{
          * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
@@ -444,15 +410,15 @@ namespace mpicxx {
          */
         template <typename return_type>
         return_type spawn_impl() {
-            MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "No executable name given!");
-            MPICXX_ASSERT_PRECONDITION(this->legal_argv_keys(argv_).first,
-                    "An empty command line argument isn't valid!: wrong key at: {}", this->legal_argv_keys(argv_).second);
+            MPICXX_ASSERT_PRECONDITION(this->legal_command(command_), "Attempt to use the executable name which is only an empty string!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_argv(argvs_).first,
+                    "Attempt to use the {}-th command line argument which is only an empty string!", this->legal_argv(argvs_).second);
             MPICXX_ASSERT_PRECONDITION(this->legal_maxprocs(maxprocs_),
-                    "Can't spawn the given number of processes!: 0 < {} <= {}",
-                    maxprocs_, single_spawner::universe_size().value_or(std::numeric_limits<int>::max()));
+                    "Attempt to use the maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                    maxprocs_, mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
                     "The previously set root '{}' isn't a valid root in the current communicator!", root_);
-            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use null communicator!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use the null communicator!");
 
             return_type res(maxprocs_);
 
@@ -465,43 +431,27 @@ namespace mpicxx {
                 }
             }();
 
-            if (argv_.empty()) {
+            if (argvs_.empty()) {
                 // no additional arguments provided -> use MPI_ARGV_NULL
                 MPI_Comm_spawn(command_.c_str(), MPI_ARGV_NULL, maxprocs_, info_.get(),
                                root_, comm_, &res.intercomm_, errcode);
             } else {
                 // convert additional arguments to char**
-                std::vector<char*> argv_ptr;
-                argv_ptr.reserve(argv_.size() + 1);
-                for (auto& str : argv_) {
-                    argv_ptr.emplace_back(str.data());
+                std::vector<char*> argvs_ptr;
+                argvs_ptr.reserve(argvs_.size() + 1);
+                for (auto& str : argvs_) {
+                    argvs_ptr.emplace_back(str.data());
                 }
                 // add null termination
-                argv_ptr.emplace_back(nullptr);
+                argvs_ptr.emplace_back(nullptr);
 
-                MPI_Comm_spawn(command_.c_str(), argv_ptr.data(), maxprocs_, info_.get(),
+                MPI_Comm_spawn(command_.c_str(), argvs_ptr.data(), maxprocs_, info_.get(),
                                root_, comm_, &res.intercomm_, errcode);
             }
             return res;
         }
 
 #if ASSERTION_LEVEL > 0
-        /*
-         * @brief Check whether @p command is legal, i.e. it is **not** empty.
-         * @param[in] command the command name
-         * @return `true` if @p command is a valid name, `false` otherwise
-         */
-        bool legal_command(const std::string& command) const noexcept {
-            return !command.empty();
-        }
-        /*
-         * @brief Check whether @p key is legal, i.e. it does **not** only contain a '-'.
-         * @param[in] key the argv key
-         * @return `true` if @p key is valid, `false` otherwise
-         */
-        bool legal_argv_key(const std::string& argv) const noexcept {
-            return !argv.empty();
-        }
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
          * @details Checks whether the distance bewteen @p first and @p last is not negative.
@@ -514,13 +464,29 @@ namespace mpicxx {
             return std::distance(first, last) >= 0;
         }
         /*
-         * @brief Check whether all keys in @p argvs are legal, i.e. whether @ref legal_argv_key() const yields `true` for all keys.
-         * @param[in] argvs a vector of multiple argument [key, value]-pairs
-         * @return `true` if all keys in @p argvs are valid, `false` otherwise
+         * @brief Check whether @p command is legal, i.e. it is **not** empty.
+         * @param[in] command the executable name
+         * @return `true` if @p command is a executable valid name, `false` otherwise
          */
-        std::pair<bool, std::size_t> legal_argv_keys(const std::vector<std::string>& argvs) const noexcept {
+        bool legal_command(const std::string& command) const noexcept {
+            return !command.empty();
+        }
+        /*
+         * @brief Check whether @p argv is legal, i.e. it is **not** empty.
+         * @param[in] argv the command line argument
+         * @return `true` if @p key is valid, `false` otherwise
+         */
+        bool legal_argv(const std::string& argv) const noexcept {
+            return !argv.empty();
+        }
+        /*
+         * @brief Check whether all command line arguments in @p argvs are legal.
+         * @param[in] argvs the list of command line arguments
+         * @return `true` if all command line arguments in @p argvs are legal, `false` otherwise
+         */
+        std::pair<bool, std::size_t> legal_argv(const std::vector<std::string>& argvs) const noexcept {
             for (std::size_t i = 0; i < argvs.size(); ++i) {
-                if (!this->legal_argv_key(argvs[i])) {
+                if (!this->legal_argv(argvs[i])) {
                     return std::make_pair(false, i);
                 }
             }
@@ -529,12 +495,12 @@ namespace mpicxx {
         /*
          * @brief Checks whether @p maxprocs is valid.
          * @details Checks whether @p maxprocs is greater than `0`. In addition, if the universe size could be queried, it's checked
-         * whether @p maxprocs is less or equal than the universe size.
+         *          whether @p maxprocs is less or equal than the universe size.
          * @param[in] maxprocs the number of processes which should be spawned
          * @return `true` if @p maxprocs is legal, `false` otherwise
          */
         bool legal_maxprocs(const int maxprocs) const {
-            std::optional<int> universe_size = single_spawner::universe_size();
+            std::optional<int> universe_size = mpicxx::universe_size();
             if (universe_size.has_value()) {
                 return 0 < maxprocs && maxprocs <= universe_size.value();
             } else {
@@ -568,10 +534,10 @@ namespace mpicxx {
         bool legal_communicator(const MPI_Comm comm) const noexcept {
             return comm != MPI_COMM_NULL;
         }
-
 #endif
+
         std::string command_;
-        std::vector<std::string> argv_;
+        std::vector<std::string> argvs_;
         int maxprocs_;
         info info_ = mpicxx::info::null;
         int root_ = 0;
