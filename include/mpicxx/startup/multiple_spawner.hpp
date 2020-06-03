@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-03
+ * @date 2020-06-04
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -10,7 +10,6 @@
 #define MPICXX_MULTIPLE_SPAWNER_HPP
 
 #include <cstddef>
-#include <iostream>
 #include <numeric>
 #include <stdexcept>
 #include <string>
@@ -482,7 +481,7 @@ namespace mpicxx {
          * @param[in] args the (additional) command line arguments
          * @return `*this`
          *
-         * @pre All command line arguments **must not** be empty.
+         * @pre All command line arguments in @p args **must not** be empty.
          *
          * @assert_sanity{ If any command line argument is empty. }
          *
@@ -707,6 +706,19 @@ namespace mpicxx {
 
         /**
          * @brief Replaces the old spawn info with the new info from the range [@p first, @p last).
+         * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
+         *
+         * key  | description
+         * :----| :--------------------------------------------------------------------------------------------------------------------------------------------------|
+         * host | a hostname                                                                                                                                         |
+         * arch | an architecture name                                                                                                                               |
+         * wdir | a name of a directory on a machine on which the spawned processes execute; this directory is made the working directory of the executing processes |
+         * path | a directory or set of directories where the MPI implementation should look for the executable                                                      |
+         * file | a name of a file in which additional information is specified                                                                                      |
+         * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
+         *
+         * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
+         *       functionality described.
          * @tparam InputIt must meet [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements.
          * @param[in] first iterator to the first spawn info in the range
          * @param[in] last iterator one-past the last spawn info in the range
@@ -731,6 +743,19 @@ namespace mpicxx {
         /**
          * @brief Replaces the old spawn info with the new info from the
          *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist.
+         * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
+         *
+         * key  | description
+         * :----| :--------------------------------------------------------------------------------------------------------------------------------------------------|
+         * host | a hostname                                                                                                                                         |
+         * arch | an architecture name                                                                                                                               |
+         * wdir | a name of a directory on a machine on which the spawned processes execute; this directory is made the working directory of the executing processes |
+         * path | a directory or set of directories where the MPI implementation should look for the executable                                                      |
+         * file | a name of a file in which additional information is specified                                                                                      |
+         * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
+         *
+         * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
+         *       functionality described.
          * @param[in] ilist the new spawn info
          * @return `*this`
          *
@@ -748,6 +773,19 @@ namespace mpicxx {
         }
         /**
          * @brief Replaces the old spawn info with the new info from the parameter pack @p args.
+         * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
+         *
+         * key  | description
+         * :----| :--------------------------------------------------------------------------------------------------------------------------------------------------|
+         * host | a hostname                                                                                                                                         |
+         * arch | an architecture name                                                                                                                               |
+         * wdir | a name of a directory on a machine on which the spawned processes execute; this directory is made the working directory of the executing processes |
+         * path | a directory or set of directories where the MPI implementation should look for the executable                                                      |
+         * file | a name of a file in which additional information is specified                                                                                      |
+         * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
+         *
+         * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
+         *       functionality described.
          * @tparam T an arbitrary number of @ref mpicxx::info objects meeting the æref detail::is_info requirements.
          * @param[in] args the new spawn info
          * @return `*this`
@@ -811,11 +849,11 @@ namespace mpicxx {
          * @pre @p comm **must not** be *MPI_COMM_NULL*.
          * @pre The currently specified rank (as returned by @ref root()) **must be** valid in @p comm.
          *
-         * @assert_sanity{ If @p comm is the null communicator (*MPI_COMM_NULL*). \n
-         *                 If the currently specified root isn't valid in @p comm. }
+         * @assert_precondition{ If @p comm is the null communicator (*MPI_COMM_NULL*). }
+         * @assert_sanity{ If the currently specified root isn't valid in @p comm. }
          */
         multiple_spawner& set_communicator(MPI_Comm comm) noexcept {
-            MPICXX_ASSERT_SANITY(this->legal_communicator(comm), "Attempt to set the communicator to MPI_COMM_NULL!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm), "Attempt to set the communicator to MPI_COMM_NULL!");
             MPICXX_ASSERT_SANITY(this->legal_root(root_, comm),
                     "The previously set root (which is {}) isn't a valid root in the new communicator anymore!", root_);
 
@@ -1145,7 +1183,7 @@ namespace mpicxx {
                     info_.size(), this->size());
             MPICXX_ASSERT_PRECONDITION(this->legal_root(root_, comm_),
                     "The previously set root '{}' isn't a valid root in the current communicator!", root_);
-            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use null communicator!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_communicator(comm_), "Can't use the  null communicator!");
 
             return_type res(this->total_maxprocs());
 
