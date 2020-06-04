@@ -1,24 +1,25 @@
 /**
  * @file test/startup/single_spawner/constructor.cpp
  * @author Marcel Breyer
- * @date 2020-04-13
+ * @date 2020-06-04
  *
  * @brief Test cases for the @ref mpicxx::single_spawner class constructors.
  * @details Testsuite: *SingleSpawnerTest*
- * | test case name                   | test case description                                                                                                       |
- * |:---------------------------------|:----------------------------------------------------------------------------------------------------------------------------|
- * | ConstructValid                   | test the spawning of a new MPI process                                                                                      |
- * | ConstructInvalidCommand          | spawn with an illegal command name (death test)                                                                             |
- * | ConstructInvalidMaxprocs         | spawn with an illegal number of maxprocs (death test)                                                                       |
- * | ConstructFromPairValid           | test the spawning of a new MPI process using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair)                |
- * | ConstructFromPairInvalidCommand  | spawn with an illegal command name using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) (death test)       |
- * | ConstructFromPairInvalidMaxprocs | spawn with an illegal number of maxprocs using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) (death test) |
+ * | test case name                   | test case description                                                                                                                                                        |
+ * |:---------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | ConstructValid                   | construct a new @ref mpicxx::single_spawner object                                                                                                                           |
+ * | ConstructInvalidCommand          | try constructing a new @ref mpicxx::single_spawner object with an illegal executable name (death test)                                                                       |
+ * | ConstructInvalidMaxprocs         | try constructing a new @ref mpicxx::single_spawner object with an illegal maxprocs value (death test)                                                                        |
+ * | ConstructFromPairValid           | construct a new @ref mpicxx::single_spawner object using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair)                                                     |
+ * | ConstructFromPairInvalidCommand  | try constructing a new @ref mpicxx::single_spawner object with an illegal executable name using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) (death test) |
+ * | ConstructFromPairInvalidMaxprocs | try constructing a new @ref mpicxx::single_spawner object with an illegal maxprocs value using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) (death test)  |
  */
 
 #include <limits>
+#include <string>
+#include <utility>
 
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/startup/single_spawner.hpp>
 
@@ -29,7 +30,7 @@ TEST(SingleSpawnerTest, ConstructValid) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // check of values were set correctly
+    // check if values were set correctly
     EXPECT_EQ(ss.command(), "a.out"s);
     EXPECT_EQ(ss.maxprocs(), 1);
 }
@@ -50,7 +51,7 @@ TEST(SingleSpawnerTest, ConstructFromPairValid) {
     // create new single_spawner object
     mpicxx::single_spawner ss(std::make_pair("a.out", 1));
 
-    // check of values were set correctly
+    // check if values were set correctly
     EXPECT_EQ(ss.command(), "a.out"s);
     EXPECT_EQ(ss.maxprocs(), 1);
 }

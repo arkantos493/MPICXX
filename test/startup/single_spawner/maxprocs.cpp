@@ -3,21 +3,20 @@
  * @author Marcel Breyer
  * @date 2020-06-04
  *
- * @brief Test cases for the @ref mpicxx::single_spawner class maxprocs member functions.
+ * @brief Test cases for the @ref mpicxx::single_spawner::set_maxprocs(int) and @ref mpicxx::single_spawner::maxprocs() const member
+ *        functions provided by the @ref mpicxx::single_spawner class.
  * @details Testsuite: *SingleSpawnerTest*
- * | test case name     | test case description                                      |
- * |:-------------------|:-----------------------------------------------------------|
- * | SetMaxprocs        | set a new number of maxprocs                               |
- * | SetInvalidMaxprocs | set a new illegal number of maxprocs (death test)          |
- * | ChainSetMaxprocs   | chain calls to @ref mpicxx::single_spawner::set_maxprocs() |
- * | GetMaxprocs        | get the current number of maxprocs                         |
- * | GetUniverseSize    | get the available universe size                            |
+ * | test case name     | test case description                             |
+ * |:-------------------|:--------------------------------------------------|
+ * | SetMaxprocs        | set a new number of maxprocs                      |
+ * | SetInvalidMaxprocs | set a new illegal number of maxprocs (death test) |
+ * | GetMaxprocs        | get the current number of maxprocs                |
  */
 
 #include <limits>
+#include <string>
 
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/startup/single_spawner.hpp>
 
@@ -49,31 +48,10 @@ TEST(SingleSpawnerDeathTest, SetInvalidMaxprocs) {
     ASSERT_DEATH( ss.set_maxprocs(std::numeric_limits<int>::max()) , "");
 }
 
-TEST(SingleSpawnerTest, ChainSetMaxprocs) {
-    // create new single_spawner object
-    mpicxx::single_spawner ss("a.out", 1);
-
-    ASSERT_EQ(ss.maxprocs(), 1);
-
-    // chain multiple calls to set_maxprocs
-    ss.set_maxprocs(2).set_maxprocs(1).set_maxprocs(2);
-
-    // check whether the number of maxprocs has been updated to the last maxprocs number
-    EXPECT_EQ(ss.maxprocs(), 2);
-}
-
 TEST(SingleSpawnerTest, GetMaxprocs) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
     // check getter
     EXPECT_EQ(ss.maxprocs(), 1);
-}
-
-TEST(SingleSpawnerTest, GetUniverseSize) {
-    // check universe size
-    std::optional<int> universe_size = mpicxx::universe_size();
-    if (universe_size.has_value()) {
-        EXPECT_NE(universe_size.value(), 0);
-    }
 }

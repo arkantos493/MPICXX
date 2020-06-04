@@ -1,20 +1,21 @@
 /**
  * @file test/startup/single_spawner/root.cpp
  * @author Marcel Breyer
- * @date 2020-04-13
+ * @date 2020-06-04
  *
- * @brief Test cases for the @ref mpicxx::single_spawner class root member functions.
+ * @brief Test cases for the @ref mpicxx::single_spawner::set_root(int) and @ref mpicxx::single_spawner::root() const member functions
+ *        provided by the @ref mpicxx::single_spawner class.
  * @details Testsuite: *SingleSpawnerTest*
- * | test case name | test case description                                  |
- * |:---------------|:-------------------------------------------------------|
- * | SetRoot        | set a new root process                                 |
- * | SetInvalidRoot | set a new illegal root process (death test)            |
- * | ChainSetRoot   | chain calls to @ref mpicxx::single_spawner::set_root() |
- * | GetRoot        | get the current root process                           |
+ * | test case name | test case description                       |
+ * |:---------------|:--------------------------------------------|
+ * | SetRoot        | set a new root process                      |
+ * | SetInvalidRoot | set a new illegal root process (death test) |
+ * | GetRoot        | get the current root process                |
  */
 
+#include <string>
+
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/startup/single_spawner.hpp>
 
@@ -39,17 +40,6 @@ TEST(SingleSpawnerDeathTest, SetInvalidRoot) {
     // set a new illegal root
     ASSERT_DEATH( ss.set_root(-1) , "");
     ASSERT_DEATH( ss.set_root(2)  , "");
-}
-
-TEST(SingleSpawnerTest, ChainSetRoot) {
-    // create new single_spawner object
-    mpicxx::single_spawner ss("a.out", 1);
-
-    // chain multiple calls to set_root
-    ss.set_root(1).set_root(0).set_root(1);
-
-    // check whether the root has been updated to the last root
-    EXPECT_EQ(ss.root(), 1);
 }
 
 TEST(SingleSpawnerTest, GetRoot) {

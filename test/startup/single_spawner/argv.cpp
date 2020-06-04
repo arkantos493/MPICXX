@@ -1,30 +1,33 @@
 /**
  * @file test/startup/single_spawner/argv.cpp
  * @author Marcel Breyer
- * @date 2020-04-13
+ * @date 2020-06-04
  *
- * @brief Test cases for the @ref mpicxx::single_spawner class argv member functions.
+ * @brief Test cases for the command line member functions provided by the @ref mpicxx::single_spawner class.
  * @details Testsuite: *SingleSpawnerTest*
- * | test case name                   | test case description                                                              |
- * |:---------------------------------|:-----------------------------------------------------------------------------------|
- * | AddArgv                          | add a single argv                                                                  |
- * | AddInvalidArgv                   | add a single and invalid argv (death test)                                         |
- * | AddArgvVbyIteratorRange          | add multiple argvs denote by the iterator range [first, last)                      |
- * | AddInvalidArgvVbyIteratorRange   | add multiple invalid argvs denote by the iterator range [first, last) (death test) |
- * | AddArgvByInitializerList         | add multiple argvs denoted by the initializer list                                 |
- * | AddInvalidArgvByInitializerList  | add multiple invalid argvs denoted by the initializer list (death test)            |
- * | ChainAddArgv                     | chain calls to @ref mpicxx::single_spawner::add_argv()                             |
- * | GetArgv                          | get the current argvs                                                              |
- * | GetSingleArgv                    | get a single argv out of all argvs                                                 |
- * | GetSingleArgvOutOfRangeException | get a single argv out of all argvs out-of-bounce (death test)                      |
- * | GetSize                          | get the number of all argvs                                                        |
+ * | test case name                  | test case description                                                                                                                       |
+ * |:--------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+ * | AddArgv                         | add command line arguments from a parameter pack                                                                                            |
+ * | AddInvalidArgv                  | add invalid command line arguments from a parameter pack (death test)                                                                       |
+ * | AddArgvByIteratorRange          | add command line arguments from an iterator range                                                                                           |
+ * | AddArgvByInvalidIteratorRange   | illegal iterator range while adding command line arguments (death test)                                                                     |
+ * | AddInvalidArgvByIteratorRange   | add invalid command line argument from an iterator range (death test)                                                                       |
+ * | AddArgvByInitializerList        | add command line arguments from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)                     |
+ * | AddInvalidArgvByInitializerList | add invalid command line argument from a [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) (death test) |
+ * | GetArgv                         | get all command line arguments                                                                                                              |
+ * | GetSingleArgvAt                 | get a single command line argument                                                                                                          |
+ * | GetSingleArgvAtInvalidIndex     | illegal index                                                                                                                               |
+ * | GetArgvSize                     | get the number of all command line arguments                                                                                                |
  */
 
+#include <cstddef>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
-#include <mpi.h>
+#include <test_utility.hpp>
 
 #include <mpicxx/startup/single_spawner.hpp>
 #include <mpicxx/startup/thread_support.hpp>
@@ -36,26 +39,19 @@ TEST(SingleSpawnerTest, AddArgv) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // add argvs
-    ss.add_argv("key_1",  "value_1");
-    ss.add_argv("key_2"s, "value_2"s);
-    ss.add_argv("-key_3", 42);
-    ss.add_argv("-key_4"s, mpicxx::thread_support::single);
+    // add command line arguments
+    ss.add_argv("foo");
+    ss.add_argv("bar"s);
+    ss.add_argv("--baz", 42, 3.1415, mpicxx::thread_support::single);
 
-    // create lookup vector for correct [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> correct_argvs = {
-            { "-key_1"s, "value_1"s },
-            { "-key_2"s, "value_2"s },
-            { "-key_3"s, "42"s },
-            { "-key_4"s, "MPI_THREAD_SINGLE"s }
-    };
+    // create lookup vector for correct command line arguments
+    std::vector<std::string> argvs = { "foo", "bar", "--baz", "42", std::to_string(3.1415), "MPI_THREAD_SINGLE" };
 
-    // check if added argvs are correct
-    for (std::size_t i = 0; i < correct_argvs.size(); ++i) {
+    // check if added command line arguments are correct
+    for (std::size_t i = 0; i < argvs.size(); ++i) {
         SCOPED_TRACE(i);
 
-        EXPECT_EQ(ss.argv(i).first,  correct_argvs[i].first);
-        EXPECT_EQ(ss.argv(i).second, correct_argvs[i].second);
+        EXPECT_EQ(ss.argv_at(i),  argvs[i]);
     }
 }
 
@@ -63,9 +59,8 @@ TEST(SingleSpawnerDeathTest, AddInvalidArgv) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // add invalid argvs
-    ASSERT_DEATH( ss.add_argv("-"s, "value"s) , "");
-    ASSERT_DEATH( ss.add_argv("", 42) ,"");
+    // add invalid command line argument
+    ASSERT_DEATH( ss.add_argv("") , "");
 }
 
 
@@ -73,46 +68,34 @@ TEST(SingleSpawnerTest, AddArgvByIteratorRange) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // create vector containing the [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> argvs = {
-            { "-key_1"s, "value_1"s },
-            { "-key_2"s, "value_2"s },
-            { "-key_3"s, "42"s },
-            { "-key_4"s, "MPI_THREAD_SINGLE"s }
-    };
+    // create vector containing the command line arguments
+    std::vector<std::string> argvs = { "foo", "bar", "--baz", "42", std::to_string(3.1415), "MPI_THREAD_SINGLE" };
 
-    // add argvs to the single_spawner object
+    // add command line arguments
     ss.add_argv(argvs.begin(), argvs.end());
 
-    // check if added argvs are correct
+    // check if added command line arguments are correct
     for (std::size_t i = 0; i < argvs.size(); ++i) {
         SCOPED_TRACE(i);
 
-        EXPECT_EQ(ss.argv(i).first,  argvs[i].first);
-        EXPECT_EQ(ss.argv(i).second, argvs[i].second);
+        EXPECT_EQ(ss.argv_at(i),  argvs[i]);
     }
 
 
     // create a second single_spawner object
     mpicxx::single_spawner ss_2("a.out", 1);
 
-    // create second vector containing the [key, value]-pairs
-    std::vector<std::pair<std::string, int>> argvs_2 = {
-            { "-key_1"s, 1 },
-            { "-key_2"s, 2 },
-            { "-key_3"s, 3 },
-            { "-key_4"s, 4 }
-    };
+    // create second vector containing the command line arguments
+    std::vector<int> argvs_2 = { 1, 2, 3, 4, 5 };
 
-    // add argvs to the single_spawner object
+    // add command line arguments
     ss_2.add_argv(argvs_2.begin(), argvs_2.end());
 
-    // check if added argvs are correct
+    // check if added command line arguments are correct
     for (std::size_t i = 0; i < argvs_2.size(); ++i) {
         SCOPED_TRACE(i);
 
-        EXPECT_EQ(ss_2.argv(i).first,  argvs_2[i].first);
-        EXPECT_EQ(ss_2.argv(i).second, std::to_string(argvs_2[i].second));
+        EXPECT_EQ(ss_2.argv_at(i),  std::to_string(argvs_2[i]));
     }
 }
 
@@ -120,13 +103,10 @@ TEST(SingleSpawnerDeathTest, AddInvalidArgvByIteratorRange) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // create vector containing the [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> argvs = {
-            { "-"s, "value"s },
-            { ""s, "42"s }
-    };
+    // create vector containing the invalid command line arguments
+    std::vector<std::string> argvs = { "", "" };
 
-    // add invalid argvs to the single_spawner object
+    // add invalid command line arguments
     ASSERT_DEATH( ss.add_argv(argvs.begin(), argvs.end()) , "");
 }
 
@@ -135,42 +115,34 @@ TEST(SingleSpawnerTest, AddArgvByInitializerList) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // create vector containing the [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> argvs = {
-            { "-key_1"s, "value_1"s },
-            { "-key_2"s, "value_2"s }
-    };
+    // create vector containing the command line arguments
+    std::vector<std::string> argvs = { "--foo", "-bar", "baz", };
 
-    // add argvs to the single_spawner object
-    ss.add_argv({ std::make_pair("key_1"s, "value_1"s), std::make_pair("-key_2"s, "value_2"s) });
+    // add command line arguments
+    ss.add_argv({ "--foo", "-bar", "baz" });
 
-    // check if added argvs are correct
+    // check if added command line arguments are correct
     for (std::size_t i = 0; i < argvs.size(); ++i) {
         SCOPED_TRACE(i);
 
-        EXPECT_EQ(ss.argv(i).first,  argvs[i].first);
-        EXPECT_EQ(ss.argv(i).second, argvs[i].second);
+        EXPECT_EQ(ss.argv_at(i),  argvs[i]);
     }
 
 
     // create a second single_spawner object
     mpicxx::single_spawner ss_2("a.out", 1);
 
-    // create second vector containing the [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> argvs_2 = {
-            { "-key_1"s, "1"s },
-            { "-key_2"s, "2"s }
-    };
+    // create second vector containing the command line arguments
+    std::vector<std::string> argvs_2 = { "1", "2", "3", "4" };
 
-    // add argvs to the single_spawner object
-    ss_2.add_argv({ std::make_pair("key_1"s, 1), std::make_pair("-key_2"s, 2) });
+    // add command line arguments
+    ss_2.add_argv({ 1, 2, 3, 4 });
 
-    // check if added argvs are correct
+    // check if added command line arguments are correct
     for (std::size_t i = 0; i < argvs_2.size(); ++i) {
         SCOPED_TRACE(i);
 
-        EXPECT_EQ(ss_2.argv(i).first,  argvs_2[i].first);
-        EXPECT_EQ(ss_2.argv(i).second, argvs_2[i].second);
+        EXPECT_EQ(ss_2.argv_at(i),  argvs_2[i]);
     }
 }
 
@@ -178,37 +150,8 @@ TEST(SingleSpawnerDeathTest, AddInvalidArgvByInitializerList) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // add invalid argvs to the single_spawner object
-    ASSERT_DEATH( ss.add_argv({ std::make_pair("-"s, "value"s), std::make_pair(""s, "42"s) }) , "");
-}
-
-
-TEST(SingleSpawnerTest, ChainAddArgv) {
-    // create new single_spawner object
-    mpicxx::single_spawner ss("a.out", 1);
-
-    // create vector containing the correct [key, value]-pairs
-    std::vector<std::pair<std::string, std::string>> correct_argvs = {
-            { "-key_1"s, "value_1"s },
-            { "-key_2"s, "42"s },
-            { "-key_3"s, "84"s },
-            { "-key_4"s, "MPI_THREAD_SINGLE"s },
-            { "-key_5"s, "MPI_THREAD_MULTIPLE"s },
-    };
-
-    std::vector<std::pair<std::string, int>> argvs = { { "key_2", 42 }, { "-key_3", 84 } };
-    // add argvs to the single_spawner object using chained calls
-    ss.add_argv("key_1", "value_1")
-      .add_argv(argvs.begin(), argvs.end())
-      .add_argv({ std::make_pair("key_4"s, mpicxx::thread_support::single), std::make_pair("-key_5"s, mpicxx::thread_support::multiple) });
-
-    // check if added argvs are correct
-    for (std::size_t i = 0; i < correct_argvs.size(); ++i) {
-        SCOPED_TRACE(i);
-
-        EXPECT_EQ(ss.argv(i).first,  correct_argvs[i].first);
-        EXPECT_EQ(ss.argv(i).second, correct_argvs[i].second);
-    }
+    // add invalid command line arguments
+    ASSERT_DEATH( ss.add_argv({ "", "" }) , "");
 }
 
 
@@ -216,25 +159,20 @@ TEST(SingleSpawnerTest, GetArgv) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // create vector containing correct argvs
-    std::vector<std::pair<std::string, std::string>> correct_argvs = {
-            { "-key_1"s, "value_1"s },
-            { "-key_2"s, "42"s },
-            { "-key_3"s, "MPI_THREAD_SINGLE"s },
-    };
+    // create vector containing correct command line arguments
+    std::vector<std::string> argvs = { "--foo", "-bar", "baz" };
 
-    // add agvs
-    ss.add_argv("key_1", "value_1").add_argv("-key_2", 42).add_argv("key_3", mpicxx::thread_support::single);
+    // add command line arguments
+    ss.add_argv(argvs.begin(), argvs.end());
 
-    // get vector containing all added argvs
+    // get vector containing all added command line arguments
     const auto& added_argvs = ss.argv();
 
-    // check if added argvs are correct
-    for (std::size_t i = 0; i < correct_argvs.size(); ++i) {
+    // check if added command line arguments are correct
+    for (std::size_t i = 0; i < argvs.size(); ++i) {
         SCOPED_TRACE(i);
 
-        EXPECT_EQ(added_argvs[i].first,  correct_argvs[i].first);
-        EXPECT_EQ(added_argvs[i].second, correct_argvs[i].second);
+        EXPECT_EQ(added_argvs[i],  argvs[i]);
     }
 }
 
@@ -242,29 +180,35 @@ TEST(SingleSpawnerTest, GetSingleArgv) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // add argv
-    ss.add_argv("key", "value");
+    // add command line arguments
+    ss.add_argv("--foo", "-bar", "baz");
 
-    // get single argv
-    EXPECT_EQ(ss.argv(0).first, "-key"s);
-    EXPECT_EQ(ss.argv(0).second, "value"s);
+    // get single command line argument
+    EXPECT_EQ(ss.argv_at(0), "--foo"s);
+    EXPECT_EQ(ss.argv_at(2), "baz"s);
 }
 
 TEST(SingleSpawnerTest, GetSingleArgvOutOfRangeException) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // add argv
-    ss.add_argv("key", "value");
+    // add command line argument
+    ss.add_argv("--foo", "-bar", "baz");
 
-    try {
-        [[maybe_unused]] const std::pair<std::string, std::string>& argv = ss.argv(1);
-        FAIL() << "expected std::out_of_range exception";
-    } catch(const std::out_of_range& e) {
-        EXPECT_STREQ(e.what(), "Out-of-bounce access!: 1 < 1");
-    } catch(...) {
-        FAIL() << "expected std::out_of_range exception";
-    }
+    // try getting i-th command line argument
+    [[maybe_unused]] std::string str;
+    EXPECT_THROW_WHAT(
+            str = ss.argv_at(3),
+            std::out_of_range,
+            "single_spawner::argv_at(const std::size_t) range check: i (which is 3) >= argvs_.size() (which is 3)");
+
+    std::string expected_msg =
+            fmt::format("single_spawner::argv_at(const std::size_t) range check: "
+                        "i (which is {}) >= argvs_.size() (which is 3)", static_cast<std::size_t>(-1));
+    EXPECT_THROW_WHAT(
+            str = ss.argv_at(-1),
+            std::out_of_range,
+            expected_msg);
 }
 
 
@@ -272,14 +216,12 @@ TEST(SingleSpawnerTest, GetSize) {
     // create new single_spawner object
     mpicxx::single_spawner ss("a.out", 1);
 
-    // get the number of argvs after construction
+    // get the number of command line arguments after construction
     EXPECT_EQ(ss.argv_size(), 0);
 
-    // add argvs
-    ss.add_argv("-key_1", "value_1");
-    ss.add_argv("-key_2", "value_2");
-    ss.add_argv("-key_3", "value_3");
+    // add command line arguments
+    ss.add_argv("--foo", "-bar", "baz");
 
-    // get the number of added argvs
+    // get the number of added command line arguments
     EXPECT_EQ(ss.argv_size(), 3);
 }

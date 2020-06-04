@@ -1,19 +1,20 @@
 /**
  * @file test/startup/single_spawner/spawn_info.cpp
  * @author Marcel Breyer
- * @date 2020-04-13
+ * @date 2020-06-04
  *
- * @brief Test cases for the @ref mpicxx::single_spawner class spawn_info member functions.
+ * @brief Test cases for the @ref mpicxx::single_spawner::set_spawn_info(info) and @ref mpicxx::single_spawner::spawn_info() const member
+ *        functions provided by the @ref mpicxx::single_spawner class.
  * @details Testsuite: *SingleSpawnerTest*
- * | test case name    | test case description                                        |
- * |:------------------|:-------------------------------------------------------------|
- * | SetSpawnInfo      | set a new @ref mpicxx::info object as spawn info             |
- * | ChainSetSpawnInfo | chain calls to @ref mpicxx::single_spawner::set_spawn_info() |
- * | GetSpawnInfo      | get the current spawn @ref mpicxx::info object               |
+ * | test case name    | test case description                            |
+ * |:------------------|:-------------------------------------------------|
+ * | SetSpawnInfo      | set a new @ref mpicxx::info object as spawn info |
+ * | GetSpawnInfo      | get the current spawn @ref mpicxx::info object   |
  */
 
+#include <string>
+
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/startup/single_spawner.hpp>
 
@@ -30,20 +31,8 @@ TEST(SingleSpawnerTest, SetSpawnInfo) {
     // set a new spawn info object
     mpicxx::info info(MPI_INFO_ENV, false);
     ss.set_spawn_info(info);
-//    ss.set_spawn_info(mpicxx::info());  // compiler error
 
     // check whether the spawn info object has been updated
-    EXPECT_EQ(ss.spawn_info(), mpicxx::info::env);
-}
-
-TEST(SingleSpawnerTest, ChainSetSpawnInfo) {
-    // create new single_spawner object
-    mpicxx::single_spawner ss("a.out", 1);
-
-    // chain multiple calls to set_spawn_info
-    ss.set_spawn_info(mpicxx::info::env).set_spawn_info(mpicxx::info::null).set_spawn_info(mpicxx::info::env);
-
-    // check whether he spawn info object has been updated to the last info object
     EXPECT_EQ(ss.spawn_info(), mpicxx::info::env);
 }
 
