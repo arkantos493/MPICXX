@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-06-05
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -1202,7 +1202,7 @@ namespace mpicxx {
             for (std::size_t i = 0; i < commands_.size(); ++i) {
                 commands_ptr.emplace_back(commands_[i].data());
             }
-            // convert vector of mpicxx::info to vector of MPI_INFO TODO: test
+            // convert vector of mpicxx::info to vector of MPI_INFO
             std::vector<MPI_Info> info_ptr;
             info_ptr.reserve(info_.size());
             for (std::size_t i = 0; i < info_.size(); ++i) {
@@ -1248,7 +1248,7 @@ namespace mpicxx {
         template <std::input_iterator InputIt>
         bool legal_number_of_values(InputIt first, InputIt last) {
             using difference_type = typename std::iterator_traits<InputIt>::difference_type;
-            return std::distance(first, last) == static_cast<difference_type>(size_);
+            return std::distance(first, last) == static_cast<difference_type>(this->size());
         }
         /*
          * @brief Checks whether the size of the [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list)
@@ -1259,7 +1259,7 @@ namespace mpicxx {
          */
         template <typename T>
         bool legal_number_of_values(const std::initializer_list<T> ilist) const {
-            return ilist.size() == size_;
+            return ilist.size() == this->size();
         }
         /*
          * @brief Checks whether the size of the parameter pack @p args equals the size of this multiple_spawner.
@@ -1269,7 +1269,7 @@ namespace mpicxx {
          */
         template <typename... T>
         bool legal_number_of_values(T&&... args) const {
-            return sizeof...(args) == size_;
+            return sizeof...(args) == this->size();
         }
         /*
          * @brief Checks whether the size of the [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) @p vec equals
@@ -1279,8 +1279,8 @@ namespace mpicxx {
          * @return `true` if both sizes are equal, `false` otherwise
          */
         template <typename T>
-        bool legal_number_of_values(const std::vector<T>& vec) const {
-            return vec.size() == size_;
+        bool legal_number_of_values(std::vector<T>& vec) const {
+            return vec.size() == this->size();
         }
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
