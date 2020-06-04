@@ -162,7 +162,7 @@ namespace mpicxx {
         single_spawner& add_argv(T&&... args) requires (sizeof...(T) > 0) {
             ([&](auto&& arg) {
                 // convert argument to a std::string
-                std::string argv = detail::convert_to_string(std::forward<T>(args));
+                std::string argv = detail::convert_to_string(std::forward<decltype(arg)>(arg));
 
                 MPICXX_ASSERT_SANITY(this->legal_argv(argv), "Attempt to set an empty command line argument!");
 
@@ -278,10 +278,10 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const std::string& argvs_at(const std::size_t i) const {
+        [[nodiscard]] const std::string& argv_at(const std::size_t i) const {
             if (i >= argvs_.size()) {
                 throw std::out_of_range(fmt::format(
-                        "single_spawner::argvs_at(const std::size_t) range check: i (which is {}) >= argvs_.size() (which is {})",
+                        "single_spawner::argv_at(const std::size_t) range check: i (which is {}) >= argvs_.size() (which is {})",
                         i, argvs_.size()));
             }
 
@@ -291,7 +291,7 @@ namespace mpicxx {
          * @brief Returns the number of command line arguments.
          * @return the number of command line arguments (`[[nodiscard]]`)
          */
-        [[nodiscard]] argvs_size_type argvs_size() const noexcept {
+        [[nodiscard]] argvs_size_type argv_size() const noexcept {
             return argvs_.size();
         }
 
