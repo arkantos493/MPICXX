@@ -95,7 +95,7 @@ if (ENABLE_STACK_TRACE)
         message(STATUS "Enabled stack traces using the '-rdynamic' linker flag")
         add_link_options(-rdynamic)
     else()
-        message(STATUS "Stack traces not supported")
+        message(WARNING "Stack traces not supported")
     endif()
 else()
     message(STATUS "Disabled stack traces")
@@ -155,7 +155,6 @@ endif (ENABLE_TESTS)
 if (ENABLE_DEATH_TESTS)
     message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
 endif(ENABLE_DEATH_TESTS)
-
 
 # generate documentation if requested
 if (GENERATE_DOCUMENTATION)
