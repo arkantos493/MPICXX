@@ -1,7 +1,7 @@
 /**
  * @file test/detail/source_location.cpp
  * @author Marcel Breyer
- * @date 2020-02-08
+ * @date 2020-05-17
  *
  * @brief Test cases for the @ref mpicxx::detail::source_location implementation.
  * @details Testsuite: *DetailTest*
@@ -65,15 +65,18 @@ TEST(DetailTest, CurrentSourceLocationPrettyFuncName) {
 TEST(DetailTest, SourceStackTrace) {
     mpicxx::detail::source_location loc = mpicxx::detail::source_location::current();
 
-    std::stringstream ss;
-    loc.stack_trace(ss);
+    std::string trace = loc.stack_trace();
 
-#ifdef __GNUG__
+#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
     // stack trace should be present
-    EXPECT_FALSE(ss.str().empty());
+    EXPECT_FALSE(trace.empty());
+#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+    // no stack trace supported
+    using namespace std::string_literals;
+    EXPECT_EQ(trace, "No stack trace supported!"s)
 #else
-    // no stack trace  supported
-    EXPECT_TRUE(ss.str().empty());
+    // no stack trace requested
+    EXPECT_TRUE(trace.empty());
 #endif
 
 }

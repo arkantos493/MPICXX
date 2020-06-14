@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-05-17
  *
  * @brief Provides a `source_location` class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
@@ -24,6 +24,7 @@
 #include <vector>
 
 #include <mpi.h>
+#include <fmt/format.h>
 
 /**
  * @def PRETTY_FUNC_NAME__
@@ -53,13 +54,19 @@ namespace mpicxx::detail {
     public:
         /**
          * @brief Constructs a new source_location with the respective information about the current call side.
-         * @param func the function name (including its signature if supported via the macro `PRETTY_FUNC_NAME__`)
-         * @param file the file name (absolute path)
-         * @param line the line number
-         * @param column the column number
+         * @param[in] func the function name (including its signature if supported via the macro `PRETTY_FUNC_NAME__`)
+         * @param[in] file the file name (absolute path)
+         * @param[in] line the line number
+         * @param[in] column the column number
          * @return the source_location holding the call side location information
          *
          * @attention @p column is always (independent of the call side position) default initialized to 0!
+         *
+         * @calls{
+         * int MPI_Initialized(int *flag);                  // exactly once
+         * int MPI_Finalized(int *flag);                    // exactly once
+         * int MPI_Comm_rank(MPI_Comm comm, int *rank);     // at most once
+         * }
          */
         static source_location current(
                 const std::string_view func = __builtin_FUNCTION(),
@@ -72,14 +79,20 @@ namespace mpicxx::detail {
             loc.func_ = func;
             loc.line_ = line;
             loc.column_ = column;
-            // get the current MPI rank iff the MPI environment is active
-            int is_initialized, is_finalized;
-            MPI_Initialized(&is_initialized);
-            MPI_Finalized(&is_finalized);
-            if (static_cast<bool>(is_initialized) && !static_cast<bool>(is_finalized)) {
-                int rank;
-                MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-                loc.rank_ = std::optional<int>(rank);
+            // TODO 2020-05-17 15:49 marcel: change to mpicxx::running()?
+            try {
+                // get the current MPI rank iff the MPI environment is active
+                int is_initialized, is_finalized;
+                MPI_Initialized(&is_initialized);
+                MPI_Finalized(&is_finalized);
+                if (static_cast<bool>(is_initialized) && !static_cast<bool>(is_finalized)) {
+                    int rank;
+                    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+                    loc.rank_ = std::optional<int>(rank);
+                }
+            } catch (...) {
+                // something went wrong during the MPI calls -> no information could be retrieved
+                loc.rank_ = std::nullopt;
             }
             return loc;
         }
@@ -98,15 +111,16 @@ namespace mpicxx::detail {
          *   #2    /lib/x86_64-linux-gnu/libc.so.6: __libc_start_main() [+0xe]
          *   #1    ./output.s: _start() [+0x2]
          * @endcode
-         * @param out the output stream on which the report should be written
-         * @param max_call_stack_size the maximum depth of the stack trace report
+         * @param[in] max_call_stack_size the maximum depth of the stack trace report
          *
          * @attention The stack trace report is only available under [*GCC*](https://gcc.gnu.org/) and [*clang*](https://clang.llvm.org/)
          * (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
          */
-        static inline void stack_trace(std::ostream& out = std::cerr, const int max_call_stack_size = 64) {
-#ifdef __GNUG__
-            out << "stack trace:\n";
+        static inline std::string stack_trace([[maybe_unused]] const int max_call_stack_size = 64) {
+#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
+            using std::to_string;
+            fmt::memory_buffer buf;
+            fmt::format_to(buf, "stack trace:\n");
 
             std::vector<std::string> symbols;
             symbols.reserve(max_call_stack_size);
@@ -119,8 +133,7 @@ namespace mpicxx::detail {
 
                 // no stack addresses could be retrieved
                 if (addrlen == 0) {
-                    out << "    <empty, possibly corrupt>" << std::endl;
-                    return;
+                    return fmt::format("{}    <empty, possibly corrupt>\n", to_string(buf));
                 }
 
                 // resolve addresses into symbol strings
@@ -133,8 +146,7 @@ namespace mpicxx::detail {
 
             // iterate over the returned symbol lines -> skip the first and second symbol because they are unimportant
             for (std::size_t i = 2; i < symbols.size(); ++i) {
-                out << "  #" << symbols.size() - i;
-                if (symbols.size() > 9 && symbols.size() - i  < 10) out << " ";
+                fmt::format_to(buf, "  #{:<6}", symbols.size() - i);
 
                 // file_name(function_name+offset) -> split the symbol line accordingly
                 const std::size_t position1 = std::min(symbols[i].find_first_of("("), symbols[i].size());
@@ -154,18 +166,24 @@ namespace mpicxx::detail {
 
                     if (status == 0) {
                         // demangling successful -> print pretty function name
-                        out << "    " << file_name << ": " << function_name_demangled << " [" << function_offset << "]\n";
+                        fmt::format_to(buf, "{}: {} [{}]\n", file_name, function_name_demangled, function_offset);
                     } else {
                         // demangling failed -> print un-demangled function name
-                        out << "    " << file_name << ": " << function_name << "() [" << function_offset << "]\n";
+                        fmt::format_to(buf, "{}: {}() [{}]\n", file_name, function_name, function_offset);
                     }
                     free(function_name_demangled);
                 } else {
                     // print complete symbol line if the splitting went wrong
-                    out << "    " << symbols[i] << "\n";
+                    fmt::format_to(buf, "{}\n", symbols[i]);
                 }
             }
-            out << std::endl;
+            return fmt::format("{}\n", to_string(buf));
+#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+// stack traces enabled but not supported
+            return std::string("No stack trace supported!");
+#else
+// stack traces not supported
+            return std::string{};
 #endif
         }
 
@@ -198,7 +216,7 @@ namespace mpicxx::detail {
          * [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) is empty.
          * @return a `std::optional<int>` containing the current rank
          */
-        constexpr std::optional<int> rank() const noexcept { return rank_; };
+        constexpr std::optional<int> rank() const noexcept { return rank_; }
 
     private:
         std::string file_ = "unknown";
