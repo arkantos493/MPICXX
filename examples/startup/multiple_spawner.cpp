@@ -1,9 +1,9 @@
 /**
  * @file examples/startup/multiple_spawner.cpp
  * @author Marcel Breyer
- * @date 2020-05-31
+ * @date 2020-06-15
  *
- * @brief Examples for the mpicxx::multiple_spawner::add_argv(...) and mpicxx::multiple_spawner::add_argv_add(...) implementations.
+ * @brief Examples for some functions of the mpicxx::multiple_spawner implementation.
  */
 
 //! [add_argv version with iterator range]
