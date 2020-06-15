@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-06-15
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -38,7 +38,7 @@ namespace mpicxx {
     class single_spawner {
     public:
         /// Unsigned integer type.
-        using argvs_size_type = std::size_t;
+        using argv_size_type = std::size_t;
 
         // ---------------------------------------------------------------------------------------------------------- //
         //                                               constructor                                                  //
@@ -291,7 +291,7 @@ namespace mpicxx {
          * @brief Returns the number of command line arguments.
          * @return the number of command line arguments (`[[nodiscard]]`)
          */
-        [[nodiscard]] argvs_size_type argv_size() const noexcept {
+        [[nodiscard]] argv_size_type argv_size() const noexcept {
             return argvs_.size();
         }
 
@@ -329,6 +329,8 @@ namespace mpicxx {
         /**
          * @brief Spawns a number of MPI processes according to the previously set options.
          * @details The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
+         *
+         * Example: @snippet examples/startup/single_spawner.cpp spawn without error codes
          * @return the result of the spawn invocation
          *
          * @pre The executable name **must not** be empty.
@@ -356,6 +358,8 @@ namespace mpicxx {
          * @brief Spawns a number of MPI processes according to the previously set options.
          * @details The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
          *          possibly occurring error codes.
+         *
+         *          Example: @snippet examples/startup/single_spawner.cpp spawn with error codes
          * @return the result of the spawn invocation
          *
          * @pre The executable name **must not** be empty.
