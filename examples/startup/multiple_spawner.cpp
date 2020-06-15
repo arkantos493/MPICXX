@@ -64,3 +64,35 @@ mpicxx::multiple_spawner ms({ { "a.out", 4 }, { "b.out", 2 } });
 ms.add_argv_at(0, "-foo", "bar", "--baz");
 ms.add_argv_at(1, 1, 2, 3);
 //! [add_argv_at version with parameter pack]
+//! [spawn without error codes]
+// create multiple_spawner spawning exactly two new executables
+mpicxx::multiple_spawner ms({ { "a.out", 4 }, { "b.out", 2 } });
+
+// add command line arguments
+ms.add_argv_at(0, "--file", "foo", "--size", 42);
+ms.add_argv_at(1, "--file", "bar");
+
+// add additional spawn information
+mpicxx::info info;
+info["wdir"] = "new/working/dir";
+ms.set_spawn_info_at(1, info);
+
+// spawn new executables
+mpicxx::spawn_result res = ms.spawn();
+//! [spawn without error codes]
+//! [spawn with error codes]
+// create multiple_spawner spawning exactly two new executables
+mpicxx::multiple_spawner ms({ { "a.out", 4 }, { "b.out", 2 } });
+
+// add command line arguments
+ms.add_argv_at(0, "--file", "foo", "--size", 42);
+ms.add_argv_at(1, "--file", "bar");
+
+// add additional spawn information
+mpicxx::info info;
+info["wdir"] = "new/working/dir";
+ms.set_spawn_info_at(1, info);
+
+// spawn new executables
+mpicxx::spawn_result_with_errcodes res = ms.spawn_with_errcodes();
+//! [spawn with error codes]

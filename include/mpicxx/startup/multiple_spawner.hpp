@@ -32,7 +32,7 @@
 
 namespace mpicxx {
 
-    // TODO 2020-05-17 23:36 breyerml: replace with mpicxx equivalent
+    // TODO 2020-05-17 23:36 breyerml: change from MPI_Comm to mpicxx equivalent -> copy/move constructor/assignment
     // TODO 2020-05-31 22:46 breyerml: test examples
 
     /**
@@ -1146,13 +1146,13 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         //                                            spawn new process(es)                                           //
         // ---------------------------------------------------------------------------------------------------------- //
-        // TODO 2020-06-04 00:09 breyerml: example ???
-
         /// @name spawn new process(es)
         ///@{
         /**
          * @brief Spawns a number of MPI processes associated with multiple executables according to the previously set options.
          * @details The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
+         *
+         * Example: @snippet examples/startup/multiple_spawner.cpp spawn without error codes
          * @return the result of the spawn invocation
          *
          * @pre The number of executables **must** match the size of this @ref multiple_spawner.
@@ -1188,6 +1188,8 @@ namespace mpicxx {
          * @brief Spawns a number of MPI processes associated with multiple executables according to the previously set options.
          * @details The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
          *          possibly occurring error codes.
+         *
+         *          Example: @snippet examples/startup/multiple_spawner.cpp spawn with error codes
          * @return the result of the spawn invocation
          *
          * @pre The number of executables **must** match the size of this @ref multiple_spawner.
@@ -1337,6 +1339,16 @@ namespace mpicxx {
         }
 
 #if ASSERTION_LEVEL > 0
+        /*
+         * @brief Checks whether the sizes of the iterator ranges [@p first1, @p last1) and [@p first2, @p last2) are qeual.
+         * @tparam InputIt1 must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @tparam InputIt2 must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @param[in] first1 iterator to the first element of the first range
+         * @param[in] last1 iterator one-past the last element of the first range
+         * @param[in] first2 iterator to the first element of the second range
+         * @param[in] last2 iterator one-past the last element of the second range
+         * @return `true` if both sizes are equal, `false` otherwise
+         */
         template <std::input_iterator InputIt1, std::input_iterator InputIt2>
         bool legal_number_of_values(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
             return std::distance(first1, last1) == std::distance(first2, last2);
