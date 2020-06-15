@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-05
+ * @date 2020-06-15
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -57,6 +57,105 @@ namespace mpicxx {
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name constructor
         ///@{
+        /**
+         * @brief Constructs the multiple_spawner object with the contents of the two ranges [@p first_commands, @p last_commands)
+         *        and [@p first_maxprocs, @p last_maxprocs).
+         * @tparam InputItCommands must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @tparam InputItMaxprocs must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @param[in] first_commands iterator to the first executable name in the first range
+         * @param[in] last_commands iterator one-past the last executable name in the first range
+         * @param[in] first_maxprocs iterator to the first number of maxprocs in the second range
+         * @param[in] last_maxprocs iterator one-past the last number of maxprocs in the second range
+         *
+         * @pre @p first_commands and @p last_commands **must** refer to the same container.
+         * @pre @p first_commands and @p last_commands **must** form a valid, non-empty range,
+         *      i.e. @p first_commands must be strictly less than @p last_commands.
+         * @pre @p first_maxprocs and @p last_maxprocs **must** refer to the same container.
+         * @pre @p first_maxprocs and @p last_maxprocs **must** form a valid, non-empty range,
+         *      i.e. @p first_maxprocs must be strictly less than @p last_maxprocs.
+         * @pre The sizes of the two iterator ranges [@p first_commands, @p last_commands) and [@p first_maxprocs, @p last_maxprocs)
+         *      **must** be equal.
+         * @pre **Any** executable name **must not** be empty.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         *
+         * @assert_precondition{ If @p first_commands and @p last_commands don't denote a valid, non-empty iterator range. \n
+         *                       If @p first_maxprocs and @p last_maxprocs don't denote a valid, non-empty iterator range. \n
+         *                       If the sizes of the iterator ranges mismatch. }
+         * @assert_sanity{ If any executable name is empty. \n
+         *                 If any number of maxprocs is invalid. \n
+         *                 If the total number of maxprocs is invalid. }
+         */
+        template <std::input_iterator InputItCommands, std::input_iterator InputItMaxprocs>
+        multiple_spawner(InputItCommands first_commands, InputItCommands last_commands,
+                         InputItMaxprocs first_maxprocs, InputItMaxprocs last_maxprocs)
+        {
+            MPICXX_ASSERT_PRECONDITION(this->legal_non_empty_iterator_range(first_commands, last_commands),
+                    "Attempt to pass an illegal iterator range ('first_commands' must be strictly less than 'last_commands')!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_non_empty_iterator_range(first_maxprocs, last_maxprocs),
+                    "Attempt to pass an illegal iterator range ('first_maxprocs' must be strictly less than 'last_maxprocs')!");
+            MPICXX_ASSERT_PRECONDITION(this->legal_number_of_values(first_commands, last_commands, first_maxprocs, last_maxprocs),
+                    "Attempt to pass two iterator ranges of different sizes (size of first range (which is {}) != size of second range (which is {}))!",
+                    std::distance(first_commands, last_commands), std::distance(first_maxprocs, last_maxprocs));
+
+            // set commands according to passed values
+            size_ = std::distance(first_commands, last_commands);
+            commands_.reserve(size_);
+            for (; first_commands != last_commands; ++first_commands) {
+                commands_.emplace_back(*first_commands);
+
+                MPICXX_ASSERT_SANITY(this->legal_command(commands_.back()),
+                        "Attempt to set the {}-th executable name to the empty string!",
+                        size_ - std::distance(first_commands, last_commands));
+            }
+
+            // set maxprocs according to passed values
+            const size_type maxprocs_size = std::distance(first_maxprocs, last_maxprocs);
+            maxprocs_.reserve(maxprocs_size);
+            for (; first_maxprocs != last_maxprocs; ++first_maxprocs) {
+                maxprocs_.emplace_back(*first_maxprocs);
+
+                MPICXX_ASSERT_SANITY(this->legal_maxprocs(maxprocs_.back()),
+                        "Attempt to set the {}-th maxprocs value (which is {}), which falls outside the valid range (0, {}]!",
+                        maxprocs_size - std::distance(first_maxprocs, last_maxprocs), maxprocs_.back(),
+                        mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+            }
+
+            MPICXX_ASSERT_SANITY(this->legal_maxprocs(this->total_maxprocs()),
+                    "Attempt to set the total number of maxprocs (which is: {} = {}), which falls outside the valid range (0, {}]!",
+                    fmt::join(maxprocs_, " + "), this->total_maxprocs(),
+                    mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
+
+            // set info objects to default values
+            info_.assign(size_, mpicxx::info::null);
+            // set command line arguments to default values
+            argvs_.assign(size_, std::vector<std::string>());
+        }
+        /**
+         * @brief Constructs the multiple_spawner object with the contents of the two
+         *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) lists
+         *        @p ilist_commands and @p ilist_maxprocs.
+         * @param[in] ilist_commands the list of executable names
+         * @param[in] ilist_maxprocs the list of number of maxprocs
+         *
+         * @pre @p ilist_commands **must not** be empty.
+         * @pre @p ilist_maxprocs **must not** be empty.
+         * @pre **Any** executable name **must not** be empty.
+         * @pre **Any** maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         * @pre The total number of maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
+         *      (@ref mpicxx::universe_size()).
+         *
+         * @assert_precondition{ If @p ilist_commands is empty. \n
+         *                       If @p ilist_maxprocs is empty. }
+         * @assert_sanity{ If any executable name is empty. \n
+         *                 If any number of maxprocs is invalid.\n
+         *                 If the total number of maxprocs is invalid. }
+         */
+        multiple_spawner(std::initializer_list<std::string> ilist_commands, std::initializer_list<int> ilist_maxprocs)
+            : multiple_spawner(ilist_commands.begin(), ilist_commands.end(), ilist_maxprocs.begin(), ilist_maxprocs.end()) { }
         /**
          * @brief Constructs the multiple_spawner object with the contents of the range [@p first, @p last).
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
@@ -1238,6 +1337,10 @@ namespace mpicxx {
         }
 
 #if ASSERTION_LEVEL > 0
+        template <std::input_iterator InputIt1, std::input_iterator InputIt2>
+        bool legal_number_of_values(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
+            return std::distance(first1, last1) == std::distance(first2, last2);
+        }
         /*
          * @brief Checks whether the size of the iterator range [@p first, @p last) equals the size of this multiple_spawner.
          * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
@@ -1402,7 +1505,7 @@ namespace mpicxx {
         }
 #endif
 
-        std::size_t size_ = 0;
+        size_type size_ = 0;
         std::vector<std::string> commands_;
         std::vector<std::vector<std::string>> argvs_;
         std::vector<int> maxprocs_;
