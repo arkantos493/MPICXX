@@ -1,10 +1,11 @@
 /**
  * @file include/mpicxx/startup/thread_support.hpp
  * @author Marcel Breyer
- * @date 2020-03-23
+ * @date 2020-06-16
  *
  * @brief Contains the level of thread support enum.
- * @details Additionally specializes a [*fmt*](https://github.com/fmtlib/fmt) formatter to print the actual thread support names.
+ * @details Additionally add various functions to perform conversions from and to
+ *          [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
  */
 
 #ifndef MPICXX_THREAD_SUPPORT_HPP
@@ -15,8 +16,9 @@
 #include <stdexcept>
 #include <string_view>
 
-#include <mpi.h>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
+#include <mpi.h>
 
 
 namespace mpicxx {
@@ -38,7 +40,6 @@ namespace mpicxx {
 
     /// @name thread_support conversion functions
     ///@{
-    // TODO 2020-03-18 15:29 marcel: change from fmt::format to std::format
     /**
      * @brief Stream-insertion operator overload for the mpicxx::thread_support enum class.
      * @param[inout] out an output stream
@@ -46,10 +47,22 @@ namespace mpicxx {
      * @return the output stream
      */
     inline std::ostream& operator<<(std::ostream& out, const thread_support ts) {
-        out << fmt::format("{}", ts);
+        switch (ts) {
+            case mpicxx::thread_support::single:
+                out << "MPI_THREAD_SINGLE";
+                break;
+            case mpicxx::thread_support::funneled:
+                out << "MPI_THREAD_FUNNELED";
+                break;
+            case mpicxx::thread_support::serialized:
+                out << "MPI_THREAD_SERIALIZED";
+                break;
+            case mpicxx::thread_support::multiple:
+                out << "MPI_THREAD_MULTIPLE";
+                break;
+        }
         return out;
     }
-    // TODO 2020-03-19 14:35 marcel: change from fmt::format to std::format
     /**
      * @brief `to_string` overload (using ADL) for the mpicxx::thread_support enum class.
      * @param[in] ts the enum class value
@@ -59,11 +72,10 @@ namespace mpicxx {
         return fmt::format("{}", ts);
     }
 
-    // TODO 2020-03-18 15:29 marcel: change from fmt::format to std::format
     /**
      * @brief Converts the given string to the respective mpicxx::thread_support value.
-     * @details Excepts the string value to be the MPI notation (e.g. `"MPI_THREAD_SINGLE"` gets converted to
-     * `mpicxx::thread_support::single`).
+     * @details Expects the string value to be the MPI notation (e.g. `"MPI_THREAD_SINGLE"` gets converted to
+     *          `mpicxx::thread_support::single`).
      * @param[in] sv the enum value represented as string
      * @return the converted enum value
      *
@@ -82,50 +94,26 @@ namespace mpicxx {
             throw std::invalid_argument(fmt::format("Can't convert \"{}\" to mpicxx::thread_support!", sv));
         }
     }
-
     /**
      * @brief Stream-extraction operator overload for the mpicxx::thread_support enum class.
+     * @details Sets the [`std::ios::failbit`](https://en.cppreference.com/w/cpp/io/ios_base/iostate) if the given value can't be converted
+     *          to a mpicxx::thread_support value.
      * @param[inout] in an input stream
      * @param[out] ts the enum class
      * @return the input stream
-     *
-     * @throws std::invalid_argument if the given value can't be converted to a mpicxx::thread_support value
      */
     inline std::istream& operator>>(std::istream& in, mpicxx::thread_support& ts) {
-        std::string str;
-        in >> str;
-        ts = enum_from_string(str);
+        try {
+            std::string str;
+            in >> str;
+            ts = enum_from_string(str);
+        } catch (const std::exception&) {
+            in.setstate(std::ios::failbit);
+        }
         return in;
     }
     ///@}
 
 }
-
-// TODO 2020-02-20 21:18 marcel: change from fmt::format to std::format
-/**
- * @brief Custom [*fmt*](https://github.com/fmtlib/fmt) formatter for the mpicxx::thread_support enum class.
- */
-template <>
-struct fmt::formatter<mpicxx::thread_support> : fmt::formatter<string_view> {
-    template <typename FormatContext>
-    auto format(const mpicxx::thread_support ts, FormatContext& ctx) {
-        string_view name;
-        switch (ts) {
-            case mpicxx::thread_support::single:
-                name = "MPI_THREAD_SINGLE";
-                break;
-            case mpicxx::thread_support::funneled:
-                name = "MPI_THREAD_FUNNELED";
-                break;
-            case mpicxx::thread_support::serialized:
-                name = "MPI_THREAD_SERIALIZED";
-                break;
-            case mpicxx::thread_support::multiple:
-                name = "MPI_THREAD_MULTIPLE";
-                break;
-        }
-        return fmt::formatter<string_view>::format(name, ctx);
-    }
-};
 
 #endif // MPICXX_THREAD_SUPPORT_HPP
