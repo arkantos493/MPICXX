@@ -66,8 +66,9 @@ namespace mpicxx {
     /**
      * @brief `to_string` overload (using ADL) for the mpicxx::thread_support enum class.
      * @param[in] ts the enum class value
-     * @return the converted [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
+     * @return the converted [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) (`[[nodiscard]]`)
      */
+    [[nodiscard]]
     inline std::string to_string(const thread_support ts) {
         return fmt::format("{}", ts);
     }
@@ -77,10 +78,11 @@ namespace mpicxx {
      * @details Expects the string value to be the MPI notation (e.g. `"MPI_THREAD_SINGLE"` gets converted to
      *          `mpicxx::thread_support::single`).
      * @param[in] sv the enum value represented as string
-     * @return the converted enum value
+     * @return the converted enum value (`[[nodiscard]]`)
      *
      * @throws std::invalid_argument if the given value can't be converted to a mpicxx::thread_support value
      */
+    [[nodiscard]]
     inline thread_support enum_from_string(const std::string_view sv) {
         if (sv.compare("MPI_THREAD_SINGLE") == 0) {
             return thread_support::single;
