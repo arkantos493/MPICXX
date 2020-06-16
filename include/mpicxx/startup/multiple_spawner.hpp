@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/multiple_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-15
+ * @date 2020-06-17
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN_MULTIPLE* function.
  */
@@ -971,7 +971,8 @@ namespace mpicxx {
          * @brief Returns all executable names.
          * @return the executable names (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<std::string>& command() const noexcept { return commands_; }
+        [[nodiscard]]
+        const std::vector<std::string>& command() const noexcept { return commands_; }
         /**
          * @brief Returns the name of the @p i-th executable.
          * @param[in] i the index of the executable
@@ -979,7 +980,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const std::string& command_at(const std::size_t i) const {
+        [[nodiscard]]
+        const std::string& command_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::command_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -993,7 +995,8 @@ namespace mpicxx {
          * @brief Returns all added command line arguments.
          * @return the command line arguments of all executables (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<std::vector<std::string>>& argv() const noexcept { return argvs_; }
+        [[nodiscard]]
+        const std::vector<std::vector<std::string>>& argv() const noexcept { return argvs_; }
         /**
          * @brief Returns all added command line arguments of the @p i-th executable.
          * @param[in] i the index of the executable
@@ -1001,7 +1004,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const std::vector<std::string>& argv_at(const std::size_t i) const {
+        [[nodiscard]]
+        const std::vector<std::string>& argv_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::argv_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -1018,7 +1022,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the indices @p i or @p j fall outside their valid ranges
          */
-        [[nodiscard]] const std::string& argv_at(const std::size_t i, const std::size_t j) const {
+        [[nodiscard]]
+        const std::string& argv_at(const std::size_t i, const std::size_t j) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::argv_at(const std::size_t, const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -1038,7 +1043,8 @@ namespace mpicxx {
          *
          * @note Creates a new [`std::vector`](https://en.cppreference.com/w/cpp/container/vector) on each invocation.
          */
-        [[nodiscard]] std::vector<argv_size_type> argv_size() const {
+        [[nodiscard]]
+        std::vector<argv_size_type> argv_size() const {
             std::vector<argv_size_type> sizes(this->size());
             std::transform(argvs_.cbegin(), argvs_.cend(), sizes.begin(), [](const auto& v) { return v.size(); });
             return sizes;
@@ -1050,7 +1056,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] argv_size_type argv_size_at(const std::size_t i) const {
+        [[nodiscard]]
+        argv_size_type argv_size_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::argv_size_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -1064,7 +1071,8 @@ namespace mpicxx {
          * @brief Returns all numbers of processes.
          * @return the number of processes (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
+        [[nodiscard]]
+        const std::vector<int>& maxprocs() const noexcept { return maxprocs_; }
         /**
          * @brief Returns the @p i-th number of processes.
          * @param[in] i the index of the executable
@@ -1072,7 +1080,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] int maxprocs_at(const std::size_t i) const {
+        [[nodiscard]]
+        int maxprocs_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::maxprocs_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -1086,7 +1095,8 @@ namespace mpicxx {
          * @brief Returns all spawn info.
          * @return the info objects used to spawn the executables (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<info>& spawn_info() const noexcept { return info_; }
+        [[nodiscard]]
+        const std::vector<info>& spawn_info() const noexcept { return info_; }
         /**
          * @brief Returns the @p i-th spawn info used to spawn the executables.
          * @param[in] i the index of the executable
@@ -1094,7 +1104,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const info& spawn_info_at(const std::size_t i) const {
+        [[nodiscard]]
+        const info& spawn_info_at(const std::size_t i) const {
             if (i >= this->size()) {
                 throw std::out_of_range(fmt::format(
                         "multiple_spawner::spawn_info_at(const std::size_t) range check: i (which is {}) >= this->size() (which is {})",
@@ -1108,20 +1119,23 @@ namespace mpicxx {
          * @brief Returns the rank of the root process.
          * @return the root rank (`[[nodiscard]]`)
          */
-        [[nodiscard]] int root() const noexcept { return root_; }
+        [[nodiscard]]
+        int root() const noexcept { return root_; }
 
         /**
          * @brief Returns the intracommunicator containing the group of spawning processes.
          * @return the intracommunicator (`[[nodiscard]]`)
          */
-        [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
+        [[nodiscard]]
+        MPI_Comm communicator() const noexcept { return comm_; }
 
         /**
          * @brief Returns the size of this @ref mpicxx::multiple_spawner object, i.e. the number of spawned executables
          *        (**not** the total number of processes to spawn).
          * @return the size if this @ref mpicxx::multiple_spawner (`[[nodiscard]]`)
          */
-        [[nodiscard]] size_type size() const noexcept {
+        [[nodiscard]]
+        size_type size() const noexcept {
             MPICXX_ASSERT_SANITY(detail::all_same([](const auto& vec) { return vec.size(); }, commands_, argvs_, maxprocs_, info_),
                     "Attempt to retrieve the size while the sizes of the members (commands = {}, argvs = {}, maxprocs = {}, info = {}) differ!",
                     commands_.size(), argvs_.size(), maxprocs_.size(), info_.size());
@@ -1132,7 +1146,8 @@ namespace mpicxx {
          * @brief Returns the total number of process that will get spawned.
          * @return the total number of processes (`[[nodiscard]]`)
          */
-        [[nodiscard]] int total_maxprocs() const noexcept {
+        [[nodiscard]]
+        int total_maxprocs() const noexcept {
             // custom implementation because std::reduce/std::accumulate aren't noexcept
             int total = 0;
             for (const int i : maxprocs_) {

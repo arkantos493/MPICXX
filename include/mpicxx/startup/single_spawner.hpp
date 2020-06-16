@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/single_spawner.hpp
  * @author Marcel Breyer
- * @date 2020-06-15
+ * @date 2020-06-17
  *
  * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
  */
@@ -264,13 +264,15 @@ namespace mpicxx {
          * @brief Returns the name of the executable which should get spawned.
          * @return the executable name (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::string& command() const noexcept { return command_; }
+        [[nodiscard]]
+        const std::string& command() const noexcept { return command_; }
 
         /**
          * @brief Returns all command line arguments.
          * @return the command line arguments (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<std::string>& argv() const noexcept { return argvs_; }
+        [[nodiscard]]
+        const std::vector<std::string>& argv() const noexcept { return argvs_; }
         /**
          * @brief Returns the @p i-th command line argument.
          * @param[in] i the index of the command line argument
@@ -278,7 +280,8 @@ namespace mpicxx {
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
-        [[nodiscard]] const std::string& argv_at(const std::size_t i) const {
+        [[nodiscard]]
+        const std::string& argv_at(const std::size_t i) const {
             if (i >= argvs_.size()) {
                 throw std::out_of_range(fmt::format(
                         "single_spawner::argv_at(const std::size_t) range check: i (which is {}) >= argvs_.size() (which is {})",
@@ -291,7 +294,8 @@ namespace mpicxx {
          * @brief Returns the number of command line arguments.
          * @return the number of command line arguments (`[[nodiscard]]`)
          */
-        [[nodiscard]] argv_size_type argv_size() const noexcept {
+        [[nodiscard]]
+        argv_size_type argv_size() const noexcept {
             return argvs_.size();
         }
 
@@ -299,25 +303,29 @@ namespace mpicxx {
          * @brief Returns the number of processes.
          * @return the number of processes (`[[nodiscard]]`)
          */
-        [[nodiscard]] int maxprocs() const noexcept { return maxprocs_; }
+        [[nodiscard]]
+        int maxprocs() const noexcept { return maxprocs_; }
 
         /**
          * @brief Returns the info object.
          * @return the info object (`[[nodiscard]]`)
          */
-        [[nodiscard]] const info& spawn_info() const noexcept { return info_; }
+        [[nodiscard]]
+        const info& spawn_info() const noexcept { return info_; }
 
         /**
          * @brief Returns the rank of the root process.
          * @return the root rank (`[[nodiscard]]`)
          */
-        [[nodiscard]] int root() const noexcept { return root_; }
+        [[nodiscard]]
+        int root() const noexcept { return root_; }
 
         /**
          * @brief Returns the intracommunicator containing the group of spawning processes.
          * @return the intracommunicator (`[[nodiscard]]`)
          */
-        [[nodiscard]] MPI_Comm communicator() const noexcept { return comm_; }
+        [[nodiscard]]
+        MPI_Comm communicator() const noexcept { return comm_; }
         ///@}
 
 
