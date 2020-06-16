@@ -83,9 +83,9 @@ TEST(StartupTest, ToEnumClass) {
     EXPECT_EQ(mpicxx::enum_from_string("MPI_THREAD_MULTIPLE"), mpicxx::thread_support::multiple);
 
     // try to convert an illegal string value
-    [[maybe_unused]] std::string str;
+    [[maybe_unused]] mpicxx::thread_support ts;
     EXPECT_THROW_WHAT(
-            strd = mpicxx::enum_from_string("INVALID_VALUE"),
+            ts = mpicxx::enum_from_string("INVALID_VALUE"),
             std::invalid_argument,
             "Can't convert \"INVALID_VALUE\" to mpicxx::thread_support!" );
 }
