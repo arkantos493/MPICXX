@@ -1,20 +1,20 @@
 /**
  * @file test/startup/thread_support.cpp
  * @author Marcel Breyer
- * @date 2020-03-19
+ * @date 2020-06-16
  *
  * @brief Test cases for the @ref mpicxx::thread_support enum class.
  * @details Testsuite: *StartupTest*
- * | test case name                         | test case description                                                |
- * |:---------------------------------------|:---------------------------------------------------------------------|
- * | CorrectEnumClassValues                 | check if the enum class reflects the correct MPI values              |
- * | ToStringViaFormat                      | check whether the conversion to `std::string` via fmt::format works  |
- * | ToStringViaToString                    | check whether the conversion to `std::string` via `to_string` works  |
- * | ToStringViaStreamInsertionOperator     | check whether the conversion to `std::string` via `operator<<` works |
- * | ToEnumClass                            | check whether the conversion from a string works                     |
- * | ToEnumClassViaStreamExtractionOperator | check whether the conversion from a string via `operator>>` works    |
+ * | test case name                         | test case description                                                                                                         |
+ * |:---------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|
+ * | CorrectEnumClassValues                 | check if the enum class reflects the correct MPI values                                                                       |
+ * | ToStringViaFormat                      | check whether the conversion to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) via fmt::format works  |
+ * | ToStringViaToString                    | check whether the conversion to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) via `to_string` works  |
+ * | ToStringViaStreamInsertionOperator     | check whether the conversion to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) via `operator<<` works |
+ * | ToEnumClass                            | check whether the conversion from a string works                                                                              |
+ * | ToEnumClassViaStreamExtractionOperator | check whether the conversion from an input stream via `operator>>` works                                                      |
  */
-// TODO 2020-03-18 15:51 marcel: change from fmt::format to std::format
+
 #include <sstream>
 #include <string>
 #include <type_traits>
