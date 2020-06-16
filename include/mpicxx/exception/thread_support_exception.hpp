@@ -51,12 +51,14 @@ namespace mpicxx {
          * @brief Returns the required level of thread support.
          * @return the required level of thread support
          */
-        [[nodiscard]] thread_support required() const noexcept { return required_; }
+        [[nodiscard]]
+        thread_support required() const noexcept { return required_; }
         /**
          * @brief Returns the provided level of thread support.
          * @return the provided level of thread support
          */
-        [[nodiscard]] thread_support provided() const noexcept { return provided_; }
+        [[nodiscard]]
+        thread_support provided() const noexcept { return provided_; }
 
     private:
         const thread_support required_;
