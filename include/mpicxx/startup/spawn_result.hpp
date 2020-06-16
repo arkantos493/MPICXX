@@ -72,7 +72,8 @@ namespace mpicxx {
          *
          * @calls{ int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once }
          */
-        [[nodiscard]] int number_of_spawned_processes() const {
+        [[nodiscard]]
+        int number_of_spawned_processes() const {
             if (intercomm_ != MPI_COMM_NULL) {
                 int size;
                 MPI_Comm_remote_size(intercomm_, &size);
@@ -87,21 +88,24 @@ namespace mpicxx {
          *
          * @calls{ int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once }
          */
-        [[nodiscard]] bool maxprocs_processes_spawned() const {
+        [[nodiscard]]
+        bool maxprocs_processes_spawned() const {
             return errcodes_.size() == static_cast<typename decltype(errcodes_)::size_type>(this->number_of_spawned_processes());
         }
         /**
          * @brief Returns the intercommunicator between the original group and the newly spawned group.
          * @return the intercommunicator (`[[nodiscard]]`)
          */
-        [[nodiscard]] MPI_Comm intercommunicator() const noexcept {
+        [[nodiscard]]
+        MPI_Comm intercommunicator() const noexcept {
             return intercomm_;
         }
         /**
          * @brief Returns the errcodes (one code per process) returned by the *MPI_COMM_SPAWN_** call.
          * @return the errcodes (`[[nodiscard]]`)
          */
-        [[nodiscard]] const std::vector<int>& errcodes() const noexcept {
+        [[nodiscard]]
+        const std::vector<int>& errcodes() const noexcept {
             return errcodes_;
         }
         /**
@@ -110,7 +114,8 @@ namespace mpicxx {
          *
          * @calls{ int MPI_Error_string(int errorcode, char *string, int *resultlen);       // at most 'maxprocs' times }
          */
-        [[nodiscard]] std::string error_list() const {
+        [[nodiscard]]
+        std::string error_list() const {
             fmt::memory_buffer buf;
 
             // count and display the number of errors
@@ -189,7 +194,8 @@ namespace mpicxx {
          *
          * @calls{ int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once }
          */
-        [[nodiscard]] int number_of_spawned_processes() const {
+        [[nodiscard]]
+        int number_of_spawned_processes() const {
             if (intercomm_ != MPI_COMM_NULL) {
                 int size;
                 MPI_Comm_remote_size(intercomm_, &size);
@@ -204,14 +210,16 @@ namespace mpicxx {
          *
          * @calls{ int MPI_Comm_remote_size(MPI_Comm comm, int *size);      // at most once }
          */
-        [[nodiscard]] bool maxprocs_processes_spawned() const {
+        [[nodiscard]]
+        bool maxprocs_processes_spawned() const {
             return maxprocs_ == this->number_of_spawned_processes();
         }
         /**
          * @brief Returns the intercommunicator between the original group and the newly spawned group.
          * @return the intercommunicator (`[[nodiscard]]`)
          */
-        [[nodiscard]] MPI_Comm intercommunicator() const noexcept {
+        [[nodiscard]]
+        MPI_Comm intercommunicator() const noexcept {
             return intercomm_;
         }
 
@@ -226,9 +234,10 @@ namespace mpicxx {
      * @brief Returns the parent intracommunicator of the current process if the process was started with *MPI_COMM_SPAWN* or
      *        *MPI_COMM_SPAWN_MULTIPLE*.
      * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the parent intracommunicator or
-     *         `std::nullopt` (`[[nodiscard]]`)
+     *         [`std::nullopt`](https://en.cppreference.com/w/cpp/utility/optional/nullopt) (`[[nodiscard]]`)
      */
-    [[nodiscard]] inline std::optional<MPI_Comm> parent_process() {
+    [[nodiscard]]
+    inline std::optional<MPI_Comm> parent_process() {
         MPI_Comm intracomm;
         MPI_Comm_get_parent(&intracomm);
         if (intracomm != MPI_COMM_NULL) {
