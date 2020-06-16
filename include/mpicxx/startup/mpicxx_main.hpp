@@ -26,24 +26,22 @@ namespace mpicxx {
     /**
      * @brief Correctly setup and teardown the MPI environment while executing the code given by @p func.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::init()
-     * 2. invoke the function represented by @p func (forwarding all additional parameters)
-     * 3. call @ref mpicxx::finalize()
+     *          -# call @ref mpicxx::init()
+     *          -# invoke the function represented by @p func (forwarding all additional parameters)
+     *          -# call @ref mpicxx::finalize()
      *
-     * Example:
-     * @snippet examples/startup/init_and_finalize.cpp normal version without args and thread support
-     * is the same as:
-     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
-     * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
-     * @tparam Args a parameter pack representing the additional (optional) parameters
+     *          Example:
+     *          @snippet examples/startup/init_and_finalize.cpp normal version without args and thread support
+     *          is the same as:
+     *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
+     * @tparam FuncPtr must meet the @ref detail::main_pointer requirements.
+     * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[in] args the additional parameters forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
      *
-     * @calls{
-     * int MPI_Init(int *argc, char ***argv);       // exactly once
-     * int MPI_Finalize();                          // exactly once
-     * }
+     * @calls{ int MPI_Init(int *argc, char ***argv);       // exactly once
+     *         int MPI_Finalize();                          // exactly once }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_pointer<FuncPtr, Args...>
@@ -58,26 +56,24 @@ namespace mpicxx {
     /**
      * @brief Correctly setup and teardown the MPI environment while executing the code given by @p func.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::init(int& argc, char** argv)
-     * 2. invoke the function represented by @p func (forwarding all additional parameters)
-     * 3. call @ref mpicxx::finalize()
+     *          -# call @ref mpicxx::init(int& argc, char** argv)
+     *          -# invoke the function represented by @p func (forwarding all additional parameters)
+     *          -# call @ref mpicxx::finalize()
      *
-     * Example:
-     * @snippet examples/startup/init_and_finalize.cpp normal version with args and without thread support
-     * is the same as:
-     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
-     * @tparam FuncPtr a callable fulfilling the @ref detail::main_args_pointer requirements
-     * @tparam Args a parameter pack representing the additional (optional) parameters
+     *          Example:
+     *          @snippet examples/startup/init_and_finalize.cpp normal version with args and without thread support
+     *          is the same as:
+     *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
+     * @tparam FuncPtr must meet the @ref detail::main_args_pointer requirements.
+     * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
      * @param[inout] argv the command line parameters
      * @param[in] args the additional parameters forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr
      *
-     * @calls{
-     * int MPI_Init(int *argc, char ***argv);       // exactly once
-     * int MPI_Finalize();                          // exactly once
-     * }
+     * @calls{ int MPI_Init(int *argc, char ***argv);       // exactly once
+     *         int MPI_Finalize();                          // exactly once }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
@@ -92,27 +88,25 @@ namespace mpicxx {
 
     /**
      * @brief Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by
-     * @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
+     *        @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::init(const thread_support)
-     * 2. invoke the function represented by @p func (forwarding all additional parameters)
-     * 3. call @ref mpicxx::finalize()
+     *          -# call @ref mpicxx::init(const thread_support)
+     *          -# invoke the function represented by @p func (forwarding all additional parameters)
+     *          -# call @ref mpicxx::finalize()
      *
-     * Example:
-     * @snippet examples/startup/init_and_finalize.cpp normal version without args and with thread support
-     * is nearly the same as (except for the return value):
-     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
-     * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
-     * @tparam Args a parameter pack representing the additional (optional) parameters
+     *          Example:
+     *          @snippet examples/startup/init_and_finalize.cpp normal version without args and with thread support
+     *          is nearly the same as (except for the return value):
+     *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
+     * @tparam FuncPtr must meet the @ref detail::main_pointer requirements.
+     * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[in] required the required level of thread support
      * @param[in] args the additional parameters forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr or -1 if the required level of thread support couldn't be satisfied
      *
-     * @calls{
-     * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
-     * int MPI_Finalize();                                                              // exactly once
-     * }
+     * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
+     *         int MPI_Finalize();                                                              // exactly once }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_pointer<FuncPtr, Args...>
@@ -130,18 +124,18 @@ namespace mpicxx {
     }
     /**
      * @brief Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by
-     * @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
+     *        @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
      * @details This function performs the following tasks in the given order:
-     * 1. call @ref mpicxx::init(int& argc, char** argv, const thread_support)
-     * 2. invoke the function represented by @p func (forwarding all additional parameters)
-     * 3. call @ref mpicxx::finalize()
+     *          -# call @ref mpicxx::init(int& argc, char** argv, const thread_support)
+     *          -# invoke the function represented by @p func (forwarding all additional parameters)
+     *          -# call @ref mpicxx::finalize()
      *
-     * Example:
-     * @snippet examples/startup/init_and_finalize.cpp normal version with args and thread support
-     * is nearly the same as (except for the return value):
-     * @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
-     * @tparam FuncPtr a callable fulfilling the @ref detail::main_pointer requirements
-     * @tparam Args a parameter pack representing the additional (optional) parameters
+     *          Example:
+     *          @snippet examples/startup/init_and_finalize.cpp normal version with args and thread support
+     *          is nearly the same as (except for the return value):
+     *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
+     * @tparam FuncPtr must meet the @ref detail::main_pointer requirements.
+     * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
      * @param[inout] argv the command line parameters
@@ -149,10 +143,8 @@ namespace mpicxx {
      * @param[in] args the additional parameters forwarded to the user defined function @p func
      * @return the result of the invocation of @p FuncPtr or -1 if the required level of thread support couldn't be satisfied
      *
-     * @calls{
-     * int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
-     * int MPI_Finalize();                                                              // exactly once
-     * }
+     * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
+     *         int MPI_Finalize();                                                              // exactly once }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
