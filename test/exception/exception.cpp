@@ -1,7 +1,7 @@
 /**
  * @file test/exception/exception.cpp
  * @author Marcel Breyer
- * @date 2020-03-02
+ * @date 2020-06-17
  *
  * @brief Test cases for the @ref mpicxx::exception class.
  * @details Testsuite: *ExceptionTest*
@@ -23,7 +23,7 @@ namespace {
     }
 
     void function_that_pretty_throws() {
-        throw_with_pretty_location(mpicxx::exception);
+        MPICXX_THROW_WITH_PRETTY_LOCATION(mpicxx::exception);
     }
 
 }
