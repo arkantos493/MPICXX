@@ -22,6 +22,7 @@
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
+#include <test_utility.hpp>
 
 #include <mpicxx/startup/thread_support.hpp>
 
@@ -82,14 +83,11 @@ TEST(StartupTest, ToEnumClass) {
     EXPECT_EQ(mpicxx::enum_from_string("MPI_THREAD_MULTIPLE"), mpicxx::thread_support::multiple);
 
     // try to convert an illegal string value
-    try {
-        mpicxx::enum_from_string("INVALID_VALUE");
-        FAIL() << "expected std::invalid_argument exception";
-    } catch(const std::invalid_argument& e) {
-        EXPECT_STREQ(e.what(), "Can't convert \"INVALID_VALUE\" to mpicxx::thread_support!");
-    } catch(...) {
-        FAIL() << "expected std::invalid_argument exception";
-    }
+    [[maybe_unused]] std::string str;
+    EXPECT_THROW_WHAT(
+            strd = mpicxx::enum_from_string("INVALID_VALUE"),
+            std::invalid_argument,
+            "Can't convert \"INVALID_VALUE\" to mpicxx::thread_support!" );
 }
 
 TEST(StartupTest, ToEnumClassViaStreamExtractionOperator) {
