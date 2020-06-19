@@ -1,18 +1,18 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-03-23
+ * @date 2020-06-19
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into three levels:
- * - **0**: **no** assertions are enabled (default)
- * - **1**: assertions that check preconditions, i.e. conditions that **must** hold for the function to complete successfully
- * - **2**: additionally to the assertions of level 1, assertions that check if the parameters make sense in the current context, but which
- * are **not required** for the function to complete successfully (e.g. increment of a past-the-end iterator), are added
+ *          - **0**: **no** assertions are enabled (default)
+ *          - **1**: assertions that check preconditions, i.e. conditions that **must** hold for the function to complete successfully
+ *          - **2**: additionally to the assertions of level 1, assertions that check if the parameters make sense in the current context,
+ *            but which are **not required** for the function to complete successfully (e.g. increment of a past-the-end iterator), are added
  *
- * During cmake's configuration step, it is possible to enable a specific assertion level using the ´-DASSERTION_LEVEL´ option.
+ *          During cmake's configuration step, it is possible to enable a specific assertion level using the ´-DASSERTION_LEVEL´ option.
  *
- * Old assertion syntax and example output:
+ *          Old assertion syntax and example output:
  * @code
  * assert(("Parameter can't be negative!", n > 0));
  *
@@ -20,7 +20,7 @@
  * output.s: ./example.cpp:42: void test(int): Assertion `("Parameter can't be negative!", n > 0)' failed.
  * @endcode
  *
- * New assertion syntax and example output:
+ *          New assertion syntax and example output:
  * @code
  * MPICXX_ASSERT_PRECONDITION(n > 0, "Parameter can't be negative! : n = %i", n);
  * // alternative: MPICXX_ASSERT_SANITY
@@ -42,11 +42,11 @@
  *   #2    /lib/x86_64-linux-gnu/libc.so.6: __libc_start_main() [+0xe]
  *   #1    ./output.s: _start() [+0x2]
  * @endcode
- * For a meaningful stack trace to be printed the linker flag `-rdynamic` ([*GCC*](https://gcc.gnu.org/) and
- * [*clang*](https://clang.llvm.org/)) is added if and only if the ASSERTION_LEVEL is greater than 0.
- * [*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/) currently doesn't print a stack trace at all.
+ *          For a meaningful stack trace to be printed the linker flag `-rdynamic` ([*GCC*](https://gcc.gnu.org/) and
+ *          [*clang*](https://clang.llvm.org/)) is added if and only if the *ASSERTION_LEVEL* is greater than 0.
+ *          [*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/) currently doesn't print a stack trace at all.
  *
- * In addition the assertions call ``MPI_Abort`` if the assertion is executed within an active MPI environment.
+ *          In addition the assertions call *MPI_Abort* if the assertion is executed within an active MPI environment.
  */
 
 #ifndef MPICXX_ASSERT_HPP
@@ -63,22 +63,21 @@
 
 namespace mpicxx::detail {
     /**
-     * @brief This function gets called by the `MPICXX_ASSERT_...` macros and does the actual assertion checking.
-     * @details If the assert condition @p cond evaluates to ``false``, the condition, location, custom message and stack trace are printed
-     * on the stderr steam. Afterwards the programs terminates with a call to MPI_Abort or
-     * [`std::abort`](https://en.cppreference.com/w/cpp/utility/program/abort) respectively.
+     * @brief This function gets called by the *MPICXX_ASSERT_...* macros and does the actual assertion checking.
+     * @details If the assert condition @p cond evaluates to `false`, the condition, location, custom message and stack trace are printed
+     *          on the stderr stream. Afterwards the programs terminates with a call to *MPI_Abort* or
+     *          [`std::abort`](https://en.cppreference.com/w/cpp/utility/program/abort) respectively.
      *
-     * @tparam Args parameter pack for the placeholder types
-     * @param[in] cond the assert condition, halts the program if evaluated to ``false``
+     * @tparam Args parameter pack for the placeholder types.
+     * @param[in] cond the assert condition, halts the program if evaluated to `false`
      * @param[in] cond_str the assert condition as string for a better assert message
      * @param[in] assertion_category the assertion category (one of: *PRECONDITION*, *SANITY*)
      * @param[in] loc the location where the assertion appeared
      * @param[in] msg the custom message printed after the assertion location
-     * @param[in] args the arguments used to fill the ``printf`` like placeholders in the custom message
+     * @param[in] args the arguments used to fill the [`printf`](https://en.cppreference.com/w/cpp/io/c/fprintf) like placeholders in the
+     *                 custom message
      *
-     * @calls{
-     * int MPI_Abort(MPI_Comm comm, int errorcode);     // at most once
-     * }
+     * @calls{ int MPI_Abort(MPI_Comm comm, int errorcode);     // at most once }
      */
     template <typename... Args>
     inline void check(const bool cond, const char* cond_str, const char* assertion_category, const source_location& loc,
@@ -129,19 +128,20 @@ namespace mpicxx::detail {
 /**
  * @def MPICXX_ASSERT_PRECONDITION
  * @brief Defines the @ref MPICXX_ASSERT_PRECONDITION macro if and only if the *ASSERTION_LEVEL*, as selected during cmake's configuration
- * step, is greater than 0.
+ *        step, is greater than 0.
  * @details This macro is responsible for all precondition checks. If a precondition of a function isn't met, the respective function isn't
- * guaranteed to finish successfully.
+ *          guaranteed to finish successfully.
  *
- * An example is to check whether an iterator can be safely dereference or not.
+ *          An example is to check whether an iterator can be safely dereference or not.
  *
  * @param[in] cond the assert condition
  * @param[in] msg the custom assert message
- * @param[in] ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
+ * @param[in] ... varying number of parameters to fill the [`printf`](https://en.cppreference.com/w/cpp/io/c/fprintf) like placeholders in
+ *                the custom assert message
  */
 #if ASSERTION_LEVEL > 0
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, "Precondition", mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...)
 #endif
@@ -149,19 +149,20 @@ namespace mpicxx::detail {
 /**
  * @def MPICXX_ASSERT_SANITY
  * @brief Defines the @ref MPICXX_ASSERT_SANITY macro if and only if the *ASSERTION_LEVEL*, as selected during cmake's configuration step,
- * is greater than 1.
+ *        is greater than 1.
  * @details This macro is responsible for all sanity checks. If a sanity check isn't successful, the respective function can still complete,
- * but the executed code wasn't necessarily meaningful.
+ *          but the executed code wasn't necessarily meaningful.
  *
- * An example is the check whether an attempt is made to increment a past-the-end iterator.
+ *          An example is the check whether an attempt is made to increment a past-the-end iterator.
  *
  * @param[in] cond the assert condition
  * @param[in] msg the custom assert message
- * @param[in] ... varying number of parameters to fill the ``printf`` like placeholders in the custom assert message
+ * @param[in] ... varying number of parameters to fill the [`printf`](https://en.cppreference.com/w/cpp/io/c/fprintf) like placeholders in
+ *                the custom assert message
  */
 #if ASSERTION_LEVEL > 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \
-        mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
+        mpicxx::detail::check(cond, #cond, "Sanity", mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
 #define MPICXX_ASSERT_SANITY(cond, msg, ...)
 #endif
