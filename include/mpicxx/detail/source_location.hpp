@@ -1,16 +1,16 @@
 /**
  * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
- * @date 2020-03-23
+ * @date 2020-06-19
  *
- * @brief Provides a `source_location` class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
+ * @brief Provides a class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
- * - The new macro `PRETTY_FUNC_NAME__` is defined as `__PRETTY_FUNC__` ([*GCC*](https://gcc.gnu.org/) and
- * [*clang*](https://clang.llvm.org/)), `__FUNCSIG__` ([*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
- * `__func__` (otherwise). This macro can be used as first parameter to the static @ref mpicxx::detail::source_location::current()
- * function to get a better function name.
- * - Includes a member named `rank` which holds the current MPI rank (if a MPI environment is currently active).
- * - The @ref mpicxx::detail::source_location::stack_trace() function can be used to print/get the current function call stack.
+ *          - The new macro `MPICXX_PRETTY_FUNC_NAME__` is defined as `__PRETTY_FUNC__` ([*GCC*](https://gcc.gnu.org/) and
+ *            [*clang*](https://clang.llvm.org/)), `__FUNCSIG__` ([*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
+ *            `__func__` (otherwise). This macro can be used as first parameter to the static
+ *            @ref mpicxx::detail::source_location::current() function to get a better function name.
+ *          - Includes a member named `rank` which holds the current MPI rank (if a MPI environment is currently active).
+ *          - The @ref mpicxx::detail::source_location::stack_trace() function can be used to print/get the current function call stack.
  */
 
 #ifndef MPICXX_SOURCE_LOCATION_HPP
@@ -27,21 +27,21 @@
 #include <mpi.h>
 
 /**
- * @def PRETTY_FUNC_NAME__
- * @brief The @ref PRETTY_FUNC_NAME__ macro is defined as `__PRETTY_FUNC__` ([*GCC*](https://gcc.gnu.org/) and
- * [*clang*](https://clang.llvm.org/)), `__FUNCSIG__` ([*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
- * `__func__` (otherwise).
+ * @def MPICXX_PRETTY_FUNC_NAME__
+ * @brief The @ref MPICXX_PRETTY_FUNC_NAME__ macro is defined as `__PRETTY_FUNC__` ([*GCC*](https://gcc.gnu.org/) and
+ *        [*clang*](https://clang.llvm.org/)), `__FUNCSIG__` ([*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
+ *        `__func__` (otherwise).
  * @details It can be used as compiler independent way to enable a better function name when used as first parameter to
- * @ref mpicxx::detail::source_location::current().
+ *          @ref mpicxx::detail::source_location::current().
  */
 #ifdef __GNUG__
 #include <execinfo.h>
 #include <cxxabi.h>
-#define PRETTY_FUNC_NAME__ __PRETTY_FUNCTION__
+#define MPICXX_PRETTY_FUNC_NAME__ __PRETTY_FUNCTION__
 #elif _MSC_VER
-#define PRETTY_FUNC_NAME__ __FUNCSIG__
+#define MPICXX_PRETTY_FUNC_NAME__ __FUNCSIG__
 #else
-#define PRETTY_FUNC_NAME__ __func__
+#define MPICXX_PRETTY_FUNC_NAME__ __func__
 #endif
 
 namespace mpicxx::detail {
@@ -53,20 +53,18 @@ namespace mpicxx::detail {
     class source_location {
     public:
         /**
-         * @brief Constructs a new source_location with the respective information about the current call side.
-         * @param[in] func the function name (including its signature if supported via the macro `PRETTY_FUNC_NAME__`)
+         * @brief Constructs a new @ref mpicxx::detail::source_location with the respective information about the current call side.
+         * @param[in] func the function name (including its signature if supported via the macro `MPICXX_PRETTY_FUNC_NAME__`)
          * @param[in] file the file name (absolute path)
          * @param[in] line the line number
          * @param[in] column the column number
-         * @return the source_location holding the call side location information
+         * @return the m@ref mpicxx::detail::source_location holding the call side location information
          *
          * @attention @p column is always (independent of the call side position) default initialized to 0!
          *
-         * @calls{
-         * int MPI_Initialized(int *flag);                  // exactly once
-         * int MPI_Finalized(int *flag);                    // exactly once
-         * int MPI_Comm_rank(MPI_Comm comm, int *rank);     // at most once
-         * }
+         * @calls{ int MPI_Initialized(int *flag);                  // exactly once
+         *         int MPI_Finalized(int *flag);                    // exactly once
+         *         int MPI_Comm_rank(MPI_Comm comm, int *rank);     // at most once }
          */
         static source_location current(
                 const std::string_view func = __builtin_FUNCTION(),
@@ -79,6 +77,7 @@ namespace mpicxx::detail {
             loc.func_ = func;
             loc.line_ = line;
             loc.column_ = column;
+            // TODO 2020-06-19 02:14 breyerml: exception may be the wrong way
             try {
                 // get the current MPI rank iff the MPI environment is active
                 int is_initialized, is_finalized;

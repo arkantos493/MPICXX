@@ -41,7 +41,7 @@ TEST(DetailTest, CurrentSourceLocation) {
 }
 
 TEST(DetailTest, CurrentSourceLocationPrettyFuncName) {
-    mpicxx::detail::source_location loc = mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__);
+    mpicxx::detail::source_location loc = mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__);
 
     // test file name
     EXPECT_STREQ(loc.file_name().c_str(), __FILE__);
