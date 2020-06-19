@@ -1,7 +1,7 @@
 /**
  * @file test/exception/thread_support_exception.cpp
  * @author Marcel Breyer
- * @date 2020-06-17
+ * @date 2020-06-19
  *
  * @brief Test cases for the @ref mpicxx::thread_support_not_satisfied exception class.
  * @details Testsuite: *ExceptionTest*
@@ -23,7 +23,7 @@ namespace {
     }
 
     void function_that_pretty_throws() {
-        MPICXX_THROW_WITH_PRETTY_LOCATION(mpicxx::thread_support_not_satisfied, mpicxx::thread_support::multiple, mpicxx::thread_support::single);
+        MPICXX_THROW_EXCEPTION(mpicxx::thread_support_not_satisfied, mpicxx::thread_support::multiple, mpicxx::thread_support::single);
     }
 
 }
