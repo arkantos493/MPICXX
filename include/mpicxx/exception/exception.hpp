@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/exception.hpp
  * @author Marcel Breyer
- * @date 2020-06-17
+ * @date 2020-06-19
  *
  * @brief Contains the base class for all custom exception in the mpicxx namespace.
  * @details This base class is fully standard conformant, i.e. it provides a public **noexcept** copy constructor and copy assignment
@@ -16,8 +16,10 @@
 #include <stdexcept>
 #include <string>
 
-#include <mpicxx/detail/source_location.hpp>
+#include <fmt/format.h>
+
 #include <mpicxx/detail/concepts.hpp>
+#include <mpicxx/detail/source_location.hpp>
 
 
 namespace mpicxx {
@@ -33,7 +35,7 @@ namespace mpicxx {
     public:
         /**
          * @brief Construct an exception, i.e. construct the exception location message.
-         * @details If the location message couldn't be constructed, the respective exception gets directly catched to prevent a call to
+         * @details If the location message couldn't be constructed, the respective exception gets directly caught to prevent a call to
          *          [`std::terminate`](https://en.cppreference.com/w/cpp/error/terminate) during stack unwinding.
          * @param[in] loc the source location information
          * @param[in] use_stack_trace if `true` a detailed stack trace is included in the exception message (if supported, see
@@ -41,27 +43,31 @@ namespace mpicxx {
          */
         exception(const detail::source_location& loc = detail::source_location::current(), const bool use_stack_trace = true) : loc_(loc) {
             try {
+                using namespace std::string_literals;
                 // try to create a detailed error message containing the source location of the thrown exception
-                std::stringstream ss;
-                ss << "Exception thrown";
-                // if we are in an active MPI environment, print current rank
-                if (loc.rank().has_value()) {
-                    ss << " on rank " << loc.rank().value();
-                }
-                ss << "\n"
-                   << "  in file " << loc.file_name() << "\n"
-                   << "  in function '" << loc.function_name() << "'\n"
-                   << "  @ line " << loc.line() << "\n\n";
+                fmt::memory_buffer buf;
 
-                // write stacktrace into the string stream if requested (default = true)
+                // format exception message
+                fmt::format_to(buf, "Exception thrown {} \n",
+                        (loc.rank().has_value() ?
+                            fmt::format("on MPI_COMM_WORLD rank {}", loc.rank().value()) :
+                            "without a running MPI environment"s));
+
+                // format source location
+                fmt::format_to(buf, "  in file {}\n  inf function {}\n  @ line {}\n\n", loc.file_name(), loc.function_name(), loc.line());
+
+                // write stacktrace into the string stream if requested (default = true) // TODO 2020-06-19 00:02 breyerml: change after rebase
+                std::stringstream ss;
                 if (use_stack_trace) {
                     loc.stack_trace(ss);
                 }
+                fmt::format_to(buf, std::move(ss.str()));
 
-                msg_ = std::make_shared<std::string>(std::move(ss.str()));
+                using std::to_string;
+                msg_ptr_ = std::make_shared<std::string>(to_string(buf));
             } catch (...) {
                 // unable to create source location message
-                msg_ = nullptr;
+                msg_ptr_ = nullptr;
             }
         }
 
@@ -81,7 +87,7 @@ namespace mpicxx {
         virtual const char* what() const noexcept override {
             // check whether any specific error message has been created
             static constexpr char error_what[] = "Couldn't create exception message!";
-            return msg_ != nullptr ? msg_->c_str() : error_what;
+            return msg_ptr_ != nullptr ? msg_ptr_->c_str() : error_what;
         }
 
         /**
@@ -93,54 +99,52 @@ namespace mpicxx {
 
     protected:
         /**
-         * @brief Tries to prepend @p msg to the current @ref detail::source_location information.
+         * @brief Tries to prepend @p msg to the current message.
          * @details There are two possible cases:
-         *          -# the @ref detail::source_location message was successfully created:
-         *             try to prepend @p msg; if an exception is thrown, this function has no effect and only the
-         *             @ref detail::source_location  message is stored
-         *          -# the @ref detail::source_location message was **not** successfully created:
-         *             try to store @p msg; if an exception is thrown, this function has no effect and nothing is stored
-         * @tparam T must meet the @ref detail::is_string requirements.
-         * @param[in] msg_to_prepend the message to prepend
+         *          -# the initial message (containing the @ref detail::source_location message) was created successfully:
+         *             try to prepend @p msg; if an exception is thrown, this function has no effect
+         *          -# the initial message (containing the @ref detail::source_location message) was **not** created successfully:
+         *             try to store @p msg; if an exception is thrown, this function has no effect
+         * @tparam T must meet the @ref mpicxx::detail::is_string requirements.
+         * @param[in] msg the message to prepend
          */
         template <detail::is_string T>
-        void prepend_to_what_message(T&& msg_to_prepend) {
+        void prepend_to_what_message(T&& msg) {
             try {
-                if (msg_ != nullptr) {
-                    // successfully created source location message
-                    // -> try to prepend the derived class message (msg_to_prepend)
-                    msg_->insert(0, std::forward<T>(msg_to_prepend));
+                if (msg_ptr_ != nullptr) {
+                    // successfully created base class message
+                    // -> try to prepend the derived class message (msg)
+                    msg_ptr_->insert(0, std::forward<T>(msg));
                 } else {
-                    // exception thrown while creating source location message
-                    // try to only create the derived class message (msg_to_prepend)
-                    msg_ = std::make_shared<std::string>(std::forward<T>(msg_to_prepend));
+                    // exception thrown while creating base class message
+                    // -> try to only create the derived class message (msg)
+                    msg_ptr_ = std::make_shared<std::string>(std::forward<T>(msg));
                 }
             } catch (...) {
                 // do nothing if the derived class message couldn't be prepended to the message
             }
         }
         /**
-         * @brief Tries to append @p msg to the current @ref detail::source_location information.
+         * @brief Tries to append @p msg to the current message.
          * @details There are two possible cases:
-         *          -# the @ref detail::source_location message was successfully created:
-         *             try to append @p msg; if an exception is thrown, this function has no effect and only the
-         *             @ref detail::source_location is stored
-         *          -# the @ref detail::source_location message was **not** successfully created:
-         *             try to store @p msg; if an exception is thrown, this function has no effect and nothing is stored
-         * @tparam T must meet the @ref detail::is_string requirements.
-         * @param[in] msg_to_append the message to append
+         *          -# the initial message (containing the @ref detail::source_location message) was created successfully:
+         *             try to append @p msg; if an exception is thrown, this function has no effect
+         *          -# the initial message (containing the @ref detail::source_location message) was **not** created successfully:
+         *             try to store @p msg; if an exception is thrown, this function has no effect
+         * @tparam T must meet the @ref mpicxx::detail::is_string requirements.
+         * @param[in] msg the message to append
          */
         template <detail::is_string T>
-        void append_to_what_message(T&& msg_to_append) {
+        void append_to_what_message(T&& msg) {
             try {
-                if (msg_ != nullptr) {
-                    // successfully created source location message
-                    // -> try to append the derived class message (msg_to_append)
-                    msg_->append(std::forward<T>(msg_to_append));
+                if (msg_ptr_ != nullptr) {
+                    // successfully created base class message
+                    // -> try to append the derived class message (msg)
+                    msg_ptr_->append(std::forward<T>(msg));
                 } else {
-                    // exception thrown while creating source location message
-                    // try to only create the derived class message (msg_to_append)
-                    msg_ = std::make_shared<std::string>(std::forward<T>(msg_to_append));
+                    // exception thrown while creating base class message
+                    // -> try to only create the derived class message (msg)
+                    msg_ptr_ = std::make_shared<std::string>(std::forward<T>(msg));
                 }
             } catch (...) {
                 // do nothing if the derived class message couldn't be appended to the message
@@ -148,16 +152,16 @@ namespace mpicxx {
         }
 
     private:
-        std::shared_ptr<std::string> msg_;
+        std::shared_ptr<std::string> msg_ptr_;
         const detail::source_location loc_;
     };
 
 
 /**
- * @brief Macro to be able to easily use @ref PRETTY_FUNC_NAME__ for a better source location message.
+ * @brief Macro to be able to easily use @ref MPICXX_PRETTY_FUNC_NAME__ for a better source location message.
  */
-#define MPICXX_THROW_WITH_PRETTY_LOCATION(except, ...) \
-    throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(PRETTY_FUNC_NAME__));
+#define MPICXX_THROW_EXCEPTION(except, ...) \
+    throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__));
 
 }
 
