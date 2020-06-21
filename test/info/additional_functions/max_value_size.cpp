@@ -1,13 +1,13 @@
 /**
  * @file test/info/additional_functions/max_value_size.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-10
  *
  * @brief Test cases for the @ref mpicxx::info::max_value_size() static member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name | test case description                            |
- * |:---------------|:-------------------------------------------------|
- * | MaxValueSize   | check received value                             |
+ * | test case name | test case description |
+ * |:---------------|:----------------------|
+ * | MaxValueSize   | check received value  |
  */
 
 #include <gtest/gtest.h>
@@ -24,7 +24,7 @@ TEST(NonMemberFunctionTest, MaxValueSize) {
     mpicxx::info info;
     EXPECT_EQ(info.max_value_size(), MPI_MAX_INFO_VAL);
 
-    // access via info object in the moved-from state
+    // access via info object which has been moved
     mpicxx::info dummy(std::move(info));
     EXPECT_EQ(info.max_value_size(), MPI_MAX_INFO_VAL);
 }

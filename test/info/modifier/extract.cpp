@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/extract.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::extract(const_iterator) and @ref mpicxx::info::extract(const std::string_view) member
  * functions provided by the @ref mpicxx::info class.
@@ -11,10 +11,10 @@
  * | ExtractByIterator                   | extract [key, value]-pair at the given iterator position   |
  * | ExtractByIllegalIterator            | iterator doesn't refer to `*this` info object (death test) |
  * | ExtractByIteratorNotDereferenceable | iterator not dereferenceable (death test)                  |
- * | MovedFromExtractByIterator          | info object in the moved-from state (death test)           |
+ * | NullExtractByIterator               | info object referring to MPI_INFO_NULL (death test)        |
  * | ExtractByKey                        | extract [key, value]-pair with the given key               |
  * | ExtractByIllegalKey                 | try to extract with an illegal key (death test)            |
- * | MovedFromExtractByKey               | info object in the moved-from state (death test)           |
+ * | NullExtractByKey                    | info object referring to MPI_INFO_NULL (death test)        |
  */
 
 #include <optional>
@@ -80,13 +80,13 @@ TEST(ModifierDeathTest, ExtractByIteratorNotDereferenceable) {
     ASSERT_DEATH( key_value_pair = info.extract(it) , "");
 }
 
-TEST(ModifierDeathTest, MovedFromExtractByIterator) {
-    // create info object and set it to the moved-from state
+TEST(ModifierDeathTest, NullExtractByIterator) {
+    // create null info object
     mpicxx::info info;
     mpicxx::info::const_iterator it = info.begin();
-    mpicxx::info dummy(std::move(info));
+    info = mpicxx::info(MPI_INFO_NULL, false);
 
-    // calling extract() on an info object in the moved-from state is illegal
+    // calling extract() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] std::pair<std::string, std::string> key_value_pair;
     ASSERT_DEATH( key_value_pair = info.extract(it) , "");
 }
@@ -144,12 +144,11 @@ TEST(ModifierDeathTest, ExtractByIllegalKey) {
     ASSERT_DEATH( info.extract("") , "");
 }
 
-TEST(ModifierDeathTest, MovedFromExtractByKey) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(ModifierDeathTest, NullExtractByKey) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling extract() on an info object in the moved-from state is illegal
+    // calling extract() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] std::optional<std::pair<std::string, std::string>> key_value_pair;
     ASSERT_DEATH( key_value_pair = info.extract("key") , "");
 }

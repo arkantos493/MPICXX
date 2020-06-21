@@ -1,17 +1,17 @@
 /**
  * @file test/info/lookup/count.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::count(const std::string_view) const member function provided by the @ref mpicxx::info
  * class.
  * @details Testsuite: *LookupTest*
- * | test case name      | test case description                            |
- * |:--------------------|:-------------------------------------------------|
- * | CountExisting       | count existing keys                              |
- * | CountNonExisting    | count non-existing key                           |
- * | MovedFromCount      | info object in the moved-from state (death test) |
- * | CountWithIllegalKey | try to count an illegal key (death test)         |
+ * | test case name      | test case description                               |
+ * |:--------------------|:----------------------------------------------------|
+ * | CountExisting       | count existing keys                                 |
+ * | CountNonExisting    | count non-existing key                              |
+ * | NullCount           | info object referring to MPI_INFO_NULL (death test) |
+ * | CountWithIllegalKey | try to count an illegal key (death test)            |
  */
 
 #include <string>
@@ -42,12 +42,11 @@ TEST(LookupTest, CountNonExisting) {
     EXPECT_EQ(info.count("key2"), 0);
 }
 
-TEST(LookupDeathTest, MovedFromCount) {
-    // create info object and set it to the moved-from state
-    mpicxx::info info;
-    mpicxx::info dummy(std::move(info));
+TEST(LookupDeathTest, NullCount) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
 
-    // calling count() on an info object in the moved-from state is illegal
+    // calling count() on an info object referring to MPI_INFO_NULL is illegal
     [[maybe_unused]] int count;
     ASSERT_DEATH( count = info.count("key") , "");
 }

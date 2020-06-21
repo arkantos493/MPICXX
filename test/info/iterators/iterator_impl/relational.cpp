@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/relational.cpp
  * @author Marcel Breyer
- * @date 2020-02-11
+ * @date 2020-04-11
  *
  * @brief Test cases for the relational operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -59,13 +59,13 @@ TEST(InfoIteratorImplDeathTest, EqualityInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
@@ -73,10 +73,10 @@ TEST(InfoIteratorImplDeathTest, EqualityInvalidComparison) {
     EXPECT_DEATH( comp = sit_1 == info_1.begin() , "");
     EXPECT_DEATH( comp = info_1.begin() == sit_1 , "");
 
-    // comparisons with iterators referring to info objects in the moved-from state are not permitted
-    EXPECT_DEATH( comp = moved_from_it_1 == moved_from_it_2 , "");
-    EXPECT_DEATH( comp = moved_from_it_1 == info_1.begin() , "");
-    EXPECT_DEATH( comp = info_1.begin() == moved_from_it_1 , "");
+    // comparisons with iterators referring to info objects referring to MPI_INFO_NULL are not permitted
+    EXPECT_DEATH( comp = info_null_it_1 == info_null_it_2 , "");
+    EXPECT_DEATH( comp = info_null_it_1 == info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() == info_null_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
     EXPECT_DEATH( comp = info_1.begin() == info_2.end() , "");
@@ -114,13 +114,13 @@ TEST(InfoIteratorImplDeathTest, InequalityInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
@@ -128,10 +128,10 @@ TEST(InfoIteratorImplDeathTest, InequalityInvalidComparison) {
     EXPECT_DEATH( comp = sit_1 != info_1.begin() , "");
     EXPECT_DEATH( comp = info_1.begin() != sit_1 , "");
 
-    // comparisons with iterators referring to info objects in the moved-from state are not permitted
-    EXPECT_DEATH( comp = moved_from_it_1 != moved_from_it_2 , "");
-    EXPECT_DEATH( comp = moved_from_it_1 != info_1.begin() , "");
-    EXPECT_DEATH( comp = info_1.begin() != moved_from_it_1 , "");
+    // comparisons with iterators referring to info objects referring to MPI_INFO_NULL are not permitted
+    EXPECT_DEATH( comp = info_null_it_1 != info_null_it_2 , "");
+    EXPECT_DEATH( comp = info_null_it_1 != info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() != info_null_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
     EXPECT_DEATH( comp = info_1.begin() != info_2.end() , "");
@@ -169,13 +169,13 @@ TEST(InfoIteratorImplDeathTest, LessThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
@@ -183,10 +183,10 @@ TEST(InfoIteratorImplDeathTest, LessThanInvalidComparison) {
     EXPECT_DEATH( comp = sit_1 < info_1.begin() , "");
     EXPECT_DEATH( comp = info_1.begin() < sit_1 , "");
 
-    // comparisons with iterators referring to info objects in the moved-from state are not permitted
-    EXPECT_DEATH( comp = moved_from_it_1 < moved_from_it_2 , "");
-    EXPECT_DEATH( comp = moved_from_it_1 < info_1.begin() , "");
-    EXPECT_DEATH( comp = info_1.begin() < moved_from_it_1 , "");
+    // comparisons with iterators referring to info objects referring to MPI_INFO_NULL are not permitted
+    EXPECT_DEATH( comp = info_null_it_1 < info_null_it_2 , "");
+    EXPECT_DEATH( comp = info_null_it_1 < info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() < info_null_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
     EXPECT_DEATH( comp = info_1.begin() < info_2.end() , "");
@@ -224,13 +224,13 @@ TEST(InfoIteratorImplDeathTest, GreaterThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
@@ -238,10 +238,10 @@ TEST(InfoIteratorImplDeathTest, GreaterThanInvalidComparison) {
     EXPECT_DEATH( comp = sit_1 > info_1.begin() , "");
     EXPECT_DEATH( comp = info_1.begin() > sit_1 , "");
 
-    // comparisons with iterators referring to info objects in the moved-from state are not permitted
-    EXPECT_DEATH( comp = moved_from_it_1 > moved_from_it_2 , "");
-    EXPECT_DEATH( comp = moved_from_it_1 > info_1.begin() , "");
-    EXPECT_DEATH( comp = info_1.begin() > moved_from_it_1 , "");
+    // comparisons with iterators referring to info objects referring to MPI_INFO_NULL are not permitted
+    EXPECT_DEATH( comp = info_null_it_1 > info_null_it_2 , "");
+    EXPECT_DEATH( comp = info_null_it_1 > info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() > info_null_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
     EXPECT_DEATH( comp = info_1.begin() > info_2.end() , "");
@@ -279,13 +279,13 @@ TEST(InfoIteratorImplDeathTest, LessOrEqualThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
@@ -293,10 +293,10 @@ TEST(InfoIteratorImplDeathTest, LessOrEqualThanInvalidComparison) {
     EXPECT_DEATH( comp = sit_1 <= info_1.begin() , "");
     EXPECT_DEATH( comp = info_1.begin() <= sit_1 , "");
 
-    // comparisons with iterators referring to info objects in the moved-from state are not permitted
-    EXPECT_DEATH( comp = moved_from_it_1 <= moved_from_it_2 , "");
-    EXPECT_DEATH( comp = moved_from_it_1 <= info_1.begin() , "");
-    EXPECT_DEATH( comp = info_1.begin() <= moved_from_it_1 , "");
+    // comparisons with iterators referring to info objects referring to MPI_INFO_NULL are not permitted
+    EXPECT_DEATH( comp = info_null_it_1 <= info_null_it_2 , "");
+    EXPECT_DEATH( comp = info_null_it_1 <= info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() <= info_null_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
     EXPECT_DEATH( comp = info_1.begin() <= info_2.end() , "");
@@ -334,13 +334,13 @@ TEST(InfoIteratorImplDeathTest, GreaterOrEqualThanInvalidComparison) {
     mpicxx::info::iterator sit_1;
     mpicxx::info::iterator sit_2;
 
-    // create iterators referring to moved-from info objects
-    mpicxx::info moved_from_1;
-    mpicxx::info moved_from_2;
-    mpicxx::info::iterator moved_from_it_1 = moved_from_1.begin();
-    mpicxx::info::iterator moved_from_it_2 = moved_from_2.begin();
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info dummy_2(std::move(moved_from_2));
+    // create iterators referring to info objects referring to MPI_INFO_NULL
+    mpicxx::info info_null_1;
+    mpicxx::info info_null_2;
+    mpicxx::info::iterator info_null_it_1 = info_null_1.begin();
+    mpicxx::info::iterator info_null_it_2 = info_null_2.begin();
+    info_null_1 = mpicxx::info(MPI_INFO_NULL, false);
+    info_null_2 = mpicxx::info(MPI_INFO_NULL, false);
 
     [[maybe_unused]] bool comp;
     // comparisons with singular iterators are not permitted
@@ -348,17 +348,17 @@ TEST(InfoIteratorImplDeathTest, GreaterOrEqualThanInvalidComparison) {
     EXPECT_DEATH( comp = sit_1 >= info_1.begin() , "");
     EXPECT_DEATH( comp = info_1.begin() >= sit_1 , "");
 
-    // comparisons with iterators referring to info objects in the moved-from state are not permitted
-    EXPECT_DEATH( comp = moved_from_it_1 >= moved_from_it_2 , "");
-    EXPECT_DEATH( comp = moved_from_it_1 >= info_1.begin() , "");
-    EXPECT_DEATH( comp = info_1.begin() >= moved_from_it_1 , "");
+    // comparisons with iterators referring to info objects referring to MPI_INFO_NULL are not permitted
+    EXPECT_DEATH( comp = info_null_it_1 >= info_null_it_2 , "");
+    EXPECT_DEATH( comp = info_null_it_1 >= info_1.begin() , "");
+    EXPECT_DEATH( comp = info_1.begin() >= info_null_it_1 , "");
 
     // comparing iterators from different info objects is not permitted
     EXPECT_DEATH( comp = info_1.begin() >= info_2.end() , "");
 }
 
 
-TEST(InfoIteratorImplTest,CompareConstAndNonConst) {
+TEST(InfoIteratorImplTest, CompareConstAndNonConst) {
     // create empty info object
     mpicxx::info info;
 

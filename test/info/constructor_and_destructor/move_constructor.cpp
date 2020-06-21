@@ -1,15 +1,15 @@
 /**
  * @file info/constructor_and_destructor/move_constructor.cpp
  * @author Marcel Breyer
- * @date 2020-02-19
+ * @date 2020-04-12
  *
  * @brief Test cases for the @ref mpicxx::info::info(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
- * | test case name                   | test case description                                                               |
- * |:---------------------------------|:------------------------------------------------------------------------------------|
- * | MoveConstructFromValidObject     | `mpicxx::info info1(info2);`                                                        |
- * | MoveConstructFromMovedFromObject | `mpicxx::info info1(info2); // where info2 is in the moved-from state` (death test) |
- * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable)       |
+ * | test case name                   | test case description                                                          |
+ * |:---------------------------------|:-------------------------------------------------------------------------------|
+ * | MoveConstructFromValidObject     | `mpicxx::info info1(std::move(info2));`                                        |
+ * | MoveConstructFromNullObject      | `mpicxx::info info1(std::move(info2)); // where info2 refers to MPI_INFO_NULL` |
+ * | MoveConstructFromNonFreeable     | info object should be non-freeable (because the copied-from was non-freeable)  |
  */
 
 #include <gtest/gtest.h>
@@ -46,17 +46,25 @@ TEST(ConstructionTest, MoveConstructFromValidObject) {
     // be sure that info_moved has the same freeable state as the moved-from object
     EXPECT_EQ(info_move.freeable(), is_freeable);
 
-    // be sure moved_from object has released it's resources and is now in the moved-from state
+    // be sure moved_from object has released it's resources and is now in the moved-from state (referring to MPI_INFO_NULL)
     EXPECT_EQ(moved_from.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(moved_from.freeable());
 }
 
-TEST(ConstructionDeathTest, MoveConstructFromMovedFromObject) {
-    // create info object and set it to the moved-from state
-    mpicxx::info moved_from;
-    mpicxx::info dummy(std::move(moved_from));
+TEST(ConstructionTest, MoveConstructFromNullObject) {
+    // create null info object
+    mpicxx::info info_null(MPI_INFO_NULL, false);
 
-    // create an new info object by invoking the move constructor
-    EXPECT_DEATH( mpicxx::info info_move(std::move(moved_from)) , "");
+    // create new info object via the move constructor
+    mpicxx::info valid(std::move(info_null));
+
+    // info_null should be in the moved-from state (referring to MPI_INFO_NULL)
+    EXPECT_EQ(info_null.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null.freeable());
+
+    // valid should refer to MPI_INFO_NULL
+    EXPECT_EQ(valid.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(valid.freeable());
 }
 
 TEST(ConstructionTest, MoveConstructFromNonFreeable) {
@@ -75,8 +83,9 @@ TEST(ConstructionTest, MoveConstructFromNonFreeable) {
     EXPECT_EQ(nkeys, 1);
     EXPECT_FALSE(info.freeable());
 
-    // non_freeable should be in the moved-from state
+    // non_freeable should be in the moved-from state (referring to MPI_INFO_NULL)
     EXPECT_EQ(non_freeable.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(non_freeable.freeable());
 
     // -> if info would have been freed, the MPI runtime would crash
     MPI_Info_free(&mpi_info);

@@ -1,7 +1,7 @@
 /**
  * @file test/info/iterators/iterator_impl/assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-04-11
  *
  * @brief Test cases for the assignment operator of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -42,13 +42,6 @@ TEST(InfoIteratorImplTest, AssignmentValid) {
     mpicxx::info::iterator sit;
     sit = info_2.begin();
     EXPECT_TRUE(sit == info_2.begin());
-
-    // assignment to a iterator referring to an info object in the moved-from state is allowed
-    mpicxx::info moved_from_info;
-    mpicxx::info::iterator moved_from_it;
-    mpicxx::info dummy(std::move(moved_from_info));
-    moved_from_it = info_2.begin();
-    EXPECT_TRUE(moved_from_it == info_2.begin());
 }
 
 TEST(InfoIteratorImplDeathTest, AssignmentInvalid) {
@@ -59,15 +52,15 @@ TEST(InfoIteratorImplDeathTest, AssignmentInvalid) {
     // create singular iterator
     mpicxx::info::iterator sit;
 
-    // create iterator referring to moved-from info object
-    mpicxx::info moved_from;
-    mpicxx::info::iterator moved_from_it = moved_from.begin();
-    mpicxx::info dummy(std::move(moved_from));
+    // create iterator referring to info object referring to MPI_INFO_NULL
+    mpicxx::info info_null;
+    mpicxx::info::iterator info_null_it = info_null.begin();
+    info_null = mpicxx::info(MPI_INFO_NULL, false);
 
     // assignment from singular iterator is not permitted
     EXPECT_DEATH( it = sit , "");
 
     it = info.begin();
-    // assignment from iterator referring to an info object in the moved-from state is not permitted
-    EXPECT_DEATH( it = moved_from_it , "");
+    // assignment from iterator referring to an info object referring to MPI_INFO_NULL is not permitted
+    EXPECT_DEATH( it = info_null_it , "");
 }

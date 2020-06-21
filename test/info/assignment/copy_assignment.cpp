@@ -1,20 +1,20 @@
 /**
  * @file test/info/assignment/copy_assignment.cpp
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-04-11
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
- * | test case name                 | test case description                                                              |
- * |:-------------------------------|:-----------------------------------------------------------------------------------|
- * | CopyAssignValidToValid         | `info1 = info2;`                                                                   |
- * | CopyAssignMultiple             | `info1 = info2 = info3; // test *this return`                                      |
- * | CopyAssignMovedFromToValid     | `info1 = info2; // where info2 is in the moved-from state` (death test)            |
- * | CopyAssignValidToMovedFrom     | `info1 = info2; // where info1 is in the moved-from state`                         |
- * | CopyAssignMovedFromToMovedFrom | `info1 = info2; // where info1 and info2 are in the moved-from state` (death test) |
- * | CopySelfAssignment             | `info1 = info1; // no-op` (death test)                                             |
- * | CopyAssignToNonFreeable        | non-freeable info object should be freeable now                                    |
- * | CopyAssignFromNonFreeable      | info object should be freeable (despite that the copied-from was non-freeable)     |
+ * | test case name            | test case description                                                          |
+ * |:--------------------------|:-------------------------------------------------------------------------------|
+ * | CopyAssignValidToValid    | `info1 = info2;`                                                               |
+ * | CopyAssignMultiple        | `info1 = info2 = info3; // test *this return`                                  |
+ * | CopyAssignNullToValid     | `info1 = info2; // where info2 refers to MPI_INFO_NULL`                        |
+ * | CopyAssignValidToNull     | `info1 = info2; // where info1 refers to MPI_INFO_NULL`                        |
+ * | CopyAssignNullToNull      | `info1 = info2; // where info1 and info2 refer to MPI_INFO_NULL`               |
+ * | CopySelfAssignment        | `info1 = info1; // no-op` (death test)                                         |
+ * | CopyAssignToNonFreeable   | non-freeable info object should be freeable now                                |
+ * | CopyAssignFromNonFreeable | info object should be freeable (despite that the copied-from was non-freeable) |
  */
 
 #include <gtest/gtest.h>
@@ -88,35 +88,40 @@ TEST(AssignmentTest, CopyAssignMultiple) {
     EXPECT_STREQ(value, "value3");
 }
 
-TEST(AssignmentDeathTest, CopyAssignMovedFromToValid) {
-    // create first info object and move-construct second info object from it
-    mpicxx::info moved_from;
-    mpicxx::info valid(std::move(moved_from));
+TEST(AssignmentTest, CopyAssignNullToValid) {
+    // create info object and null info object
+    mpicxx::info info_null(MPI_INFO_NULL, false);
+    mpicxx::info valid;
 
-    // copy assignment where rhs is in the moved-from state is illegal
-    ASSERT_DEATH( valid = moved_from , "");
+    // copy assign moved-from object
+    valid = info_null;
+
+    // info_null and valid should refer to MPI_INFO_NULL
+    EXPECT_EQ(info_null.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null.freeable());
+    EXPECT_EQ(valid.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(valid.freeable());
 }
 
-TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
-    // create first info object and set it to the moved-from state
-    mpicxx::info moved_from;
-    mpicxx::info dummy(std::move(moved_from));
+TEST(AssignmentTest, CopyAssignValidToNull) {
+    // create null info object
+    mpicxx::info info_null(MPI_INFO_NULL, false);
     // create second info object
     mpicxx::info valid;
     MPI_Info_set(valid.get(), "key", "value");
 
     // perform copy assignment
-    moved_from = valid;
+    info_null = valid;
 
     // moved_from should not be in the moved-from state anymore
-    ASSERT_NE(moved_from.get(), MPI_INFO_NULL);
+    ASSERT_NE(info_null.get(), MPI_INFO_NULL);
 
-    // moved_from should now contain ["key2", "value2"]
+    // info_null should now contain ["key2", "value2"]
     int nkeys, flag;
     char value[MPI_MAX_INFO_VAL];
-    MPI_Info_get_nkeys(moved_from.get(), &nkeys);
+    MPI_Info_get_nkeys(info_null.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
-    MPI_Info_get(moved_from.get(), "key", 5, value, &flag);
+    MPI_Info_get(info_null.get(), "key", 5, value, &flag);
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value");
 
@@ -127,22 +132,26 @@ TEST(AssignmentTest, CopyAssignValidToMovedFrom) {
     EXPECT_TRUE(static_cast<bool>(flag));
     EXPECT_STREQ(value, "value");
 
-    // be sure that info_1 really is a deep-copy
-    // -> add element to info_1 and be sure that info_2 still has only one [key, value]-pair
-    MPI_Info_set(moved_from.get(), "key2", "value2");
+    // be sure that info_null really is a deep-copy
+    // -> add element to info_null and be sure that valid still has only one [key, value]-pair
+    MPI_Info_set(info_null.get(), "key2", "value2");
     MPI_Info_get_nkeys(valid.get(), &nkeys);
     EXPECT_EQ(nkeys, 1);
 }
 
-TEST(AssignmentDeathTest, CopyAssignMovedFromToMovedFrom) {
-    // create empty info objects and set them to the moved-from state
-    mpicxx::info moved_from_1;
-    mpicxx::info dummy_1(std::move(moved_from_1));
-    mpicxx::info moved_from_2;
-    mpicxx::info dummy_2(std::move(moved_from_2));
+TEST(AssignmentTest, CopyAssignNullToNull) {
+    // create two null info objects
+    mpicxx::info info_null_1(MPI_INFO_NULL, false);
+    mpicxx::info info_null_2(MPI_INFO_NULL, false);
 
-    // copy assignment where rhs is in the moved-from state is illegal
-    ASSERT_DEATH( moved_from_1 = moved_from_2 , "");
+    // copy assign moved-from object
+    info_null_1 = info_null_2;
+
+    // info_null_1 and info_null_2 should refer to MPI_INFO_NULL
+    EXPECT_EQ(info_null_1.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null_1.freeable());
+    EXPECT_EQ(info_null_2.get(), MPI_INFO_NULL);
+    EXPECT_FALSE(info_null_2.freeable());
 }
 
 TEST(AssignmentDeathTest, CopySelfAssignment) {

@@ -1,7 +1,7 @@
 /**
  * @file test/info/non-member_functions/equality.cpp
  * @author Marcel Breyer
- * @date 2020-03-24
+ * @date 2020-06-21
  *
  * @brief Test cases for the @ref mpicxx::info::operator==(const info&, const info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
@@ -11,7 +11,7 @@
  * | EqualityIdempotence | `info1 == info1; // true`                           |
  * | EqualitySymmetry    | `info1 == info2` <-> `info2 == info1`               |
  * | EqualityNonFreeable | freeable state should't have any impact on equality |
- * | MovedFromEquality   | info objects in the moved-from state                |
+ * | NullEquality        | info objects referring to *MPI_INFO_NULL*           |
  */
 
 #include <gtest/gtest.h>
@@ -99,17 +99,14 @@ TEST(NonMemberFunctionTest, EqualityNonFreeable) {
     MPI_Info_free(&info_2);
 }
 
-TEST(NonMemberFunctionTest, MovedFromEquality) {
-    // create two info objects and set them to the moved-from state
-    mpicxx::info moved_from_1;
-    mpicxx::info valid_1(std::move(moved_from_1));
-    mpicxx::info moved_from_2;
-    mpicxx::info valid_2(std::move(moved_from_2));
+TEST(NonMemberFunctionTest, NullEquality) {
+    // create two null info objects
+    mpicxx::info info_null_1(MPI_INFO_NULL, false);
+    mpicxx::info info_null_2(MPI_INFO_NULL, false);
+    mpicxx::info valid;
 
-    ASSERT_TRUE(valid_1 == valid_2);
-    // comparing two moved-from info objects is illegal
-    [[maybe_unused]] bool comp;
-    EXPECT_FALSE(moved_from_1 == valid_1);
-    EXPECT_FALSE(moved_from_2 == valid_2);
-    EXPECT_TRUE(moved_from_1 == moved_from_2);
+    // comparing two null objects
+    EXPECT_TRUE(info_null_1 == info_null_2);
+    EXPECT_FALSE(info_null_1 == valid);
+    EXPECT_FALSE(valid == info_null_2);
 }

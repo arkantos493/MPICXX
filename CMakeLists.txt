@@ -22,7 +22,7 @@ option(ENABLE_TESTS "Generate tests" OFF)
 cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
                        "ENABLE_TESTS" OFF)
 option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
-
+option(ENABLE_STACK_TRACE "Enables the generation of stack traces in the source_location class" ON)
 
 # set maximum possible number of atfinalize callback functions
 set(MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS 32 CACHE STRING "The maximum possible number of atfinalize callback functions.")
@@ -109,12 +109,17 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
 endif ()
 
 # set compiler linker flag for better stack traces
-if (NOT (active_assertion_categories EQUAL 0))
+if (ENABLE_STACK_TRACE)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE ENABLE_STACK_TRACE)
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC
-        message(STATUS "Enabled '-rdynamic' linker flag for better stack traces in assertions")
-        target_link_options(${PROJECT_NAME} INTERFACE -rdynamic)
-    endif ()
+        message(STATUS "Enabled stack traces using the '-rdynamic' linker flag")
+        add_link_options(-rdynamic)
+    else()
+        message(WARNING "Stack traces not supported")
+    endif()
+else()
+    message(STATUS "Disabled stack traces")
 endif ()
 
 # set targets to install

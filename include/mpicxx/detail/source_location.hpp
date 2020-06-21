@@ -109,15 +109,16 @@ namespace mpicxx::detail {
          *   #2    /lib/x86_64-linux-gnu/libc.so.6: __libc_start_main() [+0xe]
          *   #1    ./output.s: _start() [+0x2]
          * @endcode
-         * @param[inout] out the output stream on which the report should be written
          * @param[in] max_call_stack_size the maximum depth of the stack trace report
          *
          * @attention The stack trace report is only available under [*GCC*](https://gcc.gnu.org/) and [*clang*](https://clang.llvm.org/)
          * (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
          */
-        static inline void stack_trace(std::ostream& out = std::cerr, const int max_call_stack_size = 64) {
-#ifdef __GNUG__
-            out << "stack trace:\n";
+        static inline std::string stack_trace([[maybe_unused]] const int max_call_stack_size = 64) {
+#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
+            using std::to_string;
+            fmt::memory_buffer buf;
+            fmt::format_to(buf, "stack trace:\n");
 
             std::vector<std::string> symbols;
             symbols.reserve(max_call_stack_size);
@@ -130,8 +131,7 @@ namespace mpicxx::detail {
 
                 // no stack addresses could be retrieved
                 if (addrlen == 0) {
-                    out << "    <empty, possibly corrupt>" << std::endl;
-                    return;
+                    return fmt::format("{}    <empty, possibly corrupt>\n", to_string(buf));
                 }
 
                 // resolve addresses into symbol strings
@@ -142,10 +142,9 @@ namespace mpicxx::detail {
                 free(symbollist);
             }
 
-            // TODO 2020-03-23 16:14 marcel: change from fmt::format to std::format
             // iterate over the returned symbol lines -> skip the first and second symbol because they are unimportant
             for (std::size_t i = 2; i < symbols.size(); ++i) {
-                out << fmt::format("  #{:<6}", symbols.size() - i);
+                fmt::format_to(buf, "  #{:<6}", symbols.size() - i);
 
                 // file_name(function_name+offset) -> split the symbol line accordingly
                 const std::size_t position1 = std::min(symbols[i].find_first_of("("), symbols[i].size());
@@ -165,18 +164,24 @@ namespace mpicxx::detail {
 
                     if (status == 0) {
                         // demangling successful -> print pretty function name
-                        out << fmt::format("{}: {} [{}]\n", file_name, function_name_demangled, function_offset);
+                        fmt::format_to(buf, "{}: {} [{}]\n", file_name, function_name_demangled, function_offset);
                     } else {
                         // demangling failed -> print un-demangled function name
-                        out << fmt::format("{}: {}() [{}]\n", file_name, function_name, function_offset);
+                        fmt::format_to(buf, "{}: {}() [{}]\n", file_name, function_name, function_offset);
                     }
                     free(function_name_demangled);
                 } else {
                     // print complete symbol line if the splitting went wrong
-                    out << fmt::format("{}\n", symbols[i]);
+                    fmt::format_to(buf, "{}\n", symbols[i]);
                 }
             }
-            out << std::endl;
+            return fmt::format("{}\n", to_string(buf));
+#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+// stack traces enabled but not supported
+            return std::string("No stack trace supported!");
+#else
+// stack traces not supported
+            return std::string{};
 #endif
         }
 
