@@ -463,7 +463,7 @@ namespace mpicxx {
             return res;
         }
 
-#if ASSERTION_LEVEL > 0
+#if MPICXX_ASSERTION_LEVEL > 0
         /*
          * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
          * @details Checks whether the distance bewteen @p first and @p last is not negative.

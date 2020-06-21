@@ -98,9 +98,9 @@ namespace mpicxx::detail {
         /**
          * @brief Prints the current stack trace to the given output stream @p out.
          * @details For a better stack trace (precise function names) the linker flag `-rdynamic` is set if and only if **any**
-         * MPICXX_ASSERTION has been activated during cmake's configuration step.
+         *          MPICXX_ASSERTION has been activated during cmake's configuration step.
          *
-         * A sample output (while `-rdynamic` set) could look like:
+         *          A sample output (while `-rdynamic` set) could look like:
          * @code
          *  stack trace:
          *   #5    ./output.s: test(int) [+0x3]
@@ -112,10 +112,10 @@ namespace mpicxx::detail {
          * @param[in] max_call_stack_size the maximum depth of the stack trace report
          *
          * @attention The stack trace report is only available under [*GCC*](https://gcc.gnu.org/) and [*clang*](https://clang.llvm.org/)
-         * (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
+         *            (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
          */
         static inline std::string stack_trace([[maybe_unused]] const int max_call_stack_size = 64) {
-#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
+#if defined(MPICXX_ENABLE_STACK_TRACE) && defined(__GNUG__)
             using std::to_string;
             fmt::memory_buffer buf;
             fmt::format_to(buf, "stack trace:\n");
@@ -176,7 +176,7 @@ namespace mpicxx::detail {
                 }
             }
             return fmt::format("{}\n", to_string(buf));
-#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+#elif defined(MPICXX_ENABLED_STACK_TRACE) && !defined(__GNUG__)
 // stack traces enabled but not supported
             return std::string("No stack trace supported!");
 #else

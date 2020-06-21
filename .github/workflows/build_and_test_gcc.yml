@@ -170,8 +170,8 @@ jobs:
                 -DMPI_CXX_COMPILER=${{ github.workspace }}/openmpi-gcc/bin/mpic++ \
                 -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/openmpi-gcc/bin/mpirun \
                 -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-gcc \
-                -DENABLE_TESTS=ON \
-                -DASSERTION_LEVEL=2 ..
+                -DMPICXX_ENABLE_TESTS=ON \
+                -DMPICXX_ASSERTION_LEVEL=2 ..
           make -j
           ctest --output-on-failure
 
@@ -212,8 +212,8 @@ jobs:
                 -DMPI_CXX_COMPILER=${{ github.workspace }}/mpich-gcc/bin/mpic++ \
                 -DMPIEXEC_EXECUTABLE=${{ github.workspace }}/mpich-gcc/bin/mpirun \
                 -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-gcc \
-                -DENABLE_TESTS=ON \
-                -DASSERTION_LEVEL=2 ..
+                -DMPICXX_ENABLE_TESTS=ON \
+                -DMPICXX_ASSERTION_LEVEL=2 ..
           make -j
           ctest --output-on-failure
 

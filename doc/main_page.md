@@ -6,11 +6,11 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Prerequisites
 
-- a C++ compiler supporting C++20 concepts (e.g. [GCC](https://gcc.gnu.org/) trunk (10.0.0))
+- at least [GCC 10.1](https://gcc.gnu.org/gcc-10/)
 - [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
-- cmake (minimum required 3.5)
+- [CMake](https://cmake.org/) (minimum required 3.13)
+- [{fmt}](https://github.com/fmtlib/fmt) formatting library
 - [Doxygen](http://www.doxygen.nl/) (for documentation only)
-- [fmt formatting library](https://github.com/fmtlib/fmt) (until `std::format` is supported)
 
 ### Installing
 
@@ -27,20 +27,24 @@ Supported configuration options are:
 
 - `-DCMAKE_INSTALL_PREFIX=...`: set the installation path (default: `/usr/local/include`)
 
-- `-DENABLE_TESTS=ON/OFF`: uses the googletest framework (automatically installed if this option is set to `ON`) to enable the target `test` (default: `OFF`)
+- `-DMPICXX_ENABLE_TESTS=ON/OFF`: uses the googletest framework (automatically installed if this option is set to `ON`) to enable the target `test` (default: `OFF`)
 
-- `-DENABLE_DEATH_TEST=ON/OFF`: enables googletests death tests (currently not supported for MPI during its usage of fork()); only used if `ENABLE_TESTS` is set to `ON` (default: `OFF`)
+- `-DMPICXX_ENABLE_DEATH_TESTS=ON/OFF`: enables googletests death tests (currently not supported for MPI during its usage of fork()); only used if `MPICXX_ENABLE_TESTS` is set to `ON` (default: `OFF`)
 
-- `-DGENERATE_DOCUMENTATION=ON/OFF`: enables the target `doc` documentation; requires Doxygen (default: `OFF`)
+- `-DMPICXX_GENERATE_DOCUMENTATION=ON/OFF`: enables the target `doc` documentation; requires Doxygen (default: `OFF`)
 
-- `-DASSERTION_LEVEL=0/1/2`: sets the assertion level; emits a warning if used in `Release` mode (default: `0`)
+- `-DMPICXX_ASSERTION_LEVEL=0/1/2`: sets the assertion level; emits a warning if used in `Release` mode (default: `0`)
   - `0`: no assertions are active
   - `1`: only precondition assertions are active
   - `2`: additional sanity checks are activated
+  
+- `-DMPICXX_ENABLE_STACK_TRACEON/OFF`: enable stack traces for the source location implementation (default: `ON`)
+  
+- `-DMPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS=0...N`: sets the maximum number of atfinalize callback functions (default: `32`)
 
 ## Running the tests
 
-After a successful `make` (with a previously `cmake` call with option `-DENABLE_TESTS=ON`) simply run:
+After a successful `make` (with a previously `cmake` call with option `-DMPICXX_ENABLE_TESTS=ON`) simply run:
 ```bash
 ctest
 ```
@@ -59,7 +63,7 @@ To use this library simple add the following lines to your `CMakeLists.txt` file
 ```cmake
 # find the library
 find_package(mpicxx CONFIG REQUIRED)
-find_package(fmt REQUIRED) # until std::format is supported
+find_package(fmt REQUIRED)
 
 # link it against your target
 target_link_libraries(target mpicxx::mpicxx)

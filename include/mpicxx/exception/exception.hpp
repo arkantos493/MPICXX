@@ -38,7 +38,7 @@ namespace mpicxx {
          * @details If the location message couldn't be constructed, the respective exception gets directly caught to prevent a call to
          *          [`std::terminate`](https://en.cppreference.com/w/cpp/error/terminate) during stack unwinding.
          *
-         *          Prints a detailed stack trace if *ENABLE_STACK_TRACE* has been enabled during the [`CMake`](https://cmake.org/)
+         *          Prints a detailed stack trace if *MPICXX_ENABLE_STACK_TRACE* has been enabled during the [`CMake`](https://cmake.org/)
          *          configuration step.
          * @param[in] loc the source location information
          */

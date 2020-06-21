@@ -67,10 +67,10 @@ TEST(DetailTest, SourceStackTrace) {
 
     std::string trace = loc.stack_trace();
 
-#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
+#if defined(MPICXX_ENABLE_STACK_TRACE) && defined(__GNUG__)
     // stack trace should be present
     EXPECT_FALSE(trace.empty());
-#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+#elif defined(MPICXX_ENABLED_STACK_TRACE) && !defined(__GNUG__)
     // no stack trace supported
     using namespace std::string_literals;
     EXPECT_EQ(trace, "No stack trace supported!"s)

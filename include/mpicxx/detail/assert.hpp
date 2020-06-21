@@ -10,7 +10,8 @@
  *          - **2**: additionally to the assertions of level 1, assertions that check if the parameters make sense in the current context,
  *            but which are **not required** for the function to complete successfully (e.g. increment of a past-the-end iterator), are added
  *
- *          During cmake's configuration step, it is possible to enable a specific assertion level using the ´-DASSERTION_LEVEL´ option.
+ *          During cmake's configuration step, it is possible to enable a specific assertion level using the
+ *          ´-DMPICXX_ASSERTION_LEVEL´ option.
  *
  *          Old assertion syntax and example output:
  * @code
@@ -43,7 +44,7 @@
  *   #1    ./output.s: _start() [+0x2]
  * @endcode
  *          For a meaningful stack trace to be printed the linker flag `-rdynamic` ([*GCC*](https://gcc.gnu.org/) and
- *          [*clang*](https://clang.llvm.org/)) is added if and only if the *ASSERTION_LEVEL* is greater than 0.
+ *          [*clang*](https://clang.llvm.org/)) is added if and only if the *MPICXX_ASSERTION_LEVEL* is greater than 0.
  *          [*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/) currently doesn't print a stack trace at all.
  *
  *          In addition the assertions call `MPI_Abort` if the assertion is executed within an active MPI environment,
@@ -157,15 +158,15 @@ namespace mpicxx::detail {
 }
 
 
-// ASSERTION_LEVEL
+// MPICXX_ASSERTION_LEVEL
 // 0 -> no assertions
 // 1 -> only PRECONDITION assertions
 // 2 -> PRECONDITION and SANITY assertions
 
 /**
  * @def MPICXX_ASSERT_PRECONDITION
- * @brief Defines the @ref MPICXX_ASSERT_PRECONDITION macro if and only if the *ASSERTION_LEVEL*, as selected during cmake's configuration
- *        step, is greater than 0.
+ * @brief Defines the @ref MPICXX_ASSERT_PRECONDITION macro if and only if the *MPICXX_ASSERTION_LEVEL*, as selected during cmake's
+ *        configuration step, is greater than 0.
  * @details This macro is responsible for all precondition checks. If a precondition of a function isn't met, the respective function isn't
  *          guaranteed to finish successfully.
  *
@@ -176,7 +177,7 @@ namespace mpicxx::detail {
  * @param[in] ... varying number of parameters to fill the [**{fmt}**](https://github.com/fmtlib/fmt) like placeholders in
  *                the custom assert message
  */
-#if ASSERTION_LEVEL > 0
+#if MPICXX_ASSERTION_LEVEL > 0
 #define MPICXX_ASSERT_PRECONDITION(cond, msg, ...) \
         mpicxx::detail::check(cond, #cond, mpicxx::detail::assertion_category::precondition, mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else
@@ -185,7 +186,7 @@ namespace mpicxx::detail {
 
 /**
  * @def MPICXX_ASSERT_SANITY
- * @brief Defines the @ref MPICXX_ASSERT_SANITY macro if and only if the *ASSERTION_LEVEL*, as selected during cmake's configuration step,
+ * @brief Defines the @ref MPICXX_ASSERT_SANITY macro if and only if the *MPICXX_ASSERTION_LEVEL*, as selected during cmake's configuration step,
  *        is greater than 1.
  * @details This macro is responsible for all sanity checks. If a sanity check isn't successful, the respective function can still complete,
  *          but the executed code wasn't necessarily meaningful.
@@ -197,7 +198,7 @@ namespace mpicxx::detail {
  * @param[in] ... varying number of parameters to fill the [**{fmt}**](https://github.com/fmtlib/fmt) placeholders in
  *                the custom assert message
  */
-#if ASSERTION_LEVEL > 1
+#if MPICXX_ASSERTION_LEVEL > 1
 #define MPICXX_ASSERT_SANITY(cond, msg, ...) \
         mpicxx::detail::check(cond, #cond, mpicxx::detail::assertion_category::sanity, mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
 #else

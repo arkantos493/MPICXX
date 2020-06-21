@@ -173,7 +173,7 @@ namespace mpicxx {
             }
 
         private:
-#if ASSERTION_LEVEL > 0
+#if MPICXX_ASSERTION_LEVEL > 0
             /*
              * @brief Check whether `*this` refers to an info object referring to *MPI_INFO_NULL*.
              */
@@ -815,7 +815,7 @@ namespace mpicxx {
 
 
         private:
-#if ASSERTION_LEVEL > 0  // this member functions are only used if assertions are active
+#if MPICXX_ASSERTION_LEVEL > 0  // this member functions are only used if assertions are active
             /*
              * @brief Calculate the size of the referred to info object.
              * @details If `*this` is a singular iterator or the referred to info object refers to *MPI_INFO_NULL*, the size is 0.
@@ -2845,7 +2845,7 @@ namespace mpicxx {
             MPI_Info_get_valuelen(info_, key.data(), &valuelen, &flag);
             return static_cast<bool>(flag);
         }
-#if ASSERTION_LEVEL > 0
+#if MPICXX_ASSERTION_LEVEL > 0
         // TODO 2020-04-13 23:02 breyerml: add parameter and return value documentation
         /*
          * @brief Check whether `*this` refers to *MPI_INFO_NULL*.

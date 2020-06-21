@@ -18,11 +18,11 @@ configure_file(${CONFIG_IN} ${CONFIG_OUT} @ONLY)
 
 # enable/disable options
 include(CMakeDependentOption)
-option(ENABLE_TESTS "Generate tests" OFF)
-cmake_dependent_option(ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
-                       "ENABLE_TESTS" OFF)
-option(GENERATE_DOCUMENTATION "Generate documentation" OFF)
-option(ENABLE_STACK_TRACE "Enables the generation of stack traces in the source_location class" ON)
+option(MPICXX_ENABLE_TESTS "Generate tests" OFF)
+cmake_dependent_option(MPICXX_ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
+                       "MPICXX_ENABLE_TESTS" OFF)
+option(MPICXX_GENERATE_DOCUMENTATION "Generate documentation" OFF)
+option(MPICXX_ENABLE_STACK_TRACE "Enables the generation of stack traces in the source_location class" ON)
 
 # set maximum possible number of atfinalize callback functions
 set(MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS 32 CACHE STRING "The maximum possible number of atfinalize callback functions.")
@@ -34,17 +34,17 @@ message(STATUS "MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS: ${MPICXX_MAX_NUMBER_O
 
 # set assertion level
 set(max_assertion_level 2)
-set(ASSERTION_LEVEL 0 CACHE STRING "The active assertion level.")
+set(MPICXX_ASSERTION_LEVEL 0 CACHE STRING "The active assertion level.")
 
 # check if assertion level is valid
-if (NOT (${ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
-    message(FATAL_ERROR "ASSERTION_LEVEL must be an integer in the range: 0-${max_assertion_level}")
+if (NOT (${MPICXX_ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${MPICXX_ASSERTION_LEVEL} GREATER_EQUAL 0 AND ${MPICXX_ASSERTION_LEVEL} LESS_EQUAL ${max_assertion_level}))
+    message(FATAL_ERROR "MPICXX_ASSERTION_LEVEL must be an integer in the range: 0-${max_assertion_level}")
 endif ()
-message(STATUS "ASSERTION_LEVEL: ${ASSERTION_LEVEL}")
+message(STATUS "MPICXX_ASSERTION_LEVEL: ${MPICXX_ASSERTION_LEVEL}")
 
-if (ENABLE_DEATH_TESTS AND ${ASSERTION_LEVEL} LESS ${max_assertion_level})
+if (MPICXX_ENABLE_DEATH_TESTS AND ${MPICXX_ASSERTION_LEVEL} LESS ${max_assertion_level})
     message(WARNING "Enabled highest assertion level because death tests are enabled.")
-    set(ASSERTION_LEVEL ${max_assertion_level})
+    set(MPICXX_ASSERTION_LEVEL ${max_assertion_level})
 endif ()
 
 
@@ -60,7 +60,7 @@ endif ()
 
 
 # warn if assertions are used in a Release build
-if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${ASSERTION_LEVEL} GREATER 0)
+if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${MPICXX_ASSERTION_LEVEL} GREATER 0)
     message(WARNING "Build type Release with active assertions: this may negatively impact performance!")
 endif ()
 
@@ -68,7 +68,7 @@ endif ()
 
 # create header-only (interface) library
 add_library(${PROJECT_NAME} INTERFACE)
-target_compile_definitions(${PROJECT_NAME} INTERFACE ASSERTION_LEVEL=${ASSERTION_LEVEL})
+target_compile_definitions(${PROJECT_NAME} INTERFACE MPICXX_ASSERTION_LEVEL=${MPICXX_ASSERTION_LEVEL})
 target_compile_definitions(${PROJECT_NAME} INTERFACE MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS=${MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS})
 
 # find MPI and add it to the library target
@@ -92,25 +92,25 @@ target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 # set general compiler flags
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # clang and GCC specific flags
-    set(WARNING_FLAGS -Wall -Wextra -Wpedantic -Wextra-semi -Wnull-dereference -Wswitch-enum)
+    set(MPICXX_WARNING_FLAGS -Wall -Wextra -Wpedantic -Wextra-semi -Wnull-dereference -Wswitch-enum)
 
     # clang specific flags
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        list(APPEND WARNING_FLAGS -Wno-gnu-zero-variadic-macro-arguments)
+        list(APPEND MPICXX_WARNING_FLAGS -Wno-gnu-zero-variadic-macro-arguments)
     endif ()
 
     # GCC specific flags
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        list(APPEND WARNING_FLAGS -Wduplicated-cond -Wduplicated-branches -Wsuggest-override)
+        list(APPEND MPICXX_WARNING_FLAGS -Wduplicated-cond -Wduplicated-branches -Wsuggest-override)
     endif ()
 
-    message(STATUS "Enabled '${WARNING_FLAGS}' compiler flags to catch more potential errors")
-    target_compile_options(${PROJECT_NAME} INTERFACE ${WARNING_FLAGS})
+    message(STATUS "Enabled '${MPICXX_WARNING_FLAGS}' compiler flags to catch more potential errors")
+    target_compile_options(${PROJECT_NAME} INTERFACE ${MPICXX_WARNING_FLAGS})
 endif ()
 
 # set compiler linker flag for better stack traces
-if (ENABLE_STACK_TRACE)
-    target_compile_definitions(${PROJECT_NAME} INTERFACE ENABLE_STACK_TRACE)
+if (MPICXX_ENABLE_STACK_TRACE)
+    target_compile_definitions(${PROJECT_NAME} INTERFACE MPICXX_ENABLE_STACK_TRACE=${MPICXX_ENABLE_STACK_TRACE})
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # using Clang or GCC
         message(STATUS "Enabled stack traces using the '-rdynamic' linker flag")
@@ -158,13 +158,13 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/mpicxx DESTINATION include
         PATTERN "version.hpp.in" EXCLUDE)
 #install documentation if generated
-if (GENERATE_DOCUMENTATION)
+if (MPICXX_GENERATE_DOCUMENTATION)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/doc/html DESTINATION share/doc)
 endif ()
 
 
 # tests for interface library
-if (ENABLE_TESTS)
+if (MPICXX_ENABLE_TESTS)
     message(STATUS "Enabled tests using google's test framework")
     # install test framework in third_party directory
     include(GoogleTest)
@@ -173,13 +173,13 @@ if (ENABLE_TESTS)
     add_subdirectory(test)
 endif ()
 
-if (ENABLE_DEATH_TESTS)
+if (MPICXX_ENABLE_DEATH_TESTS)
     message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
 endif ()
 
 
 # generate documentation if requested
-if (GENERATE_DOCUMENTATION)
+if (MPICXX_GENERATE_DOCUMENTATION)
     message(STATUS "Enabled documentation generation with Doxygen")
     add_subdirectory(doc)
 endif ()

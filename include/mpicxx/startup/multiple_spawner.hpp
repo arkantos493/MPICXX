@@ -1353,7 +1353,7 @@ namespace mpicxx {
             return res;
         }
 
-#if ASSERTION_LEVEL > 0
+#if MPICXX_ASSERTION_LEVEL > 0
         /*
          * @brief Checks whether the sizes of the iterator ranges [@p first1, @p last1) and [@p first2, @p last2) are qeual.
          * @tparam InputIt1 must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
