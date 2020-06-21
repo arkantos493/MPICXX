@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-06-21
+ * @date 2020-06-22
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -24,29 +24,29 @@ namespace mpicxx::version {
      * @brief The name of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    constexpr std::string_view name = "mpicxx";
+    inline constexpr std::string_view name = "mpicxx";
     /**
      * @brief The current version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      *
      *          It's of the form: "version_major.version_minor.version_patch".
      */
-    constexpr std::string_view version = "0.3.1";
+    inline constexpr std::string_view version = "0.3.1";
     /**
      * @brief The current major version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    constexpr int version_major = 0;
+    inline constexpr int version_major = 0;
     /**
      * @brief The current minor version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    constexpr int version_minor = 3;
+    inline constexpr int version_minor = 3;
     /**
      * @brief The current patch version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    constexpr int version_patch = 1;
+    inline constexpr int version_patch = 1;
     ///@}
 
     /// @name version details specific to the used MPI standard
@@ -58,7 +58,7 @@ namespace mpicxx::version {
          *
          * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly once }
          */
-        std::pair<int, int> get_mpi_version() {
+        inline std::pair<int, int> get_mpi_version() {
             int version, subversion;
             MPI_Get_version(&version, &subversion);
             return std::make_pair(version, subversion);
@@ -73,7 +73,7 @@ namespace mpicxx::version {
      * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly twice }
      */
     [[nodiscard]]
-    std::string mpi_version() {
+    inline std::string mpi_version() {
         return fmt::format("{}.{}", detail::get_mpi_version().first, detail::get_mpi_version().second);
     }
     /**
@@ -85,7 +85,7 @@ namespace mpicxx::version {
      * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly once }
      */
     [[nodiscard]]
-    int mpi_version_major() {
+    inline int mpi_version_major() {
         return detail::get_mpi_version().first;
     }
     /**
@@ -97,7 +97,7 @@ namespace mpicxx::version {
      * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly once }
      */
     [[nodiscard]]
-    int mpi_version_minor() {
+    inline int mpi_version_minor() {
         return detail::get_mpi_version().second;
     }
     ///@}
@@ -113,7 +113,7 @@ namespace mpicxx::version {
      * @calls{ int MPI_Get_library_version(char *version, int *resultlen);      // exactly once }
      */
     [[nodiscard]]
-    std::string mpi_library_version() {
+    inline std::string mpi_library_version() {
         char library_version[MPI_MAX_LIBRARY_VERSION_STRING];
         int resultlen;
         MPI_Get_library_version(library_version, &resultlen);
@@ -130,7 +130,7 @@ namespace mpicxx::version {
      * @calls{ int MPI_Get_library_version(char *version, int *resultlen);      // exactly once }
      */
     [[nodiscard]]
-    std::string mpi_library_name() {
+    inline std::string mpi_library_name() {
         using namespace std::string_literals;
         std::string library_version = mpi_library_version();
         if (library_version.find("Open MPI"s) != std::string::npos) {
