@@ -44,7 +44,7 @@ Supported configuration options are:
   - `1`: only precondition assertions are active
   - `2`: additional sanity checks are activated
   
-- `-DMPICXX_ENABLE_STACK_TRACEON/OFF`: enable stack traces for the source location implementation (default: `ON`)
+- `-DMPICXX_ENABLE_STACK_TRACE=ON/OFF`: enable stack traces for the source location implementation (default: `ON`)
   
 - `-DMPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS=0...N`: sets the maximum number of atfinalize callback functions (default: `32`)
 
