@@ -9,6 +9,7 @@
 #ifndef MPICXX_VERSION_HPP
 #define MPICXX_VERSION_HPP
 
+#include <string>
 #include <string_view>
 
 #include <mpi.h>
@@ -118,20 +119,21 @@ namespace mpicxx::version {
      * @brief The name of the used MPI library.
      * @details The value is one of: `"Open MPI"`, `"MPICH"`, or `"unknown"`.
      *
-     * This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
-     * the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
+     *          This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the name of the used MPI library
      *
      * @calls{ int MPI_Get_library_version(char *version, int *resultlen);      // exactly once }
      */
     std::string mpi_library_name() {
+        using namespace std::string_literals;
         std::string library_version = mpi_library_version();
-        if (library_version.find("Open MPI") != std::string::npos) {
-            return std::string("Open MPI");
-        } else if (library_version.find("MPICH") != std::string::npos) {
-            return std::string("MPICH");
+        if (library_version.find("Open MPI"s) != std::string::npos) {
+            return "Open MPI"s;
+        } else if (library_version.find("MPICH"s) != std::string::npos) {
+            return "MPICH"s;
         } else {
-            return std::string("unknown");
+            return "unknown"s;
         }
     }
     ///@}
