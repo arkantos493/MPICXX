@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-21
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -1061,7 +1061,7 @@ namespace mpicxx {
          * @post @p other is in the moved-from state, i.e. it refers to *MPI_INFO_NULL*.
          * @post All iterators referring to @p other remain valid, but now refer to `*this`.
          * @attention Only a limited number of member functions can be called on an info object referring to *MPI_INFO_NULL* (aka moved-from state):
-         * - the destructor @ref ~info()
+         * - the destructor ~info()
          * - all assignment operators: @ref operator=(const info&), @ref operator=(info&&) and @ref operator=(std::initializer_list<value_type>)
          * - the swap member function: @ref swap(info&)
          * - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
@@ -1241,7 +1241,7 @@ namespace mpicxx {
          * @post @p rhs is in the moved-from state, i.e. it refers to *MPI_INFO_NULL*.
          * @post All iterators referring to @p rhs remain valid, but now refer to `*this`.
          * @attention Only a limited number of member functions can be called on an info object referring to *MPI_INFO_NULL* (aka moved-from state):
-         * - the destructor @ref ~info()
+         * - the destructor ~info()
          * - all assignment operators: @ref operator=(const info&), @ref operator=(info&&) and @ref operator=(std::initializer_list<value_type>)
          * - the swap member function: @ref swap(info&)
          * - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
