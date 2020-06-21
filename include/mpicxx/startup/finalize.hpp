@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/finalize.hpp
  * @author Marcel Breyer
- * @date 2020-06-16
+ * @date 2020-06-22
  *
  * @brief Implements wrapper around the MPI finalization functions.
  */
@@ -36,7 +36,7 @@ namespace mpicxx {
 
     /**
      * @brief Clean up the MPI state.
-     * @details If an MPI program terminates normally (i.e., not due to a call to @ref mpicxx::abort() or an unrecoverable error) then each
+     * @details If a MPI program terminates normally (i.e., not due to a call to @ref mpicxx::abort() or an unrecoverable error) then each
      *          process must call @ref mpicxx::finalize() before it exits. Before an MPI process invokes @ref mpicxx::finalize(), the
      *          process must perform all MPI calls needed to complete its involvement in MPI communications.
      *
@@ -54,7 +54,7 @@ namespace mpicxx {
     /**
      * @brief Attempts to abort all tasks in the communication group of @p comm.
      * @details An MPI implementation is **not** required to be able to abort only a subset of processes of *MPI_COMM_WORLD*.
-     * @param[in] error_code the returned error code (not necessarily returned from the executable)
+     * @param[in] error_code the error code (not necessarily returned from the executable)
      * @param[in] comm the communicator whom's tasks to abort
      *
      * @calls{ int MPI_Abort(MPI_Comm comm, int errorcode);      // exactly once }
@@ -67,9 +67,9 @@ namespace mpicxx {
         // callback functions type
         using atfinalize_callback_t = void (*)(void);
         // registered callback functions
-        std::array<atfinalize_callback_t, MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS> atfinalize_lookup_callbacks;
+        inline std::array<atfinalize_callback_t, MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS> atfinalize_lookup_callbacks;
         // number of registered callback functions
-        std::size_t atfinalize_idx = 0;
+        inline std::size_t atfinalize_idx = 0;
 
         /*
          * @brief Calls a specific callback function (previously registered).
@@ -79,7 +79,7 @@ namespace mpicxx {
          * @param[in] extra_state not used
          * @return always `0`
          */
-        int atfinalize_delete_fn([[maybe_unused]] MPI_Comm comm, [[maybe_unused]] int comm_key_val,
+        inline int atfinalize_delete_fn([[maybe_unused]] MPI_Comm comm, [[maybe_unused]] int comm_key_val,
                 [[maybe_unused]] void* attribute_val, [[maybe_unused]] void* extra_state)
         {
             // invoke handler function
@@ -88,23 +88,21 @@ namespace mpicxx {
         }
     }
     /**
-     * @brief Registers the callback function @p func to be called directly before *MPI_Finalize*.
-     * @details Calls all registered functions in reversed order in which they were set. This happens before any other parts of MPI are
+     * @brief Registers the callback function @p func (of the type `void (*)void`) to be called directly before *MPI_Finalize*.
+     * @details Calls all registered functions in reverse order in which they were set. This happens before any other parts of MPI are
      *          affected, i.e. @ref mpicxx::finalized() will return `false` in any of these callback functions.
      *
-     *          The maximum number of registrable callback functions can be set via the compiler flag
-     *          `MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS` (default: `32`).
+     *          The maximum number of registrable callback functions can be set via the [`CMake`](https://cmake.org/) configuration flag
+     *          *MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS* (default: `32`).
      * @param[in] func pointer to a function to be called on normal MPI finalization
      * @return `0` if the registration succeeded, `1` otherwise
      *
      * @assert_precondition{ If @p func is the `nullptr`. }
      *
-     * @calls{
-     * int MPI_Comm_create_keyval(MPI_Comm_copy_attr_function *comm_copy_attr_fn, MPI_Comm_delete_attr_function *comm_delete_attr_fn, int *comm_keyval, void *extra_state);     // exactly once
-     * int MPI_Comm_set_attr(MPI_Comm comm, int comm_keyval, void *attribute_val);                                                                                              // exactly once
-     * }
+     * @calls{ int MPI_Comm_create_keyval(MPI_Comm_copy_attr_function *comm_copy_attr_fn, MPI_Comm_delete_attr_function *comm_delete_attr_fn, int *comm_keyval, void *extra_state);     // exactly once
+     *         int MPI_Comm_set_attr(MPI_Comm comm, int comm_keyval, void *attribute_val); }
      */
-    int atfinalize(detail::atfinalize_callback_t func) {
+    inline int atfinalize(detail::atfinalize_callback_t func) {
         MPICXX_ASSERT_PRECONDITION(func != nullptr, "The callback function cannot be nullptr!");
 
         int comm_keyval;
