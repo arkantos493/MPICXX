@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/exception.hpp
  * @author Marcel Breyer
- * @date 2020-06-19
+ * @date 2020-06-21
  *
  * @brief Contains the base class for all custom exception in the mpicxx namespace.
  * @details This base class is fully standard conformant, i.e. it provides a public **noexcept** copy constructor and copy assignment
@@ -37,11 +37,12 @@ namespace mpicxx {
          * @brief Construct an exception, i.e. construct the exception location message.
          * @details If the location message couldn't be constructed, the respective exception gets directly caught to prevent a call to
          *          [`std::terminate`](https://en.cppreference.com/w/cpp/error/terminate) during stack unwinding.
+         *
+         *          Prints a detailed stack trace if *ENABLE_STACK_TRACE* has been enabled during the [`CMake`](https://cmake.org/)
+         *          configuration step.
          * @param[in] loc the source location information
-         * @param[in] use_stack_trace if `true` a detailed stack trace is included in the exception message (if supported, see
-         *                            @ref mpicxx::detail::source_location::stack_trace(std::ostream&, const int))
          */
-        exception(const detail::source_location& loc = detail::source_location::current(), const bool use_stack_trace = true) : loc_(loc) {
+        exception(const detail::source_location& loc = detail::source_location::current()) : loc_(loc) {
             try {
                 using namespace std::string_literals;
                 // try to create a detailed error message containing the source location of the thrown exception
@@ -56,12 +57,8 @@ namespace mpicxx {
                 // format source location
                 fmt::format_to(buf, "  in file {}\n  inf function {}\n  @ line {}\n\n", loc.file_name(), loc.function_name(), loc.line());
 
-                // write stacktrace into the string stream if requested (default = true) // TODO 2020-06-19 00:02 breyerml: change after rebase
-                std::stringstream ss;
-                if (use_stack_trace) {
-                    loc.stack_trace(ss);
-                }
-                fmt::format_to(buf, std::move(ss.str()));
+                // format stack trace
+                fmt::format_to(buf, loc.stack_trace());
 
                 using std::to_string;
                 msg_ptr_ = std::make_shared<std::string>(to_string(buf));
