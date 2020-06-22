@@ -1,7 +1,7 @@
 /**
  * @file test/startup/thread_support.cpp
  * @author Marcel Breyer
- * @date 2020-06-16
+ * @date 2020-06-22
  *
  * @brief Test cases for the @ref mpicxx::thread_support enum class.
  * @details Testsuite: *StartupTest*
@@ -77,15 +77,15 @@ TEST(StartupTest, ToStringViaStreamInsertionOperator) {
 
 TEST(StartupTest, ToEnumClass) {
     // conversion from string to enum value should work as expected
-    EXPECT_EQ(mpicxx::enum_from_string("MPI_THREAD_SINGLE"), mpicxx::thread_support::single);
-    EXPECT_EQ(mpicxx::enum_from_string("MPI_THREAD_FUNNELED"), mpicxx::thread_support::funneled);
-    EXPECT_EQ(mpicxx::enum_from_string("MPI_THREAD_SERIALIZED"), mpicxx::thread_support::serialized);
-    EXPECT_EQ(mpicxx::enum_from_string("MPI_THREAD_MULTIPLE"), mpicxx::thread_support::multiple);
+    EXPECT_EQ(mpicxx::thread_support_from_string("MPI_THREAD_SINGLE"), mpicxx::thread_support::single);
+    EXPECT_EQ(mpicxx::thread_support_from_string("MPI_THREAD_FUNNELED"), mpicxx::thread_support::funneled);
+    EXPECT_EQ(mpicxx::thread_support_from_string("MPI_THREAD_SERIALIZED"), mpicxx::thread_support::serialized);
+    EXPECT_EQ(mpicxx::thread_support_from_string("MPI_THREAD_MULTIPLE"), mpicxx::thread_support::multiple);
 
     // try to convert an illegal string value
     [[maybe_unused]] mpicxx::thread_support ts;
     EXPECT_THROW_WHAT(
-            ts = mpicxx::enum_from_string("INVALID_VALUE"),
+            ts = mpicxx::thread_support_from_string("INVALID_VALUE"),
             std::invalid_argument,
             "Can't convert \"INVALID_VALUE\" to mpicxx::thread_support!" );
 }

@@ -25,7 +25,7 @@ namespace mpicxx {
 
     /**
      * @brief Enum class for the different levels of thread support provided by MPI.
-     * @details The values are monotonic: single < funneled < serialized < multiple.
+     * @details The values are monotonic: *single < funneled < serialized < multiple*.
      */
     enum class thread_support {
         /** only one thread will execute */
@@ -83,7 +83,7 @@ namespace mpicxx {
      * @throws std::invalid_argument if the given value can't be converted to a mpicxx::thread_support value
      */
     [[nodiscard]]
-    inline thread_support enum_from_string(const std::string_view sv) {
+    inline thread_support thread_support_from_string(const std::string_view sv) {
         if (sv.compare("MPI_THREAD_SINGLE") == 0) {
             return thread_support::single;
         } else if (sv.compare("MPI_THREAD_FUNNELED") == 0) {
@@ -108,7 +108,7 @@ namespace mpicxx {
         try {
             std::string str;
             in >> str;
-            ts = enum_from_string(str);
+            ts = thread_support_from_string(str);
         } catch (const std::exception&) {
             in.setstate(std::ios::failbit);
         }
@@ -117,5 +117,6 @@ namespace mpicxx {
     ///@}
 
 }
+
 
 #endif // MPICXX_THREAD_SUPPORT_HPP
