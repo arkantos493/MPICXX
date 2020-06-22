@@ -4,19 +4,20 @@
  * @date 2020-03-18
  *
  * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
- * *MPI_Finalize*.
+ *        *MPI_Finalize*.
  */
 
 
 #ifndef MPICXX_MPICXX_MAIN_HPP
 #define MPICXX_MPICXX_MAIN_HPP
 
+#include <cstdlib>
+#include <functional>
+#include <iostream>
+
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/startup/finalize.hpp>
 #include <mpicxx/startup/init.hpp>
-
-#include <functional>
-#include <iostream>
 
 
 namespace mpicxx {
@@ -45,7 +46,7 @@ namespace mpicxx {
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_pointer<FuncPtr, Args...>
-    int main(FuncPtr func, Args&&... args) {
+    inline int main(FuncPtr func, Args&&... args) {
         init();
 
         int ret = std::invoke(func, std::forward<Args>(args)...);
@@ -77,7 +78,7 @@ namespace mpicxx {
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
-    int main(FuncPtr func, int& argc, char** argv, Args&&... args) {
+    inline int main(FuncPtr func, int& argc, char** argv, Args&&... args) {
         init(argc, argv);
 
         int ret = std::invoke(func, argc, argv, std::forward<Args>(args)...);
@@ -88,7 +89,8 @@ namespace mpicxx {
 
     /**
      * @brief Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by
-     *        @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
+     *        @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code
+     *        *EXIT_FAILURE*.
      * @details This function performs the following tasks in the given order:
      *          -# call @ref mpicxx::init(const thread_support)
      *          -# invoke the function represented by @p func (forwarding all additional parameters)
@@ -103,15 +105,15 @@ namespace mpicxx {
      * @param[in] func any callable holding the main code of the application
      * @param[in] required the required level of thread support
      * @param[in] args the additional parameters forwarded to the user defined function @p func
-     * @return the result of the invocation of @p FuncPtr or -1 if the required level of thread support couldn't be satisfied
+     * @return the result of the invocation of @p FuncPtr or *EXIT_FAILURE* if the required level of thread support couldn't be satisfied
      *
      * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
      *         int MPI_Finalize();                                                              // exactly once }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_pointer<FuncPtr, Args...>
-    int main(FuncPtr func, const thread_support required, Args&&... args) {
-        int ret = -1;
+    inline int main(FuncPtr func, const thread_support required, Args&&... args) {
+        int ret = EXIT_FAILURE;
         try {
             init(required);
             ret = std::invoke(func, std::forward<Args>(args)...);
@@ -124,7 +126,8 @@ namespace mpicxx {
     }
     /**
      * @brief Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by
-     *        @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code -1.
+     *        @p func. If the required level of thread support couldn't be satisfied, the function returns immediately with return code
+     *        *EXIT_FAILURE*.
      * @details This function performs the following tasks in the given order:
      *          -# call @ref mpicxx::init(int& argc, char** argv, const thread_support)
      *          -# invoke the function represented by @p func (forwarding all additional parameters)
@@ -141,15 +144,15 @@ namespace mpicxx {
      * @param[inout] argv the command line parameters
      * @param[in] required the required level of thread support
      * @param[in] args the additional parameters forwarded to the user defined function @p func
-     * @return the result of the invocation of @p FuncPtr or -1 if the required level of thread support couldn't be satisfied
+     * @return the result of the invocation of @p FuncPtr or *EXIT_FAILURE* if the required level of thread support couldn't be satisfied
      *
      * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once
      *         int MPI_Finalize();                                                              // exactly once }
      */
     template <typename FuncPtr, typename... Args>
     requires detail::main_args_pointer<FuncPtr, Args...>
-    int main(FuncPtr func, int& argc, char** argv, const thread_support required, Args&&... args) {
-        int ret = -1;
+    inline int main(FuncPtr func, int& argc, char** argv, const thread_support required, Args&&... args) {
+        int ret = EXIT_FAILURE;
         try {
             init(argc, argv, required);
             ret = std::invoke(func, argc, argv, std::forward<Args>(args)...);
