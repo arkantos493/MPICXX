@@ -25,11 +25,12 @@ namespace mpicxx::detail {
      * @param pred the binary function
      * @param t first argument
      * @param u second argument
-     * @return `true` if `pred(t, u)` evaluates to `true`, otherwise `false`
+     * @return `true` if `pred(t, u)` evaluates to `true`, otherwise `false` (`[[nodiscard]]`)
      */
     template <typename BinaryOp, typename T, typename U>
     requires std::is_same_v<std::invoke_result_t<BinaryOp, T, U>, bool>
-    bool all_same(BinaryOp pred, const T& t, const U& u) {
+    [[nodiscard]]
+    inline bool all_same(BinaryOp pred, const T& t, const U& u) {
         return std::invoke(pred, t, u);
     }
     /**
@@ -43,11 +44,12 @@ namespace mpicxx::detail {
      * @param t first argument
      * @param u second argument
      * @param args remaining arguments
-     * @return `true` if all results compare equal, `false` otherwise
+     * @return `true` if all results compare equal, `false` otherwise (`[[nodiscard]]`)
      */
     template <typename BinaryOp, typename T, typename U, typename... Args>
     requires std::is_same_v<std::invoke_result_t<BinaryOp, T, U>, bool>
-    bool all_same(BinaryOp pred, const T& t, const U& u, const Args&... args) {
+    [[nodiscard]]
+    inline bool all_same(BinaryOp pred, const T& t, const U& u, const Args&... args) {
         return std::invoke(pred, t, u) && all_same(pred, u, args...);
     }
 
@@ -59,10 +61,11 @@ namespace mpicxx::detail {
      * @param pred the unary function
      * @param t first argument
      * @param u second argument
-     * @return `true` if `pred(t) == pred(u)`, otherwise `false`
+     * @return `true` if `pred(t) == pred(u)`, otherwise `false` (`[[nodiscard]]`)
      */
     template <typename UnaryOp, typename T, typename U>
-    bool all_same(UnaryOp pred, const T& t, const U& u) {
+    [[nodiscard]]
+    inline bool all_same(UnaryOp pred, const T& t, const U& u) {
         return std::invoke(pred, t) == std::invoke(pred, u);
     }
     /**
@@ -75,10 +78,11 @@ namespace mpicxx::detail {
      * @param t first argument
      * @param u second argument
      * @param args remaining arguments
-     * @return `true` if all results compare equal, otherwise `false`
+     * @return `true` if all results compare equal, otherwise `false` (`[[nodiscard]]`)
      */
     template <typename UnaryOp, typename T, typename U, typename... Args>
-    bool all_same(UnaryOp pred, const T& t, const U& u, const Args&... args) {
+    [[nodiscard]]
+    inline bool all_same(UnaryOp pred, const T& t, const U& u, const Args&... args) {
         return (std::invoke(pred, t) == std::invoke(pred, u)) && all_same(pred, u, args...);
     }
 
@@ -89,10 +93,11 @@ namespace mpicxx::detail {
      * @tparam T the argument type.
      * @param pred the function
      * @param t the argument
-     * @return always `true`
+     * @return always `true` (`[[nodiscard]]`)
      */
     template <typename Op, typename T>
-    bool all_same(Op pred, const T& t) { return true; }
+    [[nodiscard]]
+    inline bool all_same(Op pred, const T& t) { return true; }
     ///@}
 
 }
