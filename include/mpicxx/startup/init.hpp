@@ -1,15 +1,13 @@
 /**
  * @file include/mpicxx/startup/init.hpp
  * @author Marcel Breyer
- * @date 2020-06-16
+ * @date 2020-06-22
  *
  * @brief Implements wrapper around the MPI initialization functions.
  */
 
 #ifndef MPICXX_INITIALIZATION_HPP
 #define MPICXX_INITIALIZATION_HPP
-
-#include <type_traits>
 
 #include <mpi.h>
 
@@ -41,7 +39,7 @@ namespace mpicxx {
     /**
      * @brief Checks whether the MPI environment is currently active, i.e. @ref mpicxx::initialized() returns `true` and
      *        @ref mpicxx::finalized() returns `false`.
-     * @details It is valid to call any mpicxx function while this function returns `true`.
+     * @details It is valid to call any mpicxx function (except the @ref mpicxx::init() functions) while this function returns `true`.
      *
      *          This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return `true` if currently the MPI environment is active, otherwise `false` (`[[nodiscard]]`)
@@ -59,7 +57,7 @@ namespace mpicxx {
 
     /**
      * @brief Initialize the MPI environment.
-     * @details All MPI programs must contain exactly one call to an MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
@@ -73,7 +71,7 @@ namespace mpicxx {
     }
     /**
      * @brief Initialize the MPI environment.
-     * @details All MPI programs must contain exactly one call to an MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
@@ -90,12 +88,12 @@ namespace mpicxx {
 
     /**
      * @brief Initialize the MPI environment with the required level of thread support (or higher).
-     * @details All MPI programs must contain exactly one call to an MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
      *          A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
-     *          higher level of thread support. For example if the requested level of thread support is `mpicxx::thread_support::single`
-     *          (*MPI_THREAD_SINGLE*) an implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
+     *          higher level of thread support. For example if the requested level of thread support is @ref mpicxx::thread_support::single
+     *          (*MPI_THREAD_SINGLE*) an implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
      * @param[in] required the required level of thread support
      * @return the provided level of thread support
      *
@@ -114,18 +112,18 @@ namespace mpicxx {
         // throw an exception if the required level of thread support can't be satisfied
         thread_support provided = static_cast<thread_support>(provided_in);
         if (required > provided) {
-            throw thread_support_not_satisfied(required, provided);
+            MPICXX_THROW_EXCEPTION(thread_support_not_satisfied, required, provided);
         }
         return provided;
     }
     /**
-     * Initialize the MPI environment with the required level of thread support (or higher).
-     * @details All MPI programs must contain exactly one call to an MPI initialization routine. Subsequent calls to any initialization
+     * @brief Initialize the MPI environment with the required level of thread support (or higher).
+     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
      *          A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
-     *          higher level of thread support. For example if the requested level of thread support is `mpicxx::thread_support::single`
-     *          (*MPI_THREAD_SINGLE*) an implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
+     *          higher level of thread support. For example if the requested level of thread support is @ref mpicxx::thread_support::single
+     *          (*MPI_THREAD_SINGLE*) an implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
      * @param[in] required the requested level of thread support
@@ -146,7 +144,7 @@ namespace mpicxx {
         // throw an exception if the required level of thread support can't be satisfied
         thread_support provided = static_cast<thread_support>(provided_in);
         if (required > provided) {
-            throw thread_support_not_satisfied(required, provided);
+            MPICXX_THROW_EXCEPTION(thread_support_not_satisfied, required, provided);
         }
         return provided;
     }
@@ -154,8 +152,8 @@ namespace mpicxx {
     /**
      * @brief Query the provided level of thread support.
      * @details Note that the provided level of thread support must **not** be equal to the requested level of thread support but could be
-     *          higher. For example if the requested level of thread support is `mpicxx::thread_support::single` (*MPI_THREAD_SINGLE*) an
-     *          implementation could return `mpicxx::thread_support::multiple` (*MPI_THREAD_MULTIPLE*).
+     *          higher. For example if the requested level of thread support is @ref mpicxx::thread_support::single (*MPI_THREAD_SINGLE*) an
+     *          implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
      *
      *          This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the provided level of thread support (`[[nodiscard]]`)
@@ -185,5 +183,6 @@ namespace mpicxx {
     ///@}
 
 }
+
 
 #endif // MPICXX_INITIALIZATION_HPP
