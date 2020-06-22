@@ -1,9 +1,9 @@
 /**
  * @file test/info/modifier/array_subscript_operator.cpp
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-06-23
  *
- * @brief Test cases for the @ref mpicxx::info::operator[](detail::string auto&&) member function provided by the @ref mpicxx::info class.
+ * @brief Test cases for the @ref mpicxx::info::operator[](T&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
  * | test case name                       | test case description                               |
  * |:-------------------------------------|:----------------------------------------------------|

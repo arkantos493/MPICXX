@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-06-21
+ * @date 2020-06-23
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -49,8 +49,8 @@ namespace mpicxx {
         //                                                 proxy class                                                //
         // ---------------------------------------------------------------------------------------------------------- //
         /**
-         * @brief A proxy class for @ref info::at(detail::string auto&&), @ref info::at(const std::string_view) const and
-         * @ref info::operator[](detail::string auto&&) to distinguish between read and write accesses.
+         * @brief A proxy class for @ref info::at(T&&), @ref info::at(const std::string_view) const and
+         * @ref info::operator[](T&&) to distinguish between read and write accesses.
          * @details Calls @ref operator std::string() const on a write access and @ref operator=(const std::string_view) on a read access.
          *
          * Can be printed through an @ref operator<<(std::ostream&, const proxy&) overload.
@@ -63,8 +63,9 @@ namespace mpicxx {
         public:
             /**
              * @brief Construct a new proxy object.
+             * @tparam T must meet the @ref detail::is_string requirements.
              * @param[in] info the referred to *MPI_Info* object
-             * @param[in] key the provided @p key (must meet the requirements of the @p detail::string concept)
+             * @param[in] key the provided @p key
              *
              * @pre @p info **must not** refer to *MPI_INFO_NULL*.
              * @pre The @p key's length **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
@@ -74,7 +75,8 @@ namespace mpicxx {
              * If @p key exceeds its size limit.
              * }
              */
-            proxy(MPI_Info_ref info, detail::string auto&& key) : info_(std::addressof(info)), key_(std::forward<decltype(key)>(key)) {
+            template <detail::is_string T>
+            proxy(MPI_Info_ref info, T&& key) : info_(std::addressof(info)), key_(std::forward<T>(key)) {
                 MPICXX_ASSERT_SANITY(!this->info_refers_to_mpi_info_null(),
                         "Attempt to create a proxy from an info object referring to 'MPI_INFO_NULL'!");
                 MPICXX_ASSERT_SANITY(this->legal_string_size(key_, MPI_MAX_INFO_KEY),
@@ -1579,8 +1581,9 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Access the value associated with the given @p key including bounds checks.
+         * @tparam must meet the @ref detail::is_string requirements.
          * @details Returns a proxy class, which is used to distinguish between read and write accesses.
-         * @param[in] key the @p key of the [key, value]-pair to find (must meet the requirements of the @p detail::string concept)
+         * @param[in] key the @p key of the [key, value]-pair to find
          * @return a proxy object
          *
          * Example:
@@ -1606,7 +1609,8 @@ namespace mpicxx {
          * For *MPI* functions called while using a proxy see the @ref proxy documentation.
          * }
          */
-        proxy at(detail::string auto&& key) {
+        template <detail::is_string T>
+        proxy at(T&& key) {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
@@ -1615,7 +1619,7 @@ namespace mpicxx {
             // check whether the key exists
             if (!this->key_exists(key)) {
                 // key doesn't exist
-                throw std::out_of_range(fmt::format("{} doesn't exist!", std::forward<decltype(key)>(key)));
+                throw std::out_of_range(fmt::format("{} doesn't exist!", std::forward<T>(key)));
             }
             // create proxy object and forward key
             return proxy(info_, std::forward<decltype(key)>(key));
@@ -1673,7 +1677,8 @@ namespace mpicxx {
          *
          * `operator[]` is non-const because it inserts the @p key if it doesn't exist. If this behavior is undesirable or if the container
          * is const, `at()` may be used.
-         * @param[in] key the @p key of the [key, value]-pair to find (must meet the requirements of the detail::string concept)
+         * @tparam T must meet the @ref detail::is_string requirements.
+         * @param[in] key the @p key of the [key, value]-pair to find
          * @return a proxy object
          *
          * Example:
@@ -1696,14 +1701,15 @@ namespace mpicxx {
          * For *MPI* functions called while using a proxy see the @ref proxy documentation.
          * }
          */
-        proxy operator[](detail::string auto&& key) {
+        template <detail::is_string T>
+        proxy operator[](T&& key) {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
                     "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(key).size(), MPI_MAX_INFO_KEY);
 
             // create proxy object and forward key
-            return proxy(info_, std::forward<decltype(key)>(key));
+            return proxy(info_, std::forward<T>(key));
         }
 
         /**
@@ -1782,7 +1788,7 @@ namespace mpicxx {
          * }
          */
         template <std::input_iterator InputIt>
-        void insert(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
+        void insert(InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
@@ -1910,7 +1916,7 @@ namespace mpicxx {
          * }
          */
         template <std::input_iterator InputIt>
-        void insert_or_assign(InputIt first, InputIt last) requires (!std::is_constructible_v<std::string, InputIt>) {
+        void insert_or_assign(InputIt first, InputIt last) requires (!detail::is_c_string<InputIt>) {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),

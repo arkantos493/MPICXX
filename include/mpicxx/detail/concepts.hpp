@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/concepts.hpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-23
  *
  * @brief Defines concepts used in the mpicxx library.
  */
@@ -21,27 +21,18 @@ namespace mpicxx {
     class info;
 }
 
+
 namespace mpicxx::detail {
 
     /// @name custom, internally used, C++20 concepts
     ///@{
     /**
      * @brief Concept that describes every *string* like type, i.e. [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string),
-     * [`std::string_view`](https://en.cppreference.com/w/cpp/string/basic_string_view), `const char*` and `char[]`.
-     * @tparam T the compared to type
-     */
-    template <typename T>
-    concept string = std::is_constructible_v<std::string_view, T>;
-
-    // TODO 2020-05-13 21:10 breyerml: change usages of string to is_string
-    /**
-     * @brief Concept that describes every *string* like type, i.e. [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string),
-     * [`std::string_view`](https://en.cppreference.com/w/cpp/string/basic_string_view), `const char*` and `char[]`.
+     *        [`std::string_view`](https://en.cppreference.com/w/cpp/string/basic_string_view), `const char*` and `char[]`.
      * @tparam T the compared to type
      */
     template <typename T>
     concept is_string = std::is_constructible_v<std::string_view, T>;
-
     /**
      * @brief Concept that describes a c-style string, i.e. `const char*` and `char*`.
      * @tparam T  the compared to type
@@ -57,10 +48,9 @@ namespace mpicxx::detail {
      */
     template <typename T, typename... Args>
     concept main_pointer = std::is_invocable_r_v<int, T, Args...>;
-
     /**
      * @brief Concept that describes a function that does accept an `int`, an array of c-style strings and any number of parameters
-     * (including none) and returns an `int`.
+     *        (including none) and returns an `int`.
      * @details Such a function is `int main(int argc, char** argv)`.
      * @tparam T a callable
      * @tparam Args optional parameters (potential empty)
@@ -95,5 +85,6 @@ namespace mpicxx::detail {
     ///@}
 
 }
+
 
 #endif // MPICXX_CONCEPTS_HPP

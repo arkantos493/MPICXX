@@ -1,9 +1,9 @@
 /**
  * @file test/info/modifier/at.cpp
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-06-23
  *
- * @brief Test cases for the @ref mpicxx::info::at(detail::string auto&&) and @ref mpicxx::info::at(const std::string_view) const member
+ * @brief Test cases for the @ref mpicxx::info::at(T&&) and @ref mpicxx::info::at(const std::string_view) const member
  * functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
  * | test case name             | test case description                                         |
