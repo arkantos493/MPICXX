@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/thread_support_exception.hpp
  * @author Marcel Breyer
- * @date 2020-06-19
+ * @date 2020-06-22
  *
  * @brief Implements the exception which gets thrown if the required level of thread support can't be satisfied.
  */
@@ -65,5 +65,6 @@ namespace mpicxx {
     };
 
 }
+
 
 #endif // MPICXX_THREAD_SUPPORT_EXCEPTION_HPP

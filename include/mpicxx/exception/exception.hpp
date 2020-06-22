@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/exception.hpp
  * @author Marcel Breyer
- * @date 2020-06-21
+ * @date 2020-06-22
  *
  * @brief Contains the base class for all custom exception in the mpicxx namespace.
  * @details This base class is fully standard conformant, i.e. it provides a public **noexcept** copy constructor and copy assignment
@@ -12,7 +12,6 @@
 #define MPICXX_EXCEPTION_HPP
 
 #include <memory>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -161,5 +160,6 @@ namespace mpicxx {
     throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__));
 
 }
+
 
 #endif // MPICXX_EXCEPTION_HPP
