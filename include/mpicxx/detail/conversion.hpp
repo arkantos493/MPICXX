@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/conversion.hpp
  * @author Marcel Breyer
- * @date 2020-06-11
+ * @date 2020-06-23
  *
  * @brief Defines conversion functions used in the mpicxx library.
  */
@@ -44,19 +44,20 @@ namespace mpicxx::detail {
     /**
      * @brief Tries to convert the given @p arg to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
      * @details Tries to use the following ways to convert @p arg (in this order):
-     * -# If T is a `bool`, returns either `std::string("true")` or `std::string("false")`.
-     * -# If T is a `char`, returns `std::string(1, arg)`
-     * -# If T meets the @ref detail::is_string requirements, returns `std::string(std::forward<T>(arg))`.
-     * -# T can be converted using a [`to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
-     * -# T can be converted using a [`operator<<`](https://en.cppreference.com/w/cpp/language/operators) overload.
+     *          -# If T is a `bool`, returns either `std::string("true")` or `std::string("false")`.
+     *          -# If T is a `char`, returns `std::string(1, arg)`
+     *          -# If T meets the @ref detail::is_string requirements, returns `std::string(std::forward<T>(arg))`.
+     *          -# T can be converted using a [`to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
+     *          -# T can be converted using a [`operator<<`](https://en.cppreference.com/w/cpp/language/operators) overload.
      *
-     * If @p arg can't be convert using one of this ways, a compiler error is issued.
+     *          If @p arg can't be convert using one of this ways, a compiler error is issued.
      * @tparam T the type to convert.
      * @param[in] arg the value to convert
      * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of @p arg (`[[nodiscard]]`)
      */
     template <typename T>
-    [[nodiscard]] std::string convert_to_string(T&& arg) {
+    [[nodiscard]]
+    inline std::string convert_to_string(T&& arg) {
         using type = std::remove_cvref_t<T>;
 
         if constexpr (std::is_same_v<type, bool>) {
@@ -86,5 +87,6 @@ namespace mpicxx::detail {
     ///@}
 
 }
+
 
 #endif // MPICXX_CONVERSION_HPP
