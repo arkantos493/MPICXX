@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-06-23
+ * @date 2020-06-24
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -390,13 +390,13 @@ namespace mpicxx {
             // ---------------------------------------------------------------------------------------------------------- //
             /// @name relational operators
             ///@{
-            // TODO 2020-06-23 23:07 breyerml:
             /**
-             * @brief Perform the respective comparison operation on the iterator and the given @p rhs one.
-             * @details The iterators `*this` and @p rhs **may not** necessarily have the same constness.
+             * @brief Compares `*this` and @p rhs for equality.
+             * @details Automatically generates `operator!=`. \n
+             *          The iterators `*this` and @p rhs **may not** necessarily have the same constness.
              * @tparam rhs_const
              * @param[in] rhs the other iterator
-             * @return boolean comparison result (`[[nodiscard]]`)
+             * @return `true` if both are euqal, otherwise `false` (`[[nodiscard]]`)
              *
              * @assert_sanity{ If `*this` or @p rhs is a singular iterator. \n
              *                 If `*this` or @p rhs refers to an info object referring to *MPI_INFO_NULL*. \n
@@ -415,79 +415,31 @@ namespace mpicxx {
                 return info_ == rhs.info_ && pos_ == rhs.pos_;
             }
             /**
-             * @copydoc operator==()
+             * @brief [Three-way comparison operator](https://en.cppreference.com/w/cpp/language/default_comparisons) for `*this` and
+             *        @p rhs.
+             * @details Automatically generates `operator<`, `operator<=`, `operator>` and `operator>=`. \n
+             *          The iterators `*this` and @p rhs **may not** necessarily have the same constness.
+             * @tparam rhs_const
+             * @param[in] rhs the other iterator
+             * @return the [`std::partial_ordering`](https://en.cppreference.com/w/cpp/utility/compare/partial_ordering) result
+             *         (`[[nodiscard]]`)
+             *
+             * @assert_sanity{ If `*this` or @p rhs is a singular iterator. \n
+             *                 If `*this` or @p rhs refers to an info object referring to *MPI_INFO_NULL*. \n
+             *                 If `*this` and @p rhs don't refer to the same info object. }
              */
-            template <bool is_rhs_const>
+            template <bool rhs_const>
             [[nodiscard]]
-            bool operator!=(const iterator_impl<is_rhs_const>& rhs) const {
+            std::partial_ordering operator<=>(const iterator_impl<rhs_const>& rhs) const {
                 MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
                         this->state(), rhs.state());
                 MPICXX_ASSERT_SANITY(!this->info_refers_to_mpi_info_null() && !rhs.info_refers_to_mpi_info_null(),
-                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
-                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
+                        "Attempt to compare a {} iterator{} to a {} iterator{}!",
+                        this->state(), this->info_state(), rhs.state(), rhs.info_state());
                 MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
 
-                return info_ != rhs.info_ || pos_ != rhs.pos_;
-            }
-            /**
-             * @copydoc operator==()
-             */
-            template <bool is_rhs_const>
-            [[nodiscard]]
-            bool operator<(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
-                        this->state(), rhs.state());
-                MPICXX_ASSERT_SANITY(!this->info_refers_to_mpi_info_null() && !rhs.info_refers_to_mpi_info_null(),
-                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
-                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
-                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
-
-                return info_ == rhs.info_ && pos_ < rhs.pos_;
-            }
-            /**
-             * @copydoc operator==()
-             */
-            template <bool is_rhs_const>
-            [[nodiscard]]
-            bool operator>(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
-                        this->state(), rhs.state());
-                MPICXX_ASSERT_SANITY(!this->info_refers_to_mpi_info_null() && !rhs.info_refers_to_mpi_info_null(),
-                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
-                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
-                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
-
-                return info_ == rhs.info_ && pos_ > rhs.pos_;
-            }
-            /**
-             * @copydoc operator==()
-             */
-            template <bool is_rhs_const>
-            [[nodiscard]]
-            bool operator<=(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
-                        this->state(), rhs.state());
-                MPICXX_ASSERT_SANITY(!this->info_refers_to_mpi_info_null() && !rhs.info_refers_to_mpi_info_null(),
-                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
-                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
-                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
-
-                return info_ == rhs.info_ && pos_ <= rhs.pos_;
-            }
-            /**
-             * @copydoc operator==()
-             */
-            template <bool is_rhs_const>
-            [[nodiscard]]
-            bool operator>=(const iterator_impl<is_rhs_const>& rhs) const {
-                MPICXX_ASSERT_SANITY(!this->singular() && !rhs.singular(), "Attempt to compare a {} iterator to a {} iterator!",
-                        this->state(), rhs.state());
-                MPICXX_ASSERT_SANITY(!this->info_refers_to_mpi_info_null() && !rhs.info_refers_to_mpi_info_null(),
-                                     "Attempt to compare a {} iterator{} to a {} iterator{}!",
-                                     this->state(), this->info_state(), rhs.state(), rhs.info_state());
-                MPICXX_ASSERT_SANITY(this->comparable(rhs), "Attempt to compare iterators from different sequences!");
-
-                return info_ == rhs.info_ && pos_ >= rhs.pos_;
+                if (auto cmp = info_ <=> rhs.info_; cmp != 0) return std::partial_ordering::unordered;
+                return pos_ <=> rhs.pos_;
             }
             ///@}
 
