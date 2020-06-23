@@ -35,7 +35,7 @@ namespace mpicxx::detail {
     concept is_string = std::is_constructible_v<std::string_view, T>;
     /**
      * @brief Concept that describes a c-style string, i.e. `const char*` and `char*`.
-     * @tparam T  the compared to type
+     * @tparam T the compared to type
      */
     template <typename T>
     concept is_c_string = std::is_same_v<std::decay_t<T>, const char*> || std::is_same_v<std::decay_t<T>, char*>;
@@ -47,7 +47,7 @@ namespace mpicxx::detail {
      * @tparam Args optional parameters (potential empty)
      */
     template <typename T, typename... Args>
-    concept main_pointer = std::is_invocable_r_v<int, T, Args...>;
+    concept is_main_pointer = std::is_invocable_r_v<int, T, Args...>;
     /**
      * @brief Concept that describes a function that does accept an `int`, an array of c-style strings and any number of parameters
      *        (including none) and returns an `int`.
@@ -56,7 +56,7 @@ namespace mpicxx::detail {
      * @tparam Args optional parameters (potential empty)
      */
     template <typename T, typename... Args>
-    concept main_args_pointer = std::is_invocable_r_v<int, T, int, char**, Args...>;
+    concept is_main_args_pointer = std::is_invocable_r_v<int, T, int, char**, Args...>;
 
     /**
      * @brief Concept that describes a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair).
@@ -78,7 +78,7 @@ namespace mpicxx::detail {
 
     /**
      * @brief Concept that describes the @ref mpicxx::info class.
-     * @tparam T  the compared to type
+     * @tparam T the compared to type
      */
     template <typename T>
     concept is_info = std::is_same_v<std::remove_cvref_t<T>, mpicxx::info>;

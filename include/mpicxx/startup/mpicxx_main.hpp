@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/startup/mpicxx_main.hpp
  * @author Marcel Breyer
- * @date 2020-03-18
+ * @date 2020-06-23
  *
  * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
  *        *MPI_Finalize*.
@@ -35,7 +35,7 @@ namespace mpicxx {
      *          @snippet examples/startup/init_and_finalize.cpp normal version without args and thread support
      *          is the same as:
      *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and thread support
-     * @tparam FuncPtr must meet the @ref detail::main_pointer requirements.
+     * @tparam FuncPtr must meet the @ref detail::is_main_pointer requirements.
      * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[in] args the additional parameters forwarded to the user defined function @p func
@@ -45,7 +45,7 @@ namespace mpicxx {
      *         int MPI_Finalize();                          // exactly once }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::main_pointer<FuncPtr, Args...>
+    requires detail::is_main_pointer<FuncPtr, Args...>
     inline int main(FuncPtr func, Args&&... args) {
         init();
 
@@ -65,7 +65,7 @@ namespace mpicxx {
      *          @snippet examples/startup/init_and_finalize.cpp normal version with args and without thread support
      *          is the same as:
      *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and without thread support
-     * @tparam FuncPtr must meet the @ref detail::main_args_pointer requirements.
+     * @tparam FuncPtr must meet the @ref detail::is_main_args_pointer requirements.
      * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
@@ -77,7 +77,7 @@ namespace mpicxx {
      *         int MPI_Finalize();                          // exactly once }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::main_args_pointer<FuncPtr, Args...>
+    requires detail::is_main_args_pointer<FuncPtr, Args...>
     inline int main(FuncPtr func, int& argc, char** argv, Args&&... args) {
         init(argc, argv);
 
@@ -100,7 +100,7 @@ namespace mpicxx {
      *          @snippet examples/startup/init_and_finalize.cpp normal version without args and with thread support
      *          is nearly the same as (except for the return value):
      *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version without args and with thread support
-     * @tparam FuncPtr must meet the @ref detail::main_pointer requirements.
+     * @tparam FuncPtr must meet the @ref detail::is_main_pointer requirements.
      * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[in] required the required level of thread support
@@ -111,7 +111,7 @@ namespace mpicxx {
      *         int MPI_Finalize();                                                              // exactly once }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::main_pointer<FuncPtr, Args...>
+    requires detail::is_main_pointer<FuncPtr, Args...>
     inline int main(FuncPtr func, const thread_support required, Args&&... args) {
         int ret = EXIT_FAILURE;
         try {
@@ -137,7 +137,7 @@ namespace mpicxx {
      *          @snippet examples/startup/init_and_finalize.cpp normal version with args and thread support
      *          is nearly the same as (except for the return value):
      *          @snippet examples/startup/mpicxx_main.cpp mpicxx_main version with args and thread support
-     * @tparam FuncPtr must meet the @ref detail::main_pointer requirements.
+     * @tparam FuncPtr must meet the @ref detail::is_main_pointer requirements.
      * @tparam Args a parameter pack representing the additional (optional) parameters.
      * @param[in] func any callable holding the main code of the application
      * @param[inout] argc the number of command line parameters
@@ -150,7 +150,7 @@ namespace mpicxx {
      *         int MPI_Finalize();                                                              // exactly once }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::main_args_pointer<FuncPtr, Args...>
+    requires detail::is_main_args_pointer<FuncPtr, Args...>
     inline int main(FuncPtr func, int& argc, char** argv, const thread_support required, Args&&... args) {
         int ret = EXIT_FAILURE;
         try {
