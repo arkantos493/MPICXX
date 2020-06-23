@@ -1014,7 +1014,7 @@ namespace mpicxx {
          *            - all assignment operators: @ref operator=(const info&), @ref operator=(info&&) and
          *              @ref operator=(std::initializer_list<value_type>)
          *            - the swap member function: @ref swap(info&)
-         *            - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
+         *            - the relational operators: @ref operator==(const info&, const info&) and operator!=(const info&, const info&)
          *            - all static member functions: @ref max_size(), @ref max_key_size() and @ref max_value_size()
          *            - all getters: @ref get(), @ref get() const and @ref freeable() const
          */
@@ -1193,7 +1193,7 @@ namespace mpicxx {
          *            - all assignment operators: @ref operator=(const info&), @ref operator=(info&&) and
          *              @ref operator=(std::initializer_list<value_type>)
          *            - the swap member function: @ref swap(info&)
-         *            - the relational operators: @ref operator==(const info&, const info&) and @ref operator!=(const info&, const info&)
+         *            - the relational operators: @ref operator==(const info&, const info&) and operator!=(const info&, const info&)
          *            - all static member functions: @ref max_size(), @ref max_key_size() and @ref max_value_size()
          *            - all getters: @ref get(), @ref get() const and @ref freeable() const
          *
@@ -2460,7 +2460,8 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Compares the contents of the two info objects for equality.
-         * @details Two info objects compare equal iff they have the same size and their contents compare equal.
+         * @details Two info objects compare equal iff they have the same size and their contents compare equal. \n
+         *          Automatically generates `operator!=`.
          * @param[in] lhs the @p lhs info object to compare
          * @param[in] rhs the @p rhs info object to compare
          * @return `true` if the contents of the info objects are equal, `false` otherwise (`[[nodiscard]]`)
@@ -2525,22 +2526,6 @@ namespace mpicxx {
             // all elements are equal
             return true;
         }
-        /**
-         * @brief Compares the contents of the two info objects for inequality.
-         * @details Two info objects compare inequal iff they differ in size or at least one element compares inequal.
-         * @param[in] lhs the @p lhs info object to compare
-         * @param[in] rhs the @p rhs info object to compare
-         * @return `true` if the contents of the info objects are inequal, `false` otherwise (`[[nodiscard]]`)
-         *
-         * @calls{
-         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                                       // at most twice
-         * int MPI_Info_get_nthkey(MPI_Info info, int n, char *key);                                // at most 'lhs.size()' times
-         * int MPI_Info_get_valuelen(MPI_Info info, const char *key, int *valuelen, int *flag);     // at most '2 * lhs.size()' times
-         * int MPI_Info_get(MPI_Info info, const char *key, int valuelen, char *value, int *flag);  // at most '2 * lhs.size()' times
-         * }
-         */
-        [[nodiscard]]
-        friend bool operator!=(const info& lhs, const info& rhs) { return !(lhs == rhs); }
         /**
          * @brief Specializes the [`std::swap`](https://en.cppreference.com/w/cpp/algorithm/swap) algorithm for info objects.
          *        Swaps the contents of @p lhs and @p rhs.
