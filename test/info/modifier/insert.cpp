@@ -1,7 +1,7 @@
 /**
  * @file test/info/modifier/insert.cpp
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-06-25
  *
  * @brief Test cases for the @ref mpicxx::info::insert(const std::string_view, const std::string_view),
  * @ref mpicxx::info::insert(InputIt, InputIt) and @ref mpicxx::info::insert(std::initializer_list<value_type>) member functions provided
@@ -20,6 +20,9 @@
  * | InsertByInitializerList                | insert all [key, value]-pairs from the initializer list                             |
  * | InsertByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                           |
  * | NullInsertByInitializerList            | info object referring to MPI_INFO_NULL (death test)                                 |
+ * | InsertByParameterPack                  | insert all [key, value]-pairs from the parameter pack                               |
+ * | InsertByParameterPackIllegalKeyOrValue | key or value in the parameter pack illegal (death test)                             |
+ * | NullInsertByParameterPack              | info object referring to MPI_INFO_NULL (death test)                                 |
  */
 
 #include <string>
@@ -246,4 +249,58 @@ TEST(ModifierDeathTest, NullInsertByInitializerList) {
 
     // calling insert() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert({ { "key", "value" } }) , "");
+}
+
+
+TEST(ModifierTest, InsertByParameterPack) {
+    // create empty info object
+    mpicxx::info info;
+
+    // create [key, value]-pairs
+    std::pair<const std::string, std::string> p1("key1", "value1");
+    std::pair<const std::string, std::string> p2("key2", "value2");
+
+    // insert [key, value]-pairs
+    info.insert(p1, p2, std::make_pair("key1", "value1_override"));
+    info.insert(std::make_pair("key3", "value3"));
+
+    // the info object should contain three [key, value]-pairs
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    ASSERT_EQ(nkeys, 3);
+
+    int flag;
+    char value[MPI_MAX_INFO_VAL];
+    MPI_Info_get(info.get(), "key1", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value1");
+    MPI_Info_get(info.get(), "key2", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+    MPI_Info_get(info.get(), "key3", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value3");
+}
+
+TEST(ModifierDeathTest, InsertByParameterPackIllegalKeyOrValue) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+    std::string value(MPI_MAX_INFO_VAL, ' ');
+
+    // try using illegal keys
+    ASSERT_DEATH( info.insert(std::make_pair(key, "value")) , "");
+    ASSERT_DEATH( info.insert(std::make_pair("", "value")) , "");
+
+    // try using illegal value
+    ASSERT_DEATH( info.insert(std::make_pair("key", value)) , "");
+    ASSERT_DEATH( info.insert(std::make_pair("key", "")) , "");
+}
+
+TEST(ModifierDeathTest, NullInsertByParameterPack) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
+
+    // calling insert() on an info object referring to MPI_INFO_NULL is illegal
+    ASSERT_DEATH( info.insert(std::make_pair("key", "value")) , "");
 }

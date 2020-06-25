@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-06-24
+ * @date 2020-06-25
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -1084,6 +1084,35 @@ namespace mpicxx {
             this->insert_or_assign(init);
         }
         /**
+         * @brief Constructs the info object with the contents of the parameter pack @p args.
+         * @details If multiple [key, value]-pairs in the range share the same key, the **last** occurrence determines the final value.
+         *
+         * Example:
+         * @snippet examples/info/constructor.cpp constructor parameter pack
+         * Results in the following [key, value]-pairs stored in the info object (not necessarily in this order):\n
+         * `["key1", "value1_override"]`, `["key2", "value2"]` and `["key3", "value3"]`
+         * @tparam T must meed the @ref detail::is_pair requirements and must not be empty.
+         * @param[in] args an arbitrary number (but at least `1`) of [key, value]-pairs
+         *
+         * @pre All @p keys and @p values **must** include the null-terminator.
+         * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
+         * @post The newly constructed info object is in a valid state.
+         *
+         * @assert_precondition{ If any key or value exceed their size limit. }
+         *
+         * @calls{
+         * int MPI_Info_create(MPI_Info *info);                                         // exactly once
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly 'sizeof...(T)' times
+         * }
+         */
+        template <detail::is_pair... T>
+        explicit info(T&&... args) requires (sizeof...(T) > 0) : info() {
+            // default construct the info object via the default constructor
+            // add all [key, value]-pairs
+            this->insert_or_assign(std::forward<T>(args)...);
+        }
+        /**
          * @brief Wrap a *MPI_Info* object in an mpicxx::info object.
          * @param[in] other the raw *MPI_Info* object
          * @param[in] is_freeable mark whether the *MPI_Info* object wrapped in this info object should be automatically
@@ -1781,6 +1810,51 @@ namespace mpicxx {
 
             this->insert(ilist.begin(), ilist.end());
         }
+        /**
+         * @brief Inserts all [key, value]-pairs from the parameter pack @p args if the info object does not already contain a
+         *        [key, value]-pair with an equivalent key.
+         * @details If multiple [key, value]-pairs in the parameter pack have the same key, the **first** occurrence determines the final
+         *          value.
+         * @tparam T must meed the @ref detail::is_pair requirements and must not be empty.
+         * @param[in] args an arbitrary number (but at least `1`) of [key, value]-pairs
+         *
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
+         * @pre All @p keys and @p values **must** include the null-terminator.
+         * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         *       are invalidated, if an insertion took place. \n
+         *       Specific MPI implementations **may** differ in this regard, i.e. iterators before the first insertion point remain valid,
+         *       all other iterators are invalidated.
+         *
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. \n
+         *                       If any key or value exceed their size limit. }
+         *
+         * @calls{
+         * int MPI_Info_get_nkeys(MPI_Info info, int *nkeys);                           // exactly 'sizeof...(T)' times
+         * int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // at most 'sizeof...(T)' times
+         * }
+         */
+        template <detail::is_pair... T>
+        void insert(T&&... args) requires (sizeof...(T) > 0) {
+            MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
+
+            ([&](auto&& pair) {
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.first, MPI_MAX_INFO_KEY),
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(pair.first).size(), MPI_MAX_INFO_KEY);
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.second, MPI_MAX_INFO_VAL),
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", std::string_view(pair.second).size(), MPI_MAX_INFO_VAL);
+
+                using pair_t = std::remove_cvref_t<decltype(pair)>;
+                // check whether the key exists
+                if (!this->key_exists(pair.first)) {
+                    // key doesn't exist -> add new [key, value]-pair
+                    MPI_Info_set(info_, std::string_view(std::forward<pair_t>(pair).first).data(),
+                                 std::string_view(std::forward<pair_t>(pair).second).data());
+                }
+            }(std::forward<T>(args)), ...);
+        }
 
         /**
          * @brief Insert or assign the given [key, value]-pair to the info object.
@@ -1892,6 +1966,43 @@ namespace mpicxx {
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             this->insert_or_assign(ilist.begin(), ilist.end());
+        }
+        /**
+         * @brief Inserts or assigns [key, value]-pairs from the parameter pack @p args to the info object.
+         * @details If multiple [key, value]-pairs in the parameter pack have the same key, the **last** occurrence determines the final
+         *          value.
+         * @tparam T must meed the @ref detail::is_pair requirements and must not be empty.
+         * @param[in] args an arbitrary number (but at least `1`) of [key, value]-pairs
+         *
+         * @pre `*this` **must not** refer to *MPI_INFO_NULL*.
+         * @pre All @p keys and @p values **must** include the null-terminator.
+         * @pre The length of **any** key **must** be greater than 0 and less than *MPI_MAX_INFO_KEY*.
+         * @pre The length of **any** value **must** be greater than 0 and less than *MPI_MAX_INFO_VAL*.
+         * @post As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) all iterators referring to `*this`
+         *       are invalidated, if an insertion took place. \n
+         *       Specific MPI implementations **may** differ in this regard, i.e. iterators before the first insertion point remain valid,
+         *       all other iterators are invalidated.
+         *
+         * @assert_precondition{ If `*this` refers to *MPI_INFO_NULL*. \n
+         *                       If any key or value exceed their size limit. }
+         *
+         * @calls{ int MPI_Info_set(MPI_Info info, const char *key, const char *value);         // exactly 'sizeof...(T)' times }
+         */
+        template <detail::is_pair... T>
+        void insert_or_assign(T&&... args) requires (sizeof...(T) > 0) {
+            MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
+                    "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
+
+            ([&](auto&& pair) {
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.first, MPI_MAX_INFO_KEY),
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", std::string_view(pair.first).size(), MPI_MAX_INFO_KEY);
+                MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.second, MPI_MAX_INFO_VAL),
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", std::string_view(pair.second).size(), MPI_MAX_INFO_VAL);
+
+                using pair_t = std::remove_cvref_t<decltype(pair)>;
+                MPI_Info_set(info_, std::string_view(std::forward<pair_t>(pair).first).data(),
+                                    std::string_view(std::forward<pair_t>(pair).second).data());
+            }(std::forward<T>(args)), ...);
         }
 
         /**
