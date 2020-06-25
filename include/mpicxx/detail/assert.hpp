@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-06-23
+ * @date 2020-06-25
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into three levels:
@@ -116,30 +116,36 @@ namespace mpicxx::detail {
     inline void check(const bool cond, const char* cond_str, const assertion_category category, const source_location& loc,
             const char* msg, Args&&... args)
     {
-        using namespace std::string_literals;
         // check if the assertion holds
         if (!cond) {
-            fmt::memory_buffer buf;
+            try {
 
-            // format assertion message
-            auto assertion_color = category == assertion_category::precondition ? fmt::fg(fmt::color::red) : fmt::fg(fmt::rgb(214, 136, 0));
-            fmt::format_to(buf, "{} assertion {} failed {}\n",
-                   fmt::format(assertion_color, "{}", category),
-                   fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::green), "'{}'", cond_str),
-                   (loc.rank().has_value() ? fmt::format("on rank {}", loc.rank().value()) : "without a running MPI environment"s));
+                const auto assertion_color = (category == assertion_category::precondition)
+                        ? fmt::fg(fmt::color::red)
+                        : fmt::fg(fmt::rgb(214, 136, 0));
 
-            // format source location
-            fmt::format_to(buf, "  in file {}\n  inf function {}\n  @ line {}\n\n", loc.file_name(), loc.function_name(), loc.line());
+                // print assertion message
+                fmt::print(stderr,
+                        "{} assertion '{}' failed\n"
+                        "  {}\n"
+                        "  in file     {}\n"
+                        "  in function {}\n"
+                        "  @ line      {}\n\n"
+                        "{}\n\n"
+                        "{}",
+                        fmt::format(assertion_color, "{}", category),
+                        fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::green), "{}", cond_str),
+                        (loc.rank().has_value() ? fmt::format("on rank     {}", loc.rank().value()) : "without a running MPI environment"),
+                        loc.file_name(),
+                        loc.function_name(),
+                        loc.line(),
+                        fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::red), msg, std::forward<Args>(args)...),
+                        loc.stack_trace()
+                    );
 
-            // format custom assertion message
-            fmt::format_to(buf, "{}\n\n", fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::red), msg, std::forward<Args>(args)...));
-
-            // get stack trace
-            fmt::format_to(buf, "{}", loc.stack_trace());
-
-            // print full assertion message
-            using std::to_string;
-            fmt::print(stderr, to_string(buf));
+            } catch (const fmt::format_error& e) {
+                fmt::print(stderr, "Something wen't wrong during assertion message construction: {}\n", e.what());
+            }
 
 
             // call MPI_Abort only if we are currently in the MPI environment
