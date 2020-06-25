@@ -95,6 +95,21 @@ namespace mpicxx::detail {
         }
         return out;
     }
+    /**
+     * @brief Returns the color associated with the the given assertion @p category.
+     * @param category the assertion category
+     * @return the associated color
+     */
+    inline fmt::text_style assertion_category_color(const assertion_category category) {
+        switch (category) {
+            case assertion_category::precondition:
+                return fmt::fg(fmt::color::red);
+            case assertion_category::sanity:
+                return fmt::fg(fmt::rgb(214, 136, 0));
+            default:
+                return fmt::fg(fmt::color::black);
+        }
+    }
 
     /**
      * @brief This function gets called by the *MPICXX_ASSERT_...* macros and does the actual assertion checking.
@@ -119,11 +134,6 @@ namespace mpicxx::detail {
         // check if the assertion holds
         if (!cond) {
             try {
-
-                const auto assertion_color = (category == assertion_category::precondition)
-                        ? fmt::fg(fmt::color::red)
-                        : fmt::fg(fmt::rgb(214, 136, 0));
-
                 // print assertion message
                 fmt::print(stderr,
                         "{} assertion '{}' failed\n"
@@ -133,7 +143,7 @@ namespace mpicxx::detail {
                         "  @ line      {}\n\n"
                         "{}\n\n"
                         "{}",
-                        fmt::format(assertion_color, "{}", category),
+                        fmt::format(assertion_category_color(category), "{}", category),
                         fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::green), "{}", cond_str),
                         (loc.rank().has_value() ? fmt::format("on rank     {}", loc.rank().value()) : "without a running MPI environment"),
                         loc.file_name(),
