@@ -1,7 +1,7 @@
 /**
  * @file test/exception/exception.cpp
  * @author Marcel Breyer
- * @date 2020-06-19
+ * @date 2020-06-25
  *
  * @brief Test cases for the @ref mpicxx::exception class.
  * @details Testsuite: *ExceptionTest*
@@ -34,8 +34,8 @@ TEST(ExceptionTest, ThrowException) {
         function_that_throws();
         FAIL() << "expected mpicxx::exception";
     } catch (const mpicxx::exception& e) {
-        EXPECT_STREQ(e.location().file_name().c_str(), __FILE__);
-        EXPECT_STREQ(e.location().function_name().c_str(), "function_that_throws");
+        EXPECT_STREQ(e.location().file_name(), __FILE__);
+        EXPECT_STREQ(e.location().function_name(), "function_that_throws");
         ASSERT_TRUE(e.location().rank().has_value());
         EXPECT_EQ(e.location().rank().value(), 0);
     } catch (...) {
@@ -49,8 +49,8 @@ TEST(ExceptionTest, ThrowExceptionWithPrettyFunctionName) {
         function_that_pretty_throws();
         FAIL() << "expected mpicxx::exception";
     } catch (const mpicxx::exception& e) {
-        EXPECT_STREQ(e.location().file_name().c_str(), __FILE__);
-        EXPECT_STREQ(e.location().function_name().c_str(), "void {anonymous}::function_that_pretty_throws()");
+        EXPECT_STREQ(e.location().file_name(), __FILE__);
+        EXPECT_STREQ(e.location().function_name(), "void {anonymous}::function_that_pretty_throws()");
         ASSERT_TRUE(e.location().rank().has_value());
         EXPECT_EQ(e.location().rank().value(), 0);
     } catch (...) {

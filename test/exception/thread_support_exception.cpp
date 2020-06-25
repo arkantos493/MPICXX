@@ -1,7 +1,7 @@
 /**
  * @file test/exception/thread_support_exception.cpp
  * @author Marcel Breyer
- * @date 2020-06-19
+ * @date 2020-06-25
  *
  * @brief Test cases for the @ref mpicxx::thread_support_not_satisfied exception class.
  * @details Testsuite: *ExceptionTest*
@@ -34,8 +34,8 @@ TEST(ExceptionTest, ThrowThreadSupportNotSatisfiedException) {
         function_that_throws();
         FAIL() << "expected mpicxx::thread_support_not_satisfied exception";
     } catch (const mpicxx::thread_support_not_satisfied& e) {
-        EXPECT_STREQ(e.location().file_name().c_str(), __FILE__);
-        EXPECT_STREQ(e.location().function_name().c_str(), "function_that_throws");
+        EXPECT_STREQ(e.location().file_name(), __FILE__);
+        EXPECT_STREQ(e.location().function_name(), "function_that_throws");
         ASSERT_TRUE(e.location().rank().has_value());
         EXPECT_EQ(e.location().rank().value(), 0);
         EXPECT_EQ(e.required(), mpicxx::thread_support::multiple);
@@ -51,8 +51,8 @@ TEST(ExceptionTest, ThrowThreadSupportNotSatisfiedExceptionWithPrettyFunctionNam
         function_that_pretty_throws();
         FAIL() << "expected mpicxx::thread_support_not_satisfied exception";
     } catch (const mpicxx::thread_support_not_satisfied& e) {
-        EXPECT_STREQ(e.location().file_name().c_str(), __FILE__);
-        EXPECT_STREQ(e.location().function_name().c_str(), "void {anonymous}::function_that_pretty_throws()");
+        EXPECT_STREQ(e.location().file_name(), __FILE__);
+        EXPECT_STREQ(e.location().function_name(), "void {anonymous}::function_that_pretty_throws()");
         ASSERT_TRUE(e.location().rank().has_value());
         EXPECT_EQ(e.location().rank().value(), 0);
         EXPECT_EQ(e.required(), mpicxx::thread_support::multiple);

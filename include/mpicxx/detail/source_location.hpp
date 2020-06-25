@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/source_location.hpp
  * @author Marcel Breyer
- * @date 2020-06-23
+ * @date 2020-06-25
  *
  * @brief Provides a class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
@@ -19,7 +19,6 @@
 
 #include <optional>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include <fmt/format.h>
@@ -71,8 +70,8 @@ namespace mpicxx::detail {
          */
         [[nodiscard]]
         static source_location current(
-                const std::string_view func = __builtin_FUNCTION(),
-                const std::string_view file = __builtin_FILE(),
+                const char* func = __builtin_FUNCTION(),
+                const char* file = __builtin_FILE(),
                 const int line = __builtin_LINE(),
                 const int column = 0
                 ) noexcept {
@@ -194,37 +193,43 @@ namespace mpicxx::detail {
 
         /**
          * @brief Returns the absolute path name of the file.
-         * @return the file name
+         * @return the file name (`[[nodiscard]]`)
          */
-        constexpr const std::string& file_name() const noexcept { return file_; }
+        [[nodiscard]]
+        constexpr const char* file_name() const noexcept { return file_; }
         /**
          * @brief Returns the function name without additional signature information (i.e. return type or parameters).
-         * @return the function name
+         * @return the function name (`[[nodiscard]]`)
          */
-        constexpr const std::string& function_name() const noexcept { return func_; }
+        [[nodiscard]]
+        constexpr const char* function_name() const noexcept { return func_; }
         /**
          * @brief Returns the line number.
-         * @return the line number
+         * @return the line number (`[[nodiscard]]`)
          */
+        [[nodiscard]]
         constexpr int line() const noexcept { return line_; }
         /**
          * @brief Returns the column number.
-         * @return the column number
+         * @return the column number (`[[nodiscard]]`)
          *
          * @attention Default value in @ref mpicxx::detail::source_location::current() always 0!
          */
+        [[nodiscard]]
         constexpr int column() const noexcept { return column_; }
         /**
          * @brief Returns the rank if a MPI environment is currently active.
          * @details If no MPI environment is currently active, the returned
          *          [`std::nullopt`](https://en.cppreference.com/w/cpp/utility/optional/nullopt) is empty.
          * @return a [`std::optional<int>`](https://en.cppreference.com/w/cpp/utility/optional) containing the current MPI rank
+         *         (`[[nodiscard]]`)
          */
+        [[nodiscard]]
         constexpr std::optional<int> rank() const noexcept { return rank_; }
 
     private:
-        std::string file_ = "unknown";
-        std::string func_ = "unknown";
+        const char* file_ = "unknown";
+        const char* func_ = "unknown";
         int line_ = 0;
         int column_ = 0;
         std::optional<int> rank_ = std::nullopt;

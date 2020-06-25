@@ -1,7 +1,7 @@
 /**
  * @file test/detail/source_location.cpp
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-06-25
  *
  * @brief Test cases for the @ref mpicxx::detail::source_location implementation.
  * @details Testsuite: *DetailTest*
@@ -22,10 +22,10 @@ TEST(DetailTest, CurrentSourceLocation) {
     mpicxx::detail::source_location loc = mpicxx::detail::source_location::current();
 
     // test file name
-    EXPECT_STREQ(loc.file_name().c_str(), __FILE__);
+    EXPECT_STREQ(loc.file_name(), __FILE__);
 
     // test function name
-    EXPECT_STREQ(loc.function_name().c_str(), "TestBody");
+    EXPECT_STREQ(loc.function_name(), "TestBody");
 
     // test line number
     EXPECT_EQ(loc.line(), 22);
@@ -44,10 +44,10 @@ TEST(DetailTest, CurrentSourceLocationPrettyFuncName) {
     mpicxx::detail::source_location loc = mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__);
 
     // test file name
-    EXPECT_STREQ(loc.file_name().c_str(), __FILE__);
+    EXPECT_STREQ(loc.file_name(), __FILE__);
 
     // test function name
-    EXPECT_STREQ(loc.function_name().c_str(), "virtual void DetailTest_CurrentSourceLocationPrettyFuncName_Test::TestBody()");
+    EXPECT_STREQ(loc.function_name(), "virtual void DetailTest_CurrentSourceLocationPrettyFuncName_Test::TestBody()");
 
     // test line number
     EXPECT_EQ(loc.line(), 44);
