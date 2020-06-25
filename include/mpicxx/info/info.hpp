@@ -227,6 +227,28 @@ namespace mpicxx {
             // info class can now directly access the pos member
             friend class info;
 
+            /**
+             * @brief Helper class returned by @ref mpicxx::info::iterator_impl::operator->() (since simply returning a pointer to a
+             *        temporary object would result in a dangling pointer).
+             * @tparam T the type of the wrapped value
+             */
+            template <typename T>
+            class pointer_impl {
+            public:
+                /**
+                 * @brief Construct a new @ref pointer_impl wrapping @p val.
+                 * @param val the value to wrap
+                 */
+                explicit pointer_impl(T&& val) : val_(std::move(val)) { }
+                /**
+                 * @brief Overload for the operator->.
+                 * @return A pointer to the underlying value.
+                 */
+                T* operator->() { return &val_; }
+            private:
+                T val_;
+            };
+
             // pointer type to the referred to info object (pointer to const if `is_const` is `true`)
             using MPI_Info_ptr = std::conditional_t<is_const, const MPI_Info*, MPI_Info*>;
             // reference type to the referred to info object (reference to const if `is_const` is `true`)
@@ -257,9 +279,9 @@ namespace mpicxx {
              * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) pointer type to the
              *        [key, value]-pair iterated over.
              * @details Because it is not possible to simply return value_type* (dangling pointer to a local object),
-             *          it is necessary to wrap value_type in a `std::unique_ptr`. TODO
+             *          it is necessary to wrap value_type in a @ref pointer_impl object (which in turn overloads operator->).
              */
-            using pointer = std::unique_ptr<value_type>;
+            using pointer = pointer_impl<value_type>;
             /**
              * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) reference type
              *        (**not** meaningful because operator*() and operator->() has to return **by-value** (using a proxy for write access)).
@@ -744,7 +766,7 @@ namespace mpicxx {
                 MPICXX_ASSERT_PRECONDITION(!this->singular() && !this->info_refers_to_mpi_info_null() && this->dereferenceable(),
                         "Attempt to dereference a {} iterator{}!", this->state(), this->info_state());
 
-                return std::make_unique<value_type>(this->operator[](0));
+                return pointer(this->operator[](0));
             }
             ///@}
 
