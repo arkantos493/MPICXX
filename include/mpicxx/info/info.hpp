@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/info/info.hpp
  * @author Marcel Breyer
- * @date 2020-06-25
+ * @date 2020-06-26
  *
  * @brief Implements a wrapper class around the *MPI_Info* object.
  * @details The @ref mpicxx::info class interface is inspired by the
@@ -17,7 +17,6 @@
 #include <functional>
 #include <initializer_list>
 #include <limits>
-#include <memory>
 #include <optional>
 #include <ostream>
 #include <stdexcept>
