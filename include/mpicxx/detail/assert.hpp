@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/assert.hpp
  * @author Marcel Breyer
- * @date 2020-06-25
+ * @date 2020-06-27
  *
  * @brief Provides more verbose assert alternatives, supporting MPI ranks.
  * @details The asserts are currently separated into three levels:
@@ -151,7 +151,7 @@ namespace mpicxx::detail {
                         loc.line(),
                         fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::red), msg, std::forward<Args>(args)...),
                         loc.stack_trace()
-                    );
+                );
 
             } catch (const fmt::format_error& e) {
                 fmt::print(stderr, "Something wen't wrong during assertion message construction: {}\n", e.what());
