@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-06-27
+ * @date 2020-06-28
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -9,11 +9,11 @@
 #ifndef MPICXX_VERSION_HPP
 #define MPICXX_VERSION_HPP
 
-#include <string>
-#include <string_view>
-
 #include <fmt/format.h>
 #include <mpi.h>
+
+#include <string>
+#include <string_view>
 
 
 namespace mpicxx::version {
