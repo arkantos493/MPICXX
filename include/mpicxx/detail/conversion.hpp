@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/conversion.hpp
  * @author Marcel Breyer
- * @date 2020-06-27
+ * @date 2020-06-28
  *
  * @brief Defines conversion functions used in the mpicxx library.
  */
@@ -17,6 +17,38 @@
 
 #include <mpicxx/detail/concepts.hpp>
 
+
+namespace mpicxx {
+
+    /// @name conversion functions to std::string
+    ///@{
+    namespace detail::adl_helper {
+        using std::to_string;
+        /**
+         * @brief Performs an ADL for the [`to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
+         * @tparam T the type to convert
+         * @param[in] arg the value to convert
+         * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of @p arg (`[[nodiscard]]`)
+         */
+        template <typename T>
+        inline std::string as_string(T&& arg) {
+            return to_string(std::forward<T>(arg));
+        }
+    }
+
+    /**
+     * @brief Calls the @ref detail::adl_helper::as_string(T&&) function, which performs an ADL for the type `T`.
+     * @tparam T the type to convert
+     * @param[in] arg the value to convert
+     * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of @p arg (`[[nodiscard]]`)
+     */
+    template <typename T>
+    inline std::string to_string(T&& arg) {
+        return detail::adl_helper::as_string(std::forward<T>(arg));
+    }
+    ///@}
+
+}
 
 namespace mpicxx::detail {
 
@@ -52,7 +84,7 @@ namespace mpicxx::detail {
      *          -# T can be converted using a [`operator<<`](https://en.cppreference.com/w/cpp/language/operators) overload.
      *
      *          If @p arg can't be convert using one of this ways, a compiler error is issued.
-     * @tparam T the type to convert.
+     * @tparam T the type to convert
      * @param[in] arg the value to convert
      * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of @p arg (`[[nodiscard]]`)
      */
@@ -71,9 +103,8 @@ namespace mpicxx::detail {
             // convert a (const) char*, (const) char[] or (const) std::string to a string
             return std::string(std::forward<T>(arg));
         } else if constexpr (has_to_string<type>) {
-            // convert the given arg to a std::string using the to_string methode (using ADL)
-            using std::to_string;
-            return to_string(std::forward<T>(arg));
+            // convert the given arg to a std::string using the to_string method
+            return mpicxx::to_string(std::forward<T>(arg));
         } else if constexpr (has_ostringstream<type>) {
             // convert the arg value to a std::string using an operator<< overload
             std::ostringstream os;
@@ -92,7 +123,7 @@ namespace mpicxx::detail {
     /**
      * @brief Returns a pointer to the string @p str.
      * @details If @p str is a pointer type, returns @p str, otherwise calls [`std::data`](https://en.cppreference.com/w/cpp/iterator/data).
-     * @tparam T must meet the @ref detail::is_string requirements.
+     * @tparam T must meet the @ref detail::is_string requirements
      * @param str the string to get the pointer to
      * @return the pointer to @p str (`[[nodiscard]]`)
      */
@@ -107,7 +138,7 @@ namespace mpicxx::detail {
     }
     /**
      * @brief Returns the size of the string @p str.
-     * @tparam T must meet the @ref detail::is_string requirements.
+     * @tparam T must meet the @ref detail::is_string requirements
      * @param str the string to get the size from
      * @return the size of @p str (`[[nodiscard]]`)
      */
@@ -123,6 +154,5 @@ namespace mpicxx::detail {
     ///@}
 
 }
-
 
 #endif // MPICXX_CONVERSION_HPP

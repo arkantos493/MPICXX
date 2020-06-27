@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/core.hpp
  * @author Marcel Breyer
- * @date 2020-06-27
+ * @date 2020-06-28
  *
  * @brief Core header which includes every other necessary header file, i.e. \#`include <mpicxx/core.hpp>` is sufficient to use every
  *        function or class of the mpicxx library.
@@ -9,7 +9,6 @@
 
 #ifndef MPICXX_CORE_HPP
 #define MPICXX_CORE_HPP
-
 
 // include all necessary headers TODO 2020-02-20 21:58 marcel: add other headers
 // chrono
@@ -34,5 +33,7 @@ namespace mpicxx::version {}
 /// This namespace is for implementation details and **should not** be used directly be users.
 namespace mpicxx::detail {}
 
+/// This namespace contains ADL (argument dependent lookup) helpers.
+namespace mpicxx::detail::adl_helper {}
 
 #endif // MPICXX_CORE_HPP
