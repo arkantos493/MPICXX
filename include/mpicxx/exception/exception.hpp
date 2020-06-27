@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/exception/exception.hpp
  * @author Marcel Breyer
- * @date 2020-06-22
+ * @date 2020-06-27
  *
  * @brief Contains the base class for all custom exception in the mpicxx namespace.
  * @details This base class is fully standard conformant, i.e. it provides a public **noexcept** copy constructor and copy assignment
@@ -43,24 +43,24 @@ namespace mpicxx {
          */
         exception(const detail::source_location& loc = detail::source_location::current()) : loc_(loc) {
             try {
-                using namespace std::string_literals;
                 // try to create a detailed error message containing the source location of the thrown exception
                 fmt::memory_buffer buf;
 
-                // format exception message
-                fmt::format_to(buf, "Exception thrown {} \n",
-                        (loc.rank().has_value() ?
-                            fmt::format("on MPI_COMM_WORLD rank {}", loc.rank().value()) :
-                            "without a running MPI environment"s));
-
-                // format source location
-                fmt::format_to(buf, "  in file {}\n  inf function {}\n  @ line {}\n\n", loc.file_name(), loc.function_name(), loc.line());
-
-                // format stack trace
-                fmt::format_to(buf, loc.stack_trace());
-
-                using std::to_string;
-                msg_ptr_ = std::make_shared<std::string>(to_string(buf));
+                msg_ptr_ = std::make_shared<std::string>(fmt::format(
+                           "Exception thrown\n"
+                           "  {}\n"
+                           "  in file     {}\n"
+                           "  in function {}\n"
+                           "  @ line      {}\n\n"
+                           "{}",
+                           (loc.rank().has_value()
+                                ? fmt::format("on MPI_COMM_WORLD rank     {}", loc.rank().value())
+                                : "without a running MPI environment"),
+                           loc.file_name(),
+                           loc.function_name(),
+                           loc.line(),
+                           loc.stack_trace()
+                ));
             } catch (...) {
                 // unable to create source location message
                 msg_ptr_ = nullptr;
