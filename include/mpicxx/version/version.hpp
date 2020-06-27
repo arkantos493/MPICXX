@@ -27,9 +27,9 @@ namespace mpicxx::version {
     inline constexpr std::string_view name = "mpicxx";
     /**
      * @brief The current version of the mpicxx library.
-     * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
+     * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step. <br>
      *
-     *          It's of the form: "version_major.version_minor.version_patch".
+     * It's of the form: `"version_major.version_minor.version_patch"`.
      */
     inline constexpr std::string_view version = "0.3.1";
     /**
@@ -123,7 +123,7 @@ namespace mpicxx::version {
      * @brief The name of the used MPI library.
      * @details The value is one of: `"Open MPI"`, `"MPICH"`, `"Intel MPI Library"` or `"other"`.
      *
-     *          This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     * This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
      *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the name of the used MPI library (`[[nodiscard]]`)
      *
