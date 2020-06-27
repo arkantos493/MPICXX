@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/detail/conversion.hpp
  * @author Marcel Breyer
- * @date 2020-06-23
+ * @date 2020-06-27
  *
  * @brief Defines conversion functions used in the mpicxx library.
  */
@@ -9,6 +9,7 @@
 #ifndef MPICXX_CONVERSION_HPP
 #define MPICXX_CONVERSION_HPP
 
+#include <cstring>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -82,6 +83,41 @@ namespace mpicxx::detail {
             // unable to convert the given arg to a std::string
             constexpr bool dependent_false = !std::is_same_v<type, type>;
             static_assert(dependent_false, "Can't convert the given value to a std::string!");
+        }
+    }
+    ///@}
+
+    /// @name conversion functions
+    ///@{
+    /**
+     * @brief Returns a pointer to the string @p str.
+     * @details If @p str is a pointer type, returns @p str, otherwise calls [`std::data`](https://en.cppreference.com/w/cpp/iterator/data).
+     * @tparam T must meet the @ref detail::is_string requirements.
+     * @param str the string to get the pointer to
+     * @return the pointer to @p str (`[[nodiscard]]`)
+     */
+    template <is_string T>
+    [[nodiscard]]
+    constexpr auto convert_to_char_pointer(const T& str) noexcept {
+        if constexpr (std::is_pointer_v<T>) {
+            return str;
+        } else {
+            return std::data(str);
+        }
+    }
+    /**
+     * @brief Returns the size of the string @p str.
+     * @tparam T must meet the @ref detail::is_string requirements.
+     * @param str the string to get the size from
+     * @return the size of @p str (`[[nodiscard]]`)
+     */
+    template <is_string T>
+    [[nodiscard]]
+    constexpr std::size_t convert_to_string_size(const T& str) noexcept {
+        if constexpr (std::is_pointer_v<std::decay_t<T>>) {
+            return std::strlen(str);
+        } else {
+            return std::size(str);
         }
     }
     ///@}
