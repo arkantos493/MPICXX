@@ -1,24 +1,26 @@
 /**
  * @file include/mpicxx/startup/thread_support.hpp
  * @author Marcel Breyer
- * @date 2020-06-16
+ * @date 2020-06-28
  *
  * @brief Contains the level of thread support enum.
- * @details Additionally add various functions to perform conversions from and to
+ * @details Additionally adds various functions to perform conversions from and to
  *          [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
  */
 
 #ifndef MPICXX_THREAD_SUPPORT_HPP
 #define MPICXX_THREAD_SUPPORT_HPP
 
-#include <istream>
-#include <ostream>
-#include <stdexcept>
-#include <string_view>
+#include <mpicxx/detail/conversion.hpp>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <mpi.h>
+
+#include <istream>
+#include <ostream>
+#include <stdexcept>
+#include <string_view>
 
 
 namespace mpicxx {
@@ -38,10 +40,10 @@ namespace mpicxx {
         multiple = MPI_THREAD_MULTIPLE,
     };
 
-    /// @name thread_support conversion functions
+    /// @name mpicxx::thread_support conversion functions
     ///@{
     /**
-     * @brief Stream-insertion operator overload for the mpicxx::thread_support enum class.
+     * @brief Stream-insertion operator overload for the @ref mpicxx::thread_support enum class.
      * @param[inout] out an output stream
      * @param[in] ts the enum class value
      * @return the output stream
@@ -64,9 +66,10 @@ namespace mpicxx {
         return out;
     }
     /**
-     * @brief `to_string` overload (using ADL) for the mpicxx::thread_support enum class.
+     * @brief Overload of the @ref mpicxx::to_string function for the mpicxx::thread_support enum class.
      * @param[in] ts the enum class value
-     * @return the converted [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) (`[[nodiscard]]`)
+     * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of the @ref mpicxx::thread_support
+     *         value (`[[nodiscard]]`)
      */
     [[nodiscard]]
     inline std::string to_string(const thread_support ts) {
@@ -74,13 +77,13 @@ namespace mpicxx {
     }
 
     /**
-     * @brief Converts the given string to the respective mpicxx::thread_support value.
+     * @brief Converts the given string to the respective @ref mpicxx::thread_support value.
      * @details Expects the string value to be the MPI notation (e.g. `"MPI_THREAD_SINGLE"` gets converted to
-     *          `mpicxx::thread_support::single`).
-     * @param[in] sv the enum value represented as string
-     * @return the converted enum value (`[[nodiscard]]`)
+     *          @ref mpicxx::thread_support::single).
+     * @param[in] sv the enum value represented as a string
+     * @return the @ref mpicxx::thread_support representation of @p sv (`[[nodiscard]]`)
      *
-     * @throws std::invalid_argument if the given value can't be converted to a mpicxx::thread_support value
+     * @throws std::invalid_argument if the given value can't be converted to a @ref mpicxx::thread_support value
      */
     [[nodiscard]]
     inline thread_support thread_support_from_string(const std::string_view sv) {
@@ -97,9 +100,9 @@ namespace mpicxx {
         }
     }
     /**
-     * @brief Stream-extraction operator overload for the mpicxx::thread_support enum class.
+     * @brief Stream-extraction operator overload for the @ref mpicxx::thread_support enum class.
      * @details Sets the [`std::ios::failbit`](https://en.cppreference.com/w/cpp/io/ios_base/iostate) if the given value can't be converted
-     *          to a mpicxx::thread_support value.
+     *          to a @ref mpicxx::thread_support value.
      * @param[inout] in an input stream
      * @param[out] ts the enum class
      * @return the input stream
@@ -117,6 +120,5 @@ namespace mpicxx {
     ///@}
 
 }
-
 
 #endif // MPICXX_THREAD_SUPPORT_HPP
