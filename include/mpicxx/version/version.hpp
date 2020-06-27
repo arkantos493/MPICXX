@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-06-22
+ * @date 2020-06-27
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -12,8 +12,8 @@
 #include <string>
 #include <string_view>
 
-#include <mpi.h>
 #include <fmt/format.h>
+#include <mpi.h>
 
 
 namespace mpicxx::version {
@@ -121,7 +121,7 @@ namespace mpicxx::version {
     }
     /**
      * @brief The name of the used MPI library.
-     * @details The value is one of: `"Open MPI"`, `"MPICH"`, or `"unknown"`.
+     * @details The value is one of: `"Open MPI"`, `"MPICH"`, `"Intel MPI Library"` or `"other"`.
      *
      *          This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
      *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
@@ -137,13 +137,14 @@ namespace mpicxx::version {
             return "Open MPI"s;
         } else if (library_version.find("MPICH"s) != std::string::npos) {
             return "MPICH"s;
+        } else if (library_version.find("Intel"s) != std::string::npos) {
+            return "Intel MPI Library"s;
         } else {
-            return "unknown"s;
+            return "other"s;
         }
     }
     ///@}
 
 }
-
 
 #endif // MPICXX_VERSION_HPP
