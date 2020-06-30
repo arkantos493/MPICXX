@@ -173,17 +173,18 @@ pre.fragment {
 }
 
 div.fragment {
-        padding: 4px 6px;
-        margin: 4px 8px 4px 2px;
+    padding: 4px 6px;
+	margin: 4px 4px;
 	background-color: #FBFCFD;
 	border: 1px solid #C4CFE5;
+	display: inline-block;
 }
 
 div.line {
 	font-family: monospace, fixed;
-        font-size: 13px;
+	font-size: 13px;
 	min-height: 13px;
-	line-height: 1.0;
+	line-height: 1.2;
 	text-wrap: unrestricted;
 	white-space: -moz-pre-wrap; /* Moz */
 	white-space: -pre-wrap;     /* Opera 4-6 */
@@ -665,17 +666,17 @@ span.mlabels {
 }
 
 span.mlabel {
-        background-color: #728DC1;
-        border-top:1px solid #5373B4;
-        border-left:1px solid #5373B4;
-        border-right:1px solid #C4CFE5;
-        border-bottom:1px solid #C4CFE5;
+	background-color: #728DC1;
+	border-top:1px solid #5373B4;
+	border-left:1px solid #5373B4;
+	border-right:1px solid #C4CFE5;
+	border-bottom:1px solid #C4CFE5;
 	text-shadow: none;
 	color: white;
 	margin-right: 4px;
 	padding: 2px 3px;
 	border-radius: 3px;
-	font-size: 7pt;
+	font-size: 9pt;
 	white-space: nowrap;
 	vertical-align: middle;
 }

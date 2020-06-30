@@ -231,7 +231,7 @@ TAB_SIZE               = 4
 ALIASES                += assert_precondition{1}="<dl class=\"section assert_precondition\"><dt>Precondition assertions</dt><dd>\1</dd></dl>"
 ALIASES                += assert_sanity{1}="<dl class=\"section assert_sanity\"><dt>Sanity assertions</dt><dd>\1</dd></dl>"
 ALIASES                += assert{1}="<dl class=\"section assert\"><dt>Assertions</dt><dd>\1</dd></dl>"
-ALIASES                += calls{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>@code{.cpp} \1 @endcode</dd></dl>"
+ALIASES                += calls{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>@code{.cpp}\1@endcode</dd></dl>"
 ALIASES                += calls_ref{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>\1</dd></dl>"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
