@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/version/version.hpp
  * @author Marcel Breyer
- * @date 2020-06-28
+ * @date 2020-06-29
  *
  * @brief Implements functions to query the current mpicxx and MPI version.
  */
@@ -14,7 +14,6 @@
 
 #include <string>
 #include <string_view>
-
 
 namespace mpicxx::version {
 
@@ -74,7 +73,8 @@ namespace mpicxx::version {
      */
     [[nodiscard]]
     inline std::string mpi_version() {
-        return fmt::format("{}.{}", detail::get_mpi_version().first, detail::get_mpi_version().second);
+        const std::pair<int, int> version = detail::get_mpi_version();
+        return fmt::format("{}.{}", version.first, version.second);
     }
     /**
      * @brief The current major version of the used MPI standard.
@@ -132,7 +132,7 @@ namespace mpicxx::version {
     [[nodiscard]]
     inline std::string mpi_library_name() {
         using namespace std::string_literals;
-        std::string library_version = mpi_library_version();
+        const std::string library_version = mpi_library_version();
         if (library_version.find("Open MPI"s) != std::string::npos) {
             return "Open MPI"s;
         } else if (library_version.find("MPICH"s) != std::string::npos) {
