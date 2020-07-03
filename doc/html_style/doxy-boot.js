@@ -3,6 +3,18 @@ $( document ).ready(function() {
     $("div.headertitle").addClass("page-header");
     $("div.title").addClass("h1");
 
+    $('li > a[href="files.html"] > span').before("<i class='fa fa-file'></i> ");
+    $('li > a[href="hierarchy.html"] > span').before("<i class='fa fa-sitemap'></i> ");
+    $('li > a[href="functions_type.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="functions_rela.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="namespacemembers.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="namespacemembers_func.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="namespacemembers_vars.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="namespacemembers_type.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="namespacemembers_enum.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="globals.html"] > span').before("<i class='fa fa-list'></i> ");
+    $('li > a[href="globals_defs.html"] > span').before("<i class='fa fa-list'></i> ");
+
     $('li > a[href="index.html"] > span').before("<i class='fa fa-cog'></i> ");
     $('li > a[href="modules.html"] > span').before("<i class='fa fa-square'></i> ");
     $('li > a[href="namespaces.html"] > span').before("<i class='fa fa-bars'></i> ");
@@ -17,9 +29,10 @@ $( document ).ready(function() {
     $('img[src="ftv2ns.png"]').replaceWith('<span class="label label-danger">N</span> ');
     $('img[src="ftv2cl.png"]').replaceWith('<span class="label label-danger">C</span> ');
 
-    $("ul.tablist").addClass("nav nav-pills nav-justified");
-    $("ul.tablist").css("margin-top", "0.5em");
-    $("ul.tablist").css("margin-bottom", "0.5em");
+    let ul_tablist = $("ul.tablist");
+    ul_tablist.addClass("nav nav-pills nav-justified");
+    ul_tablist.css("margin-top", "0.5em");
+    ul_tablist.css("margin-bottom", "0.5em");
     $("li.current").addClass("active");
     $("iframe").attr("scrolling", "yes");
 
@@ -83,7 +96,7 @@ $( document ).ready(function() {
     });
 
 	function getOriginalWidthOfImg(img_element) {
-		var t = new Image();
+		let t = new Image();
 		t.src = (img_element.getAttribute ? img_element.getAttribute("src") : false) || img_element.src;
 		return t.width;
 	}
@@ -97,16 +110,16 @@ $( document ).ready(function() {
   /* responsive search box */
   $('#MSearchBox').parent().remove();
 
-  var nav_container = $('<div class="row"></div>');
+  let nav_container = $('<div class="row"></div>');
   $('#navrow1').parent().prepend(nav_container);
 
-  var left_nav = $('<div class="col-md-9"></div>');
+  let left_nav = $('<div class="col-md-9"></div>');
   for (i = 0; i < 6; i++) {
-    var navrow = $('#navrow' + i + ' > ul.tablist').detach();
+    let navrow = $('#navrow' + i + ' > ul.tablist').detach();
     left_nav.append(navrow);
     $('#navrow' + i).remove();
   }
-  var right_nav = $('<div class="col-md-3"></div>').append('\
+  let right_nav = $('<div class="col-md-3"></div>').append('\
     <div id="search-box" class="input-group">\
       <div class="input-group-btn">\
         <button aria-expanded="false" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">\
@@ -120,13 +133,13 @@ $( document ).ready(function() {
     </div>');
   $(nav_container).append(left_nav);
 
-  var header_container = document.getElementsByClassName("navbar-header");
+  let header_container = document.getElementsByClassName("navbar-header");
   $(header_container).append(right_nav);
 
   $('#MSearchSelectWindow .SelectionMark').remove();
-  var search_selectors = $('#MSearchSelectWindow .SelectItem');
-  for (var i = 0; i < search_selectors.length; i += 1) {
-    var element_a = $('<a href="#"></a>').text($(search_selectors[i]).text());
+  let search_selectors = $('#MSearchSelectWindow .SelectItem');
+  for (let i = 0; i < search_selectors.length; i += 1) {
+    let element_a = $('<a href="#"></a>').text($(search_selectors[i]).text());
 
     element_a.click(function(){
       $('#search-box .dropdown-menu li').removeClass('active');
@@ -136,7 +149,7 @@ $( document ).ready(function() {
       return false;
     });
 
-    var element = $('<li></li>').append(element_a);
+    let element = $('<li></li>').append(element_a);
     $('#search-box .dropdown-menu').append(element);
   }
   $('#MSearchSelectWindow').remove();
@@ -159,7 +172,7 @@ $( document ).ready(function() {
 
 
   /* search results */
-  var results_iframe = $('#MSearchResults').detach();
+  let results_iframe = $('#MSearchResults').detach();
   $('#MSearchResultsWindow')
     .attr('id', 'search-results-window')
     .addClass('panel panel-default')
@@ -177,7 +190,7 @@ $( document ).ready(function() {
 
   function update_search_results_window() {
     $('#search-results-window').removeClass('panel-default panel-success panel-warning panel-danger')
-    var status = $('#MSearchResults').contents().find('.SRStatus:visible');
+    let status = $('#MSearchResults').contents().find('.SRStatus:visible');
     if (status.length > 0) {
       switch(status.attr('id')) {
         case 'Loading':
@@ -202,12 +215,12 @@ $( document ).ready(function() {
     update_search_results_window();
 
     // detect status changes (only for search with external search backend)
-    var observer = new MutationObserver(function(mutations) {
+    let observer = new MutationObserver(function(mutations) {
       update_search_results_window();
     });
-    var config = { attributes: true};
+    let config = { attributes: true};
 
-    var targets = $('#MSearchResults').contents().find('.SRStatus');
+    let targets = $('#MSearchResults').contents().find('.SRStatus');
     for (i = 0; i < targets.length; i++) {
       observer.observe(targets[i], config);
     }
@@ -225,8 +238,8 @@ $( document ).ready(function() {
   });
 
   /* todo list */
-  var todoelements = $('.contents > .textblock > dl.reflist > dt, .contents > .textblock > dl.reflist > dd');
-  for (var i = 0; i < todoelements.length; i += 2) {
+  let todoelements = $('.contents > .textblock > dl.reflist > dt, .contents > .textblock > dl.reflist > dd');
+  for (let i = 0; i < todoelements.length; i += 2) {
     $('.contents > .textblock').append(
       '<div class="panel panel-default active">'
         + "<div class=\"panel-heading todoname\">" + $(todoelements[i]).html() + "</div>"
@@ -280,18 +293,28 @@ $( document ).ready(function() {
   $("table.tparams").addClass("table");
   $("table.exception").addClass("table");
 
+  // change custom group from one dd to n dds
   ["assert_precondition", "assert_sanity"].forEach(function(elem) {
       [].forEach.call(document.getElementsByClassName(elem), function(item) {
-           var assertions = item.lastElementChild.innerHTML.split("\n");
+           let assertions = item.lastElementChild.innerHTML.split("\n");
            item.lastElementChild.remove();
            assertions.forEach(function(a, i) {
-               var dd = document.createElement("DD");
-               var template = document.createElement("template");
+               let dd = document.createElement("DD");
+               let template = document.createElement("template");
                template.innerHTML = a.trim();
                dd.appendChild(template.content);
                item.appendChild(dd);
            });
       });
+  });
+
+  // correctly place nodiscard
+  [].forEach.call(document.getElementsByClassName("nodiscard"), function(item) {
+      let parent_panel = item.closest(".panel");
+      console.log(parent_panel);
+      let target_child = $(parent_panel).find("span.pull-right").first();
+      console.log(target_child);
+      target_child.append(item);
   });
 
 });
