@@ -97,10 +97,11 @@ namespace mpicxx {
         /**
          * @brief Tries to prepend @p msg to the current message.
          * @details There are two possible cases:
-         *          -# the initial message (containing the @ref detail::source_location message) was created successfully:
-         *             try to prepend @p msg; if an exception is thrown, this function has no effect
-         *          -# the initial message (containing the @ref detail::source_location message) was **not** created successfully:
-         *             try to store @p msg; if an exception is thrown, this function has no effect
+         * -# the initial message (containing the @ref detail::source_location message) was created successfully:
+         *    try to prepend @p msg; if an exception is thrown, this function has no effect
+         * -# the initial message (containing the @ref detail::source_location message) was **not** created successfully:
+         *    try to store @p msg; if an exception is thrown, this function has no effect
+         *
          * @tparam T must meet the @ref mpicxx::detail::is_string requirements.
          * @param[in] msg the message to prepend
          */

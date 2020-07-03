@@ -38,7 +38,7 @@ PROJECT_NAME           = "mpicxx"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = @Project-Name_VERSION@
+PROJECT_NUMBER         = @mpicxx_VERSION@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -230,7 +230,6 @@ TAB_SIZE               = 4
 
 ALIASES                += assert_precondition{1}="<dl class=\"section assert_precondition\"><dt>Precondition assertions</dt><dd>\1</dd></dl>"
 ALIASES                += assert_sanity{1}="<dl class=\"section assert_sanity\"><dt>Sanity assertions</dt><dd>\1</dd></dl>"
-ALIASES                += assert{1}="<dl class=\"section assert\"><dt>Assertions</dt><dd>\1</dd></dl>"
 ALIASES                += calls{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>@code{.cpp}\1@endcode</dd></dl>"
 ALIASES                += calls_ref{1}="<dl class=\"section calls\"><dt>MPI functions internally called</dt><dd>\1</dd></dl>"
 
@@ -529,7 +528,7 @@ HIDE_COMPOUND_REFERENCE= NO
 # the files that are included by a file in the documentation of that file.
 # The default value is: YES.
 
-SHOW_INCLUDE_FILES     = NO
+SHOW_INCLUDE_FILES     = YES
 
 # If the SHOW_GROUPED_MEMB_INC tag is set to YES then Doxygen will add for each
 # grouped member an include statement to the documentation, telling the reader
@@ -743,7 +742,7 @@ WARN_IF_DOC_ERROR      = YES
 # documentation, but not about the absence of documentation.
 # The default value is: NO.
 
-WARN_NO_PARAMDOC       = NO
+WARN_NO_PARAMDOC       = YES
 
 # If the WARN_AS_ERROR tag is set to YES then doxygen will immediately stop when
 # a warning is encountered.
@@ -929,7 +928,7 @@ USE_MDFILE_AS_MAINPAGE = @CMAKE_SOURCE_DIR@/doc/main_page.md
 # also VERBATIM_HEADERS is set to NO.
 # The default value is: NO.
 
-SOURCE_BROWSER         = YES
+SOURCE_BROWSER         = NO
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.
@@ -1039,7 +1038,7 @@ ALPHABETICAL_INDEX     = YES
 # Minimum value: 1, maximum value: 20, default value: 5.
 # This tag requires that the tag ALPHABETICAL_INDEX is set to YES.
 
-COLS_IN_ALPHA_INDEX    = 5
+COLS_IN_ALPHA_INDEX    = 2
 
 # In case all classes in a project start with a common prefix, all classes will
 # be put under the same header in the alphabetical index. The IGNORE_PREFIX tag
@@ -1113,7 +1112,7 @@ HTML_FOOTER            = @PROJECT_SOURCE_DIR@/doc/html_style/footer.html
 # obsolete.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_STYLESHEET        = @PROJECT_SOURCE_DIR@/doc/html_style/stylesheet.css
+HTML_STYLESHEET        =
 
 # The HTML_EXTRA_STYLESHEET tag can be used to specify additional user-defined
 # cascading style sheets that are included after the standard style sheets
@@ -1126,7 +1125,7 @@ HTML_STYLESHEET        = @PROJECT_SOURCE_DIR@/doc/html_style/stylesheet.css
 # list). For an example see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  += @PROJECT_SOURCE_DIR@/doc/custom_style.css
+HTML_EXTRA_STYLESHEET  += @PROJECT_SOURCE_DIR@/doc/html_style/customdoxygen.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1137,6 +1136,7 @@ HTML_EXTRA_STYLESHEET  += @PROJECT_SOURCE_DIR@/doc/custom_style.css
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_FILES       += @PROJECT_SOURCE_DIR@/doc/html_style/logo.ico
+HTML_EXTRA_FILES       += @PROJECT_SOURCE_DIR@/doc/html_style/doxy-boot.js
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the stylesheet and background images according to
@@ -1411,7 +1411,7 @@ DISABLE_INDEX          = NO
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-GENERATE_TREEVIEW      = YES
+GENERATE_TREEVIEW      = NO
 
 # The ENUM_VALUES_PER_LINE tag can be used to set the number of enum values that
 # doxygen will group on one line in the generated HTML documentation.
