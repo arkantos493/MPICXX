@@ -189,6 +189,8 @@ div.qindex, div.navtab, .btn-default {
 a#Item1 {
     color: var(--link-color);
 }
+/*TODO: button#search-close*/
+/*TODO: search result window*/
 /*.dropdown-menu {*/
 /*    background-color: var(--search-dropdown-bg-color);*/
 /*    border-color: var(--border-color);*/
