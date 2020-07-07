@@ -50,6 +50,7 @@
     --table-odd-bg-color: #f9f9f9;
 
     --scrollbar-color: #93A1A1;
+    --search-dropdown-hover-color: #000;
     --scrollbar-bg-color: #e0e0e0;
 }
 
@@ -62,9 +63,10 @@
     --search-color: #dcdcdc;
     --search-bg-color: #586e75;
 
-    --search-result-color: #fff;
-    --search-dropdown-bg-color: #586e75;
+    --search-dropdown-color: #dcdcdc;
+    --search-dropdown-bg-color: #282e36;
     --search-dropdown-bg-hover-color: #2f363f;
+    --search-result-color: #fff;
     --search-result-success-bg-color: #679157;
     --search-result-success-border-color: #517345;
     --search-result-warning-bg-color: #c9b64f;
@@ -105,6 +107,7 @@
     --table-odd-bg-color: #434d59;
 
     --scrollbar-color: #586e75;
+    --search-dropdown-hover-color: #000;
     --scrollbar-bg-color: #dcdcdc;
 }
 
@@ -181,7 +184,8 @@ div.qindex, div.navtab, .btn-default {
     background-color: var(--table-odd-bg-color);
     border-color: var(--border-color);
 }
-.btn-default:hover {
+.btn-default:hover, .btn-default:focus, .btn-default:active,
+.open>.dropdown-toggle.btn-default {
     background-color: var(--navbar-hover-color);
 }
 .form-control {
@@ -196,26 +200,28 @@ a#Item1 {
     color: var(--link-color);
 }
 /*TODO: button#search-close*/
-/*TODO: search result window*/
-/*.dropdown-menu {*/
-/*    background-color: var(--search-dropdown-bg-color);*/
-/*    border-color: var(--border-color);*/
-/*}*/
-/*.dropdown-menu:hover {*/
-/*    background-color: var(--search-dropdown-bg-hover-color);*/
-/*}*/
+.dropdown-menu {
+    background-color: var(--search-dropdown-bg-color);
+    border-color: var(--border-color);
+}
+.dropdown-menu>li>a {
+    color: var(--search-dropdown-color);
+}
+.dropdown-menu>li>a:hover, .dropdown-menu>li:hover {
+    color: var(--search-dropdown-hover-color);
+    background-color: var(--border-color);
+}
+.dropdown-menu>li:first-child {
+    padding-top: 5px;
+}
 
-/* width */
+
 html::-webkit-scrollbar {
     width: 10px;
 }
-
-/* Track */
 html::-webkit-scrollbar-track {
     background: var(--scrollbar-bg-color);
 }
-
-/* Handle */
 html::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-color);
 }
