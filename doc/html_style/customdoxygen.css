@@ -553,6 +553,9 @@ span.SRScope {
 .SRResult {
     display: none;
 }
+.SRPage {
+    background-color: var(--bg-color);
+}
 
 
 .panel-success>.panel-heading {
