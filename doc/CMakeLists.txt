@@ -14,6 +14,8 @@ add_custom_command(
         doxygen.stamp
     COMMAND
         ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    COMMAND
+        ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/doc/html_style/append_to_file.cmake
     COMMENT
         "Generating API documentation with Doxygen"
     VERBATIM
