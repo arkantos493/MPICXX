@@ -210,7 +210,7 @@ $( document ).ready(function() {
   $('#MSearchResults').load(function() {
     $('#MSearchResults').contents().find('link[href="search.css"]').attr('href','../doxygen.css');
     $('#MSearchResults').contents().find('head').append(
-      '<link href="customdoxygen.css" rel="stylesheet" type="text/css">');
+      '<link href="../customdoxygen.css" rel="stylesheet" type="text/css">');
 
     update_search_results_window();
 
@@ -311,9 +311,7 @@ $( document ).ready(function() {
   // correctly place nodiscard
   [].forEach.call(document.getElementsByClassName("nodiscard"), function(item) {
       let parent_panel = item.closest(".panel");
-      console.log(parent_panel);
       let target_child = $(parent_panel).find("span.pull-right").first();
-      console.log(target_child);
       target_child.append(item);
   });
 
