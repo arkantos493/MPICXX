@@ -66,9 +66,6 @@ $( document ).ready(function() {
     $("div.ttname a").css("color", 'white');
     $("div.ttdef,div.ttdoc,div.ttdeci").addClass("panel-body");
 
-    $('div.fragment.well div.line:first').css('margin-top', '2px');
-    $('div.fragment.well div.line:last').css('margin-bottom', '2px');
-
 	$('table.doxtable').removeClass('doxtable').addClass('table table-striped table-bordered').each(function(){
 		$(this).prepend('<thead></thead>');
 		$(this).find('tbody > tr:first').prependTo($(this).find('thead'));
@@ -335,5 +332,8 @@ $( document ).ready(function() {
           toggleSwitch.checked = true;
       }
   }
+
+  // better inline code link style
+  $("a").has("code").addClass("inline_code_link");
 
 });
