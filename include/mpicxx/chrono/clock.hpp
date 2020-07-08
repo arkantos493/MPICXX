@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/chrono/clock.hpp
  * @author Marcel Breyer
- * @date 2020-06-23
+ * @date 2020-07-08
  *
  * @brief Implements a wrapper class around the MPI timer functions.
  * @details These functions include *MPI_Wtime*, *MPI_Wtick* and the attribute *MPI_WTIME_IS_GLOBAL*.
@@ -20,7 +20,7 @@ namespace mpicxx {
     /**
      * @brief A clock wrapper for *MPI_Wtime* and *MPI_Wtick* which supports [`std::chrono`](https://en.cppreference.com/w/cpp/chrono).
      * @details Example usage:
-     * @include examples/chrono/clock.cpp
+     * @snippet examples/chrono/clock.cpp mwe
      */
     struct clock {
         /**

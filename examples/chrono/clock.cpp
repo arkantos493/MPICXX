@@ -1,11 +1,12 @@
 /**
  * @file examples/chrono/clock.cpp
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-07-08
  *
  * @brief Examples for the @ref mpicxx::chrono::clock implementation.
  */
 
+//! [mwe]
 #include <chrono>
 #include <iostream>
 
@@ -23,3 +24,4 @@ int main() {
 
     return 0;
 }
+//! [mwe]
