@@ -211,7 +211,7 @@ div.qindex, div.navtab, .btn-default {
 a#Item1 {
     color: var(--link-color);
 }
-/*TODO: button#search-close*/
+
 .dropdown-menu {
     background-color: var(--search-dropdown-bg-color);
     border-color: var(--border-color);
@@ -558,6 +558,12 @@ blockquote {
     right: 0;
     padding: 6px 12px;
     z-index: 5;
+    opacity: 1;
+    text-shadow: none;
+    color: var(--search-color);
+}
+#search-box .close:hover {
+    color: var(--search-color);
 }
 #search-box {
     margin-top: 12px;
