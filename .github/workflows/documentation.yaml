@@ -25,7 +25,7 @@ jobs:
           sed -i -e 's/@CMAKE_SOURCE_DIR@\///g' doc/Doxyfile.in
           sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' doc/Doxyfile.in
           sed -i -e 's/@CMAKE_CURRENT_SOURCE_DIR@//g' doc/Doxyfile.in
-          grep 'VERSION "' CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' doc/Doxyfile
+          grep 'VERSION "' CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' doc/Doxyfile.in
 
       - name: Doxygen Action
         uses: arkantos493/doxygen-action@v2.1.0
