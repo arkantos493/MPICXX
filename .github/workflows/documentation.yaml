@@ -20,11 +20,17 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - uses: Configure
+        run: |
+          sed -i -e 's/@CMAKE_SOURCE_DIR@\///g' doc/Doxyfile.in
+          sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' doc/Doxyfile.in
+          sed -i -e 's/@CMAKE_CURRENT_SOURCE_DIR@//g' doc/Doxyfile.in
+
       - name: Doxygen Action
         uses: arkantos493/doxygen-action@v2.1.0
         with:
           # Path to Doxyfile
-          doxyfile-path: "doc/Doxyfile" # default is ./Doxyfile
+          doxyfile-path: "doc/Doxyfile.in" # default is ./Doxyfile
           # Working directory
           working-directory: "." # default is .
 
