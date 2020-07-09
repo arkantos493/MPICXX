@@ -24,9 +24,9 @@ jobs:
         uses: arkantos493/doxygen-action@v2.1.0
         with:
           # Path to Doxyfile
-          doxyfile-path: "Doxyfile" # default is ./Doxyfile
+          doxyfile-path: "doc/Doxyfile" # default is ./Doxyfile
           # Working directory
-          working-directory: "doc/" # default is .
+          working-directory: "." # default is .
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
@@ -34,4 +34,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Default Doxyfile build documentation to html directory.
           # Change the directory if changes in Doxyfile
-          publish_dir: ./html
+          publish_dir: ./doc/html
