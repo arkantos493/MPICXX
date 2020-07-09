@@ -336,4 +336,31 @@ $( document ).ready(function() {
   // better inline code link style
   $("a").has("code").addClass("inline_code_link");
 
+  // better pages
+  let current_page = window.location.pathname.split("/").pop();
+  let supported_pages = [ "namespacemembers.html", "namespacemembers_func.html", "functions_func.html" ];
+  if (supported_pages.includes(current_page)) {
+      // hide elements
+      $("div.contents>ul, div.contents>h3").css("display", "none");
+
+      var navbar = $("div.col-md-9").children()[3];
+
+      navbar.addEventListener("click", function(e) {
+          // set navbar
+          $(navbar).find("li.current").removeClass();
+          let current = $(e.target).closest("li");
+          current.addClass("current active");
+
+          // hide old element
+          $("div.contents>ul, div.contents>h3").css("display", "none");
+
+          // show new element
+          let selector = "div.contents>h3:contains(- " + current.text() + " -)";
+          $(selector).css("display", "block");
+          $(selector).next().css("display", "block");
+      });
+
+      $(navbar).find("li").first().click();
+  }
+
 });
