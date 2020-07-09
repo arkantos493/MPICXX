@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Doxygen Action
-        uses: arkantos493/doxygen-action
+        uses: arkantos493/doxygen-action@v1
         with:
           # Path to Doxyfile
           doxyfile-path: "doc/Doxyfile" # default is ./Doxyfile
