@@ -19,11 +19,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: info
-        run: |
-          ls
-          doxygen --version
-          cmake --version
+
       - name: Doxygen Action
         uses: arkantos493/doxygen-action@v2.1.0
         with:
