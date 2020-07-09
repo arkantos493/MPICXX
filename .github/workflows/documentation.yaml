@@ -20,7 +20,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - uses: Configure
+      - name: Configure
         run: |
           sed -i -e 's/@CMAKE_SOURCE_DIR@\///g' doc/Doxyfile.in
           sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' doc/Doxyfile.in
