@@ -22,7 +22,7 @@ jobs:
       - name: info
         run: ls
       - name: Doxygen Action
-        uses: arkantos493/doxygen-action@v2.0.0
+        uses: arkantos493/doxygen-action@2.0.0
         with:
           # Path to Doxyfile
           doxyfile-path: "doc/Doxyfile" # default is ./Doxyfile
