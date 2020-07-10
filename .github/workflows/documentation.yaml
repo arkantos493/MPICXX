@@ -3,7 +3,7 @@ name: Generate documentation
 on: [push]
 
 jobs:
-  build:
+  build-documentation:
     runs-on: ubuntu-latest
     steps:
       # checkout repository
@@ -22,10 +22,15 @@ jobs:
           doxyfile-path: "doc/Doxyfile.in"
           working-directory: "."
       # minify files
-      - name: Auto Minify
-        uses: nizarmah/auto-minify@master
-        with:
-          directory: "doc/html"
+      - name: Minify
+        run: |
+          sudo apt install nodejs npm
+          sudo npm install uglify-js -g
+          sudo npm install clean-css-cli -g
+          sudo npm install html-minifier -g
+          for i in `find doc/html/ -type f -name "*.js"`; do uglifyjs --compress --mangle --toplevel $i -o $i; done
+          for i in `find doc/html/ -type f -name "*.css"`; do cleancss $i -o $i; done
+          for i in `find doc/html/ -type f -name "*.html"`; do html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true $i -o $i; done
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
