@@ -1,6 +1,15 @@
 name: Test with clang
 
-on: [push]
+# only trigger this action on specific events
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   build-clang:
