@@ -24,10 +24,10 @@ jobs:
       # minify files
       - name: Minify
         run: |
-          sudo apt install nodejs npm
-          sudo npm install uglify-js -g
-          sudo npm install clean-css-cli -g
-          sudo npm install html-minifier -g
+          sudo apt-get install nodejs npm
+          npm install uglify-js -g
+          npm install clean-css-cli -g
+          npm install html-minifier -g
           for i in `find doc/html/ -type f -name "*.js"`; do uglifyjs --compress --mangle --toplevel $i -o $i; done
           for i in `find doc/html/ -type f -name "*.css"`; do cleancss $i -o $i; done
           for i in `find doc/html/ -type f -name "*.html"`; do html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true $i -o $i; done
