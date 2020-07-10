@@ -1,6 +1,15 @@
 name: Generate documentation
 
-on: [push]
+# only trigger this action on specific events
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   build-documentation:
@@ -21,11 +30,6 @@ jobs:
         with:
           doxyfile-path: "doc/Doxyfile.in"
           working-directory: "."
-      # minify files
-      - name: Auto Minify
-        uses: arkantos493/auto-minify@v2.0.0
-        with:
-          directory: "doc/html"
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
