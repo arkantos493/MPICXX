@@ -22,16 +22,10 @@ jobs:
           doxyfile-path: "doc/Doxyfile.in"
           working-directory: "."
       # minify files
-      - name: Minify
-        run: |
-          sudo apt-get install nodejs npm
-          mkdir -p minify/node_modules
-          npm install --prefix ./minify uglify-js -g
-          npm install --prefix ./minify clean-css-cli -g
-          npm install --prefix ./minify html-minifier -g
-          for i in `find doc/html/ -type f -name "*.js"`; do ./minify/lib/node_modules/uglify-js/bin/uglifyjs --compress --mangle --toplevel $i -o $i; done
-          for i in `find doc/html/ -type f -name "*.css"`; do ./minify/lib/node_modules/clean-css-cli/bin/cleancss $i -o $i; done
-          for i in `find doc/html/ -type f -name "*.html"`; do ./minify/lib/node_modules/html-minifier/bin/cli.js --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true $i -o $i; done
+      - name: Auto Minify
+        uses: arkantos493/auto-minify@v2.0.0
+        with:
+          directory: "doc/html"
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
