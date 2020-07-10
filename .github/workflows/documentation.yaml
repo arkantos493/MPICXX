@@ -25,12 +25,13 @@ jobs:
       - name: Minify
         run: |
           sudo apt-get install nodejs npm
-          npm install --prefix . uglify-js -g
-          npm install --prefix . clean-css-cli -g
-          npm install --prefix . html-minifier -g
-          for i in `find doc/html/ -type f -name "*.js"`; do uglifyjs --compress --mangle --toplevel $i -o $i; done
-          for i in `find doc/html/ -type f -name "*.css"`; do cleancss $i -o $i; done
-          for i in `find doc/html/ -type f -name "*.html"`; do html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true $i -o $i; done
+          mkdir minify/node_modules
+          npm install --prefix ./minify uglify-js -g
+          npm install --prefix ./minify clean-css-cli -g
+          npm install --prefix ./minify html-minifier -g
+          for i in `find doc/html/ -type f -name "*.js"`; do ./minify/node_modules/uglify-js/bin/uglifyjs --compress --mangle --toplevel $i -o $i; done
+          for i in `find doc/html/ -type f -name "*.css"`; do ./minify/node_modules/clean-css-cli/bin/cleancss $i -o $i; done
+          for i in `find doc/html/ -type f -name "*.html"`; do ./minify/node_modules/html-minifier/bin/html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true $i -o $i; done
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
