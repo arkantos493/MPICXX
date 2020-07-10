@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function(event) {
-    let page = document.querySelector("html");
+    var page = document.querySelector("html");
     page.style.overflow = "auto";
 
-    const toggleSwitch = parent.document.querySelector('.theme-switch input[type="checkbox"]');
+    var toggleSwitch = parent.document.querySelector('.theme-switch input[type="checkbox"]');
     function switchTheme(e) {
         if (e.target.checked) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
     toggleSwitch.addEventListener('change', switchTheme, false);
 
-    const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+    var currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
     if (currentTheme) {
         document.documentElement.setAttribute('data-theme', currentTheme);
         if (currentTheme === 'dark') {

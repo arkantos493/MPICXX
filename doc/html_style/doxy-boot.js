@@ -29,7 +29,7 @@ $( document ).ready(function() {
     $('img[src="ftv2ns.png"]').replaceWith('<span class="label label-danger">N</span> ');
     $('img[src="ftv2cl.png"]').replaceWith('<span class="label label-danger">C</span> ');
 
-    let ul_tablist = $("ul.tablist");
+    var ul_tablist = $("ul.tablist");
     ul_tablist.addClass("nav nav-pills nav-justified");
     ul_tablist.css("margin-top", "0.5em");
     ul_tablist.css("margin-bottom", "0.5em");
@@ -93,7 +93,7 @@ $( document ).ready(function() {
     });
 
 	function getOriginalWidthOfImg(img_element) {
-		let t = new Image();
+		var t = new Image();
 		t.src = (img_element.getAttribute ? img_element.getAttribute("src") : false) || img_element.src;
 		return t.width;
 	}
@@ -107,16 +107,16 @@ $( document ).ready(function() {
   /* responsive search box */
   $('#MSearchBox').parent().remove();
 
-  let nav_container = $('<div class="row"></div>');
+  var nav_container = $('<div class="row"></div>');
   $('#navrow1').parent().prepend(nav_container);
 
-  let left_nav = $('<div class="col-md-9"></div>');
+  var left_nav = $('<div class="col-md-9"></div>');
   for (i = 0; i < 6; i++) {
-    let navrow = $('#navrow' + i + ' > ul.tablist').detach();
+    var navrow = $('#navrow' + i + ' > ul.tablist').detach();
     left_nav.append(navrow);
     $('#navrow' + i).remove();
   }
-  let right_nav = $('<div class="col-md-3"></div>').append('\
+  var right_nav = $('<div class="col-md-3"></div>').append('\
     <div id="search-box" class="input-group">\
       <div class="input-group-btn">\
         <button aria-expanded="false" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">\
@@ -130,13 +130,13 @@ $( document ).ready(function() {
     </div>');
   $(nav_container).append(left_nav);
 
-  let header_container = document.getElementsByClassName("navbar-header");
+  var header_container = document.getElementsByClassName("navbar-header");
   $(header_container).append(right_nav);
 
   $('#MSearchSelectWindow .SelectionMark').remove();
-  let search_selectors = $('#MSearchSelectWindow .SelectItem');
-  for (let i = 0; i < search_selectors.length; i += 1) {
-    let element_a = $('<a href="#"></a>').text($(search_selectors[i]).text());
+  var search_selectors = $('#MSearchSelectWindow .SelectItem');
+  for (var i = 0; i < search_selectors.length; i += 1) {
+    var element_a = $('<a href="#"></a>').text($(search_selectors[i]).text());
 
     element_a.click(function(){
       $('#search-box .dropdown-menu li').removeClass('active');
@@ -146,7 +146,7 @@ $( document ).ready(function() {
       return false;
     });
 
-    let element = $('<li></li>').append(element_a);
+    var element = $('<li></li>').append(element_a);
     $('#search-box .dropdown-menu').append(element);
   }
   $('#MSearchSelectWindow').remove();
@@ -169,7 +169,7 @@ $( document ).ready(function() {
 
 
   /* search results */
-  let results_iframe = $('#MSearchResults').detach();
+  var results_iframe = $('#MSearchResults').detach();
   $('#MSearchResultsWindow')
     .attr('id', 'search-results-window')
     .addClass('panel panel-default')
@@ -187,7 +187,7 @@ $( document ).ready(function() {
 
   function update_search_results_window() {
     $('#search-results-window').removeClass('panel-default panel-success panel-warning panel-danger')
-    let status = $('#MSearchResults').contents().find('.SRStatus:visible');
+    var status = $('#MSearchResults').contents().find('.SRStatus:visible');
     if (status.length > 0) {
       switch(status.attr('id')) {
         case 'Loading':
@@ -212,12 +212,12 @@ $( document ).ready(function() {
     update_search_results_window();
 
     // detect status changes (only for search with external search backend)
-    let observer = new MutationObserver(function(mutations) {
+    var observer = new MutationObserver(function(mutations) {
       update_search_results_window();
     });
-    let config = { attributes: true};
+    var config = { attributes: true};
 
-    let targets = $('#MSearchResults').contents().find('.SRStatus');
+    var targets = $('#MSearchResults').contents().find('.SRStatus');
     for (i = 0; i < targets.length; i++) {
       observer.observe(targets[i], config);
     }
@@ -235,8 +235,8 @@ $( document ).ready(function() {
   });
 
   /* todo list */
-  let todoelements = $('.contents > .textblock > dl.reflist > dt, .contents > .textblock > dl.reflist > dd');
-  for (let i = 0; i < todoelements.length; i += 2) {
+  var todoelements = $('.contents > .textblock > dl.reflist > dt, .contents > .textblock > dl.reflist > dd');
+  for (var i = 0; i < todoelements.length; i += 2) {
     $('.contents > .textblock').append(
       '<div class="panel panel-default active">'
         + "<div class=\"panel-heading todoname\">" + $(todoelements[i]).html() + "</div>"
@@ -293,11 +293,11 @@ $( document ).ready(function() {
   // change custom group from one dd to n dds
   ["assert_precondition", "assert_sanity"].forEach(function(elem) {
       [].forEach.call(document.getElementsByClassName(elem), function(item) {
-           let assertions = item.lastElementChild.innerHTML.split("\n");
+           var assertions = item.lastElementChild.innerHTML.split("\n");
            item.lastElementChild.remove();
            assertions.forEach(function(a, i) {
-               let dd = document.createElement("DD");
-               let template = document.createElement("template");
+               var dd = document.createElement("DD");
+               var template = document.createElement("template");
                template.innerHTML = a.trim();
                dd.appendChild(template.content);
                item.appendChild(dd);
@@ -307,13 +307,13 @@ $( document ).ready(function() {
 
   // correctly place nodiscard
   [].forEach.call(document.getElementsByClassName("nodiscard"), function(item) {
-      let parent_panel = item.closest(".panel");
-      let target_child = $(parent_panel).find("span.pull-right").first();
+      var parent_panel = item.closest(".panel");
+      var target_child = $(parent_panel).find("span.pull-right").first();
       target_child.append(item);
   });
 
   // switch themes
-  const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+  var toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
   function switchTheme(e) {
       if (e.target.checked) {
           document.documentElement.setAttribute('data-theme', 'dark');
@@ -325,7 +325,7 @@ $( document ).ready(function() {
   }
   toggleSwitch.addEventListener('change', switchTheme, false);
 
-  const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+  var currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
   if (currentTheme) {
       document.documentElement.setAttribute('data-theme', currentTheme);
       if (currentTheme === 'dark') {
@@ -337,8 +337,8 @@ $( document ).ready(function() {
   $("a").has("code").addClass("inline_code_link");
 
   // better pages
-  let current_page = window.location.pathname.split("/").pop();
-  let supported_pages = [ "namespacemembers.html", "namespacemembers_func.html", "functions_func.html" ];
+  var current_page = window.location.pathname.split("/").pop();
+  var supported_pages = [ "namespacemembers.html", "namespacemembers_func.html", "functions_func.html" ];
   if (supported_pages.includes(current_page)) {
       // hide elements
       $("div.contents>ul, div.contents>h3").css("display", "none");
@@ -348,14 +348,14 @@ $( document ).ready(function() {
       navbar.addEventListener("click", function(e) {
           // set navbar
           $(navbar).find("li.current").removeClass();
-          let current = $(e.target).closest("li");
+          var current = $(e.target).closest("li");
           current.addClass("current active");
 
           // hide old element
           $("div.contents>ul, div.contents>h3").css("display", "none");
 
           // show new element
-          let selector = "div.contents>h3:contains(- " + current.text() + " -)";
+          var selector = "div.contents>h3:contains(- " + current.text() + " -)";
           $(selector).css("display", "block");
           $(selector).next().css("display", "block");
       });
