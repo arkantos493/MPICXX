@@ -21,6 +21,11 @@ jobs:
         with:
           doxyfile-path: "doc/Doxyfile.in"
           working-directory: "."
+      # minify files
+      - name: Auto Minify
+        uses: nizarmah/auto-minify@master
+        with:
+          directory: "doc/html"
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
