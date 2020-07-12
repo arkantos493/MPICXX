@@ -150,6 +150,9 @@ code {
 .breadcrumb {
     background-color: var(--memdesc-bg-color);
 }
+a:hover {
+    color: var(--link-color);
+}
 .panel-default>.panel-heading {
     color: var(--color);
     background-color: var(--memdesc-bg-color);
@@ -226,7 +229,12 @@ a#Item1 {
 .dropdown-menu>li:first-child {
     padding-top: 5px;
 }
-
+.panel-body {
+    padding: 8px;
+}
+div.panel-body :last-child {
+    margin-bottom: 0;
+}
 
 html::-webkit-scrollbar {
     width: 10px;
