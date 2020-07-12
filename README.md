@@ -4,7 +4,7 @@
 ![Test with clang](https://github.com/arkantos493/MPICXX/workflows/Test%20with%20clang/badge.svg)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9088a6289f864f19ba5869e103925b30)](https://www.codacy.com/manual/arkantos493/MPICXX?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=arkantos493/MPICXX&amp;utm_campaign=Badge_Grade)
-[![Documentation](https://codedocs.xyz/arkantos493/MPICXX.svg)](https://codedocs.xyz/arkantos493/MPICXX/)
+[![Generic badge](https://img.shields.io/badge/code-documented-<COLOR>.svg)](https://arkantos493.github.io/MPICXX/)
 
 This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPICH).
 
@@ -16,7 +16,7 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 - [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
 - [CMake](https://cmake.org/) (minimum required 3.13)
 - [{fmt}](https://github.com/fmtlib/fmt) formatting library
-- [Doxygen](http://www.doxygen.nl/) (for documentation only)
+- [Doxygen](http://www.doxygen.nl/) (for documentation only, version 1.8.11 **required**)
 
 ### Installing
 
@@ -76,7 +76,7 @@ target_link_libraries(target mpicxx::mpicxx)
 ```
 
 ## Examples
-For usage examples see the [Doxygen documentation](https://codedocs.xyz/arkantos493/MPICXX/) or the [Wiki](https://github.com/arkantos493/MPICXX/wiki).
+For usage examples see the [Doxygen documentation](https://arkantos493.github.io/MPICXX/) or the [Wiki](https://github.com/arkantos493/MPICXX/wiki).
 
 ## License
 
