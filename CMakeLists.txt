@@ -11,11 +11,6 @@ set(CONFIG_IN ${CMAKE_CURRENT_SOURCE_DIR}/include/mpicxx/version/version.hpp.in)
 set(CONFIG_OUT ${CMAKE_CURRENT_SOURCE_DIR}/include/mpicxx/version/version.hpp)
 configure_file(${CONFIG_IN} ${CONFIG_OUT} @ONLY)
 
-# configure .codedocs file
-set(CONFIG_IN ${CMAKE_CURRENT_SOURCE_DIR}/.codedocs.in)
-set(CONFIG_OUT ${CMAKE_CURRENT_SOURCE_DIR}/.codedocs)
-configure_file(${CONFIG_IN} ${CONFIG_OUT} @ONLY)
-
 # enable/disable options
 include(CMakeDependentOption)
 option(MPICXX_ENABLE_TESTS "Generate tests" OFF)
