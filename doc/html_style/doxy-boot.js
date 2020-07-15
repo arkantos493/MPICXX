@@ -363,4 +363,8 @@ $( document ).ready(function() {
       $(navbar).find("li").first().click();
   }
 
+  // remove spaces from empty parameter list
+  $("td.paramname:empty").remove();
+  // add whitespace between parameter list and "const"
+  $(".memname td:contains(')')").append("&nbsp;");
 });

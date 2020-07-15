@@ -741,7 +741,7 @@ span.SRScope {
 }
 
 .paramname {
-    padding: 0 8px;
+    padding-left: 4px;
     font-weight: bold;
 }
 .dyncontent {
