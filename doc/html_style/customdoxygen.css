@@ -263,6 +263,9 @@ img.formulaInl {
 tr.heading>td {
     border-top: none!important;
 }
+span.lineno a {
+    background-color: var(--code-bg-color);
+}
 
 
 dl.assert_precondition, dl.assert_sanity, dl.calls {
