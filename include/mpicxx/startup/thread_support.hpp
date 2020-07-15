@@ -1,7 +1,8 @@
 /**
- * @file include/mpicxx/startup/thread_support.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-28
+ * @date 2020-07-15
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Contains the level of thread support enum.
  * @details Additionally adds various functions to perform conversions from and to
@@ -21,7 +22,6 @@
 #include <ostream>
 #include <stdexcept>
 #include <string_view>
-
 
 namespace mpicxx {
 
@@ -66,10 +66,10 @@ namespace mpicxx {
         return out;
     }
     /**
-     * @brief Overload of the @ref mpicxx::to_string function for the mpicxx::thread_support enum class.
+     * @brief Overload of the @ref mpicxx::to_string function for the @ref mpicxx::thread_support enum class.
      * @param[in] ts the enum class value
-     * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of the @ref mpicxx::thread_support
-     *         value (`[[nodiscard]]`)
+     * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of the enum class value
+     * @nodiscard
      */
     [[nodiscard]]
     inline std::string to_string(const thread_support ts) {
@@ -81,7 +81,8 @@ namespace mpicxx {
      * @details Expects the string value to be the MPI notation (e.g. `"MPI_THREAD_SINGLE"` gets converted to
      *          @ref mpicxx::thread_support::single).
      * @param[in] sv the enum value represented as a string
-     * @return the @ref mpicxx::thread_support representation of @p sv (`[[nodiscard]]`)
+     * @return the @ref mpicxx::thread_support representation of @p sv
+     * @nodiscard
      *
      * @throws std::invalid_argument if the given value can't be converted to a @ref mpicxx::thread_support value
      */
