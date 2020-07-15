@@ -266,6 +266,9 @@ tr.heading>td {
 span.lineno a {
     background-color: var(--code-bg-color);
 }
+.return>dd {
+    padding-left: 8px;
+}
 
 
 dl.assert_precondition, dl.assert_sanity, dl.calls {
