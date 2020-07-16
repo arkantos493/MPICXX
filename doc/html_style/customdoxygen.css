@@ -272,6 +272,9 @@ span.lineno a {
 td.memTemplParams {
     color: var(--memtemplate-color);
 }
+td.desc {
+    white-space: normal;
+}
 
 
 dl.assert_precondition, dl.assert_sanity, dl.calls {
