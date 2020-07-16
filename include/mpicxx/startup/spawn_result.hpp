@@ -4,8 +4,8 @@
  * @date 2020-07-16
  * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements the class which gets returned from the @ref mpicxx::single_spawner::spawn(),\n
- *        @ref mpicxx::single_spawner::spawn_with_errcodes(), @ref mpicxx::multiple_spawner::spawn() and\n
+ * @brief Implements the class which gets returned from the @ref mpicxx::single_spawner::spawn(),
+ *        @ref mpicxx::single_spawner::spawn_with_errcodes(), @ref mpicxx::multiple_spawner::spawn() and
  *        @ref mpicxx::multiple_spawner::spawn_with_errcodes() functions.
  */
 

@@ -1,11 +1,10 @@
 /**
- * @file
+ * @file include/mpicxx/core.hpp
  * @author Marcel Breyer
- * @date 2020-07-16
- * @copyright This file is distributed under the MIT License.
+ * @date 2020-06-28
  *
- * @brief Core header which includes every other necessary header file, i.e. \c \#include` <mpicxx/core.hpp>` is sufficient to use \n
- *        every function or class of the mpicxx library.
+ * @brief Core header which includes every other necessary header file, i.e. \#`include <mpicxx/core.hpp>` is sufficient to use every
+ *        function or class of the mpicxx library.
  */
 
 #ifndef MPICXX_CORE_HPP

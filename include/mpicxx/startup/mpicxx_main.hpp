@@ -4,8 +4,8 @@
  * @date 2020-07-16
  * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call \n
- *        to *MPI_Init* or *MPI_Finalize*.
+ * @brief Implements a save way to setup and teardown the MPI environment, e.g. without the possibility to forget a call to *MPI_Init* or
+ *        *MPI_Finalize*.
  */
 
 #ifndef MPICXX_MPICXX_MAIN_HPP
