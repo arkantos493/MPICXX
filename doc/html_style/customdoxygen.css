@@ -35,7 +35,7 @@
     --code-preprocessor-color: #CB4B16;
     --code-stringliteral-color: #2AA198;
     --code-charliteral-color: #2AA198;
-    --code-blockquote-color: #93a1a1;
+    --code-blockquote-color: #93A1A1;
 
     --inline-code-color: #C7254E;
     --inline-code-bg-color: #F9F2F4;
@@ -92,11 +92,11 @@
     --code-keyword-color: #859900;
     --code-keywordtype-color: #B58900;
     --code-keywordflow-color: #859900;
-    --code-comment-color: #93A1A1;
+    --code-comment-color: #586e75;
     --code-preprocessor-color: #CB4B16;
     --code-stringliteral-color: #2AA198;
     --code-charliteral-color: #2AA198;
-    --code-blockquote-color: #93a1a1;
+    --code-blockquote-color: #586e75;
 
     --inline-code-color: #e07f7c;
     --inline-code-bg-color: #282e36;
