@@ -270,7 +270,7 @@ span.lineno a {
     padding-left: 8px;
 }
 td.memTemplParams {
-    color: var(--color);
+    color: var(--memtemplate-color);
 }
 
 
