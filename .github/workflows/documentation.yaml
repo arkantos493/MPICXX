@@ -30,6 +30,11 @@ jobs:
         with:
           doxyfile-path: "doc/Doxyfile.in"
           working-directory: "."
+      # fix errors after generation
+      - name: After Generation
+        run: |
+          cp doc/html/customdoxygen.css doc/html/search/customdoxygen.css
+          cat doc/html_style/customsearch.js >> doc/html/search/search.js
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
