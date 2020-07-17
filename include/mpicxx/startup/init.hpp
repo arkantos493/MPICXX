@@ -1,10 +1,10 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-16
+ * @date 2020-07-18
  * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements wrapper around the MPI initialization functions.
+ * @brief Implements wrapper around the [MPI initialization functions](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm).
  */
 
 #ifndef MPICXX_INITIALIZATION_HPP
@@ -64,6 +64,8 @@ namespace mpicxx {
      * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
+     * @pre The MPI environment **must not** be initialized.
+     *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
      * @calls{ int MPI_Init(int *argc, char ***argv);    // exactly once  }
@@ -79,6 +81,8 @@ namespace mpicxx {
      *          routines are erroneous.
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
+     *
+     * @pre The MPI environment **must not** be initialized.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
@@ -97,9 +101,13 @@ namespace mpicxx {
      *
      *    A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
      *          higher level of thread support. For example if the requested level of thread support is @ref mpicxx::thread_support::single
-     *          (*MPI_THREAD_SINGLE*) an implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
+     *          ([*MPI_THREAD_SINGLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)) an implementation could return
+     *          @ref mpicxx::thread_support::multiple
+     *          ([*MPI_THREAD_MULTIPLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)).
      * @param[in] required the required level of thread support
      * @return the provided level of thread support
+     *
+     * @pre The MPI environment **must not** be initialized.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
@@ -127,11 +135,15 @@ namespace mpicxx {
      *
      *    A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
      *          higher level of thread support. For example if the requested level of thread support is @ref mpicxx::thread_support::single
-     *          (*MPI_THREAD_SINGLE*) an implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
+     *          ([*MPI_THREAD_SINGLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)) an implementation could return
+     *          @ref mpicxx::thread_support::multiple
+     *          ([*MPI_THREAD_MULTIPLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)).
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
      * @param[in] required the requested level of thread support
      * @return the provided level of thread support
+     *
+     * @pre The MPI environment **must not** be initialized.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
@@ -156,8 +168,10 @@ namespace mpicxx {
     /**
      * @brief Query the provided level of thread support.
      * @details Note that the provided level of thread support must **not** be equal to the requested level of thread support but could be
-     *          higher. For example if the requested level of thread support is @ref mpicxx::thread_support::single (*MPI_THREAD_SINGLE*) an
-     *          implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
+     *          higher. For example if the requested level of thread support is @ref mpicxx::thread_support::single
+     *          ([*MPI_THREAD_SINGLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)) an implementation could return
+     *          @ref mpicxx::thread_support::multiple
+     *          ([*MPI_THREAD_MULTIPLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)).
      *
      *    This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
      * @return the provided level of thread support

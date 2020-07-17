@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-15
+ * @date 2020-07-17
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Contains the level of thread support enum.
@@ -66,7 +66,7 @@ namespace mpicxx {
         return out;
     }
     /**
-     * @brief Overload of the @ref mpicxx::to_string function for the @ref mpicxx::thread_support enum class.
+     * @brief Overload of the @ref mpicxx::to_string(T&&) function for the @ref mpicxx::thread_support enum class.
      * @param[in] ts the enum class value
      * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of the enum class value
      * @nodiscard
@@ -78,7 +78,8 @@ namespace mpicxx {
 
     /**
      * @brief Converts the given string to the respective @ref mpicxx::thread_support value.
-     * @details Expects the string value to be the MPI notation (e.g. `"MPI_THREAD_SINGLE"` gets converted to
+     * @details Expects the string value to be the MPI notation
+     *          (e.g. [`"MPI_THREAD_SINGLE"`](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm) gets converted to
      *          @ref mpicxx::thread_support::single).
      * @param[in] sv the enum value represented as a string
      * @return the @ref mpicxx::thread_support representation of @p sv
