@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-18
+ * @date 2020-07-19
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the [MPI initialization functions](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm).
@@ -61,10 +61,11 @@ namespace mpicxx {
 
     /**
      * @brief Initialize the MPI environment.
-     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
      * @pre The MPI environment **must not** be initialized.
+     * @post The MPI environment is initialized, i.e. **any** mpicxx function can be called, except other initialization functions.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
@@ -77,12 +78,13 @@ namespace mpicxx {
     }
     /**
      * @brief Initialize the MPI environment.
-     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
      *
      * @pre The MPI environment **must not** be initialized.
+     * @post The MPI environment is initialized, i.e. **any** mpicxx function can be called, except other initialization functions.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
@@ -96,7 +98,7 @@ namespace mpicxx {
 
     /**
      * @brief Initialize the MPI environment with the required level of thread support (or higher).
-     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
      *    A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
@@ -108,6 +110,7 @@ namespace mpicxx {
      * @return the provided level of thread support
      *
      * @pre The MPI environment **must not** be initialized.
+     * @post The MPI environment is initialized, i.e. **any** mpicxx function can be called, except other initialization functions.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
