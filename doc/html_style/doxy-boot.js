@@ -367,4 +367,9 @@ $( document ).ready(function() {
   $("td.paramname:empty").remove();
   // add whitespace between parameter list and "const"
   $(".memname td:contains(')')").append("&nbsp;");
+
+  $("td.memTemplItemLeft").each(function() {
+      var text = $(this).html();
+      $(this).html(text.substring(0, text.indexOf("requires")));
+  });
 });
