@@ -1,10 +1,11 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-13
+ * @date 2020-07-19
  * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements functions to query the current mpicxx and MPI (library) version.
+ * @brief Implements functions to query the current mpicxx and
+ *        [MPI (library) version](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node209.htm).
  */
 
 #ifndef MPICXX_VERSION_HPP
