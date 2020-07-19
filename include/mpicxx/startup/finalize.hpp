@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-18
+ * @date 2020-07-19
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the [MPI finalization functions](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm).
@@ -42,6 +42,12 @@ namespace mpicxx {
      *          process must perform all MPI calls needed to complete its involvement in MPI communications.
      *
      * @pre The MPI environment **must not** be finalized.
+     * @post The MPI environment has been finalized, i.e. it's illegal to call any mpicxx function.
+     *       The only exceptions are:
+     *         - @ref mpicxx::version::mpi_version(), @ref mpicxx::version::mpi_version_major(), @ref mpicxx::version::mpi_version_minor()
+     *         - @ref mpicxx::version::mpi_library_version(), @ref mpicxx::version::mpi_library_name()
+     *         - @ref mpicxx::initialized(), @ref mpicxx::active(), @ref mpicxx::finalized()
+     *         - other mpicxx functions that don't wrap MPI calls
      *
      * @assert_precondition{ If the MPI environment has already been finalized. }
      *
@@ -103,7 +109,7 @@ namespace mpicxx {
      * @return `0` if the registration succeeded, `1` otherwise
      *
      * @pre The callback function pointer @p func **must not** be the `nullptr`.
-     * @pre The total number of added callback functions **must not** be greater than *MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS*.
+     * @pre The total number of added callback functions **must not** be greater or equal than *MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS*.
      *
      * @assert_precondition{ If @p func is the `nullptr`. \n
      *                       If adding @p func would exceed the size limit. }
