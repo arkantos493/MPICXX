@@ -1,9 +1,9 @@
 /**
  * @file include/mpicxx/core.hpp
  * @author Marcel Breyer
- * @date 2020-06-28
+ * @date 2020-07-19
  *
- * @brief Core header which includes every other necessary header file, i.e. \#`include <mpicxx/core.hpp>` is sufficient to use every
+ * @brief Core header which includes every other necessary header file, i.e. \c \#include` <mpicxx/core.hpp>` is sufficient to use every
  *        function or class of the mpicxx library.
  */
 
