@@ -61,8 +61,7 @@ namespace mpicxx {
      * }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::is_main_pointer<FuncPtr, Args...>
-    inline int main(FuncPtr func, Args&&... args) {
+    inline int main(FuncPtr func, Args&&... args) requires detail::is_main_pointer<FuncPtr, Args...> {
         init();
 
         int ret = std::invoke(func, std::forward<Args>(args)...);
@@ -109,8 +108,7 @@ namespace mpicxx {
      * }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::is_main_args_pointer<FuncPtr, Args...>
-    inline int main(FuncPtr func, int& argc, char** argv, Args&&... args) {
+    inline int main(FuncPtr func, int& argc, char** argv, Args&&... args) requires detail::is_main_args_pointer<FuncPtr, Args...> {
         init(argc, argv);
 
         int ret = std::invoke(func, argc, argv, std::forward<Args>(args)...);
@@ -161,8 +159,7 @@ namespace mpicxx {
      * }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::is_main_pointer<FuncPtr, Args...>
-    inline int main(FuncPtr func, const thread_support required, Args&&... args) {
+    inline int main(FuncPtr func, const thread_support required, Args&&... args) requires detail::is_main_pointer<FuncPtr, Args...> {
         int ret = EXIT_FAILURE;
         try {
             init(required);
@@ -218,8 +215,7 @@ namespace mpicxx {
      * }
      */
     template <typename FuncPtr, typename... Args>
-    requires detail::is_main_args_pointer<FuncPtr, Args...>
-    inline int main(FuncPtr func, int& argc, char** argv, const thread_support required, Args&&... args) {
+    inline int main(FuncPtr func, int& argc, char** argv, const thread_support required, Args&&... args) requires detail::is_main_args_pointer<FuncPtr, Args...> {
         int ret = EXIT_FAILURE;
         try {
             init(argc, argv, required);
