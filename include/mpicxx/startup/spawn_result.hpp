@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-16
+ * @date 2020-07-19
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements the class which gets returned from the @ref mpicxx::single_spawner::spawn(),
@@ -35,7 +35,7 @@ namespace mpicxx {
     /**
      * @nosubgrouping
      * @brief This class implements all functions that can be called on the result of @ref mpicxx::single_spawner::spawn_with_errcodes()
-     *        respectively \n@ref mpicxx::multiple_spawner::spawn_with_errcodes().
+     *        respectively @ref mpicxx::multiple_spawner::spawn_with_errcodes().
      * @details Same as @ref mpicxx::spawn_result but also contains information about potentially error codes.
      */
     class spawn_result_with_errcodes {
@@ -62,9 +62,9 @@ namespace mpicxx {
         /**
          * @brief Returns the number of spawned processes.
          * @details Two possible behaviors:
-         *          -# **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in
+         *          1. **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in
          *             an error (returning `0`).
-         *          -# **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed
+         *          2. **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed
          *             values for the number of spawned processes. If one of these allowed numbers of processes \f$ m_i \f$ can be spawned,
          *             the call to spawn succeeds (returning \f$ m_i \f$). If it isn't possible to spawn one of the allowed number of
          *             processes, the call to spawn results in an error (returning `0`).
@@ -92,7 +92,7 @@ namespace mpicxx {
          * @calls{ int MPI_Comm_remote_size(MPI_Comm comm, int *size);    // at most once }
          */
         [[nodiscard]]
-        bool maxprocs_processes_spawned() const {
+        bool all_processes_spawned() const {
             return errcodes_.size() == static_cast<typename decltype(errcodes_)::size_type>(this->number_of_spawned_processes());
         }
         /**
@@ -105,7 +105,9 @@ namespace mpicxx {
             return intercomm_;
         }
         /**
-         * @brief Returns the errcodes (one for each process) returned by the *MPI_Comm_spawn* respectively *MPI_Comm_spawn_multiple* call.
+         * @brief Returns the errcodes (one for each process) returned by the
+         *        [*MPI_Comm_spawn*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm) respectively
+         *        [*MPI_Comm_spawn_multiple*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm) call.
          * @return the errcodes
          * @nodiscard
          */
@@ -194,9 +196,9 @@ namespace mpicxx {
         /**
          * @brief Returns the number of spawned processes.
          * @details Two possible behaviors:
-         *          -# **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in
+         *          1. **hard** spawn: Either `maxprocs` processes are spawned (returning `maxprocs`) or the call to spawn results in
          *             an error (returning `0`).
-         *          -# **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed
+         *          2. **soft** spawn: The info object may specify an arbitrary set \f$\{m_i : 0 \leq m_i \leq maxprocs \}\f$ of allowed
          *             values for the number of spawned processes. If one of these allowed numbers of processes \f$ m_i \f$ can be spawned,
          *             the call to spawn succeeds (returning \f$ m_i \f$). If it isn't possible to spawn one of the allowed number of
          *             processes, the call to spawn results in an error (returning `0`).
@@ -224,7 +226,7 @@ namespace mpicxx {
          * @calls{ int MPI_Comm_remote_size(MPI_Comm comm, int *size);    // at most once }
          */
         [[nodiscard]]
-        bool maxprocs_processes_spawned() const {
+        bool all_processes_spawned() const {
             return maxprocs_ == this->number_of_spawned_processes();
         }
         /**
@@ -244,18 +246,19 @@ namespace mpicxx {
 
 
     /**
-     * @brief Returns the parent intracommunicator of the current process if the process was started with *MPI_Comm_spawn* or
-     *        *MPI_Comm_spawn_multiple*.
-     * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the parent intracommunicator or
+     * @brief Returns the parent intercommunicator of the current process if the process was started with
+     *        [*MPI_Comm_spawn*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm) or
+     *        [*MPI_Comm_spawn_multiple*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm).
+     * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the parent intercommunicator or
      *         [`std::nullopt`](https://en.cppreference.com/w/cpp/utility/optional/nullopt)
      * @nodiscard
      */
     [[nodiscard]]
     inline std::optional<MPI_Comm> parent_process() {
-        MPI_Comm intracomm;
-        MPI_Comm_get_parent(&intracomm);
-        if (intracomm != MPI_COMM_NULL) {
-            return std::make_optional(intracomm);
+        MPI_Comm intercomm;
+        MPI_Comm_get_parent(&intercomm);
+        if (intercomm != MPI_COMM_NULL) {
+            return std::make_optional(intercomm);
         } else {
             return std::nullopt;
         }
