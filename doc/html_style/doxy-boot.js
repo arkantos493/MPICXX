@@ -368,8 +368,15 @@ $( document ).ready(function() {
   // add whitespace between parameter list and "const"
   $(".memname td:contains(')')").append("&nbsp;");
 
+  // remove requires(...) from brief function description
   $("td.memTemplItemLeft").each(function() {
       var text = $(this).html();
       $(this).html(text.substring(0, text.indexOf("requires")));
+  });
+
+  // correctly display C++20 concepts
+  $("span.concept").each(function() {
+      $(this).closest("tr").prev("tr").find("td.memTemplItemLeft").html($(this).html());
+      $(this).remove();
   });
 });
