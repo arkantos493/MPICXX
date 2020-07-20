@@ -1,7 +1,8 @@
 /**
- * @file include/mpicxx/exception/thread_support_exception.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-22
+ * @date 2020-07-21
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements the exception which gets thrown if the required level of thread support can't be satisfied.
  */
@@ -9,13 +10,12 @@
 #ifndef MPICXX_THREAD_SUPPORT_EXCEPTION_HPP
 #define MPICXX_THREAD_SUPPORT_EXCEPTION_HPP
 
-#include <fmt/color.h>
-#include <fmt/format.h>
-
 #include <mpicxx/detail/source_location.hpp>
 #include <mpicxx/exception/exception.hpp>
 #include <mpicxx/startup/thread_support.hpp>
 
+#include <fmt/color.h>
+#include <fmt/format.h>
 
 namespace mpicxx {
 
@@ -65,6 +65,5 @@ namespace mpicxx {
     };
 
 }
-
 
 #endif // MPICXX_THREAD_SUPPORT_EXCEPTION_HPP

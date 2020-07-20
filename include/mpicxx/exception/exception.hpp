@@ -1,25 +1,25 @@
 /**
- * @file include/mpicxx/exception/exception.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-27
+ * @date 2020-07-21
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Contains the base class for all custom exception in the mpicxx namespace.
- * @details This base class is fully standard conformant, i.e. it provides a public **noexcept** copy constructor and copy assignment
- *          operator.
+ * @details This base class is standard conformant, i.e. it provides a public
+ *          [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) copy constructor and copy assignment operator.
  */
 
 #ifndef MPICXX_EXCEPTION_HPP
 #define MPICXX_EXCEPTION_HPP
 
-#include <memory>
-#include <stdexcept>
-#include <string>
-
-#include <fmt/format.h>
-
 #include <mpicxx/detail/concepts.hpp>
 #include <mpicxx/detail/source_location.hpp>
 
+#include <fmt/format.h>
+
+#include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace mpicxx {
 
@@ -27,8 +27,9 @@ namespace mpicxx {
      * @brief The base class of all exceptions in the mpicxx namespace.
      * @details The @ref mpicxx::detail::source_location class is used to provide more information in case of an exceptional case.
      *
-     *          It uses a [`std::shared_pointer<std::string>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) for the what message
-     *          to be able to provide a **noexcept** copy constructor and copy assignment operator (as requested by the C++ standard).
+     *    It uses a [`std::shared_pointer<std::string>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) for the what message
+     *          to be able to provide a [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) copy constructor and copy
+     *          assignment operator (as requested by the C++ standard).
      */
     class exception : public std::exception {
     public:
@@ -37,7 +38,7 @@ namespace mpicxx {
          * @details If the location message couldn't be constructed, the respective exception gets directly caught to prevent a call to
          *          [`std::terminate`](https://en.cppreference.com/w/cpp/error/terminate) during stack unwinding.
          *
-         *          Prints a detailed stack trace if *MPICXX_ENABLE_STACK_TRACE* has been enabled during the [`CMake`](https://cmake.org/)
+         *          Prints a detailed stack trace if `MPICXX_ENABLE_STACK_TRACE` has been enabled during [`CMake`](https://cmake.org/)'s
          *          configuration step.
          * @param[in] loc the source location information
          */
@@ -47,19 +48,19 @@ namespace mpicxx {
                 fmt::memory_buffer buf;
 
                 msg_ptr_ = std::make_shared<std::string>(fmt::format(
-                           "Exception thrown\n"
-                           "  {}\n"
-                           "  in file     {}\n"
-                           "  in function {}\n"
-                           "  @ line      {}\n\n"
-                           "{}",
-                           (loc.rank().has_value()
-                                ? fmt::format("on MPI_COMM_WORLD rank     {}", loc.rank().value())
-                                : "without a running MPI environment"),
-                           loc.file_name(),
-                           loc.function_name(),
-                           loc.line(),
-                           loc.stack_trace()
+                   "Exception thrown\n"
+                   "  {}\n"
+                   "  in file     {}\n"
+                   "  in function {}\n"
+                   "  @ line      {}\n\n"
+                   "{}",
+                   (loc.rank().has_value()
+                        ? fmt::format("on MPI_COMM_WORLD rank     {}", loc.rank().value())
+                        : "without a running MPI environment"),
+                   loc.file_name(),
+                   loc.function_name(),
+                   loc.line(),
+                   loc.stack_trace()
                 ));
             } catch (...) {
                 // unable to create source location message
@@ -87,8 +88,8 @@ namespace mpicxx {
         }
 
         /**
-         * @brief Returns the created @ref detail::source_location information.
-         * @return the @ref detail::source_location information
+         * @brief Returns the created @ref mpicxx::detail::source_location information.
+         * @return the @ref mpicxx::detail::source_location information
          */
         [[nodiscard]]
         const detail::source_location& location() const noexcept { return loc_; }
@@ -97,12 +98,12 @@ namespace mpicxx {
         /**
          * @brief Tries to prepend @p msg to the current message.
          * @details There are two possible cases:
-         * -# the initial message (containing the @ref detail::source_location message) was created successfully:
-         *    try to prepend @p msg; if an exception is thrown, this function has no effect
-         * -# the initial message (containing the @ref detail::source_location message) was **not** created successfully:
-         *    try to store @p msg; if an exception is thrown, this function has no effect
-         *
-         * @tparam T must meet the @ref mpicxx::detail::is_string requirements.
+         *          1. The initial message (containing the @ref mpicxx::detail::source_location message) was created successfully:
+         *             try to prepend @p msg.\n If an exception is thrown, this function has no effect.
+         *          2. The initial message (containing the @ref mpicxx::detail::source_location message) was **not** created successfully:
+         *             try to store @p msg.\n If an exception is thrown, this function has no effect.
+         * 
+         * @tparam T must meet the @ref mpicxx::detail::is_string requirements
          * @param[in] msg the message to prepend
          */
         template <detail::is_string T>
@@ -124,10 +125,11 @@ namespace mpicxx {
         /**
          * @brief Tries to append @p msg to the current message.
          * @details There are two possible cases:
-         *          -# the initial message (containing the @ref detail::source_location message) was created successfully:
-         *             try to append @p msg; if an exception is thrown, this function has no effect
-         *          -# the initial message (containing the @ref detail::source_location message) was **not** created successfully:
-         *             try to store @p msg; if an exception is thrown, this function has no effect
+         *          1. The initial message (containing the @ref mpicxx::detail::source_location message) was created successfully:
+         *             try to append @p msg.\n If an exception is thrown, this function has no effect.
+         *          2. The initial message (containing the @ref mpicxx::detail::source_location message) was **not** created successfully:
+         *             try to store @p msg.\n If an exception is thrown, this function has no effect.
+         *
          * @tparam T must meet the @ref mpicxx::detail::is_string requirements.
          * @param[in] msg the message to append
          */
@@ -152,8 +154,7 @@ namespace mpicxx {
         std::shared_ptr<std::string> msg_ptr_;
         const detail::source_location loc_;
     };
-
-
+    
 /**
  * @brief Macro to be able to easily use @ref MPICXX_PRETTY_FUNC_NAME__ for a better source location message.
  */
@@ -161,6 +162,5 @@ namespace mpicxx {
     throw except(__VA_ARGS__ __VA_OPT__(,) mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__));
 
 }
-
 
 #endif // MPICXX_EXCEPTION_HPP
