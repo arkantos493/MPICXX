@@ -1,7 +1,8 @@
 /**
- * @file include/mpicxx/detail/conversion.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-28
+ * @date 2020-07-20
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines conversion functions used in the mpicxx library.
  */
@@ -9,14 +10,13 @@
 #ifndef MPICXX_CONVERSION_HPP
 #define MPICXX_CONVERSION_HPP
 
+#include <mpicxx/detail/concepts.hpp>
+
 #include <cstring>
 #include <sstream>
 #include <string>
 #include <type_traits>
 #include <utility>
-
-#include <mpicxx/detail/concepts.hpp>
-
 
 namespace mpicxx {
 
@@ -55,7 +55,8 @@ namespace mpicxx::detail {
     /// @name custom, internally used, C++20 concepts
     ///@{
     /**
-     * @brief Concept that describes a type that can be converted to a
+     * @brief @concept{ @ref has_to_string<T> }
+     *        Concept that describes a type that can be converted to a
      *        [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using the
      *        [`to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
      * @tparam T the compared to type
@@ -63,7 +64,8 @@ namespace mpicxx::detail {
     template <typename T>
     concept has_to_string = requires (T t) { std::to_string(t); } || requires (T t) { to_string(t); };
     /**
-     * @brief Concept that describes a type that can be converted to a
+     * @brief @concept{ @ref has_ostringstream<T> }
+     *        Concept that describes a type that can be converted to a
      *        [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) using the
      *        [`operator<<`](https://en.cppreference.com/w/cpp/language/operators) overload.
      * @tparam T the compared to type
@@ -77,16 +79,17 @@ namespace mpicxx::detail {
     /**
      * @brief Tries to convert the given @p arg to a [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string).
      * @details Tries to use the following ways to convert @p arg (in this order):
-     *          -# If T is a `bool`, returns either `std::string("true")` or `std::string("false")`.
-     *          -# If T is a `char`, returns `std::string(1, arg)`
-     *          -# If T meets the @ref detail::is_string requirements, returns `std::string(std::forward<T>(arg))`.
-     *          -# T can be converted using a [`to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
-     *          -# T can be converted using a [`operator<<`](https://en.cppreference.com/w/cpp/language/operators) overload.
+     *          1. If T is a `bool`, returns either `std::string("true")` or `std::string("false")`.
+     *          2. If T is a `char`, returns `std::string(1, arg)`
+     *          3. If T meets the @ref mpicxx::detail::is_string requirements, returns `std::string(std::forward<T>(arg))`.
+     *          4. T can be converted using a [`to_string`](https://en.cppreference.com/w/cpp/string/basic_string/to_string) function.
+     *          5. T can be converted using a [`operator<<`](https://en.cppreference.com/w/cpp/language/operators) overload.
      *
      *          If @p arg can't be convert using one of this ways, a compiler error is issued.
      * @tparam T the type to convert
      * @param[in] arg the value to convert
-     * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of @p arg (`[[nodiscard]]`)
+     * @return the [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string) representation of @p arg
+     * @nodiscard
      */
     template <typename T>
     [[nodiscard]]
@@ -123,9 +126,10 @@ namespace mpicxx::detail {
     /**
      * @brief Returns a pointer to the string @p str.
      * @details If @p str is a pointer type, returns @p str, otherwise calls [`std::data`](https://en.cppreference.com/w/cpp/iterator/data).
-     * @tparam T must meet the @ref detail::is_string requirements
+     * @tparam T must meet the @ref mpicxx::detail::is_string requirements
      * @param str the string to get the pointer to
-     * @return the pointer to @p str (`[[nodiscard]]`)
+     * @return the pointer to @p str
+     * @nodiscard
      */
     template <is_string T>
     [[nodiscard]]
@@ -138,12 +142,13 @@ namespace mpicxx::detail {
     }
     /**
      * @brief Returns the size of the string @p str.
-     * @tparam T must meet the @ref detail::is_string requirements
+     * @tparam T must meet the @ref mpicxx::detail::is_string requirements
      * @param str the string to get the size from
-     * @return the size of @p str (`[[nodiscard]]`)
+     * @return the size of @p str
+     * @nodiscard
      */
     template <is_string T>
-    [[nodiscard]]
+    [[nodiscard]] 
     constexpr std::size_t convert_to_string_size(const T& str) noexcept {
         if constexpr (std::is_pointer_v<std::decay_t<T>>) {
             return std::strlen(str);
