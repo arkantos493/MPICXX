@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-19
+ * @date 2020-07-24
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the [*MPI_Comm_spawn*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm) function.
@@ -150,7 +150,7 @@ namespace mpicxx {
         /**
          * @brief Adds all command line arguments in the parameter pack @p args to the executable.
          * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
-         *           via @ref mpicxx::detail::convert_to_string
+         *           via @ref mpicxx::detail::convert_to_string and must not be empty
          * @param[in] args the (additional) command line arguments
          * @return `*this`
          *

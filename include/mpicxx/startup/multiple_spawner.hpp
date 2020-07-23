@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-19
+ * @date 2020-07-24
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the
@@ -229,7 +229,7 @@ namespace mpicxx {
         multiple_spawner(std::initializer_list<std::pair<std::string, int>> ilist) : multiple_spawner(ilist.begin(), ilist.end()) { }
         /**
          * @brief Constructs the @ref mpicxx::multiple_spawner object with the contents of the parameter pack @p args.
-         * @tparam T an arbitrary number of pairs meeting the @ref mpicxx::detail::is_pair requirements
+         * @tparam T an arbitrary number (but at least 1) of pairs meeting the @ref mpicxx::detail::is_pair requirements
          * @param[in] args the list of executable names and maxprocs pairs
          *
          * @pre **Any** executable name **must not** be empty.
@@ -274,7 +274,7 @@ namespace mpicxx {
         // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
         /**
          * @brief Constructs the @ref mpicxx::multiple_spawner object with the spawner object(s) of the parameter pack @p args.
-         * @tparam T an arbitrary number of spawners meeting the @ref mpicxx::detail::is_spawner requirements
+         * @tparam T an arbitrary number (but at least 1) of spawners meeting the @ref mpicxx::detail::is_spawner requirements
          * @param[in] args the spawners which should get merged into this @ref mpicxx::multiple_spawner
          *
          * @pre **All** roots **must** be equal.
@@ -384,7 +384,7 @@ namespace mpicxx {
         }
         /**
          * @brief Replaces the old executable names with the new names from the parameter pack @p args.
-         * @tparam T an arbitrary number of string like objects meeting @p mpicxx::detail::is_string requirements
+         * @tparam T an arbitrary number (but at least 1) of string like objects meeting @p mpicxx::detail::is_string requirements
          * @param[in] args the new executable names
          * @return `*this`
          *
@@ -500,7 +500,7 @@ namespace mpicxx {
         /**
          * @brief Adds all command line arguments of the parameter pack @p args to the respective executable.
          * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv version with parameter pack
-         * @tparam T must be a container type or C-style array type
+         * @tparam T must be a container type or C-style array type and must not be empty
          * @param[in] args the lists of the (additional) command line arguments
          * @return `*this`
          *
@@ -580,7 +580,7 @@ namespace mpicxx {
          * @brief Adds all command line arguments in the parameter pack @p args to the @p i-th executable.
          * @details Example: @snippet examples/startup/multiple_spawner.cpp add_argv_at version with parameter pack
          * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
-         *           via @ref mpicxx::detail::convert_to_string
+         *           via @ref mpicxx::detail::convert_to_string and must not be empty
          * @param[in] i the index of the executable
          * @param[in] args the (additional) command line arguments
          * @return `*this`
@@ -744,7 +744,7 @@ namespace mpicxx {
         }
         /**
          * @brief Replaces the old number of processes with the new numbers from the parameter pack @p args.
-         * @tparam T an arbitrary number of integral objects meeting the
+         * @tparam T an arbitrary number (but at least 1) of integral objects meeting the
          *           [`std::integral`](https://en.cppreference.com/w/cpp/concepts/integral) requirements
          * @param[in] args the parameter pack containing the new number of processes
          * @return `*this`
@@ -895,7 +895,7 @@ namespace mpicxx {
          * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
          * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
          *       functionality described.
-         * @tparam T an arbitrary number of @ref mpicxx::info objects meeting the @ref mpicxx::detail::is_info requirements
+         * @tparam T an arbitrary number (but at least 1) of @ref mpicxx::info objects meeting the @ref mpicxx::detail::is_info requirements
          * @param[in] args the new spawn info
          * @return `*this`
          *
