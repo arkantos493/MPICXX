@@ -1,9 +1,10 @@
 /**
- * @file examples/startup/multiple_spawner.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-15
+ * @date 2020-07-24
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Examples for some functions of the mpicxx::multiple_spawner implementation.
+ * @brief Examples for some functions of the @ref mpicxx::multiple_spawner implementation.
  */
 
 //! [add_argv version with iterator range]
