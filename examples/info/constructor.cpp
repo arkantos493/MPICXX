@@ -1,7 +1,8 @@
 /**
- * @file examples/info/constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-25
+ * @date 2020-07-24
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Code snippets for the @ref mpicxx::info constructor implementations.
  */
