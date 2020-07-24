@@ -18,9 +18,7 @@ jobs:
       # mimic CMake's configure step for current setup
       - name: Configure
         run: |
-          sed -i -e 's/@CMAKE_SOURCE_DIR@\///g' doc/Doxyfile.in
           sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' doc/Doxyfile.in
-          sed -i -e 's/@CMAKE_CURRENT_SOURCE_DIR@//g' doc/Doxyfile.in
           grep 'VERSION "' CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' doc/Doxyfile.in
       # generate documentation using doxygen
       - name: Generate
