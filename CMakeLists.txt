@@ -17,6 +17,8 @@ option(MPICXX_ENABLE_TESTS "Generate tests" OFF)
 cmake_dependent_option(MPICXX_ENABLE_DEATH_TESTS "Enables gtest's death tests (not supported with MPI)" OFF
                        "MPICXX_ENABLE_TESTS" OFF)
 option(MPICXX_GENERATE_DOCUMENTATION "Generate documentation" OFF)
+cmake_dependent_option(MPICXX_GENERATE_TEST_DOCUMENTATION "Generate documentation for test cases" OFF
+                       "MPICXX_GENERATE_DOCUMENTATION" OFF)
 option(MPICXX_ENABLE_STACK_TRACE "Enables the generation of stack traces in the source_location class" ON)
 
 # set maximum possible number of atfinalize callback functions
@@ -176,7 +178,15 @@ endif ()
 
 # generate documentation if requested
 if (MPICXX_GENERATE_DOCUMENTATION)
-    message(STATUS "Enabled documentation generation with Doxygen")
+    message(STATUS "Enabled documentation generation using Doxygen")
+    if (MPICXX_GENERATE_TEST_DOCUMENTATION)
+        message(STATUS "Enabled documentation generation for tests using Doxygen")
+        # used to include description of test directory
+        set(MPICXX_TEST_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/)
+    else ()
+        # used to exclude directory description of test directory
+        set(MPICXX_DIR_TEST_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/dirs/test/)
+    endif ()
     add_subdirectory(doc)
 endif ()
 

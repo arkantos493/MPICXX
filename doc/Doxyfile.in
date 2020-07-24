@@ -780,7 +780,7 @@ WARN_LOGFILE           =
 
 INPUT                  = @PROJECT_SOURCE_DIR@/doc/ \
                          @PROJECT_SOURCE_DIR@/include/ \
-                         @PROJECT_SOURCE_DIR@/test/
+                         @MPICXX_TEST_DIRECTORY@
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -816,7 +816,8 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @PROJECT_SOURCE_DIR@/test/gtest-mpi-listener.hpp \
-                         @PROJECT_SOURCE_DIR@/test/main.cpp
+                         @PROJECT_SOURCE_DIR@/test/main.cpp \
+                         @MPICXX_DIR_TEST_DIRECTORY@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
