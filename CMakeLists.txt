@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.14.4)
 
 project("mpicxx" 
         VERSION "0.3.1"
@@ -14,7 +14,7 @@ configure_file(${CONFIG_IN} ${CONFIG_OUT} @ONLY)
 # enable/disable options
 include(CMakeDependentOption)
 option(MPICXX_ENABLE_TESTS "Generate tests" OFF)
-cmake_dependent_option(MPICXX_ENABLE_DEATH_TESTS "Enables gtest's death tests (not support with MPI)" OFF
+cmake_dependent_option(MPICXX_ENABLE_DEATH_TESTS "Enables gtest's death tests (not supported with MPI)" OFF
                        "MPICXX_ENABLE_TESTS" OFF)
 option(MPICXX_GENERATE_DOCUMENTATION "Generate documentation" OFF)
 option(MPICXX_ENABLE_STACK_TRACE "Enables the generation of stack traces in the source_location class" ON)
@@ -37,6 +37,7 @@ if (NOT (${MPICXX_ASSERTION_LEVEL} MATCHES "^[0-9]+$" AND ${MPICXX_ASSERTION_LEV
 endif ()
 message(STATUS "MPICXX_ASSERTION_LEVEL: ${MPICXX_ASSERTION_LEVEL}")
 
+# enable all assertions if death tests are enabled
 if (MPICXX_ENABLE_DEATH_TESTS AND ${MPICXX_ASSERTION_LEVEL} LESS ${max_assertion_level})
     message(WARNING "Enabled highest assertion level because death tests are enabled.")
     set(MPICXX_ASSERTION_LEVEL ${max_assertion_level})
@@ -50,7 +51,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 # set build type to Release if none was specified
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type (Debug/Release)" FORCE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the build type (Debug|Release|RelWithDebInfo|MinSizeRel)" FORCE)
 endif ()
 
 
@@ -59,7 +60,8 @@ if (CMAKE_BUILD_TYPE MATCHES "Release" AND ${MPICXX_ASSERTION_LEVEL} GREATER 0)
     message(WARNING "Build type Release with active assertions: this may negatively impact performance!")
 endif ()
 
-### based on http://dominikberner.ch/cmake-interface-lib/ ###
+
+### based on: http://dominikberner.ch/cmake-interface-lib/ ###
 
 # create header-only (interface) library
 add_library(${PROJECT_NAME} INTERFACE)
@@ -99,7 +101,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
         list(APPEND MPICXX_WARNING_FLAGS -Wduplicated-cond -Wduplicated-branches -Wsuggest-override)
     endif ()
 
-    message(STATUS "Enabled '${MPICXX_WARNING_FLAGS}' compiler flags to catch more potential errors")
+    message(STATUS "Enabled compiler flags: '${MPICXX_WARNING_FLAGS}'")
     target_compile_options(${PROJECT_NAME} INTERFACE ${MPICXX_WARNING_FLAGS})
 endif ()
 
@@ -152,7 +154,7 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 # install headers
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/mpicxx DESTINATION include
         PATTERN "version.hpp.in" EXCLUDE)
-#install documentation if generated
+# install documentation if generated
 if (MPICXX_GENERATE_DOCUMENTATION)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/doc/html DESTINATION share/doc)
 endif ()
@@ -160,16 +162,15 @@ endif ()
 
 # tests for interface library
 if (MPICXX_ENABLE_TESTS)
-    message(STATUS "Enabled tests using google's test framework")
+    message(STATUS "Enabled tests using gtest")
+    if (MPICXX_ENABLE_DEATH_TESTS)
+        message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
+    endif ()
     # install test framework in third_party directory
     include(GoogleTest)
     include(CTest)
     enable_testing()
     add_subdirectory(test)
-endif ()
-
-if (MPICXX_ENABLE_DEATH_TESTS)
-    message(STATUS "Enabled death tests using gtest's ASSERT_DEATH()")
 endif ()
 
 
