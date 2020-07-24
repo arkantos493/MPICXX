@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-19
+ * @date 2020-07-24
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements the class which gets returned from the @ref mpicxx::single_spawner::spawn(),
@@ -35,7 +35,7 @@ namespace mpicxx {
     /**
      * @nosubgrouping
      * @brief This class implements all functions that can be called on the result of @ref mpicxx::single_spawner::spawn_with_errcodes()
-     *        respectively @ref mpicxx::multiple_spawner::spawn_with_errcodes().
+     *        respectively \n@ref mpicxx::multiple_spawner::spawn_with_errcodes().
      * @details Same as @ref mpicxx::spawn_result but also contains information about potentially error codes.
      */
     class spawn_result_with_errcodes {
