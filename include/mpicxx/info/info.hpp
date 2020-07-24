@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-23
+ * @date 2020-07-24
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements a wrapper class around the [*MPI_Info*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) object.
@@ -153,8 +153,8 @@ namespace mpicxx {
 
             /**
              * @brief Convenience overload to be able to directly print a proxy object.
-             * @details Calls @ref operator std::string() const to get the value that should be printed, i.e. if key doesn't exist yet, a
-             *          new [key, value]-pair will be inserted into the info object.
+             * @details Calls @ref operator std::string() const to get the value that should be printed,
+             *          i.e. if key doesn't exist yet, a new [key, value]-pair will be inserted into the info object
              * @param[inout] out the output stream to write on
              * @param[in] rhs the proxy object
              * @return the output stream
@@ -293,9 +293,10 @@ namespace mpicxx {
             using pointer = pointer_impl<value_type>;
             /**
              * @brief [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) reference type
-             *        (**not** meaningful because [`operator*()`](https://en.cppreference.com/w/cpp/language/operator_member_access) and
-             *        [`operator->()`](https://en.cppreference.com/w/cpp/language/operator_member_access) has to return **by-value**
-             *        (using a proxy for write access)).
+             *        (**not** meaningful because
+             *        [`mpicxx::info::iterator_impl::operator*()`](https://en.cppreference.com/w/cpp/language/operator_member_access) and
+             *        [`mpicxx::info::iterator_impl::operator->()`](https://en.cppreference.com/w/cpp/language/operator_member_access) \n
+             *        has to return **by-value** (using a proxy for write access)).
              */
             using reference = value_type;
             /// [`std::iterator_traits`](https://en.cppreference.com/w/cpp/iterator/iterator_traits) iterator category.
@@ -430,7 +431,7 @@ namespace mpicxx {
             ///@{
             /**
              * @brief Compares `*this` and @p rhs for equality.
-             * @details Automatically generates [`operator!=`](https://en.cppreference.com/w/cpp/language/operator_comparison).
+             * @details Automatically generates mpicxx::info::iterator_impl::operator!=.
              *
              *    The iterators `*this` and @p rhs **may not** necessarily have the same constness.
              * @tparam rhs_const
@@ -458,10 +459,8 @@ namespace mpicxx {
             /**
              * @brief [Three-way comparison operator](https://en.cppreference.com/w/cpp/language/default_comparisons) for `*this` and
              *        @p rhs.
-             * @details Automatically generates [`operator<`](https://en.cppreference.com/w/cpp/language/operator_comparison),
-             *          [`operator<=`](https://en.cppreference.com/w/cpp/language/operator_comparison),
-             *          [`operator>`](https://en.cppreference.com/w/cpp/language/operator_comparison) and
-             *          [`operator>=`](https://en.cppreference.com/w/cpp/language/operator_comparison).
+             * @details Automatically generates mpicxx::info::iterator_impl::operator<, mpicxx::info::iterator_impl::operator<=,
+             *          mpicxx::info::iterator_impl::operator> and mpicxx::info::iterator_impl::operator>=.
              *          
              *          The iterators `*this` and @p rhs **may not** necessarily have the same constness.
              * @tparam rhs_const
