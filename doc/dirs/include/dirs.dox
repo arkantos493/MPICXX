@@ -1,0 +1,7 @@
+/**
+ * @dir include/mpicxx
+ * @author Marcel Breyer
+ * @date 2020-07-25
+ *
+ * @brief This directory contains all header files for the mpicxx library.
+ */
