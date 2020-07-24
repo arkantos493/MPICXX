@@ -5,7 +5,7 @@ find_package(Doxygen REQUIRED dot)
 
 # configure doxygen files
 set(DOXYGEN_IN Doxyfile.in)
-set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.in)
+set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.out)
 configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
 
 
