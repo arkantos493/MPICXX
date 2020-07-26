@@ -12,15 +12,15 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Prerequisites
 
-- at least [GCC 10.1](https://gcc.gnu.org/gcc-10/)
-- [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
-- [CMake](https://cmake.org/) (minimum required 3.13)
+- at least [GCC 10.1](https://gcc.gnu.org/gcc-10/); clang isn't supported until it supports the `<concepts>` header
+- [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI v3.1 standard
+- [CMake](https://cmake.org/) (minimum required 3.14.4)
 - [{fmt}](https://github.com/fmtlib/fmt) formatting library
 - [Doxygen](http://www.doxygen.nl/) (for documentation only, version 1.8.11 **required**)
 
 ### Installing
 
-This library supports the normal cmake tool chain.
+This library supports the normal cmake toolchain.
 ```bash
 git clone git@github.com:arkantos493/MPICXX.git
 cd MPICXX
@@ -33,11 +33,13 @@ Supported configuration options are:
 
 - `-DCMAKE_INSTALL_PREFIX=...`: set the installation path (default: `/usr/local/include`)
 
-- `-DMPICXX_ENABLE_TESTS=ON/OFF`: uses the googletest framework (automatically installed if this option is set to `ON`) to enable the target `test` (default: `OFF`)
+- `-DMPICXX_ENABLE_TESTS=ON/OFF`: uses the [googletest](https://github.com/google/googletest) framework (automatically installed if this option is set to `ON`) to enable the target `test` (default: `OFF`)
 
-- `-DMPICXX_ENABLE_DEATH_TESTS=ON/OFF`: enables googletests death tests (currently not supported for MPI during its usage of fork()); only used if `MPICXX_ENABLE_TESTS` is set to `ON` (default: `OFF`)
+- `-DMPICXX_ENABLE_DEATH_TESTS=ON/OFF`: enables gtest's death tests (currently not supported for MPI during its internal usage of fork()); only used if `MPICXX_ENABLE_TESTS` is set to `ON` (default: `OFF`)
 
 - `-DMPICXX_GENERATE_DOCUMENTATION=ON/OFF`: enables the target `doc` documentation; requires Doxygen (default: `OFF`)
+
+- `-DMPICXX_GENERATE_TEST_DOCUMENTATION=ON/OFF`: additionally document test cases; only used if `MPICXX_GENERATE_DOCUMENTATION` is set to `ON` (default: `OFF`)
 
 - `-DMPICXX_ASSERTION_LEVEL=0/1/2`: sets the assertion level; emits a warning if used in `Release` mode (default: `0`)
   - `0`: no assertions are active
@@ -53,6 +55,13 @@ Supported configuration options are:
 After a successful `make` (with a previously `cmake` call with option `-DMPICXX_ENABLE_TESTS=ON`) simply run:
 ```bash
 ctest
+```
+
+## Generate documentation
+
+```bash
+cmake -DMPICXX_GENERATE_DOCUMENTATION=ON -DMPICXX_GENERATE_TEST_DOCUMENTATION=ON ..
+make doc
 ```
 
 ## Deployment
@@ -80,4 +89,4 @@ For usage examples see the [Doxygen documentation](https://arkantos493.github.io
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the <a href="https://github.com/arkantos493/MPICXX/blob/master/LICENSE.md">LICENSE.md</a> file for details.
