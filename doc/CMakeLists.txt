@@ -13,11 +13,11 @@ add_custom_command(
     OUTPUT
         doxygen.stamp
     COMMAND
-        ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/html_style/copy_readme.cmake
+        ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/resources/copy_readme.cmake
     COMMAND
         ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
     COMMAND
-        ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/html_style/append_to_file.cmake
+        ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/resources/append_to_file.cmake
     COMMENT
         "Generating API documentation with Doxygen"
     VERBATIM

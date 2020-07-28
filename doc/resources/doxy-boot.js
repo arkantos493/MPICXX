@@ -363,6 +363,13 @@ $( document ).ready(function() {
       $(navbar).find("li").first().click();
   }
 
+  // fix table on readme page
+  if (current_page === "index.html") {
+      $("td").css("white-space", "normal");
+      $("td").css("vertical-align", "middle");
+      $("th").css("text-align", "center");
+  }
+
   // remove spaces from empty parameter list
   $("td.paramname:empty").remove();
   // add whitespace between parameter list and "const"
