@@ -6,6 +6,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9088a6289f864f19ba5869e103925b30)](https://www.codacy.com/manual/arkantos493/MPICXX?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=arkantos493/MPICXX&amp;utm_campaign=Badge_Grade)
 [![Generic badge](https://img.shields.io/badge/code-documented-<COLOR>.svg)](https://arkantos493.github.io/MPICXX/)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPICH).
 
 ## Getting Started
@@ -20,7 +22,7 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Installing
 
-This library supports the normal cmake toolchain.
+This library supports the normal `CMake` toolchain.
 ```bash
 git clone git@github.com:arkantos493/MPICXX.git
 cd MPICXX
@@ -45,7 +47,7 @@ make -j
 
 ## Running the tests
 
-This library supports `ctest` together with `cmake`:
+This library supports `ctest` together with `CMake`:
 ```bash
 cmake -DMPICXX_ENABLE_TESTS=On ..
 make -j
@@ -54,7 +56,7 @@ ctest
 
 ## Generate the documentation
 
-This library integrates doxygen within `cmake`:
+This library integrates doxygen within `CMake`:
 ```bash
 cmake -DMPICXX_GENERATE_DOCUMENTATION=On ..
 make doc

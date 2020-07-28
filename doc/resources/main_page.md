@@ -14,7 +14,7 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Installing
 
-This library supports the normal cmake toolchain.
+This library supports the normal `CMake` toolchain.
 ```bash
 git clone git@github.com:arkantos493/MPICXX.git
 cd MPICXX
@@ -39,7 +39,7 @@ make -j
 
 ## Running the tests
 
-This library supports `ctest` together with `cmake`:
+This library supports `ctest` together with `CMake`:
 ```bash
 cmake -DMPICXX_ENABLE_TESTS=On ..
 make -j
@@ -48,7 +48,7 @@ ctest
 
 ## Generate the documentation
 
-This library integrates doxygen within `cmake`:
+This library integrates doxygen within `CMake`:
 ```bash
 cmake -DMPICXX_GENERATE_DOCUMENTATION=On ..
 make doc
