@@ -6,7 +6,7 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Prerequisites
 
-- at least [GCC 10.1](https://gcc.gnu.org/gcc-10/); clang isn't supported until it supports the `<concepts>` header
+- [GCC 10.1](https://gcc.gnu.org/gcc-10/) or higher; clang isn't supported until it supports the `<concepts>` header
 - [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI v3.1 standard
 - [CMake](https://cmake.org/) (minimum required 3.14.4)
 - [{fmt}](https://github.com/fmtlib/fmt) formatting library
