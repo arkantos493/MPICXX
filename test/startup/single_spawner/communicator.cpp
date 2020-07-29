@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/communicator.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::single_spawner::set_communicator(MPI_Comm) and @ref mpicxx::single_spawner::communicator() const
  *        member functions provided by the @ref mpicxx::single_spawner class.
@@ -13,14 +14,13 @@
  * | GetCommunicator        | get the current intracommunicator                |
  */
 
-#include <string>
+#include <mpicxx/startup/single_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/single_spawner.hpp>
+#include <string>
 
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, SetCommunicator) {
     // create new single_spawner object

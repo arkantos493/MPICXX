@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/root.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_root(const int) and @ref mpicxx::multiple_spawner::root() const member
  *        function provided by the @ref mpicxx::multiple_spawner class.
@@ -13,13 +14,12 @@
  * | GetRoot        | get the current root process                |
  */
 
-#include <initializer_list>
-#include <utility>
+#include <mpicxx/startup/multiple_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/multiple_spawner.hpp>
-
+#include <initializer_list>
+#include <utility>
 
 TEST(MultipleSpawnerTest, SetRoot) {
     // create new multiple_spawner object

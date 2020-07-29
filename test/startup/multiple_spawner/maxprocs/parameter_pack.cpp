@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/maxprocs/parameter_pack.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_maxprocs(T...) member function provided
  *        by the @ref mpicxx::multiple_spawner class.
@@ -14,13 +15,12 @@
  * | SetMaxprocsViaParameterPackInvalidTotalValue | try to set new number of processes with an invalid total value (death test) |
  */
 
-#include <initializer_list>
-#include <utility>
+#include <mpicxx/startup/multiple_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/multiple_spawner.hpp>
-
+#include <initializer_list>
+#include <utility>
 
 TEST(MultipleSpawnerTest, SetMaxprocsViaParameterPack) {
     // create new multiple_spawner object

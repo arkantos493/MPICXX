@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/maxprocs/getter.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::maxprocs() const and
  * @ref mpicxx::multiple_spawner::maxprocs_at(const std::size_t) const member function provided by the @ref mpicxx::multiple_spawner class.
@@ -13,18 +14,17 @@
  * | GetIthMaxprocsInvalidIndex | illegal index                |
  */
 
+#include <mpicxx/startup/multiple_spawner.hpp>
+#include <test_utility.hpp>
+
+#include <fmt/format.h>
+#include <gtest/gtest.h>
+
 #include <initializer_list>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
-#include <gtest/gtest.h>
-#include <test_utility.hpp>
-
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 
 TEST(MultipleSpawnerTest, GetMaxprocs) {
     // create new multiple_spawner object

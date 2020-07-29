@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/constructor/initializer_list_constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-15
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the
  *        @ref mpicxx::multiple_spawner::multiple_spawner(std::initializer_list<std::string>, std::initializer_list<int>) and
@@ -21,19 +22,18 @@
  * | ConstructFromTwoInitializerListsInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test)                                                                             |
  */
 
+#include <mpicxx/info/runtime_info.hpp>
+#include <mpicxx/startup/multiple_spawner.hpp>
+
+#include <gtest/gtest.h>
+
 #include <initializer_list>
 #include <limits>
 #include <optional>
 #include <string>
 #include <utility>
 
-#include <gtest/gtest.h>
-
-#include <mpicxx/info/runtime_info.hpp>
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 using namespace std::string_literals;
-
 
 TEST(MultipleSpawnerTest, ConstructFromInitializerList) {
     // create new multiple_spawner using a initializer_list

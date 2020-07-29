@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/sizes.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::size() const and @ref mpicxx::multiple_spawner::total_maxprocs() const member
  *        function provided by the @ref mpicxx::multiple_spawner class.
@@ -12,13 +13,12 @@
  * | GetTotalMaxprocs | set a new illegal root process |
  */
 
-#include <initializer_list>
-#include <utility>
+#include <mpicxx/startup/multiple_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/multiple_spawner.hpp>
-
+#include <initializer_list>
+#include <utility>
 
 TEST(MultipleSpawnerTest, GetSize) {
     // create new multiple_spawner objects

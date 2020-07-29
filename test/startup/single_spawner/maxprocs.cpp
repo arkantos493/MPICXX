@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/maxprocs.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::single_spawner::set_maxprocs(int) and @ref mpicxx::single_spawner::maxprocs() const member
  *        functions provided by the @ref mpicxx::single_spawner class.
@@ -13,15 +14,14 @@
  * | GetMaxprocs        | get the current number of maxprocs                |
  */
 
-#include <limits>
-#include <string>
+#include <mpicxx/startup/single_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/single_spawner.hpp>
+#include <limits>
+#include <string>
 
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, SetMaxprocs) {
     // create new single_spawner object
