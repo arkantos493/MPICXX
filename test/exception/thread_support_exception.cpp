@@ -1,7 +1,8 @@
 /**
- * @file test/exception/thread_support_exception.cpp
+ * @file 
  * @author Marcel Breyer
- * @date 2020-06-25
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::thread_support_not_satisfied exception class.
  * @details Testsuite: *ExceptionTest*
@@ -11,10 +12,9 @@
  * | ThrowThreadSupportNotSatisfiedExceptionWithPrettyFunctionName | throw exception with better source location information |
  */
 
-#include <gtest/gtest.h>
-
 #include <mpicxx/exception/thread_support_exception.hpp>
 
+#include <gtest/gtest.h>
 
 namespace {
 
