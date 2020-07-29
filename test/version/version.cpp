@@ -1,19 +1,20 @@
 /**
- * @file test/version/version.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-03-15
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the version constants and function.
  * @details Testsuite: *VersionTest*
- * | test case name | test case description                        |
- * |:---------------|:---------------------------------------------|
- * | MPICXXVersion  | check the mpicxx version constants           |
- * | MPIVersion     | check the mpi version constants and function |
+ * | test case name | test case description                         |
+ * |:---------------|:----------------------------------------------|
+ * | MPICXXVersion  | check the mpicxx version constants            |
+ * | MPIVersion     | check the mpi version constants and functions |
  */
 
-#include <gtest/gtest.h>
-
 #include <mpicxx/version/version.hpp>
+
+#include <gtest/gtest.h>
 
 #include <charconv>
 #include <vector>
@@ -41,10 +42,11 @@ TEST(VersionTest, MPICXXVersion) {
     std::vector<std::string_view> version_splitted = split(mpicxx::version::version);
 
     // correct splitted version numbers
-    std::vector<int> version_splitted_int =
-            { mpicxx::version::version_major,
-              mpicxx::version::version_minor,
-              mpicxx::version::version_patch };
+    std::vector<int> version_splitted_int = {
+            mpicxx::version::version_major,
+            mpicxx::version::version_minor,
+            mpicxx::version::version_patch
+    };
 
     ASSERT_EQ(version_splitted.size(), version_splitted_int.size());
     for (std::size_t i = 0; i < version_splitted.size(); ++i) {
