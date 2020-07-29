@@ -1,22 +1,22 @@
 /**
- * @file test/info/non-member_functions/swap.cpp
+ * @file 
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::swap(info&, info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name    | test case description                                             |
- * |:------------------|:------------------------------------------------------------------|
- * | SwapValidAndValid | swap two info objects                                             |
- * | SwapValidAndNull  | swap two info objects where one of them refers to *MPI_INFO_NULL* |
- * | SwapNullAndNull   | swap two info objects where both refer to *MPI_INFO_NULL*         |
+ * | test case name    | test case description                                                                                                                |
+ * |:------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
+ * | SwapValidAndValid | swap two info objects                                                                                                                |
+ * | SwapValidAndNull  | swap two info objects where one of them refers to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) |
+ * | SwapNullAndNull   | swap two info objects where both refer to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm)         |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(NonMemberFunctionTest, SwapValidAndValid) {
     // create two info objects and add [key, value]-pairs

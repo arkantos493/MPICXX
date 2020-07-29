@@ -1,19 +1,20 @@
 /**
- * @file test/info/env.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-01-29
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::env static const info object provided by the @ref mpicxx::info class.
  * @details Testsuite: *InfoEnvTest*
- * | test case name | test case description                 |
- * |:---------------|:--------------------------------------|
- * | InfoEnv        | check elements against *MPI_INFO_ENV* |
+ * | test case name | test case description                                                                                    |
+ * |:---------------|:---------------------------------------------------------------------------------------------------------|
+ * | InfoEnv        | check elements against [*MPI_INFO_ENV*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) |
  */
+
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
-
-#include <mpicxx/info/info.hpp>
 
 TEST(InfoEnvTest, InfoEnv) {
     // check whether the same amount of keys a present

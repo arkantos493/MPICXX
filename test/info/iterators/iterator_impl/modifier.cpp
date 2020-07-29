@@ -1,7 +1,8 @@
 /**
- * @file test/info/iterators/iterator_impl/modifier.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the modifying operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -21,11 +22,10 @@
  * | RetreatInvalid       | retreat an invalid iterator: `it -= n; it - n;` (death test)         |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(InfoIteratorImplTest, PreIncrementValid) {
     // create info object and add [key, value]-pairs

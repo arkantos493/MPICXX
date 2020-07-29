@@ -1,32 +1,32 @@
 /**
- * @file test/info/modifier/at.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-23
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::at(T&&) and @ref mpicxx::info::at(const std::string_view) const member
- * functions provided by the @ref mpicxx::info class.
+ *        functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name             | test case description                                         |
- * |:---------------------------|:--------------------------------------------------------------|
- * | AtRead                     | read [key, value]-pairs                                       |
- * | ConstAtRead                | read [key, value]-pairs (const info object)                   |
- * | AtWrite                    | overwrite already existing [key, value]-pair                  |
- * | NullAt                     | info object referring to MPI_INFO_NULL (death test)           |
- * | NullConstAt                | const info object referring to MPI_INFO_NULL (death test)     |
- * | AtOutOfRangeException      | try to access a non-existing key                              |
- * | ConstAtOutOfRangeException | try to access a non-existing key (const info object)          |
- * | AtWithIllegalKey           | try to access an illegal key (death test)                     |
- * | ConstAtWithIllegalKey      | try to access an illegal key (const info object) (death test) |
+ * | test case name             | test case description                                                                                                                       |
+ * |:---------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+ * | AtRead                     | read [key, value]-pairs                                                                                                                     |
+ * | ConstAtRead                | read [key, value]-pairs (const info object)                                                                                                 |
+ * | AtWrite                    | overwrite already existing [key, value]-pair                                                                                                |
+ * | NullAt                     | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) (death test)       |
+ * | NullConstAt                | const info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) (death test) |
+ * | AtOutOfRangeException      | try to access a non-existing key                                                                                                            |
+ * | ConstAtOutOfRangeException | try to access a non-existing key (const info object)                                                                                        |
+ * | AtWithIllegalKey           | try to access an illegal key (death test)                                                                                                   |
+ * | ConstAtWithIllegalKey      | try to access an illegal key (const info object) (death test)                                                                               |
  */
 
-#include <stdexcept>
-#include <string>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <stdexcept>
+#include <string>
 
 TEST(ModifierTest, AtRead) {
     // create info object

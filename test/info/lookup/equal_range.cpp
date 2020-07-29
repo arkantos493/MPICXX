@@ -1,30 +1,30 @@
 /**
- * @file test/info/lookup/equal_range.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::equal_range(const std::string_view) and
- * @ref mpicxx::info::equal_range(const std::string_view) const member function provided by the @ref mpicxx::info class.
+ *        @ref mpicxx::info::equal_range(const std::string_view) const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *LookupTest*
- * | test case name                   | test case description                                        |
- * |:---------------------------------|:-------------------------------------------------------------|
- * | EqualRangeExisting               | find key in info object                                      |
- * | ConstEqualRangeExisting          | find key in const info object                                |
- * | EqualRangeNonExisting            | find non-existing key in info object                         |
- * | ConstEqualRangeNonExisting       | find non-existing key in const info object                   |
- * | NullEqualRangeExisting           | info object referring to MPI_INFO_NULL (death test)          |
- * | NullConstEqualRangeExisting      | const info object referring to MPI_INFO_NULL (death test)    |
- * | EqualRangeWithIllegalKey         | try to find an illegal key in info object (death test)       |
- * | ConstEqualRangeWithIllegalKey    | try to find an illegal key in const info object (death test) |
+ * | test case name                   | test case description                                                                                                          |
+ * |:---------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+ * | EqualRangeExisting               | find key in info object                                                                                                        |
+ * | ConstEqualRangeExisting          | find key in const info object                                                                                                  |
+ * | EqualRangeNonExisting            | find non-existing key in info object                                                                                           |
+ * | ConstEqualRangeNonExisting       | find non-existing key in const info object                                                                                     |
+ * | NullEqualRangeExisting           | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test)       |
+ * | NullConstEqualRangeExisting      | const info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | EqualRangeWithIllegalKey         | try to find an illegal key in info object (death test)                                                                         |
+ * | ConstEqualRangeWithIllegalKey    | try to find an illegal key in const info object (death test)                                                                   |
  */
 
-#include <string>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
 
 TEST(LookupTest, EqualRangeExisting) {
     // create info object and add [key, value]-pairs

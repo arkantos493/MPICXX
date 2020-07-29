@@ -1,31 +1,30 @@
 /**
- * @file test/info/lookup/find.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::find(const std::string_view) and @ref mpicxx::info::find(const std::string_view) const
- * member functions provided by the @ref mpicxx::info
- * class.
+ *        member functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *LookupTest*
- * | test case name          | test case description                                        |
- * |:------------------------|:-------------------------------------------------------------|
- * | FindExisting            | find key in info object                                      |
- * | ConstFindExisting       | find key in const info object                                |
- * | FindNonExisting         | find non-existing key in info object                         |
- * | ConstFindNonExisting    | find non-existing key in const info object                   |
- * | NullFind                | info object referring to MPI_INFO_NULL (death test)          |
- * | NullConstFind           | const info object referring to MPI_INFO_NULL (death test)    |
- * | FindWithIllegalKey      | try to find an illegal key in info object (death test)       |
- * | ConstFindWithIllegalKey | try to find an illegal key in const info object (death test) |
+ * | test case name          | test case description                                                                                                          |
+ * |:------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+ * | FindExisting            | find key in info object                                                                                                        |
+ * | ConstFindExisting       | find key in const info object                                                                                                  |
+ * | FindNonExisting         | find non-existing key in info object                                                                                           |
+ * | ConstFindNonExisting    | find non-existing key in const info object                                                                                     |
+ * | NullFind                | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test)       |
+ * | NullConstFind           | const info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | FindWithIllegalKey      | try to find an illegal key in info object (death test)                                                                         |
+ * | ConstFindWithIllegalKey | try to find an illegal key in const info object (death test)                                                                   |
  */
 
-#include <string>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
 
 TEST(LookupTest, FindExisting) {
     // create info object and add [key, value]-pairs

@@ -1,28 +1,32 @@
 /**
- * @file test/info/iterators/iterator.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::begin() and @ref mpicxx::info::end() member functions provided by the
- * @ref mpicxx::info class.
+ *        @ref mpicxx::info class.
  * @details Testsuite: *IteratorsTest*
- * | test case name | test case description                                     |
- * |:---------------|:----------------------------------------------------------|
- * | Iterator       | check for the correct iterator types                      |
- * | IteratorEmpty  | check whether `begin() == end()` for an empty info object |
- * | NullIterator   | info object referring to MPI_INFO_NULL (death test)       |
+ * | test case name | test case description                                                                                                    |
+ * |:---------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | Iterator       | check for the correct iterator types                                                                                     |
+ * | IteratorEmpty  | check whether `begin() == end()` for an empty info object                                                                |
+ * | NullIterator   | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
 
-#include <type_traits>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
+#include <type_traits>
 
+namespace {
 
-template <typename T, typename U>
-constexpr bool check_iterator_type(U) { return std::is_same_v<T, U>; }
+    template <typename T, typename U>
+    constexpr bool check_iterator_type(U) { return std::is_same_v<T, U>; }
+
+}
 
 TEST(IteratorsTest, Iterator) {
     // create info object

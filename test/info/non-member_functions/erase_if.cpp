@@ -1,23 +1,23 @@
 /**
- * @file test/info/non-member_functions/erase_if.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::erase_if(info&, Pred) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name | test case description                                  |
- * |:---------------|:-------------------------------------------------------|
- * | EraseIfNone    | erase nothing from the info object                     |
- * | EraseIfSome    | erase some [key, value]-pairs from the info object     |
- * | EraseIfAll     | erase all [key, value]-pairs from the info object      |
- * | NullEraseIf    | info object ireferring to *MPI_INFO_NULL* (death test) |
+ * | test case name | test case description                                                                                                    |
+ * |:---------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | EraseIfNone    | erase nothing from the info object                                                                                       |
+ * | EraseIfSome    | erase some [key, value]-pairs from the info object                                                                       |
+ * | EraseIfAll     | erase all [key, value]-pairs from the info object                                                                        |
+ * | NullEraseIf    | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(NonMemberFunctionTest, EraseIfNone) {
     // create info object and add [key, value]-pairs
