@@ -45,17 +45,15 @@
 #ifndef GTEST_MPI_MINIMAL_LISTENER_H
 #define GTEST_MPI_MINIMAL_LISTENER_H
 
-#include <cassert>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <iostream>
-
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <fmt/format.h>
-// TODO 2020-02-27 19:09 marcel: change from fmt::format to std::format
+#include <cassert>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
 
 
 namespace GTestMPIListener {
