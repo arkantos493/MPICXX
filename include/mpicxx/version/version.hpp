@@ -1,7 +1,6 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-02
  * @date 2020-07-19
  * @copyright This file is distributed under the MIT License.
  *
@@ -33,7 +32,7 @@ namespace mpicxx::version {
      *
      *    It's in the form of `"version_major.version_minor.version_patch"`.
      */
-    inline constexpr std::string_view version = "0.3.1";
+    inline constexpr std::string_view version = "0.4.0";
     /**
      * @brief The current major version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
@@ -43,12 +42,12 @@ namespace mpicxx::version {
      * @brief The current minor version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    inline constexpr int version_minor = 3;
+    inline constexpr int version_minor = 4;
     /**
      * @brief The current patch version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    inline constexpr int version_patch = 1;
+    inline constexpr int version_patch = 0;
     ///@}
 
     /// @name version details specific to the used MPI standard
