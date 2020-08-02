@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/command.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::single_spawner::set_command(T&&) and @ref mpicxx::single_spawner::command() const member
  *        functions of the @ref mpicxx::single_spawner class.
@@ -13,14 +14,13 @@
  * | GetCommand        | get the current executable name                |
  */
 
-#include <string>
+#include <mpicxx/startup/single_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/single_spawner.hpp>
+#include <string>
 
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, SetCommand) {
     // create new single_spawner object

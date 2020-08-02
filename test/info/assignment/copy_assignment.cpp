@@ -1,7 +1,8 @@
 /**
- * @file test/info/assignment/copy_assignment.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const info&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
@@ -17,11 +18,10 @@
  * | CopyAssignFromNonFreeable | info object should be freeable (despite that the copied-from was non-freeable) |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(AssignmentTest, CopyAssignValidToValid) {
     // create first info object

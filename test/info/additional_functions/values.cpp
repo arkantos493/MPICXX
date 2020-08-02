@@ -1,24 +1,24 @@
 /**
- * @file test/info/additional_functions/values.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::values() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name | test case description                                 |
- * |:---------------|:------------------------------------------------------|
- * | NoValues       | empty info object                                     |
- * | Values         | info object with [key, value]-pairs                   |
- * | NullValues     | info object referring to *MPI_INFO_NULL* (death test) |
+ * | test case name | test case description                                                                                                    |
+ * |:---------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | NoValues       | empty info object                                                                                                        |
+ * | Values         | info object with [key, value]-pairs                                                                                      |
+ * | NullValues     | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
 
-#include <vector>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <vector>
 
 TEST(NonMemberFunctionTest, NoValues) {
     // create empty info object

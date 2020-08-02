@@ -1,7 +1,8 @@
 /**
- * @file test/info/iterators/iterator_impl/distance.cpp
+ * @file 
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the distance calculation of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -11,12 +12,10 @@
  * | DistanceInvalid | calculate the distance between two invalid iterators (death test) |
  */
 
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
-
-#include <mpicxx/info/info.hpp>
-
 
 TEST(InfoIteratorImplTest, DistanceValid) {
     // create info object and add [key, value]-pairs

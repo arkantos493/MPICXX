@@ -4,7 +4,9 @@
 ![Test with clang](https://github.com/arkantos493/MPICXX/workflows/Test%20with%20clang/badge.svg)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9088a6289f864f19ba5869e103925b30)](https://www.codacy.com/manual/arkantos493/MPICXX?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=arkantos493/MPICXX&amp;utm_campaign=Badge_Grade)
-[![Documentation](https://codedocs.xyz/arkantos493/MPICXX.svg)](https://codedocs.xyz/arkantos493/MPICXX/)
+[![Generic badge](https://img.shields.io/badge/code-documented-<COLOR>.svg)](https://arkantos493.github.io/MPICXX/)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPICH).
 
@@ -12,72 +14,87 @@ This library provides a small C++ wrapper for MPI libraries (like OpenMPI or MPI
 
 ### Prerequisites
 
-- at least [GCC 10.1](https://gcc.gnu.org/gcc-10/)
-- [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI 3 standard
-- [CMake](https://cmake.org/) (minimum required 3.13)
+- [GCC 10.1](https://gcc.gnu.org/gcc-10/) or higher; clang isn't supported until it supports the `<concepts>` header
+- [OpenMPI](https://www.open-mpi.org/) or [MPICH](https://www.mpich.org/) supporting the MPI v3.1 standard
+- [CMake](https://cmake.org/) (minimum required 3.14.4)
 - [{fmt}](https://github.com/fmtlib/fmt) formatting library
-- [Doxygen](http://www.doxygen.nl/) (for documentation only)
+- [doxygen](http://www.doxygen.nl/) (for documentation only, version 1.8.11 **required**)
 
 ### Installing
 
-This library supports the normal cmake tool chain.
+This library supports the normal `CMake` toolchain.
 ```bash
 git clone git@github.com:arkantos493/MPICXX.git
 cd MPICXX
 mkdir build && cd build
 cmake [options] ..
-make -j $(nproc)
+make -j
 ```
-Supported configuration options are:
-- `-DCMAKE_BUILD_TYPE=Debug/Release/...` (default: `Release`)
 
-- `-DCMAKE_INSTALL_PREFIX=...`: set the installation path (default: `/usr/local/include`)
+### Supported CMake options (incomplete for options without MPICXX prefix)
 
-- `-DMPICXX_ENABLE_TESTS=ON/OFF`: uses the googletest framework (automatically installed if this option is set to `ON`) to enable the target `test` (default: `OFF`)
-
-- `-DMPICXX_ENABLE_DEATH_TESTS=ON/OFF`: enables googletests death tests (currently not supported for MPI during its usage of fork()); only used if `MPICXX_ENABLE_TESTS` is set to `ON` (default: `OFF`)
-
-- `-DMPICXX_GENERATE_DOCUMENTATION=ON/OFF`: enables the target `doc` documentation; requires Doxygen (default: `OFF`)
-
-- `-DMPICXX_ASSERTION_LEVEL=0/1/2`: sets the assertion level; emits a warning if used in `Release` mode (default: `0`)
-  - `0`: no assertions are active
-  - `1`: only precondition assertions are active
-  - `2`: additional sanity checks are activated
-  
-- `-DMPICXX_ENABLE_STACK_TRACE=ON/OFF`: enable stack traces for the source location implementation (default: `ON`)
-  
-- `-DMPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS=0...N`: sets the maximum number of atfinalize callback functions (default: `32`)
+| option                                       | default value   | description |
+| -------------------------------------------- | :-------------: | ----------- |
+| `CMAKE_BUILD_TYPE`                           | `Release` | specifies the build type on single-configuration generators |
+| `CMAKE_INSTALL_PREFIX`                       | `/usr/local/include` | install directory used by `make install` |
+| `MPICXX_ENABLE_TESTS`                        | `Off` | use the [googletest](https://github.com/google/googletest) framework (automatically installed if this option is set to `On`) to enable the `make test` target |
+| `MPICXX_ENABLE_DEATH_TESTS`                  | `Off` | enables gtest's death tests (currently not supported for MPI during its internal usage of `fork()`); only used if `MPICXX_ENABLE_TESTS` is set to `On` |
+| `MPICXX_GENERATE_DOCUMENTATION`              | `Off` | enables the documentation target `make doc`; requires doxygen |
+| `MPICXX_GENERATE_TEST_DOCUMENTATION`         | `Off` | additionally document test cases; only used if `MPICXX_GENERATE_DOCUMENTATION` is set to `On` |
+| `MPICXX_ASSERTION_LEVEL`                     | `0`   | sets the assertion level; emits a warning if used in `Release` mode; <ul><li>`0` = no assertions</li><li>`1` = only precondition assertions</li><li>`2` = precondition and sanity assertions</li></ul> |
+| `MPICXX_ENABLE_STACK_TRACE`                  | `On`  | enable stack traces for the source location implementation |
+| `DMPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS` | `32`  | sets the maximum number of `atfinalize` callback functions |
 
 ## Running the tests
 
-After a successful `make` (with a previously `cmake` call with option `-DMPICXX_ENABLE_TESTS=ON`) simply run:
+This library supports `ctest` together with `CMake`:
 ```bash
+cmake -DMPICXX_ENABLE_TESTS=On ..
+make -j
 ctest
+```
+
+## Generate the documentation
+
+This library integrates doxygen within `CMake`:
+```bash
+cmake -DMPICXX_GENERATE_DOCUMENTATION=On ..
+make doc
+```
+
+To additionally generate documentation for the test cases:
+```bash
+cmake -DMPICXX_GENERATE_DOCUMENTATION=On -DMPICXX_GENERATE_TEST_DOCUMENTATION=On ..
+make doc
 ```
 
 ## Deployment
 
-To install the library simple use:
+This library supports the `make install` target:
 ```bash
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make install
 ```
-or
+
+For a debug build one should enable assertions:
 ```bash
-sudo make install
+cmake -DCMAKE_BUILD_TYPE=Debug -DMPICXX_ASSERTION_LEVEL=2 ..
+make install
 ```
-To use this library simple add the following lines to your `CMakeLists.txt` file:
+
+To then use this library simple add the following lines to your `CMakeLists.txt` file:
 ```cmake
 # find the library
 find_package(mpicxx CONFIG REQUIRED)
 find_package(fmt REQUIRED)
 
 # link it against your target
-target_link_libraries(target mpicxx::mpicxx)
+target_link_libraries(target PUBLIC mpicxx::mpicxx)
 ```
 
 ## Examples
-For usage examples see the [Doxygen documentation](https://codedocs.xyz/arkantos493/MPICXX/) or the [Wiki](https://github.com/arkantos493/MPICXX/wiki).
+For usage examples see the [doxygen documentation](https://arkantos493.github.io/MPICXX/) or the [wiki](https://github.com/arkantos493/MPICXX/wiki).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the <a href="https://github.com/arkantos493/MPICXX/blob/master/LICENSE.md">LICENSE.md</a> file for details.

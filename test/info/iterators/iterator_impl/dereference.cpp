@@ -1,22 +1,22 @@
 /**
- * @file test/info/iterators/iterator_impl/dereference.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the dereference operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
- * | test case name        | test case description                                                                    |
- * |:----------------------|:-----------------------------------------------------------------------------------------|
- * | DereferenceValid      | dereference valid iterator via `operator[]`, `operator*` and `operator->`                |
- * | ConstDereferenceValid | dereference valid const_iterator via `operator[]`, `operator*` and `operator->`          |
- * | DereferenceInvalid    | dereference invalid iterator via `operator[]`, `operator*` and `operator->` (death test) |
+ * | test case name        | test case description                                                                                                                      |
+ * |:----------------------|:-------------------------------------------------------------------------------------------------------------------------------------------|
+ * | DereferenceValid      | dereference valid iterator via [member access operators](https://en.cppreference.com/w/cpp/language/operator_member_access)                |
+ * | ConstDereferenceValid | dereference valid const_iterator via [member access operators](https://en.cppreference.com/w/cpp/language/operator_member_access)          |
+ * | DereferenceInvalid    | dereference invalid iterator via [member access operators](https://en.cppreference.com/w/cpp/language/operator_member_access) (death test) |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(InfoIteratorImplTest, DereferenceValid) {
     // create info object and add [key, value]-pairs

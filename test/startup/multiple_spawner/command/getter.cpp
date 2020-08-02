@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/command/getter.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::command() const and
  *        @ref mpicxx::multiple_spawner::command_at(const std::size_t) const member function provided by the
@@ -14,20 +15,19 @@
  * | GetIthExecutableNameInvalidIndex | illegal index            |
  */
 
+#include <mpicxx/startup/multiple_spawner.hpp>
+#include <test_utility.hpp>
+
+#include <fmt/format.h>
+#include <gtest/gtest.h>
+
 #include <initializer_list>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-#include <gtest/gtest.h>
-#include <test_utility.hpp>
-
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 using namespace std::string_literals;
-
 
 TEST(MultipleSpawnerTest, GetExecutableNames) {
     // create new multiple_spawner object

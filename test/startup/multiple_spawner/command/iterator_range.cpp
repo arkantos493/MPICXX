@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/command/iterator_range.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_command(InputIt, InputIt) member function provided
  *        by the @ref mpicxx::multiple_spawner class.
@@ -14,16 +15,15 @@
  * | SetExecutableNamesViaIteratorRangeInvalidName | try to set new executable names with an invalid name (death test) |
  */
 
+#include <mpicxx/startup/multiple_spawner.hpp>
+
+#include <gtest/gtest.h>
+
 #include <cstddef>
 #include <initializer_list>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <gtest/gtest.h>
-
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 
 TEST(MultipleSpawnerTest, SetExecutableNamesViaIteratorRange) {
     // create new multiple_spawner object

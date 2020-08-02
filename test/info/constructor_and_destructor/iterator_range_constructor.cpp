@@ -1,7 +1,8 @@
 /**
- * @file test/info/constructor_and_destructor/iterator_range_constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-01-31
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::info(InputIter, InputIter) member function provided by the  @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
@@ -13,15 +14,14 @@
  * | IteratorRangeIllegalKeyOrValue   | try to construct info object from an illegal key/value (death test) |
  */
 
-#include <string>
-#include <utility>
-#include <vector>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
+#include <utility>
+#include <vector>
 
 TEST(ConstructionTest, IteratorRangeConstruction) {
     // create vector with all [key, value]-pairs

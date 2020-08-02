@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/constructor/parameter_pack_constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(T&&...) member function provided by the
  *        @ref mpicxx::multiple_spawner class.
@@ -14,16 +15,15 @@
  * | ConstructFromParameterPackInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test) |
  */
 
+#include <mpicxx/startup/multiple_spawner.hpp>
+
+#include <gtest/gtest.h>
+
 #include <initializer_list>
 #include <limits>
 #include <optional>
 #include <string>
 #include <utility>
-
-#include <gtest/gtest.h>
-
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 
 TEST(MultipleSpawnerTest, ConstructFromParameterPack) {
     // create new multiple_spawner using variadic templates

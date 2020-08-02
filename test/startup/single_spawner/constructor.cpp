@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::single_spawner class constructors.
  * @details Testsuite: *SingleSpawnerTest*
@@ -15,16 +16,15 @@
  * | ConstructFromPairInvalidMaxprocs | try constructing a new @ref mpicxx::single_spawner object with an illegal maxprocs value using a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) (death test)  |
  */
 
+#include <mpicxx/startup/single_spawner.hpp>
+
+#include <gtest/gtest.h>
+
 #include <limits>
 #include <string>
 #include <utility>
 
-#include <gtest/gtest.h>
-
-#include <mpicxx/startup/single_spawner.hpp>
-
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, ConstructValid) {
     // create new single_spawner object

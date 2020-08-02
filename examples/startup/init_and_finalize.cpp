@@ -1,7 +1,8 @@
 /**
- * @file examples/startup/init_and_finalize.cpp
+ * @file 
  * @author Marcel Breyer
- * @date 2020-02-26
+ * @date 2020-07-16
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Examples for the @ref mpicxx::init() and @ref mpicxx::finalize() implementation.
  */
@@ -11,13 +12,13 @@
 #include <mpicxx/startup/finalize.hpp>
 
 int main() {
-    mpicxx::init();         // don't forget the initialization call (exactly once)!
-    {                       // brackets needed or mpicxx objects would get destroyed after the finalization call which is not permitted
+    mpicxx::init();        // don't forget the initialization call
+    {                      // brackets needed or mpicxx objects would get destroyed after the finalization call
 
         // user code
 
     }
-    mpicxx::finalize();     // don't forget the finalization call (exactly once)!
+    mpicxx::finalize();    // don't forget the finalization call
     return 0;
 }
 //! [normal version without args and thread support]
@@ -26,13 +27,13 @@ int main() {
 #include <mpicxx/startup/finalize.hpp>
 
 int main(int argc, char** argv) {
-    mpicxx::init(argc, argv);   // don't forget the initialization call (exactly once)!
-    {                           // brackets needed or mpicxx objects would get destroyed after the finalization call which is not permitted
+    mpicxx::init(argc, argv);    // don't forget the initialization call
+    {                            // brackets needed or mpicxx objects would get destroyed after the finalization call
 
         // user code
 
     }
-    mpicxx::finalize();         // don't forget the finalization call (exactly once)!
+    mpicxx::finalize();          // don't forget the finalization call
     return 0;
 }
 //! [normal version with args and without thread support]
@@ -42,14 +43,14 @@ int main(int argc, char** argv) {
 
 int main() {
     try {
-        mpicxx::init(mpicxx::thread_support::MULTIPLE);     // don't forget the initialization call (exactly once)!
+        mpicxx::init(mpicxx::thread_support::multiple);    // don't forget the initialization call
 
         // user code
 
     } catch(const mpicxx::thread_support_not_satisfied& e) {
         std::cout << e.what() << std::endl;
     }
-    mpicxx::finalize();                                     // don't forget the finalization call even in case of an exception (exactly once)!
+    mpicxx::finalize();                                    // don't forget the finalization call even in case of an exception
     return 0;
 }
 //! [normal version without args and with thread support]
@@ -59,14 +60,14 @@ int main() {
 
 int main(int argc, char** argv) {
     try {
-        mpicxx::init(argc, argv, mpicxx::thread_support::MULTIPLE);     // don't forget the initialization call (exactly once)!
+        mpicxx::init(argc, argv, mpicxx::thread_support::multiple);    // don't forget the initialization call
 
         // user code
 
     } catch(const mpicxx::thread_support_not_satisfied& e) {
         std::cout << e.what() << std::endl;
     }
-    mpicxx::finalize();                                                 // don't forget the finalization call even in case of an exception (exactly once)!
+    mpicxx::finalize();                                                // don't forget the finalization call even in case of an exception
     return 0;
 }
 //! [normal version with args and thread support]

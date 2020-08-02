@@ -1,25 +1,25 @@
 /**
- * @file test/info/modifier/merge.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::merge(info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name           | test case description                                         |
- * |:-------------------------|:--------------------------------------------------------------|
- * | MergeNonEmptyAndNonEmpty | merge two info objects                                        |
- * | MergeEmptyAndEmpty       | merge two info objects (where `*this` and `source` are empty) |
- * | MergeNonEmptyAndEmpty    | merge two info objects (where `source` is empty)              |
- * | MergeEmptyAndNonEmpty    | merge two info objects (where `*this` is empty)               |
- * | NullMerge                | info object referring to MPI_INFO_NULL (death test)           |
- * | SelfMerge                | perform merge with itself (death test)                        |
+ * | test case name           | test case description                                                                                                    |
+ * |:-------------------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | MergeNonEmptyAndNonEmpty | merge two info objects                                                                                                   |
+ * | MergeEmptyAndEmpty       | merge two info objects (where `*this` and `source` are empty)                                                            |
+ * | MergeNonEmptyAndEmpty    | merge two info objects (where `source` is empty)                                                                         |
+ * | MergeEmptyAndNonEmpty    | merge two info objects (where `*this` is empty)                                                                          |
+ * | NullMerge                | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | SelfMerge                | perform merge with itself (death test)                                                                                   |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(ModifierTest, MergeNonEmptyAndNonEmpty) {
     // create info objects

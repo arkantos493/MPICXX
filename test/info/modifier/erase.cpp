@@ -1,33 +1,33 @@
 /**
- * @file test/info/modifier/erase.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::erase(const_iterator), @ref mpicxx::info::erase(const_iterator, const_iterator)
- * and @ref mpicxx::info::erase(const std::string_view) member functions provided by the @ref mpicxx::info class.
+ *        and @ref mpicxx::info::erase(const std::string_view) member functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name                         | test case description                                      |
- * |:---------------------------------------|:-----------------------------------------------------------|
- * | EraseByIterator                        | erase [key, value]-pair at the given iterator position     |
- * | EraseByIllegalIterator                 | iterator doesn't refer to `*this` info object (death test) |
- * | EraseByIteratorNotDereferenceable      | iterator not dereferenceable (death test)                  |
- * | NullEraseByIterator                    | info object referring to MPI_INFO_NULL (death test)        |
- * | EraseByIteratorRange                   | erase all [key, value]-pairs in the given iterator range   |
- * | EraseByIllegalIteratorRange            | iterator range is not valid (death test)                   |
- * | EraseByIteratorRangeNotDereferenceable | iterators not dereferenceable (death test)                 |
- * | NullEraseByIteratorRange               | info object referring to MPI_INFO_NULL (death test)        |
- * | EraseByKey                             | erase [key, value]-pair with the given key                 |
- * | EraseByIllegalKey                      | try to erase with an illegal key (death test)              |
- * | NullEraseByKey                         | info object referring to MPI_INFO_NULL (death test)        |
+ * | test case name                         | test case description                                                                                                    |
+ * |:---------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | EraseByIterator                        | erase [key, value]-pair at the given iterator position                                                                   |
+ * | EraseByIllegalIterator                 | iterator doesn't refer to `*this` info object (death test)                                                               |
+ * | EraseByIteratorNotDereferenceable      | iterator not dereferenceable (death test)                                                                                |
+ * | NullEraseByIterator                    | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | EraseByIteratorRange                   | erase all [key, value]-pairs in the given iterator range                                                                 |
+ * | EraseByIllegalIteratorRange            | iterator range is not valid (death test)                                                                                 |
+ * | EraseByIteratorRangeNotDereferenceable | iterators not dereferenceable (death test)                                                                               |
+ * | NullEraseByIteratorRange               | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | EraseByKey                             | erase [key, value]-pair with the given key                                                                               |
+ * | EraseByIllegalKey                      | try to erase with an illegal key (death test)                                                                            |
+ * | NullEraseByKey                         | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
 
-#include <string>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
 
 TEST(ModifierTest, EraseByIterator) {
     // create info object

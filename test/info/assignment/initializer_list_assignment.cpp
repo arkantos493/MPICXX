@@ -1,27 +1,27 @@
 /**
- * @file test/info/assignment/initializer_list_assignment.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(const std::initializer_list<value_type>) member function provided by the
  * @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
- * | test case name                         | test case description                                                                     |
- * |:---------------------------------------|:------------------------------------------------------------------------------------------|
- * | AssignInitializerListToValid           | assign all elements of the initializer list to the info object                            |
- * | AssignInitializerListToNull            | assign all elements of the initializer list to the info object referring to MPI_INFO_NULL |
- * | AssignInitializerListToNonFreeable     | assign all elements of the initializer list to the non-freeable info object               |
- * | AssignInitializerListIllegalKeyOrValue | try to assign an illegal key/value to the info object (death test)                        |
+ * | test case name                         | test case description                                                                                                                                          |
+ * |:---------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | AssignInitializerListToValid           | assign all elements of the initializer list to the info object                                                                                                 |
+ * | AssignInitializerListToNull            | assign all elements of the initializer list to the info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) |
+ * | AssignInitializerListToNonFreeable     | assign all elements of the initializer list to the non-freeable info object                                                                                    |
+ * | AssignInitializerListIllegalKeyOrValue | try to assign an illegal key/value to the info object (death test)                                                                                             |
  */
 
-#include <string>
-#include <utility>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
+#include <utility>
 
 TEST(AssignmentTest, AssignInitializerListToValid) {
     // create info object

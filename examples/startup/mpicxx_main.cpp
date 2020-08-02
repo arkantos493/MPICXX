@@ -1,7 +1,8 @@
 /**
- * @file examples/startup/mpicxx_main.cpp
+ * @file 
  * @author Marcel Breyer
- * @date 2020-02-26
+ * @date 2020-07-16
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Examples for the @ref mpicxx::main() implementation.
  */
@@ -19,7 +20,7 @@ int mpicxx_main() {
 }
 
 int main() {
-    return mpicxx::main(&mpicxx_main);   // can't make any mistake related to initialization or finalization!
+    return mpicxx::main(&mpicxx_main);    // can't make any mistake related to initialization or finalization!
 }
 //! [mpicxx_main version without args and thread support]
 //! [mpicxx_main version with args and without thread support]
@@ -35,7 +36,7 @@ int mpicxx_main(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-    return mpicxx::main(&mpicxx_main, argc, argv);   // can't make any mistake related to initialization or finalization!
+    return mpicxx::main(&mpicxx_main, argc, argv);    // can't make any mistake related to initialization or finalization!
 }
 //! [mpicxx_main version with args and without thread support]
 //! [mpicxx_main version without args and with thread support]
@@ -52,7 +53,8 @@ int mpicxx_main() {
 }
 
 int main() {
-    return mpicxx::main(&mpicxx_main, mpicxx::thread_support::MULTIPLE);   // can't make any mistake related to initialization or finalization!
+    // can't make any mistake related to initialization or finalization!
+    return mpicxx::main(&mpicxx_main, mpicxx::thread_support::multiple);
 }
 //! [mpicxx_main version without args and with thread support]
 //! [mpicxx_main version with args and thread support]
@@ -69,6 +71,7 @@ int mpicxx_main(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-    return mpicxx::main(&mpicxx_main, argc, argv, mpicxx::thread_support::MULTIPLE);   // can't make any mistake related to initialization or finalization!
+    // can't make any mistake related to initialization or finalization!
+    return mpicxx::main(&mpicxx_main, argc, argv, mpicxx::thread_support::multiple);
 }
 //! [mpicxx_main version with args and thread support]

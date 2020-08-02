@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/spawn_info/parameter_pack.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_spawn_info(T&&...) member function provided
  *        by the @ref mpicxx::multiple_spawner class.
@@ -12,14 +13,13 @@
  * | SetSpawnInfoViaParameterPackInvalidSize | parameter pack with illegal size (death test) |
  */
 
-#include <initializer_list>
-#include <utility>
-
-#include <gtest/gtest.h>
-
 #include <mpicxx/info/info.hpp>
 #include <mpicxx/startup/multiple_spawner.hpp>
 
+#include <gtest/gtest.h>
+
+#include <initializer_list>
+#include <utility>
 
 TEST(MultipleSpawnerTest, SetSpawnInfoViaParameterPack) {
     // create new multiple_spawner object
