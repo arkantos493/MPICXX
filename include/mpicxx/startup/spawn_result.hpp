@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-24
+ * @date 2020-08-02
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements the class which gets returned from the @ref mpicxx::single_spawner::spawn(),
@@ -52,7 +52,7 @@ namespace mpicxx {
          * @brief Construct a new spawn_result_with_errcodes object.
          * @param[in] maxprocs the total number of spawned processes
          */
-        spawn_result_with_errcodes(const int maxprocs) : errcodes_(maxprocs, -1) { }
+        explicit spawn_result_with_errcodes(const int maxprocs) : errcodes_(maxprocs, -1) { }
 
 
     public:
@@ -186,7 +186,7 @@ namespace mpicxx {
          * @brief Construct a new spawn_result object.
          * @param[in] maxprocs the total number of spawned processes.
          */
-        spawn_result(const int maxprocs) : maxprocs_(maxprocs) { }
+        explicit spawn_result(const int maxprocs) : maxprocs_(maxprocs) { }
 
 
     public:
