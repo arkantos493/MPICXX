@@ -1720,7 +1720,8 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
-                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", detail::convert_to_string_size(key), MPI_MAX_INFO_KEY);
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)",
+                    detail::convert_to_string_size(key, MPI_MAX_INFO_KEY), MPI_MAX_INFO_KEY);
 
             // check whether the key exists
             if (!this->key_exists(key)) {
@@ -1806,7 +1807,8 @@ namespace mpicxx {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
             MPICXX_ASSERT_PRECONDITION(this->legal_string_size(key, MPI_MAX_INFO_KEY),
-                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", detail::convert_to_string_size(key), MPI_MAX_INFO_KEY);
+                    "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)",
+                    detail::convert_to_string_size(key, MPI_MAX_INFO_KEY), MPI_MAX_INFO_KEY);
 
             // create proxy object and forward key
             return proxy(info_, std::forward<T>(key));
@@ -1980,9 +1982,11 @@ namespace mpicxx {
 
             ([&](auto&& pair) {
                 MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.first, MPI_MAX_INFO_KEY),
-                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", detail::convert_to_string_size(pair.first), MPI_MAX_INFO_KEY);
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)",
+                        detail::convert_to_string_size(pair.first, MPI_MAX_INFO_KEY), MPI_MAX_INFO_KEY);
                 MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.second, MPI_MAX_INFO_VAL),
-                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", detail::convert_to_string_size(pair.second), MPI_MAX_INFO_VAL);
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)",
+                        detail::convert_to_string_size(pair.second, MPI_MAX_INFO_VAL), MPI_MAX_INFO_VAL);
 
                 using pair_t = std::remove_cvref_t<decltype(pair)>;
                 // check whether the key exists
@@ -2144,9 +2148,11 @@ namespace mpicxx {
 
             ([&](auto&& pair) {
                 MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.first, MPI_MAX_INFO_KEY),
-                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)", detail::convert_to_string_size(pair.first), MPI_MAX_INFO_KEY);
+                        "Illegal info key: 0 < {} < {} (MPI_MAX_INFO_KEY)",
+                        detail::convert_to_string_size(pair.first, MPI_MAX_INFO_KEY), MPI_MAX_INFO_KEY);
                 MPICXX_ASSERT_PRECONDITION(this->legal_string_size(pair.second, MPI_MAX_INFO_VAL),
-                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", detail::convert_to_string_size(pair.second), MPI_MAX_INFO_VAL);
+                        "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)",
+                        detail::convert_to_string_size(pair.second, MPI_MAX_INFO_VAL), MPI_MAX_INFO_VAL);
 
                 using pair_t = std::remove_cvref_t<decltype(pair)>;
                 MPI_Info_set(info_, detail::convert_to_char_pointer(std::forward<pair_t>(pair).first),

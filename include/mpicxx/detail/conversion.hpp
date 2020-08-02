@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-20
+ * @date 2020-08-02
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines conversion functions used in the mpicxx library.
@@ -12,9 +12,9 @@
 
 #include <mpicxx/detail/concepts.hpp>
 
-#include <cstring>
 #include <sstream>
 #include <string>
+#include <string.h>
 #include <type_traits>
 #include <utility>
 
@@ -149,9 +149,9 @@ namespace mpicxx::detail {
      */
     template <is_string T>
     [[nodiscard]] 
-    constexpr std::size_t convert_to_string_size(const T& str) noexcept {
+    constexpr std::size_t convert_to_string_size(const T& str, [[maybe_unused]] const std::size_t max_size) noexcept {
         if constexpr (std::is_pointer_v<std::decay_t<T>>) {
-            return std::strlen(str);
+            return strnlen(str, max_size);
         } else {
             return std::size(str);
         }
