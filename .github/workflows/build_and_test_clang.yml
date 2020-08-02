@@ -1,6 +1,15 @@
 name: Test with clang
 
-on: [push]
+# only trigger this action on specific events
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   build-clang:
@@ -213,3 +222,16 @@ jobs:
                 -DMPICXX_ASSERTION_LEVEL=2 ..
           make -j
           ctest --output-on-failure
+
+  delete-artifacts-clang:
+    needs: [test-openmpi-clang, test-mpich-clang]
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Delete all artifacts
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            clang
+            OpenMPI-clang
+            MPICH-clang
+            fmt-clang

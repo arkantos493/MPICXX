@@ -1,7 +1,8 @@
 /**
- * @file test/info/assignment/move_assignment.cpp
+ * @file 
  * @author Marcel Breyer
- * @date 2020-04-12
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::operator=(info&&) member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *AssignmentTest*
@@ -16,11 +17,10 @@
  * | MoveAssignFromNonFreeable | info object should be non-freeable (because the copied-from was non-freeable) |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(AssignmentTest, MoveAssignValidToValid) {
     // create first info object

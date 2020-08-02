@@ -1,7 +1,8 @@
 /**
- * @file test/info/iterators/iterator_impl/relational.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the relational operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -22,11 +23,10 @@
  * | CompareConstAndNonConst             | compare const and non-const iterators                            |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(InfoIteratorImplTest, EqualityValidComparison) {
     // create info objects and add [key, value]-pairs

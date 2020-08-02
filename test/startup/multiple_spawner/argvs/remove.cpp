@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/argvs/remove.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::remove_argv(), @ref mpicxx::multiple_spawner::remove_argv_at(const std::size_t)
  *        and @ref mpicxx::multiple_spawner::remove_argv_at(const std::size_t, const std::size_t) member functions provided by the
@@ -16,19 +17,18 @@
  * | RemoveSingleArgvAtOutOfBounce | try removing a single command line arguments of one executable at an out of bounce index |
  */
 
+#include <mpicxx/startup/multiple_spawner.hpp>
+#include <test_utility.hpp>
+
+#include <fmt/format.h>
+#include <gtest/gtest.h>
+
 #include <cstddef>
 #include <initializer_list>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
-#include <gtest/gtest.h>
-#include <test_utility.hpp>
-
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 
 TEST(MultipleSpawnerTest, RemoveArgv) {
     // create new multiple_spawner object

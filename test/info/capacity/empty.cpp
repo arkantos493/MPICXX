@@ -1,22 +1,22 @@
 /**
- * @file test/info/capacity/empty.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::empty() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *CapacityTest*
- * | test case name | test case description                               |
- * |:---------------|:----------------------------------------------------|
- * | Empty          | empty info object                                   |
- * | NonEmpty       | non empty info object                               |
- * | NullEmpty      | info object referring to MPI_INFO_NULL (death test) |
+ * | test case name | test case description                                                                                                    |
+ * |:---------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | Empty          | empty info object                                                                                                        |
+ * | NonEmpty       | non empty info object                                                                                                    |
+ * | NullEmpty      | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(CapacityTest, Empty) {
     // create empty info object

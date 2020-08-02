@@ -1,24 +1,24 @@
 /**
- * @file test/info/iterators/iterator_impl/constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the constructors of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
- * | test case name                 | test case description                                                                     |
- * |:-------------------------------|:------------------------------------------------------------------------------------------|
- * | DefaultConstruct               | default construct a singular iterator (death test)                                        |
- * | ConstructFromInfoObjectValid   | construct an iterator referring to an info object                                         |
- * | ConstructFromInfoObjectInvalid | construct an iterator referring to an info object referring to MPI_INFO_NULL (death test) |
- * | CopyConstructValid             | construct an iterator from another, valid iterator                                        |
- * | CopyConstructInvalid           | construct an iterator from another, invalid iterator (death test)                         |
+ * | test case name                 | test case description                                                                                                                                          |
+ * |:-------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ * | DefaultConstruct               | default construct a singular iterator (death test)                                                                                                             |
+ * | ConstructFromInfoObjectValid   | construct an iterator referring to an info object                                                                                                              |
+ * | ConstructFromInfoObjectInvalid | construct an iterator referring to an info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | CopyConstructValid             | construct an iterator from another, valid iterator                                                                                                             |
+ * | CopyConstructInvalid           | construct an iterator from another, invalid iterator (death test)                                                                                              |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(InfoIteratorImplDeathTest, DefaultConstruct) {
     // default construct iterator

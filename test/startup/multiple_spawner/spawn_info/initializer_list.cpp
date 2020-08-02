@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/spawn_info/initializer_list.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_spawn_info(std::initializer_list<info>) member function provided
  *        by the @ref mpicxx::multiple_spawner class.
@@ -12,14 +13,13 @@
  * | SetSpawnInfoViaInitializerListInvalidSize | [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) with illegal size (death test) |
  */
 
-#include <initializer_list>
-#include <utility>
-
-#include <gtest/gtest.h>
-
 #include <mpicxx/info/info.hpp>
 #include <mpicxx/startup/multiple_spawner.hpp>
 
+#include <gtest/gtest.h>
+
+#include <initializer_list>
+#include <utility>
 
 TEST(MultipleSpawnerTest, SetSpawnInfoViaInitializerList) {
     // create new multiple_spawner object

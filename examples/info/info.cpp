@@ -1,11 +1,13 @@
 /**
- * @file examples/info/info.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-02-16
+ * @date 2020-07-23
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Examples for the @ref mpicxx::info implementation.
  */
 
+//! [mwe]
 #include <iostream>
 
 #include <mpicxx/info/info.hpp>
@@ -43,3 +45,4 @@ int main(int argc, char** argv) {
     MPI_Finalize();
     return 0;
 }
+//! [mwe]

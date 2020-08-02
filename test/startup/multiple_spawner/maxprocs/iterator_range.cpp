@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/maxprocs/iterator_range.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::set_maxprocs(InputIt, InputIt) member function provided
  *        by the @ref mpicxx::multiple_spawner class.
@@ -15,16 +16,15 @@
  * | SetMaxprocsViaIteratorRangeInvalidTotalValue | try to set new number of processes with illegal total value (death test) |
  */
 
+#include <mpicxx/startup/multiple_spawner.hpp>
+
+#include <gtest/gtest.h>
+
 #include <cstddef>
 #include <initializer_list>
 #include <limits>
 #include <utility>
 #include <vector>
-
-#include <gtest/gtest.h>
-
-#include <mpicxx/startup/multiple_spawner.hpp>
-
 
 TEST(MultipleSpawnerTest, SetMaxprocsViaIteratorRange) {
     // create new multiple_spawner object

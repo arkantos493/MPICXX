@@ -1,9 +1,10 @@
 /**
- * @file examples/startup/single_spawner.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-15
+ * @date 2020-07-24
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Examples for some functions of the mpicxx::single_spawner implementation.
+ * @brief Examples for some functions of the @ref mpicxx::single_spawner implementation.
  */
 
 //! [spawn without error codes]

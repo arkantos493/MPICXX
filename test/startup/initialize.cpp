@@ -1,21 +1,21 @@
 /**
- * @file test/startup/initialize.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-03-17
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Test cases for the @ref mpicxx::initialized() function.
+ * @brief Test cases for the initialization functions.
  * @details Testsuite: *StartupTest*
- * | test case name | test case description                              |
- * |:---------------|:---------------------------------------------------|
- * | IsInitialized  | check that *MPI_Init()* has been called            |
- * | IsActive       | check that the MPI environment is currently active |
- * | IsMainThread   | check whether this thread is the main thread       |
+ * | test case name | test case description                                                                                      |
+ * |:---------------|:-----------------------------------------------------------------------------------------------------------|
+ * | IsInitialized  | check that [*MPI_Init()*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm) has been called |
+ * | IsActive       | check that the MPI environment is currently active                                                         |
+ * | IsMainThread   | check whether this thread is the main thread                                                               |
  */
-
-#include <gtest/gtest.h>
 
 #include <mpicxx/startup/init.hpp>
 
+#include <gtest/gtest.h>
 
 TEST(StartupTest, IsInitialized) {
     // MPI should be initialized

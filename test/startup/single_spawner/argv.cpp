@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/argv.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the command line member functions provided by the @ref mpicxx::single_spawner class.
  * @details Testsuite: *SingleSpawnerTest*
@@ -20,20 +21,19 @@
  * | GetArgvSize                     | get the number of all command line arguments                                                                                                |
  */
 
+#include <mpicxx/startup/single_spawner.hpp>
+#include <mpicxx/startup/thread_support.hpp>
+#include <test_utility.hpp>
+
+#include <fmt/format.h>
+#include <gtest/gtest.h>
+
 #include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-#include <gtest/gtest.h>
-#include <test_utility.hpp>
-
-#include <mpicxx/startup/single_spawner.hpp>
-#include <mpicxx/startup/thread_support.hpp>
-
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, AddArgv) {
     // create new single_spawner object

@@ -1,9 +1,12 @@
 /**
- * @file include/mpicxx/version/version.hpp
+ * @file
  * @author Marcel Breyer
  * @date 2020-08-02
+ * @date 2020-07-19
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements functions to query the current mpicxx and MPI version.
+ * @brief Implements functions to query the current mpicxx and
+ *        [MPI (library) version](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node209.htm).
  */
 
 #ifndef MPICXX_VERSION_HPP
@@ -28,7 +31,7 @@ namespace mpicxx::version {
      * @brief The current version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      *
-     *    It's of the form: "version_major.version_minor.version_patch".
+     *    It's in the form of `"version_major.version_minor.version_patch"`.
      */
     inline constexpr std::string_view version = "0.3.1";
     /**
@@ -64,12 +67,15 @@ namespace mpicxx::version {
         }
     }
     /**
-     * @brief The current version of the used MPI standard in the form "mpi_version_major.mpi_version_minor" (e.g. `"3.1"`).
-     * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
-     *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return the MPI standard version (`[[nodiscard]]`)
+     * @brief The current version of the used MPI standard.
+     * @details It's in the form of `"mpi_version_major.mpi_version_minor"`.
      *
-     * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly twice }
+     *    This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
+     *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
+     * @return the MPI standard version
+     * @nodiscard
+     *
+     * @calls{ int MPI_Get_version(int *version, int *subversion);    // exactly once }
      */
     [[nodiscard]]
     inline std::string mpi_version() {
@@ -80,9 +86,10 @@ namespace mpicxx::version {
      * @brief The current major version of the used MPI standard.
      * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
      *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return the MPI standard major version (`[[nodiscard]]`)
+     * @return the MPI standard major version
+     * @nodiscard
      *
-     * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly once }
+     * @calls{ int MPI_Get_version(int *version, int *subversion);    // exactly once }
      */
     [[nodiscard]]
     inline int mpi_version_major() {
@@ -92,9 +99,10 @@ namespace mpicxx::version {
      * @brief The current minor version (subversion) of the used MPI standard.
      * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
      *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return the MPI standard minor version (`[[nodiscard]]`)
+     * @return the MPI standard minor version
+     * @nodiscard
      *
-     * @calls{ int MPI_Get_version(int *version, int *subversion);      // exactly once }
+     * @calls{ int MPI_Get_version(int *version, int *subversion);    // exactly once }
      */
     [[nodiscard]]
     inline int mpi_version_minor() {
@@ -108,9 +116,10 @@ namespace mpicxx::version {
      * @brief The current version of the used MPI library (library specific implementation defined).
      * @details This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
      *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return a library specific version string (`[[nodiscard]]`)
+     * @return a library specific version string
+     * @nodiscard
      *
-     * @calls{ int MPI_Get_library_version(char *version, int *resultlen);      // exactly once }
+     * @calls{ int MPI_Get_library_version(char *version, int *resultlen);    // exactly once }
      */
     [[nodiscard]]
     inline std::string mpi_library_version() {
@@ -121,13 +130,14 @@ namespace mpicxx::version {
     }
     /**
      * @brief The name of the used MPI library.
-     * @details The value is one of: `"Open MPI"`, `"MPICH"`, `"Intel MPI Library"` or `"other"`.
+     * @details The name is one of: `"Open MPI"`, `"MPICH"`, `"Intel MPI Library"` or `"other"`.
      *
      *    This function can be called before @ref mpicxx::init() and after @ref mpicxx::finalize() and is thread safe as required by
      *          the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return the name of the used MPI library (`[[nodiscard]]`)
+     * @return the name of the used MPI library
+     * @nodiscard
      *
-     * @calls{ int MPI_Get_library_version(char *version, int *resultlen);      // exactly once }
+     * @calls{ int MPI_Get_library_version(char *version, int *resultlen);    // exactly once }
      */
     [[nodiscard]]
     inline std::string mpi_library_name() {

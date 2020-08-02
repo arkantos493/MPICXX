@@ -1,11 +1,13 @@
 /**
- * @file examples/detail/source_location.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-19
+ * @date 2020-07-20
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Examples for the @ref mpicxx::detail::source_location implementation.
  */
 
+//! [mwe]
 #include <iostream>
 #include <string_view>
 
@@ -30,3 +32,4 @@ int main() {
 
     return 0;
 }
+//! [mwe]

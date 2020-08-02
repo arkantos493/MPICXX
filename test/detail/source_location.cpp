@@ -1,7 +1,8 @@
 /**
- * @file test/detail/source_location.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-25
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::detail::source_location implementation.
  * @details Testsuite: *DetailTest*
@@ -12,11 +13,11 @@
  * | SourceLocationStackTrace     | test the source location information with pretty function name |
  */
 
-#include <sstream>
+#include <mpicxx/detail/source_location.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/detail/source_location.hpp>
+#include <sstream>
 
 TEST(DetailTest, CurrentSourceLocation) {
     mpicxx::detail::source_location loc = mpicxx::detail::source_location::current();
@@ -28,7 +29,7 @@ TEST(DetailTest, CurrentSourceLocation) {
     EXPECT_STREQ(loc.function_name(), "TestBody");
 
     // test line number
-    EXPECT_EQ(loc.line(), 22);
+    EXPECT_EQ(loc.line(), 23);
 
     // test column number
     EXPECT_EQ(loc.column(), 0);
@@ -50,7 +51,7 @@ TEST(DetailTest, CurrentSourceLocationPrettyFuncName) {
     EXPECT_STREQ(loc.function_name(), "virtual void DetailTest_CurrentSourceLocationPrettyFuncName_Test::TestBody()");
 
     // test line number
-    EXPECT_EQ(loc.line(), 44);
+    EXPECT_EQ(loc.line(), 45);
 
     // test column number
     EXPECT_EQ(loc.column(), 0);

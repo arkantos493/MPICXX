@@ -1,20 +1,20 @@
 /**
- * @file include/mpicxx/startup/init.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-22
+ * @date 2020-07-19
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements wrapper around the MPI initialization functions.
+ * @brief Implements wrapper around the [MPI initialization functions](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm).
  */
 
 #ifndef MPICXX_INITIALIZATION_HPP
 #define MPICXX_INITIALIZATION_HPP
 
-#include <mpi.h>
-
 #include <mpicxx/detail/assert.hpp>
 #include <mpicxx/exception/thread_support_exception.hpp>
 #include <mpicxx/startup/thread_support.hpp>
 
+#include <mpi.h>
 
 namespace mpicxx {
 
@@ -24,8 +24,9 @@ namespace mpicxx {
      * @brief Checks whether @ref mpicxx::init() has completed.
      * @details It is valid to call @ref mpicxx::initialized() before @ref mpicxx::init() and after @ref mpicxx::finalize().
      *
-     *          This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return `true` if @ref mpicxx::init() has completed, otherwise `false` (`[[nodiscard]]`)
+     *    This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
+     * @return `true` if @ref mpicxx::init() has completed, otherwise `false`
+     * @nodiscard
      *
      * @calls{ int MPI_Initialized(int *flag);    // exactly once }
      */
@@ -41,11 +42,14 @@ namespace mpicxx {
      *        @ref mpicxx::finalized() returns `false`.
      * @details It is valid to call any mpicxx function (except the @ref mpicxx::init() functions) while this function returns `true`.
      *
-     *          This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return `true` if currently the MPI environment is active, otherwise `false` (`[[nodiscard]]`)
+     *    This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
+     * @return `true` if currently the MPI environment is active, otherwise `false`
+     * @nodiscard
      *
-     * @calls{ int MPI_Initialized(int *flag);    // exactly once
-     *         int MPI_Finalized(int *flag);      // exactly once }
+     * @calls{
+     * int MPI_Initialized(int *flag);    // exactly once
+     * int MPI_Finalized(int *flag);      // exactly once
+     * }
      */
     [[nodiscard]]
     inline bool active() {
@@ -57,12 +61,15 @@ namespace mpicxx {
 
     /**
      * @brief Initialize the MPI environment.
-     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
+     *
+     * @pre The MPI environment **must not** be initialized.
+     * @post The MPI environment is initialized, i.e. **any** mpicxx function can be called, except other initialization functions.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
-     * @calls{ int MPI_Init(int *argc, char ***argv);       // exactly once  }
+     * @calls{ int MPI_Init(int *argc, char ***argv);    // exactly once  }
      */
     inline void init() {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -71,14 +78,17 @@ namespace mpicxx {
     }
     /**
      * @brief Initialize the MPI environment.
-     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
      *
+     * @pre The MPI environment **must not** be initialized.
+     * @post The MPI environment is initialized, i.e. **any** mpicxx function can be called, except other initialization functions.
+     *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
-     * @calls{ int MPI_Init(int *argc, char ***argv);       // exactly once }
+     * @calls{ int MPI_Init(int *argc, char ***argv);    // exactly once }
      */
     inline void init(int& argc, char** argv) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -88,20 +98,25 @@ namespace mpicxx {
 
     /**
      * @brief Initialize the MPI environment with the required level of thread support (or higher).
-     * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
+     * @details All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
-     *          A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
+     *    A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
      *          higher level of thread support. For example if the requested level of thread support is @ref mpicxx::thread_support::single
-     *          (*MPI_THREAD_SINGLE*) an implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
+     *          ([*MPI_THREAD_SINGLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)) an implementation could return
+     *          @ref mpicxx::thread_support::multiple
+     *          ([*MPI_THREAD_MULTIPLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)).
      * @param[in] required the required level of thread support
      * @return the provided level of thread support
+     *
+     * @pre The MPI environment **must not** be initialized.
+     * @post The MPI environment is initialized, i.e. **any** mpicxx function can be called, except other initialization functions.
      *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
      * @throws mpicxx::thread_support_not_satisfied if the requested level of thread support cannot be satisfied
      *
-     * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once }
+     * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);    // exactly once }
      */
     inline thread_support init(const thread_support required) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -121,19 +136,23 @@ namespace mpicxx {
      * @details All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization
      *          routines are erroneous.
      *
-     *          A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
+     *    A MPI implementation is not required to return the level of thread support requested by @p required if it can provide a
      *          higher level of thread support. For example if the requested level of thread support is @ref mpicxx::thread_support::single
-     *          (*MPI_THREAD_SINGLE*) an implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
+     *          ([*MPI_THREAD_SINGLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)) an implementation could return
+     *          @ref mpicxx::thread_support::multiple
+     *          ([*MPI_THREAD_MULTIPLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)).
      * @param[inout] argc number of command line arguments
      * @param[inout] argv command line arguments
      * @param[in] required the requested level of thread support
      * @return the provided level of thread support
      *
+     * @pre The MPI environment **must not** be initialized.
+     *
      * @assert_precondition{ If the MPI environment has already been initialized. }
      *
      * @throws mpicxx::thread_support_not_satisfied if the requested level of thread support cannot be satisfied
      *
-     * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);       // exactly once }
+     * @calls{ int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);    // exactly once }
      */
     inline thread_support init(int& argc, char** argv, const thread_support required) {
         MPICXX_ASSERT_PRECONDITION(!initialized(), "MPI environment already initialized!");
@@ -152,13 +171,16 @@ namespace mpicxx {
     /**
      * @brief Query the provided level of thread support.
      * @details Note that the provided level of thread support must **not** be equal to the requested level of thread support but could be
-     *          higher. For example if the requested level of thread support is @ref mpicxx::thread_support::single (*MPI_THREAD_SINGLE*) an
-     *          implementation could return @ref mpicxx::thread_support::multiple (*MPI_THREAD_MULTIPLE*).
+     *          higher. For example if the requested level of thread support is @ref mpicxx::thread_support::single
+     *          ([*MPI_THREAD_SINGLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)) an implementation could return
+     *          @ref mpicxx::thread_support::multiple
+     *          ([*MPI_THREAD_MULTIPLE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm)).
      *
-     *          This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return the provided level of thread support (`[[nodiscard]]`)
+     *    This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
+     * @return the provided level of thread support
+     * @nodiscard
      *
-     * @calls{ int MPI_Query_thread(int *provided);     // exactly once }
+     * @calls{ int MPI_Query_thread(int *provided);    // exactly once }
      */
     [[nodiscard]]
     inline thread_support provided_thread_support() {
@@ -170,9 +192,10 @@ namespace mpicxx {
     /**
      * @brief Returns `true` if this thread is the main thread, i.e. the thread that called @ref mpicxx::init().
      * @details This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-     * @return `true` if this is the main thread, otherwise `false` (`[[nodiscard]]`)
+     * @return `true` if this is the main thread, otherwise `false`
+     * @nodiscard
      *
-     * @calls{ int MPI_Is_thread_main(int *flag);       // exactly once }
+     * @calls{ int MPI_Is_thread_main(int *flag);    // exactly once }
      */
     [[nodiscard]]
     inline bool is_main_thread() {
@@ -183,6 +206,5 @@ namespace mpicxx {
     ///@}
 
 }
-
 
 #endif // MPICXX_INITIALIZATION_HPP

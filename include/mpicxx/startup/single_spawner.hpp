@@ -1,23 +1,14 @@
 /**
- * @file include/mpicxx/startup/single_spawner.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-17
+ * @date 2020-07-24
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Implements wrapper around the *MPI_COMM_SPAWN* function.
+ * @brief Implements wrapper around the [*MPI_Comm_spawn*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm) function.
  */
 
 #ifndef MPICXX_SINGLE_SPAWNER_HPP
 #define MPICXX_SINGLE_SPAWNER_HPP
-
-#include <cstddef>
-#include <stdexcept>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
-#include <fmt/format.h>
-#include <mpi.h>
 
 #include <mpicxx/detail/assert.hpp>
 #include <mpicxx/detail/concepts.hpp>
@@ -26,6 +17,15 @@
 #include <mpicxx/info/runtime_info.hpp>
 #include <mpicxx/startup/spawn_result.hpp>
 
+#include <fmt/format.h>
+#include <mpi.h>
+
+#include <cstddef>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace mpicxx {
 
@@ -46,8 +46,8 @@ namespace mpicxx {
         /// @name constructor
         ///@{
         /**
-         * @brief Construct a new @ref single_spawner object.
-         * @tparam T must meet the @p detail::is_string requirements.
+         * @brief Construct a new @ref mpicxx::single_spawner object.
+         * @tparam T must meet the @p mpicxx::detail::is_string requirements
          * @param[in] command name of the executable
          * @param[in] maxprocs maximum number of processes
          *
@@ -66,8 +66,8 @@ namespace mpicxx {
                     maxprocs, mpicxx::universe_size().value_or(std::numeric_limits<int>::max()));
         }
         /**
-         * @brief Construct a new @ref single_spawner object.
-         * @tparam T must meet the @p detail::is_string requirements.
+         * @brief Construct a new @ref mpicxx::single_spawner object.
+         * @tparam T must meet the @p mpicxx::detail::is_string requirements
          * @param[in] pair a [`std::pair`](https://en.cppreference.com/w/cpp/utility/pair) containing the executable name and the
          *                 maximum number of processes
          *
@@ -79,7 +79,7 @@ namespace mpicxx {
          *                 If maxprocs (@p pair.second) is invalid. }
          */
         template <detail::is_string T>
-        single_spawner(std::pair<T, int> pair) : single_spawner(std::move(pair.first), pair.second) { }
+        explicit single_spawner(std::pair<T, int> pair) : single_spawner(std::move(pair.first), pair.second) { }
         ///@}
 
 
@@ -90,7 +90,7 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Replace the old executable name with the new executable name @p command.
-         * @tparam T must meet the @p detail::is_string requirements.
+         * @tparam T must meet the @p mpicxx::detail::is_string requirements
          * @param[in] command the new executable name
          * @return `*this`
          *
@@ -109,7 +109,7 @@ namespace mpicxx {
 
         /**
          * @brief Adds all command line arguments in the range [@p first, @p last) to the executable.
-         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator).
+         * @tparam InputIt must meet the requirements of [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator)
          * @param[in] first iterator to the first command line argument in the range
          * @param[in] last iterator one-past the last command line argument in the range
          * @return `*this`
@@ -135,7 +135,7 @@ namespace mpicxx {
          * @brief Adds all command line arguments in the
          *        [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) @p ilist to the executable.
          * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
-         *           via @ref detail::convert_to_string.
+         *           via @ref mpicxx::detail::convert_to_string
          * @param[in] ilist the (additional) command line arguments
          * @return `*this`
          *
@@ -150,7 +150,7 @@ namespace mpicxx {
         /**
          * @brief Adds all command line arguments in the parameter pack @p args to the executable.
          * @tparam T must be convertible to [`std::string`](https://en.cppreference.com/w/cpp/string/basic_string)
-         *           via @ref detail::convert_to_string.
+         *           via @ref mpicxx::detail::convert_to_string and must not be empty
          * @param[in] args the (additional) command line arguments
          * @return `*this`
          *
@@ -194,7 +194,6 @@ namespace mpicxx {
         /**
          * @brief Set the info object representing additional information for the runtime system where and how to spawn the processes.
          * @details As of [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf) reserved keys are:
-         *
          * key  | description
          * :----| :--------------------------------------------------------------------------------------------------------------------------------------------------|
          * host | a hostname                                                                                                                                         |
@@ -203,7 +202,6 @@ namespace mpicxx {
          * path | a directory or set of directories where the MPI implementation should look for the executable                                                      |
          * file | a name of a file in which additional information is specified                                                                                      |
          * soft | a set of numbers which are allowed for the number of processes that can be spawned                                                                 |
-         *
          * @note An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the
          *       functionality described.
          * @param[in] spawn_info copy of the @ref info object
@@ -220,7 +218,8 @@ namespace mpicxx {
          * @return `*this`
          *
          * @pre @p root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
+         *      @ref set_communicator(MPI_Comm) or default
+         *      [*MPI_COMM_WORLD*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)).
          *
          * @assert_sanity{ If @p root isn't a legal root. }
          */
@@ -238,10 +237,11 @@ namespace mpicxx {
          * @param[in] comm an intracommunicator
          * @return `*this`
          *
-         * @pre @p comm **must not** be *MPI_COMM_NULL*.
+         * @pre @p comm **must not** be [*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm).
          * @pre The currently specified rank (as returned by @ref root()) **must be** valid in @p comm.
          *
-         * @assert_precondition{ If @p comm is the null communicator (*MPI_COMM_NULL*). }
+         * @assert_precondition{ If @p comm is the null communicator
+         *                       ([*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)). }
          * @assert_sanity{ If the currently specified root isn't valid in @p comm. }
          */
         single_spawner& set_communicator(MPI_Comm comm) noexcept {
@@ -262,21 +262,26 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Returns the name of the executable which should get spawned.
-         * @return the executable name (`[[nodiscard]]`)
+         * @return the executable name
+         * @nodiscard
          */
         [[nodiscard]]
         const std::string& command() const noexcept { return command_; }
 
         /**
          * @brief Returns all command line arguments.
-         * @return the command line arguments (`[[nodiscard]]`)
+         * @return the command line arguments
+         * @nodiscard
          */
         [[nodiscard]]
         const std::vector<std::string>& argv() const noexcept { return argvs_; }
         /**
          * @brief Returns the @p i-th command line argument.
          * @param[in] i the index of the command line argument
-         * @return the @p i-th command line argument (`[[nodiscard]]`)
+         * @return the @p i-th command line argument
+         * @nodiscard
+         *
+         * @pre @p i **must not** be greater than `this->argv_size()`.
          *
          * @throws std::out_of_range if the index @p i falls outside the valid range
          */
@@ -292,7 +297,8 @@ namespace mpicxx {
         }
         /**
          * @brief Returns the number of command line arguments.
-         * @return the number of command line arguments (`[[nodiscard]]`)
+         * @return the number of command line arguments
+         * @nodiscard
          */
         [[nodiscard]]
         argv_size_type argv_size() const noexcept {
@@ -301,28 +307,32 @@ namespace mpicxx {
 
         /**
          * @brief Returns the number of processes.
-         * @return the number of processes (`[[nodiscard]]`)
+         * @return the number of processes
+         * @nodiscard
          */
         [[nodiscard]]
         int maxprocs() const noexcept { return maxprocs_; }
 
         /**
          * @brief Returns the info object.
-         * @return the info object (`[[nodiscard]]`)
+         * @return the info object
+         * @nodiscard
          */
         [[nodiscard]]
         const info& spawn_info() const noexcept { return info_; }
 
         /**
          * @brief Returns the rank of the root process.
-         * @return the root rank (`[[nodiscard]]`)
+         * @return the root rank
+         * @nodiscard
          */
         [[nodiscard]]
         int root() const noexcept { return root_; }
 
         /**
          * @brief Returns the intracommunicator containing the group of spawning processes.
-         * @return the intracommunicator (`[[nodiscard]]`)
+         * @return the intracommunicator
+         * @nodiscard
          */
         [[nodiscard]]
         MPI_Comm communicator() const noexcept { return comm_; }
@@ -338,7 +348,7 @@ namespace mpicxx {
          * @brief Spawns a number of MPI processes according to the previously set options.
          * @details The returned @ref mpicxx::spawn_result object **only** contains the intercommunicator.
          *
-         * Example: @snippet examples/startup/single_spawner.cpp spawn without error codes
+         *    Example: @snippet examples/startup/single_spawner.cpp spawn without error codes
          * @return the result of the spawn invocation
          *
          * @pre The executable name **must not** be empty.
@@ -346,17 +356,19 @@ namespace mpicxx {
          * @pre maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          *      (@ref mpicxx::universe_size()).
          * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
-         * @pre comm **must not** be *MPI_COMM_NULL*.
+         *      @ref set_communicator(MPI_Comm) or default
+         *      [*MPI_COMM_WORLD*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)).
+         * @pre comm **must not** be [*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm).
          *
          * @assert_precondition{ If the executable name is empty. \n
          *                       If any command line argument is empty. \n
          *                       If maxprocs is invalid. \n
          *                       If root isn't a legal root. \n
-         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
+         *                       If comm is the null communicator
+         *                       ([*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)). }
          *
          * @calls{
-         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);    // exactly once
          * }
          */
         spawn_result spawn() {
@@ -367,7 +379,7 @@ namespace mpicxx {
          * @details The returned @ref mpicxx::spawn_result_with_errcodes object contains the intercommunicator **and** information about the
          *          possibly occurring error codes.
          *
-         *          Example: @snippet examples/startup/single_spawner.cpp spawn with error codes
+         *    Example: @snippet examples/startup/single_spawner.cpp spawn with error codes
          * @return the result of the spawn invocation
          *
          * @pre The executable name **must not** be empty.
@@ -375,17 +387,19 @@ namespace mpicxx {
          * @pre maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          *      (@ref mpicxx::universe_size()).
          * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
-         * @pre comm **must not** be *MPI_COMM_NULL*.
+         *      @ref set_communicator(MPI_Comm) or default
+         *      [*MPI_COMM_WORLD*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)).
+         * @pre comm **must not** be [*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm).
          *
          * @assert_precondition{ If the executable name is empty. \n
          *                       If any command line argument is empty. \n
          *                       If maxprocs is invalid. \n
          *                       If root isn't a legal root. \n
-         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
+         *                       If comm is the null communicator
+         *                       ([*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)). }
          *
          * @calls{
-         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);    // exactly once
          * }
          */
         spawn_result_with_errcodes spawn_with_errcodes() {
@@ -395,10 +409,10 @@ namespace mpicxx {
 
 
     private:
-
         /*
          * @brief Spawns a number of MPI processes according to the previously set options.
-         * @details Removes empty values before getting passed to *MPI_COMM_SPAWN*.
+         * @details Removes empty values before getting passed to
+         *          [*MPI_Comm_spawn*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm).
          * @tparam return_type either @ref mpicxx::spawn_result or @ref mpicxx::spawn_result_with_errcodes
          * @return the result of the spawn invocation
          *
@@ -407,17 +421,19 @@ namespace mpicxx {
          * @pre maxprocs **must not** be less or equal than `0` or greater than the maximum possible number of processes
          *      (@ref mpicxx::universe_size()).
          * @pre root **must not** be less than `0` and greater or equal than the size of the communicator (set via
-         *      @ref set_communicator(MPI_Comm) or default *MPI_COMM_WORLD*).
-         * @pre comm **must not** be *MPI_COMM_NULL*.
+         *      @ref set_communicator(MPI_Comm) or default
+         *      [*MPI_COMM_WORLD*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)).
+         * @pre comm **must not** be [*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm).
          *
          * @assert_precondition{ If the executable name is empty. \n
          *                       If any command line argument is empty. \n
          *                       If maxprocs is invalid. \n
          *                       If root isn't a legal root. \n
-         *                       If comm is the null communicator (*MPI_COMM_NULL*). }
+         *                       If comm is the null communicator
+         *                       ([*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm)). }
          *
          * @calls{
-         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);       // exactly once
+         * int MPI_Comm_spawn(const char *command, char *argv[], int maxprocs, MPI_Info info, int root, MPI_Comm comm, MPI_Comm *intercomm, int array_of_errcodes[]);    // exactly once
          * }
          */
         template <typename return_type>
@@ -507,7 +523,7 @@ namespace mpicxx {
         /*
          * @brief Checks whether @p maxprocs is valid.
          * @details Checks whether @p maxprocs is greater than `0`. In addition, if the universe size could be queried, it's checked
-         *          whether @p maxprocs is less or equal than the universe size.
+         *          whether @p maxprocs is less or equal than the @ref mpicxx::universe_size().
          * @param[in] maxprocs the number of processes which should be spawned
          * @return `true` if @p maxprocs is legal, `false` otherwise
          */
@@ -539,7 +555,8 @@ namespace mpicxx {
             return size;
         }
         /*
-         * @brief Checks whether @p comm is valid, i.e. it does **not** refer to *MPI_COMM_NULL*.
+         * @brief Checks whether @p comm is valid, i.e. it does **not** refer to
+         *        [*MPI_COMM_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm).
          * @param[in] comm a intercommunicator
          * @return `true` if @p comm is valid, `false` otherwise
          */
@@ -556,10 +573,9 @@ namespace mpicxx {
         MPI_Comm comm_ = MPI_COMM_WORLD;
     };
 
-    /// default spawner is a @ref single_spawner
+    /// The default spawner is a @ref single_spawner.
     using spawner = single_spawner;
 
 }
-
 
 #endif // MPICXX_SINGLE_SPAWNER_HPP

@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/root.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::single_spawner::set_root(int) and @ref mpicxx::single_spawner::root() const member functions
  *        provided by the @ref mpicxx::single_spawner class.
@@ -13,14 +14,13 @@
  * | GetRoot        | get the current root process                |
  */
 
-#include <string>
+#include <mpicxx/startup/single_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/single_spawner.hpp>
+#include <string>
 
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, SetRoot) {
     // create new single_spawner object

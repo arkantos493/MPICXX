@@ -1,26 +1,26 @@
 /**
- * @file test/info/lookup/count.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Test cases for the @ref mpicxx::info::count(const std::string_view) const member function provided by the @ref mpicxx::info
- * class.
+ * @brief Test cases for the @ref mpicxx::info::count(const std::string_view) const member function provided by the
+ *        @ref mpicxx::info class.
  * @details Testsuite: *LookupTest*
- * | test case name      | test case description                               |
- * |:--------------------|:----------------------------------------------------|
- * | CountExisting       | count existing keys                                 |
- * | CountNonExisting    | count non-existing key                              |
- * | NullCount           | info object referring to MPI_INFO_NULL (death test) |
- * | CountWithIllegalKey | try to count an illegal key (death test)            |
+ * | test case name      | test case description                                                                                                    |
+ * |:--------------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | CountExisting       | count existing keys                                                                                                      |
+ * | CountNonExisting    | count non-existing key                                                                                                   |
+ * | NullCount           | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | CountWithIllegalKey | try to count an illegal key (death test)                                                                                 |
  */
 
-#include <string>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
 
 TEST(LookupTest, CountExisting) {
     // create info object and add [key, value]-pairs

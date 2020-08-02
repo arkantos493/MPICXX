@@ -1,7 +1,8 @@
 /**
- * @file test/startup/multiple_spawner/constructor/spawner_constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-02
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::multiple_spawner::multiple_spawner(T&&...) member function provided by the
  *        @ref mpicxx::multiple_spawner class.
@@ -12,14 +13,13 @@
  * | ConstructFromSpawnerInvalidTotalMaxprocs | try to construct a multiple_spawner object with an illegal total maxprocs number (death test) |
  */
 
-#include <initializer_list>
-#include <utility>
-
-#include <gtest/gtest.h>
-
 #include <mpicxx/startup/single_spawner.hpp>
 #include <mpicxx/startup/multiple_spawner.hpp>
 
+#include <gtest/gtest.h>
+
+#include <initializer_list>
+#include <utility>
 
 TEST(MultipleSpawnerTest, ConstructFromSpawner) {
     // create new multiple_spawner using other spawners

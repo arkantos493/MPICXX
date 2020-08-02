@@ -1,7 +1,8 @@
 /**
- * @file test/startup/single_spawner/spawn_info.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-06-04
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::single_spawner::set_spawn_info(info) and @ref mpicxx::single_spawner::spawn_info() const member
  *        functions provided by the @ref mpicxx::single_spawner class.
@@ -12,14 +13,13 @@
  * | GetSpawnInfo      | get the current spawn @ref mpicxx::info object   |
  */
 
-#include <string>
+#include <mpicxx/startup/single_spawner.hpp>
 
 #include <gtest/gtest.h>
 
-#include <mpicxx/startup/single_spawner.hpp>
+#include <string>
 
 using namespace std::string_literals;
-
 
 TEST(SingleSpawnerTest, SetSpawnInfo) {
     // create new single_spawner object
