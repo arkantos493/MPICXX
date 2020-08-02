@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-24
+ * @date 2020-08-02
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements a wrapper class around the [*MPI_Info*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) object.
@@ -25,6 +25,7 @@
 #include <functional>
 #include <initializer_list>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <ostream>
 #include <stdexcept>
@@ -2490,13 +2491,12 @@ namespace mpicxx {
                     // get the value associated with source_key
                     int valuelen, flag;
                     MPI_Info_get_valuelen(source.info_, source_key, &valuelen, &flag);
-                    char* source_value = new char[valuelen + 1];
-                    MPI_Info_get(source.info_, source_key, valuelen, source_value, &flag);
+                    auto source_value = std::make_unique<char[]>(valuelen + 1);
+                    MPI_Info_get(source.info_, source_key, valuelen, source_value.get(), &flag);
                     // remember the source's key
                     keys_to_delete.emplace_back(source_key);
                     // add [key, value]-pair to *this info object
-                    MPI_Info_set(info_, source_key, source_value);
-                    delete[] source_value;
+                    MPI_Info_set(info_, source_key, source_value.get());
                 }
             }
 
@@ -2785,18 +2785,15 @@ namespace mpicxx {
                 }
 
                 // allocate a buffer for each value with the correct length
-                char* lhs_value = new char[valuelen + 1];
-                char* rhs_value = new char[valuelen + 1];
+                auto lhs_value = std::make_unique<char[]>(valuelen + 1);
+                auto rhs_value = std::make_unique<char[]>(valuelen + 1);
                 // retrieve values
-                MPI_Info_get(lhs.info_, key, valuelen, lhs_value, &flag);
-                MPI_Info_get(rhs.info_, key, valuelen, rhs_value, &flag);
+                MPI_Info_get(lhs.info_, key, valuelen, lhs_value.get(), &flag);
+                MPI_Info_get(rhs.info_, key, valuelen, rhs_value.get(), &flag);
                 // check if the values are equal
-                const bool are_values_equal = std::strcmp(lhs_value, rhs_value) == 0;
-                // release buffer
-                delete[] lhs_value;
-                delete[] rhs_value;
+                const bool are_values_equal = std::strcmp(lhs_value.get(), rhs_value.get()) == 0;
                 if (!are_values_equal) {
-                    // values compare inequal -> info objects can't cmopare equal
+                    // values compare inequal -> info objects can't compare equal
                     return false;
                 }
             }

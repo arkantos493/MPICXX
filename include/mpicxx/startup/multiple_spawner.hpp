@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-24
+ * @date 2020-08-02
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the
@@ -1378,23 +1378,30 @@ namespace mpicxx {
                                         info_ptr.data(), root_, comm_, &res.intercomm_, errcode);
             } else {
                 // convert command line arguments to char***
-                char*** argv_ptr = new char**[argvs_.size()];
-                for (std::size_t i = 0; i < argvs_.size(); ++i) {
-                    argv_ptr[i] = new char*[argvs_[i].size() + 1];
-                    for (std::size_t j = 0; j < argvs_[i].size(); ++j) {
-                        argv_ptr[i][j] = argvs_[i][j].data();
+
+                // get total number of command line arguments including nullptr
+                const std::size_t total_size = std::accumulate(argvs_.cbegin(), argvs_.cend(), 0,
+                        [](std::size_t sum, const std::vector<std::string>& vec) { return sum + vec.size(); });
+                // convert vector of vectors of strings to flat vector of char*
+                std::vector<char*> ptr(total_size);
+                std::size_t idx = 0;
+                for (std::vector<std::string>& vec : argvs_) {
+                    for (std::string& str : vec) {
+                        ptr[idx++] = str.data();
                     }
-                    argv_ptr[i][argvs_[i].size()] = nullptr;
+                    ptr[idx++] = nullptr;
                 }
 
-                MPI_Comm_spawn_multiple(static_cast<int>(this->size()), commands_ptr.data(), argv_ptr, maxprocs_.data(),
-                                        info_ptr.data(), root_, comm_, &res.intercomm_, errcode);
-
-                // delete char***
+                // get pointer to start of individual char* arrays
+                std::vector<char**> argv_ptr(argvs_.size());
+                idx = 0;
                 for (std::size_t i = 0; i < argvs_.size(); ++i) {
-                    delete[] argv_ptr[i];
+                    argv_ptr[i] = &ptr[idx];
+                    idx += argvs_[i].size() + 1;
                 }
-                delete[] argv_ptr;
+
+                MPI_Comm_spawn_multiple(static_cast<int>(this->size()), commands_ptr.data(), argv_ptr.data(), maxprocs_.data(),
+                                        info_ptr.data(), root_, comm_, &res.intercomm_, errcode);
             }
 
             return res;
