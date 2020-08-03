@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - develop
+      - init_and_finalize
   pull_request:
     branches:
       - master
@@ -22,10 +23,10 @@ jobs:
           path: ${{ github.workspace }}/gcc-install
           key: cache-gcc
       - name: Build GCC
-        if: steps.cache-gcc.outputs.cache-hit != 'true'
+        if: steps.cache-gcc.outputs.cache-hit != 'false'
         run: |
           sudo apt-get install flex
-          git clone https://github.com/gcc-mirror/gcc.git
+          git clone -b releases/gcc-10.2.0 --depth 1  https://github.com/gcc-mirror/gcc.git
           cd gcc
           ./contrib/download_prerequisites
           cd ..
@@ -56,7 +57,7 @@ jobs:
           path: ${{ github.workspace }}/openmpi-gcc
           key: cache-openmpi-gcc
       - name: Build OpenMPI with GCC
-        if: steps.cache-openmpi-gcc.outputs.cache-hit != 'true'
+        if: steps.cache-openmpi-gcc.outputs.cache-hit != 'false'
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/gcc
           export CC=${{ github.workspace }}/gcc/bin/gcc
@@ -64,7 +65,7 @@ jobs:
           wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.gz
           tar -xvf openmpi-4.0.2.tar.gz
           cd openmpi-4.0.2
-          ./configure --prefix=${{ github.workspace }}/openmpi-gcc
+          ./configure --prefix=${{ github.workspace }}/openmpi-gcc --disable-mpi-fortran
           make
           make install
       - name: Upload OpenMPI with GCC artifact
