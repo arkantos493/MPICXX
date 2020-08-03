@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - init_and_finalize
   pull_request:
     branches:
       - master
@@ -18,12 +19,12 @@ jobs:
       # fix errors before configuration
       - name: Before Generation
         run: |
-          sed '/^!\[/d;/^\[!\[/d' README.md | cat -s > doc/resources/main_page.md
+          sed '/^!\[/d;/^\[!\[/d' ${{ github.workspace }}/README.md | cat -s > ${{ github.workspace }}/doc/resources/main_page.md
       # mimic CMake's configure step for current setup
       - name: Configure
         run: |
-          sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' doc/Doxyfile.in
-          grep 'VERSION "' CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' doc/Doxyfile.in
+          sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' ${{ github.workspace }}/doc/Doxyfile.in
+          grep 'VERSION "' ${{ github.workspace }}/CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' ${{ github.workspace }}/doc/Doxyfile.in
       # generate documentation using doxygen
       - name: Generate
         uses: arkantos493/doxygen-action@v2.1.0
@@ -33,8 +34,8 @@ jobs:
       # fix errors after generation
       - name: After Generation
         run: |
-          cp doc/html/customdoxygen.css doc/html/search/customdoxygen.css
-          cat doc/resources/customsearch.js >> doc/html/search/search.js
+          cp ${{ github.workspace }}/doc/html/customdoxygen.css ${{ github.workspace }}/doc/html/search/customdoxygen.css
+          cat ${{ github.workspace }}/doc/resources/customsearch.js >> ${{ github.workspace }}/doc/html/search/search.js
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
