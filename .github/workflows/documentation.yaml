@@ -29,7 +29,7 @@ jobs:
       # mimic CMake's configure step for current setup
       - name: Configure
         run: |
-          cd doc
+          cd mpicxx/doc
           ls
           sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' Doxyfile.in
           grep 'VERSION "' ../CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' Doxyfile.in
@@ -37,11 +37,12 @@ jobs:
       - name: Generate
         uses: arkantos493/doxygen-action@v2.1.0
         with:
-          doxyfile-path: "Doxyfile.in"
+          doxyfile-path: "mpicxx/doc/Doxyfile.in"
           working-directory: "."
       # fix errors after generation
       - name: After Generation
         run: |
+          cd mpicxx/doc
           cp html/customdoxygen.css html/search/customdoxygen.css
           cat resources/customsearch.js >> html/search/search.js
       # deploy generated documentation using github.io
@@ -49,4 +50,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./html
+          publish_dir: ./mpicxx/doc/html
