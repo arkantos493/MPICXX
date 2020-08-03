@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - master
-      - init_and_finalize
   pull_request:
     branches:
       - master
