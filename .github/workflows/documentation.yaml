@@ -28,15 +28,15 @@ jobs:
       # mimic CMake's configure step for current setup
       - name: Configure
         run: |
-          cd mpicxx/doc
-          sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' Doxyfile.in
-          grep 'VERSION "' ../CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' Doxyfile.in
+          cd mpicxx
+          sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' doc/Doxyfile.in
+          grep 'VERSION "' CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' doc/Doxyfile.in
       # generate documentation using doxygen
       - name: Generate
         uses: arkantos493/doxygen-action@v2.1.0
         with:
-          doxyfile-path: "mpicxx/doc/Doxyfile.in"
-          working-directory: "mpicxx"
+          doxyfile-path: "doc/Doxyfile.in"
+          working-directory: "."
       # fix errors after generation
       - name: After Generation
         run: |
