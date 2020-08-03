@@ -25,17 +25,17 @@ make -j
 
 ### Supported CMake options (incomplete for options without MPICXX prefix)
 
-| option                                       | default value   | description |
-| -------------------------------------------- | :-------------: | ----------- |
-| `CMAKE_BUILD_TYPE`                           | `Release` | specifies the build type on single-configuration generators |
-| `CMAKE_INSTALL_PREFIX`                       | `/usr/local/include` | install directory used by `make install` |
-| `MPICXX_ENABLE_TESTS`                        | `Off` | use the [googletest](https://github.com/google/googletest) framework (automatically installed if this option is set to `On`) to enable the `make test` target |
-| `MPICXX_ENABLE_DEATH_TESTS`                  | `Off` | enables gtest's death tests (currently not supported for MPI during its internal usage of `fork()`); only used if `MPICXX_ENABLE_TESTS` is set to `On` |
-| `MPICXX_GENERATE_DOCUMENTATION`              | `Off` | enables the documentation target `make doc`; requires doxygen |
-| `MPICXX_GENERATE_TEST_DOCUMENTATION`         | `Off` | additionally document test cases; only used if `MPICXX_GENERATE_DOCUMENTATION` is set to `On` |
-| `MPICXX_ASSERTION_LEVEL`                     | `0`   | sets the assertion level; emits a warning if used in `Release` mode; <ul><li>`0` = no assertions</li><li>`1` = only precondition assertions</li><li>`2` = precondition and sanity assertions</li></ul> |
-| `MPICXX_ENABLE_STACK_TRACE`                  | `On`  | enable stack traces for the source location implementation |
-| `DMPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS` | `32`  | sets the maximum number of `atfinalize` callback functions |
+| option                                       | default value        | description                                                                                                                                                                                            |
+| -------------------------------------------- | :------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `CMAKE_BUILD_TYPE`                           | `Release`            | specifies the build type on single-configuration generators                                                                                                                                            |
+| `CMAKE_INSTALL_PREFIX`                       | `/usr/local/include` | install directory used by `make install`                                                                                                                                                               |
+| `MPICXX_ENABLE_TESTS`                        | `Off`                | use the [googletest](https://github.com/google/googletest) framework (automatically installed if this option is set to `On`) to enable the `make test` target                                          |
+| `MPICXX_ENABLE_DEATH_TESTS`                  | `Off`                | enables gtest's death tests (currently not supported for MPI during its internal usage of `fork()`); only used if `MPICXX_ENABLE_TESTS` is set to `On`                                                 |
+| `MPICXX_GENERATE_DOCUMENTATION`              | `Off`                | enables the documentation target `make doc`; requires doxygen                                                                                                                                          |
+| `MPICXX_GENERATE_TEST_DOCUMENTATION`         | `Off`                | additionally document test cases; only used if `MPICXX_GENERATE_DOCUMENTATION` is set to `On`                                                                                                          |
+| `MPICXX_ASSERTION_LEVEL`                     | `0`                  | sets the assertion level; emits a warning if used in `Release` mode; <ul><li>`0` = no assertions</li><li>`1` = only precondition assertions</li><li>`2` = precondition and sanity assertions</li></ul> |
+| `MPICXX_ENABLE_STACK_TRACE`                  | `On`                 | enable stack traces for the source location implementation                                                                                                                                             |
+| `DMPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS` | `32`                 | sets the maximum number of `atfinalize` callback functions                                                                                                                                             |
 
 ## Running the tests
 
