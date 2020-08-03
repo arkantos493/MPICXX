@@ -41,11 +41,8 @@ jobs:
       - name: After Generation
         run: |
           cd mpicxx/doc
-          ls
-          ls html
-          ls html/search
           sudo cp html/customdoxygen.css html/search/customdoxygen.css
-          cat resources/customsearch.js >> html/search/search.js
+          sudo sh -c 'cat resources/customsearch.js >> html/search/search.js'
       # deploy generated documentation using github.io
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
