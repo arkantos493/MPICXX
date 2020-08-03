@@ -24,13 +24,11 @@ jobs:
       - name: Before Generation
         run: |
           cd mpicxx
-          ls
           sed '/^!\[/d;/^\[!\[/d' README.md | cat -s > doc/resources/main_page.md
       # mimic CMake's configure step for current setup
       - name: Configure
         run: |
           cd mpicxx/doc
-          ls
           sed -i -e 's/@PROJECT_SOURCE_DIR@\///g' Doxyfile.in
           grep 'VERSION "' ../CMakeLists.txt | sed -n '/"/!{/\n/{P;b}};s/"/\n/g;D' | xargs -I {} sed -i -e 's/@mpicxx_VERSION@/{}/g' Doxyfile.in
       # generate documentation using doxygen
@@ -38,7 +36,7 @@ jobs:
         uses: arkantos493/doxygen-action@v2.1.0
         with:
           doxyfile-path: "mpicxx/doc/Doxyfile.in"
-          working-directory: "."
+          working-directory: "mpicxx"
       # fix errors after generation
       - name: After Generation
         run: |
