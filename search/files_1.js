@@ -1,20 +1,7 @@
 var searchData=
 [
-  ['clear_2ecpp',['clear.cpp',['../clear_8cpp.html',1,'']]],
-  ['clock_2ecpp',['clock.cpp',['../clock_8cpp.html',1,'']]],
   ['clock_2ehpp',['clock.hpp',['../clock_8hpp.html',1,'']]],
-  ['command_2ecpp',['command.cpp',['../command_8cpp.html',1,'']]],
-  ['communicator_2ecpp',['communicator.cpp',['../single__spawner_2communicator_8cpp.html',1,'']]],
-  ['communicator_2ecpp',['communicator.cpp',['../multiple__spawner_2communicator_8cpp.html',1,'']]],
   ['concepts_2ehpp',['concepts.hpp',['../concepts_8hpp.html',1,'']]],
-  ['const_5fiterator_2ecpp',['const_iterator.cpp',['../const__iterator_8cpp.html',1,'']]],
-  ['const_5freverse_5fiterator_2ecpp',['const_reverse_iterator.cpp',['../const__reverse__iterator_8cpp.html',1,'']]],
-  ['constructor_2ecpp',['constructor.cpp',['../startup_2single__spawner_2constructor_8cpp.html',1,'']]],
-  ['constructor_2ecpp',['constructor.cpp',['../info_2iterators_2iterator__impl_2constructor_8cpp.html',1,'']]],
-  ['contains_2ecpp',['contains.cpp',['../contains_8cpp.html',1,'']]],
   ['conversion_2ehpp',['conversion.hpp',['../conversion_8hpp.html',1,'']]],
-  ['copy_5fassignment_2ecpp',['copy_assignment.cpp',['../copy__assignment_8cpp.html',1,'']]],
-  ['copy_5fconstructor_2ecpp',['copy_constructor.cpp',['../copy__constructor_8cpp.html',1,'']]],
-  ['core_2ehpp',['core.hpp',['../core_8hpp.html',1,'']]],
-  ['count_2ecpp',['count.cpp',['../count_8cpp.html',1,'']]]
+  ['core_2ehpp',['core.hpp',['../core_8hpp.html',1,'']]]
 ];

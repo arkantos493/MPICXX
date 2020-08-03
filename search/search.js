@@ -789,7 +789,6 @@ function init_search()
   searchBox.OnSelectItem(0);
 }
 
-
 document.addEventListener("DOMContentLoaded", function(event) {
     var page = document.querySelector("html");
     page.style.overflow = "auto";
@@ -814,4 +813,3 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
     }
 });
-

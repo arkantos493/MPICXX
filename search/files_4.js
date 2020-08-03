@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['finalize_2ecpp',['finalize.cpp',['../finalize_8cpp.html',1,'']]],
-  ['finalize_2ehpp',['finalize.hpp',['../finalize_8hpp.html',1,'']]],
-  ['find_2ecpp',['find.cpp',['../find_8cpp.html',1,'']]]
+  ['info_2ehpp',['info.hpp',['../info_8hpp.html',1,'']]],
+  ['init_2ehpp',['init.hpp',['../init_8hpp.html',1,'']]]
 ];

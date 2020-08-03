@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -129,7 +129,8 @@ Public Types</h2></td></tr>
 <tr class="memdesc:a7e11c09672518de750b928373d46ae0d"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> pointer type to the [key, value]-pair iterated over.  <a href="#a7e11c09672518de750b928373d46ae0d">More...</a><br /></td></tr>
 <tr class="separator:a7e11c09672518de750b928373d46ae0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cc6f92ce714430b8e2c1a35809f5fc5"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a1cc6f92ce714430b8e2c1a35809f5fc5">reference</a> = <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#aecdde8cd6abcc25aced6c24d929373d2">value_type</a></td></tr>
-<tr class="memdesc:a1cc6f92ce714430b8e2c1a35809f5fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> reference type (<b>not</b> meaningful because <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#af6bde5c3d8a1b7544d5a333edea84095" title="Get the [key, value]-pair at the current iterator position. ">operator*()</a> and <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a0a5b413a15654f2e0eca312e09333350" title="Get the [key, value]-pair at the current iterator position. ">operator-&gt;()</a> has to return <b>by-value</b> (using a proxy for write access)).  <a href="#a1cc6f92ce714430b8e2c1a35809f5fc5">More...</a><br /></td></tr>
+<tr class="memdesc:a1cc6f92ce714430b8e2c1a35809f5fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> reference type (<b>not</b> meaningful because <a href="https://en.cppreference.com/w/cpp/language/operator_member_access"><code>mpicxx::info::iterator_impl::operator*()</code></a> and <a href="https://en.cppreference.com/w/cpp/language/operator_member_access"><code>mpicxx::info::iterator_impl::operator-&gt;()</code></a> <br />
+ has to return <b>by-value</b> (using a proxy for write access)).  <a href="#a1cc6f92ce714430b8e2c1a35809f5fc5">More...</a><br /></td></tr>
 <tr class="separator:a1cc6f92ce714430b8e2c1a35809f5fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0909a049605a9ed319637c512a261b14"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a0909a049605a9ed319637c512a261b14">iterator_category</a> = std::random_access_iterator_tag</td></tr>
 <tr class="memdesc:a0909a049605a9ed319637c512a261b14"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> iterator category.  <a href="#a0909a049605a9ed319637c512a261b14">More...</a><br /></td></tr>
@@ -273,7 +274,7 @@ template&lt;bool is_const&gt; </div>
 </div><div class="memdoc">
 
 <p><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> value type that can be obtained by dereferencing the iterator. </p>
-<p>In case of a non-const iterator, the value will be returned by a <a class="el" href="classmpicxx_1_1info_1_1proxy.html">info::proxy</a> object to allow changing its value.</p>
+<p>In case of a non-const iterator, the value will be returned by a <a class="el" href="classmpicxx_1_1info_1_1proxy.html">mpicxx::info::proxy</a> object to allow changing its value.</p>
 <p>In case of a const_iterator, the value will directly be returned as <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>const std::string</code></a> because changing the value is impossible by definition. </p>
 
 </div>
@@ -291,7 +292,7 @@ template&lt;bool is_const&gt; </div>
 </div><div class="memdoc">
 
 <p><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> pointer type to the [key, value]-pair iterated over. </p>
-<p>Because it is not possible to simply return value_type* (dangling pointer to a local object), it is necessary to wrap value_type in a <a class="el" href="classmpicxx_1_1info_1_1iterator__impl_1_1pointer__impl.html">pointer_impl</a> object (which in turn overloads operator-&gt;). </p>
+<p>Because it is not possible to simply return value_type* (dangling pointer to a local object), it is necessary to wrap value_type in a <a class="el" href="classmpicxx_1_1info_1_1iterator__impl_1_1pointer__impl.html">mpicxx::info::iterator_impl::pointer_impl</a> object (which in turn overloads <a href="https://en.cppreference.com/w/cpp/language/operator_member_access"><code>operator-&gt;()</code></a>). </p>
 
 </div>
 </div>
@@ -307,7 +308,8 @@ template&lt;bool is_const&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> reference type (<b>not</b> meaningful because <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#af6bde5c3d8a1b7544d5a333edea84095" title="Get the [key, value]-pair at the current iterator position. ">operator*()</a> and <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a0a5b413a15654f2e0eca312e09333350" title="Get the [key, value]-pair at the current iterator position. ">operator-&gt;()</a> has to return <b>by-value</b> (using a proxy for write access)). </p>
+<p><a href="https://en.cppreference.com/w/cpp/iterator/iterator_traits"><code>std::iterator_traits</code></a> reference type (<b>not</b> meaningful because <a href="https://en.cppreference.com/w/cpp/language/operator_member_access"><code>mpicxx::info::iterator_impl::operator*()</code></a> and <a href="https://en.cppreference.com/w/cpp/language/operator_member_access"><code>mpicxx::info::iterator_impl::operator-&gt;()</code></a> <br />
+ has to return <b>by-value</b> (using a proxy for write access)). </p>
 
 </div>
 </div>
@@ -409,16 +411,16 @@ template&lt;bool is_const&gt; </div>
 <p>Construct a new iterator referring to <code>info</code> at position <code>pos</code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">info</td><td>the referred to <em>MPI_Info</em> object </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">info</td><td>the referred to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_Info</em></a> object </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pos</td><td>the iterator's current position</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section post"><dt>Postcondition</dt><dd><code>*this</code> is not singular if and only if <code>info</code> is not the <code>nullptr</code>.</dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd><code>*this</code> is not singular if and only if <code>info</code> is not the <a href="https://en.cppreference.com/w/cpp/language/nullptr"><code>nullptr</code></a>.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
-<dd>If <code>info</code> is a <code>nullptr</code>. <br />
- If <code>info</code> refers to <em>MPI_INFO_NULL</em>. <br />
+<dd>If <code>info</code> is a <a href="https://en.cppreference.com/w/cpp/language/nullptr"><code>nullptr</code></a>. <br />
+ If <code>info</code> refers to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>pos</code> falls outside the valid range. </dd>
 </dl>
 
@@ -459,7 +461,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>other</code> is a singular iterator. <br />
- If <code>other</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+ If <code>other</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 </dl>
 
 </div>
@@ -507,7 +509,7 @@ template&lt;bool other_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>other</code> is a singular iterator. <br />
- If <code>other</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+ If <code>other</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 </dl>
 
 </div>
@@ -549,7 +551,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>rhs</code> is a singular iterator. <br />
- If <code>rhs</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+ If <code>rhs</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 </dl>
 
 </div>
@@ -598,7 +600,7 @@ template&lt;bool rhs_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>rhs</code> is a singular iterator. <br />
- If <code>rhs</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+ If <code>rhs</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 </dl>
 
 </div>
@@ -630,8 +632,8 @@ template&lt;bool rhs_const&gt; </div>
 </div><div class="memdoc">
 
 <p>Compares <code>*this</code> and <code>rhs</code> for equality. </p>
-<p>Automatically generates <code>operator!=</code>. <br />
- The iterators <code>*this</code> and <code>rhs</code> <b>may not</b> necessarily have the same constness. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Automatically generates <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a73ad6baa40807c4d89566517779338d8" title="Three-way comparison operator for *this and rhs. ">mpicxx::info::iterator_impl::operator</a>!=.</p>
+<p>The iterators <code>*this</code> and <code>rhs</code> <b>may not</b> necessarily have the same constness. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">rhs_const</td><td></td></tr>
   </table>
@@ -643,11 +645,11 @@ template&lt;bool rhs_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if both are euqal, otherwise <code>false</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if both are equal, otherwise <code>false</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> or <code>rhs</code> is a singular iterator. <br />
- If <code>*this</code> or <code>rhs</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> or <code>rhs</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> and <code>rhs</code> don't refer to the same info object. </dd>
 </dl>
 
@@ -680,8 +682,8 @@ template&lt;bool rhs_const&gt; </div>
 </div><div class="memdoc">
 
 <p><a href="https://en.cppreference.com/w/cpp/language/default_comparisons">Three-way comparison operator</a> for <code>*this</code> and <code>rhs</code>. </p>
-<p>Automatically generates <code>operator&lt;</code>, <code>operator&lt;=</code>, <code>operator&gt;</code> and <code>operator&gt;=</code>. <br />
- The iterators <code>*this</code> and <code>rhs</code> <b>may not</b> necessarily have the same constness. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Automatically generates <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a73ad6baa40807c4d89566517779338d8" title="Three-way comparison operator for *this and rhs. ">mpicxx::info::iterator_impl::operator</a>&lt;, <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a73ad6baa40807c4d89566517779338d8" title="Three-way comparison operator for *this and rhs. ">mpicxx::info::iterator_impl::operator</a>&lt;=, <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a73ad6baa40807c4d89566517779338d8" title="Three-way comparison operator for *this and rhs. ">mpicxx::info::iterator_impl::operator</a>&gt; and <a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html#a73ad6baa40807c4d89566517779338d8" title="Three-way comparison operator for *this and rhs. ">mpicxx::info::iterator_impl::operator</a>&gt;=.</p>
+<p>The iterators <code>*this</code> and <code>rhs</code> <b>may not</b> necessarily have the same constness. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">rhs_const</td><td></td></tr>
   </table>
@@ -693,11 +695,11 @@ template&lt;bool rhs_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <a href="https://en.cppreference.com/w/cpp/utility/compare/partial_ordering"><code>std::partial_ordering</code></a> result (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <a href="https://en.cppreference.com/w/cpp/utility/compare/partial_ordering"><code>std::partial_ordering</code></a> result <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> or <code>rhs</code> is a singular iterator. <br />
- If <code>*this</code> or <code>rhs</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> or <code>rhs</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> and <code>rhs</code> don't refer to the same info object. </dd>
 </dl>
 
@@ -731,7 +733,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> is a past-the-end iterator. </dd>
 </dl>
 
@@ -766,7 +768,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> is a past-the-end iterator. </dd>
 </dl>
 
@@ -807,7 +809,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this + inc</code> falls outside the valid range. </dd>
 </dl>
 
@@ -841,7 +843,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> is a start-of-sequence iterator. </dd>
 </dl>
 
@@ -876,7 +878,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> is a start-of-sequence iterator. </dd>
 </dl>
 
@@ -917,7 +919,7 @@ template&lt;bool is_const&gt; </div>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> is a start-of-sequence iterator. </dd>
 </dl>
 
@@ -950,8 +952,8 @@ template&lt;bool rhs_const&gt; </div>
 </div><div class="memdoc">
 
 <p>Calculate the distance between the iterator and the given <code>rhs</code> one. </p>
-<p>The iterators <code>*this</code> and <code>rhs</code> <b>may not</b> necessarily have the same constness. </p><pre class="fragment">     It holds: `it2 - it1 ==` [`std::distance`](https://en.cppreference.com/w/cpp/iterator/distance)`(it1, it2)`
-</pre> <dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>The iterators <code>*this</code> and <code>rhs</code> <b>may not</b> necessarily have the same constness.</p>
+<p>It holds: <code>it2 - it1 ==</code> <a href="https://en.cppreference.com/w/cpp/iterator/distance"><code>std::distance(it1, it2)</code></a>. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">rhs_const</td><td></td></tr>
   </table>
@@ -963,11 +965,11 @@ template&lt;bool rhs_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>number of [key, value]-pairs between the iterators <code>*this</code> and <code>rhs</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>number of [key, value]-pairs between the iterators <code>*this</code> and <code>rhs</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>*this</code> or <code>rhs</code> is a singular iterator. <br />
- If <code>*this</code> or <code>rhs</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> or <code>rhs</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> and <code>rhs</code> don't refer to the same info object. </dd>
 </dl>
 
@@ -1005,23 +1007,23 @@ template&lt;bool is_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the [key, value]-pair (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the [key, value]-pair <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section pre"><dt>Precondition</dt><dd><code>*this</code> <b>must not</b> be a singular iterator. </dd>
 <dd>
-<code>*this</code> <b>must not</b> refer to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+<code>*this</code> <b>must not</b> refer to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 <dd>
 <code>*this</code> <b>must</b> be dereferenceable, i.e. the position denoted by the current iterator + <code>n</code> must be in the half-open interval [0, nkeys), where <code>nkeys</code> ist the size of the referred to info object.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> can't be dereferenced. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_nthkey(MPI_Info info, <span class="keywordtype">int</span> n, <span class="keywordtype">char</span> *key);                                    <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>const_iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;true&gt;</code>): <br />
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);         <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);      <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;false&gt;</code>): <br />
-For <em>MPI</em> functions called while using a proxy see the <a class="el" href="classmpicxx_1_1info_1_1proxy.html">proxy</a> documentation. </dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_nthkey(MPI_Info info, <span class="keywordtype">int</span> n, <span class="keywordtype">char</span> *key);                                  <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>const_iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;true&gt;</code>): <br />
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;false&gt;</code>): <br />
+For <em>MPI</em> functions called while using a proxy see the <a class="el" href="classmpicxx_1_1info_1_1proxy.html">mpicxx::info::proxy</a> documentation. </dd>
 </dl>
 
 </div>
@@ -1051,23 +1053,23 @@ template&lt;bool is_const&gt; </div>
 
 <p>Get the [key, value]-pair at the current iterator position. </p>
 <p>If the current iterator is a const_iterator, the returned type is a <a href="https://en.cppreference.com/w/cpp/utility/pair"><code>std::pair&lt;const std::string, const std::string&gt;</code></a>.</p>
-<p>If the current iterator is a non-const iterator, the returned type is a <a href="https://en.cppreference.com/w/cpp/utility/pair"><code>std::pair&lt;const std::string, proxy&gt;</code></a>, i.e. the [key, value]-pair's value can be changed through the proxy object. </p><dl class="section return"><dt>Returns</dt><dd>the [key, value]-pair (<code>[[nodiscard]]</code>)</dd></dl>
+<p>If the current iterator is a non-const iterator, the returned type is a <a href="https://en.cppreference.com/w/cpp/utility/pair"><code>std::pair&lt;const std::string, proxy&gt;</code></a>, i.e. the [key, value]-pair's value can be changed through the proxy object. </p><dl class="section return"><dt>Returns</dt><dd>the [key, value]-pair <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section pre"><dt>Precondition</dt><dd><code>*this</code> <b>must not</b> be a singular iterator. </dd>
 <dd>
-<code>*this</code> <b>must not</b> refer to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+<code>*this</code> <b>must not</b> refer to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 <dd>
-<code>*this</code> <b>must</b> be dereferenceable, i.e. the position denoted by the current iteratormust be in the half-open interval [0, nkeys), where <code>nkeys</code> ist the size of the referred to info object.</dd></dl>
+<code>*this</code> <b>must</b> be dereferenceable, i.e. the position denoted by the current iterator must be in the half-open interval [0, nkeys), where <code>nkeys</code> ist the size of the referred to info object.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> can't be dereferenced. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_nthkey(MPI_Info info, <span class="keywordtype">int</span> n, <span class="keywordtype">char</span> *key);                                    <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>const_iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;true&gt;</code>): <br />
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);         <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);      <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;false&gt;</code>): <br />
-For <em>MPI</em> functions called while using a proxy see the <a class="el" href="classmpicxx_1_1info_1_1proxy.html">proxy</a> documentation. </dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_nthkey(MPI_Info info, <span class="keywordtype">int</span> n, <span class="keywordtype">char</span> *key);                                  <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>const_iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;true&gt;</code>): <br />
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;false&gt;</code>): <br />
+For <em>MPI</em> functions called while using a proxy see the <a class="el" href="classmpicxx_1_1info_1_1proxy.html">mpicxx::info::proxy</a> documentation. </dd>
 </dl>
 
 </div>
@@ -1097,23 +1099,23 @@ template&lt;bool is_const&gt; </div>
 
 <p>Get the [key, value]-pair at the current iterator position. </p>
 <p>If the current iterator is a const_iterator, the returned type is a <a href="https://en.cppreference.com/w/cpp/utility/pair"><code>std::pair&lt;const std::string, const std::string&gt;</code></a>.</p>
-<p>If the current iterator is a non-const iterator, the returned type is a <a href="https://en.cppreference.com/w/cpp/utility/pair"><code>std::pair&lt;const std::string, proxy&gt;</code></a>, i.e. the [key, value]-pair's value can be changed through the proxy object. </p><dl class="section return"><dt>Returns</dt><dd>the [key, value]-pair (<code>[[nodiscard]]</code>)</dd></dl>
+<p>If the current iterator is a non-const iterator, the returned type is a <a href="https://en.cppreference.com/w/cpp/utility/pair"><code>std::pair&lt;const std::string, proxy&gt;</code></a>, i.e. the [key, value]-pair's value can be changed through the proxy object. </p><dl class="section return"><dt>Returns</dt><dd>the [key, value]-pair <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section pre"><dt>Precondition</dt><dd><code>*this</code> <b>must not</b> be a singular iterator. </dd>
 <dd>
-<code>*this</code> <b>must not</b> refer to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+<code>*this</code> <b>must not</b> refer to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 <dd>
-<code>*this</code> <b>must</b> be dereferenceable, i.e. the position denoted by the current iteratormust be in the half-open interval [0, nkeys), where <code>nkeys</code> ist the size of the referred to info object.</dd></dl>
+<code>*this</code> <b>must</b> be dereferenceable, i.e. the position denoted by the current iterator must be in the half-open interval [0, nkeys), where <code>nkeys</code> ist the size of the referred to info object.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If <code>*this</code> is a singular iterator. <br />
- If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>*this</code> can't be dereferenced. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_nthkey(MPI_Info info, <span class="keywordtype">int</span> n, <span class="keywordtype">char</span> *key);                                    <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>const_iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;true&gt;</code>): <br />
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);         <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);      <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;false&gt;</code>): <br />
-For <em>MPI</em> functions called while using a proxy see the <a class="el" href="classmpicxx_1_1info_1_1proxy.html">proxy</a> documentation. </dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_nthkey(MPI_Info info, <span class="keywordtype">int</span> n, <span class="keywordtype">char</span> *key);                                  <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>const_iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;true&gt;</code>): <br />
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once</span></div></div><!-- fragment --> <code>iterator</code> (alias for an <code><a class="el" href="classmpicxx_1_1info_1_1iterator__impl.html" title="Provides iterator and const_iterator for an info object. ">iterator_impl</a>&lt;false&gt;</code>): <br />
+For <em>MPI</em> functions called while using a proxy see the <a class="el" href="classmpicxx_1_1info_1_1proxy.html">mpicxx::info::proxy</a> documentation. </dd>
 </dl>
 
 </div>
@@ -1161,11 +1163,11 @@ template&lt;bool is_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>new iterator pointing to the new position (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>new iterator pointing to the new position <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>it</code> is a singular iterator. <br />
- If <code>it</code> refers to an info object referring to 'MPI_INFO_NULL*. <br />
+ If <code>it</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>it + inc</code> falls outside the valid range. </dd>
 </dl>
 
@@ -1213,11 +1215,11 @@ template&lt;bool is_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>new iterator pointing to the new position (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>new iterator pointing to the new position <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>it</code> is a singular iterator. <br />
- If <code>it</code> refers to an info object referring to 'MPI_INFO_NULL*. <br />
+ If <code>it</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>it + inc</code> falls outside the valid range. </dd>
 </dl>
 
@@ -1265,11 +1267,11 @@ template&lt;bool is_const&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>new iterator pointing to the new position (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>new iterator pointing to the new position <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>it</code> is a singular iterator. <br />
- If <code>it</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. <br />
+ If <code>it</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>it - inc</code> falls outside the valid range. </dd>
 </dl>
 

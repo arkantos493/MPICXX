@@ -1,10 +1,7 @@
 var searchData=
 [
-  ['test_5futility_2ehpp',['test_utility.hpp',['../test__utility_8hpp.html',1,'']]],
   ['thread_5fsupport',['thread_support',['../namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85',1,'mpicxx']]],
-  ['thread_5fsupport_2ecpp',['thread_support.cpp',['../thread__support_8cpp.html',1,'']]],
   ['thread_5fsupport_2ehpp',['thread_support.hpp',['../thread__support_8hpp.html',1,'']]],
-  ['thread_5fsupport_5fexception_2ecpp',['thread_support_exception.cpp',['../thread__support__exception_8cpp.html',1,'']]],
   ['thread_5fsupport_5fexception_2ehpp',['thread_support_exception.hpp',['../thread__support__exception_8hpp.html',1,'']]],
   ['thread_5fsupport_5ffrom_5fstring',['thread_support_from_string',['../namespacempicxx.html#ab69c703bcf9df9417f074e5696e2853c',1,'mpicxx']]],
   ['thread_5fsupport_5fnot_5fsatisfied',['thread_support_not_satisfied',['../classmpicxx_1_1thread__support__not__satisfied.html',1,'mpicxx']]],

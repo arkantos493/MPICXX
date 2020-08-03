@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -109,7 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A proxy class for <a class="el" href="classmpicxx_1_1info.html#ac7798c2d24be1ab8a3ef6eb4183234e1">info::at(T&amp;&amp;)</a>, <a class="el" href="classmpicxx_1_1info.html#a898ab9a9f313dec15a1e137078fd83b6">info::at(const std::string_view) const</a> and <a class="el" href="classmpicxx_1_1info.html#add2673e15b1de1fa4506775cce1493f3">info::operator[](T&amp;&amp;)</a> to distinguish between read and write accesses.  
+<p>A proxy class for <a class="el" href="classmpicxx_1_1info.html#ac7798c2d24be1ab8a3ef6eb4183234e1">mpicxx::info::at(T&amp;&amp;)</a>, <a class="el" href="classmpicxx_1_1info.html#a898ab9a9f313dec15a1e137078fd83b6">mpicxx::info::at(const std::string_view) const</a> and <a class="el" href="classmpicxx_1_1info.html#add2673e15b1de1fa4506775cce1493f3">mpicxx::info::operator[](T&amp;&amp;)</a> to distinguish between read and write accesses.  
  <a href="classmpicxx_1_1info_1_1proxy.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -128,10 +128,10 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-types"></a>
 Private Types</h2></td></tr>
 <tr class="memitem:a89aafca50d6c1ea1790603d4662a7599"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info_1_1proxy.html#a89aafca50d6c1ea1790603d4662a7599">MPI_Info_ptr</a> = MPI_Info *</td></tr>
-<tr class="memdesc:a89aafca50d6c1ea1790603d4662a7599"><td class="mdescLeft">&#160;</td><td class="mdescRight">pointer type to the referred to info object  <a href="#a89aafca50d6c1ea1790603d4662a7599">More...</a><br /></td></tr>
+<tr class="memdesc:a89aafca50d6c1ea1790603d4662a7599"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer type to the referred to info object.  <a href="#a89aafca50d6c1ea1790603d4662a7599">More...</a><br /></td></tr>
 <tr class="separator:a89aafca50d6c1ea1790603d4662a7599"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf9102c0b634593dfa843f2cf8f93b95"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info_1_1proxy.html#aaf9102c0b634593dfa843f2cf8f93b95">MPI_Info_ref</a> = MPI_Info &amp;</td></tr>
-<tr class="memdesc:aaf9102c0b634593dfa843f2cf8f93b95"><td class="mdescLeft">&#160;</td><td class="mdescRight">reference type to the referred to info object  <a href="#aaf9102c0b634593dfa843f2cf8f93b95">More...</a><br /></td></tr>
+<tr class="memdesc:aaf9102c0b634593dfa843f2cf8f93b95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference type to the referred to info object.  <a href="#aaf9102c0b634593dfa843f2cf8f93b95">More...</a><br /></td></tr>
 <tr class="separator:aaf9102c0b634593dfa843f2cf8f93b95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -141,8 +141,10 @@ Friends</h2></td></tr>
 <tr class="separator:ab7aeed27aa3df6ea83f088234114e425"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A proxy class for <a class="el" href="classmpicxx_1_1info.html#ac7798c2d24be1ab8a3ef6eb4183234e1">info::at(T&amp;&amp;)</a>, <a class="el" href="classmpicxx_1_1info.html#a898ab9a9f313dec15a1e137078fd83b6">info::at(const std::string_view) const</a> and <a class="el" href="classmpicxx_1_1info.html#add2673e15b1de1fa4506775cce1493f3">info::operator[](T&amp;&amp;)</a> to distinguish between read and write accesses. </p>
-<p>Calls <a class="el" href="classmpicxx_1_1info_1_1proxy.html#adb4823dd5abc61d256a3d4c877d7d79d">operator std::string() const</a> on a write access and <a class="el" href="classmpicxx_1_1info_1_1proxy.html#a42a8738a35cd7428a8351b73256b7f77">operator=(const std::string_view)</a> on a read access. </p><pre class="fragment">     Can be printed through an @ref operator&lt;&lt;(std::ostream&amp;, const proxy&amp;) overload.</pre> </div><h2 class="groupheader">Member Typedef Documentation</h2>
+<div class="textblock"><p>A proxy class for <a class="el" href="classmpicxx_1_1info.html#ac7798c2d24be1ab8a3ef6eb4183234e1">mpicxx::info::at(T&amp;&amp;)</a>, <a class="el" href="classmpicxx_1_1info.html#a898ab9a9f313dec15a1e137078fd83b6">mpicxx::info::at(const std::string_view) const</a> and <a class="el" href="classmpicxx_1_1info.html#add2673e15b1de1fa4506775cce1493f3">mpicxx::info::operator[](T&amp;&amp;)</a> to distinguish between read and write accesses. </p>
+<p>Calls <a class="el" href="classmpicxx_1_1info_1_1proxy.html#adb4823dd5abc61d256a3d4c877d7d79d">operator std::string() const</a> on a write access and <a class="el" href="classmpicxx_1_1info_1_1proxy.html#a42a8738a35cd7428a8351b73256b7f77">operator=(const std::string_view)</a> on a read access.</p>
+<p>Can be printed through an <a class="el" href="classmpicxx_1_1info_1_1proxy.html#ab7aeed27aa3df6ea83f088234114e425">operator&lt;&lt;(std::ostream&amp;, const proxy&amp;)</a> overload. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a89aafca50d6c1ea1790603d4662a7599"></a>
 <div class="memitem">
 <div class="memproto">
@@ -161,7 +163,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>pointer type to the referred to info object </p>
+<p>Pointer type to the referred to info object. </p>
 
 </div>
 </div>
@@ -183,7 +185,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>reference type to the referred to info object </p>
+<p>Reference type to the referred to info object. </p>
 
 </div>
 </div>
@@ -225,23 +227,23 @@ template&lt;detail::is_string T&gt; </div>
 <p>Construct a new proxy object. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837">detail::is_string</a> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837">mpicxx::detail::is_string</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>the referred to <em>MPI_Info</em> object </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">info</td><td>the referred to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_Info</em></a> object </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>the provided <code>key</code> </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>info</code> <b>must not</b> refer to <em>MPI_INFO_NULL</em>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>info</code> <b>must not</b> refer to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 <dd>
-The <code>key's</code> length <b>must</b> be greater than <code>0</code> and less than <em>MPI_MAX_INFO_KEY</em>.</dd></dl>
+The <code>key's</code> length <b>must</b> be greater than 0 and less than <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_MAX_INFO_KEY</em></a>.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
-<dd>If <code>info</code> refers to <em>MPI_INFO_NULL</em>. <br />
+<dd>If <code>info</code> refers to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>key</code> exceeds its size limit. </dd>
 </dl>
 
@@ -279,15 +281,15 @@ The <code>key's</code> length <b>must</b> be greater than <code>0</code> and les
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd><code>value</code> <b>must</b> include the null-terminator. </dd>
 <dd>
-The <code>value's</code> length <b>must</b> be greater than 0 and less than <em>MPI_MAX_INFO_VAL</em>.</dd></dl>
+The <code>value's</code> length <b>must</b> be greater than 0 and less than <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_MAX_INFO_VAL</em></a>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
-<dd>If <code>*this</code> refers to an info object referring to 'MPI_INFO_NULL'. <br />
+<dd>If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. <br />
  If <code>value</code> exceeds its size limit. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_set(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> *value);         <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_set(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> *value);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -314,17 +316,17 @@ The <code>value's</code> length <b>must</b> be greater than 0 and less than <em>
 </div><div class="memdoc">
 
 <p>On read access, return the value associated with the saved key. </p>
-<p>If the key doesn't exist yet, it will be inserted with a string consisting only of one whitespace as value, also returning a <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a><code>(" ")</code>. </p><dl class="section return"><dt>Returns</dt><dd>the value associated with key (<code>[[nodiscard]]</code>)</dd></dl>
+<p>If the key doesn't exist yet, it will be inserted with a string consisting only of one whitespace as value, also returning a <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string(" ")</code></a>. </p><dl class="section return"><dt>Returns</dt><dd>the value associated with key <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function returns the associated value <em>by-value</em>, i.e. changing the returned <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> <b>won't</b> alter the info object's internal value! </dd>
 <dd>
 Because inserting an empty string <code>""</code> is not allowed, a <code>" "</code> string is inserted instead, if the key does not already exist.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
-<dd>If <code>*this</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+<dd>If <code>*this</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);         <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_set(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> *value);                         <span class="comment">// at most once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);      <span class="comment">// at most once</span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_set(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> *value);                       <span class="comment">// at most once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);    <span class="comment">// at most once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -363,7 +365,7 @@ Because inserting an empty string <code>""</code> is not allowed, a <code>" "</c
 </div><div class="memdoc">
 
 <p>Convenience overload to be able to directly print a proxy object. </p>
-<p>Calls <a class="el" href="classmpicxx_1_1info_1_1proxy.html#adb4823dd5abc61d256a3d4c877d7d79d">operator std::string() const</a> to get the value that should be printed, i.e. if key doesn't exist yet, a new [key, value]-pair will be inserted into the info object. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Calls <a class="el" href="classmpicxx_1_1info_1_1proxy.html#adb4823dd5abc61d256a3d4c877d7d79d">operator std::string() const</a> to get the value that should be printed, i.e. if key doesn't exist yet, a new [key, value]-pair will be inserted into the info object </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">out</td><td>the output stream to write on </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">rhs</td><td>the proxy object </td></tr>
@@ -373,11 +375,11 @@ Because inserting an empty string <code>""</code> is not allowed, a <code>" "</c
 <dl class="section return"><dt>Returns</dt><dd>the output stream</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
-<dd>If <code>rhs</code> refers to an info object referring to <em>MPI_INFO_NULL</em>. </dd>
+<dd>If <code>rhs</code> refers to an info object referring to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_INFO_NULL</em></a>. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);         <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_set(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> *value);                         <span class="comment">// at most once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);      <span class="comment">// at most once</span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Info_get_valuelen(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> *valuelen, <span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_set(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keyword">const</span> <span class="keywordtype">char</span> *value);                       <span class="comment">// at most once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Info_get(MPI_Info info, <span class="keyword">const</span> <span class="keywordtype">char</span> *key, <span class="keywordtype">int</span> valuelen, <span class="keywordtype">char</span> *value, <span class="keywordtype">int</span> *flag);    <span class="comment">// at most once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>

@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
         <meta name="generator" content="Doxygen 1.8.11"/>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <title>mpicxx: include/mpicxx/detail/source_location.hpp File Reference</title>
+        <title>mpicxx: /github/workspace/mpicxx/include/mpicxx/detail/source_location.hpp File Reference</title>
         <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link type="image/x-icon" rel="shortcut icon" href="logo.ico">
         <script type="text/javascript" src="dynsections.js"></script>
@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_577beba3f1c5b4ba73c78e086d96629d.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_a9f1036782c0468974feeb8f108e6341.html">detail</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_aa394cd1d9abb8ffe941d9aaafca8d03.html">github</a></li><li class="navelem"><a class="el" href="dir_c52569aa89a7adbb6029022c2fa60a11.html">workspace</a></li><li class="navelem"><a class="el" href="dir_d946da1135403067f4297c50191b2e68.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_f994a43fc660a205a9236742d2191c64.html">include</a></li><li class="navelem"><a class="el" href="dir_6f3b6bfc911252f1bb43169d9217f018.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_cb792bac188806f7c5abbb8150626824.html">detail</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -108,11 +108,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>Provides a class similar to <a href="https://en.cppreference.com/w/cpp/utility/source_location"><code>std::source_location</code></a>.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;optional&gt;</code><br />
+<div class="textblock"><code>#include &lt;fmt/format.h&gt;</code><br />
+<code>#include &lt;mpi.h&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
-<code>#include &lt;fmt/format.h&gt;</code><br />
-<code>#include &lt;mpi.h&gt;</code><br />
 </div>
 <p><a href="source__location_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -131,15 +131,16 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:abfe6739c81e58c3d84b0fc4bd161917c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a>&#160;&#160;&#160;__func__</td></tr>
-<tr class="memdesc:abfe6739c81e58c3d84b0fc4bd161917c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a> macro is defined as <code>__PRETTY_FUNC__</code> (<a href="https://gcc.gnu.org/"><em>GCC</em></a> and <a href="https://clang.llvm.org/"><em>clang</em></a>), <code>__FUNCSIG__</code> (<a href="https://visualstudio.microsoft.com/de/vs/features/cplusplus/"><em>MSVC</em></a>) or <code>__func__</code> (otherwise).  <a href="#abfe6739c81e58c3d84b0fc4bd161917c">More...</a><br /></td></tr>
+<tr class="memdesc:abfe6739c81e58c3d84b0fc4bd161917c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a> macro is defined as <code>__PRETTY_FUNC__</code> (<a href="https://gcc.gnu.org/">GCC</a> and <a href="https://clang.llvm.org/">clang</a>), <code>__FUNCSIG__</code> (<a href="https://visualstudio.microsoft.com/de/vs/features/cplusplus/">MSVC</a>) or <code>__func__</code> (otherwise).  <a href="#abfe6739c81e58c3d84b0fc4bd161917c">More...</a><br /></td></tr>
 <tr class="separator:abfe6739c81e58c3d84b0fc4bd161917c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides a class similar to <a href="https://en.cppreference.com/w/cpp/utility/source_location"><code>std::source_location</code></a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Marcel Breyer </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2020-06-25</dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2020-07-21 </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>This file is distributed under the MIT License.</dd></dl>
 <p>Differences are:</p><ul>
-<li>The new macro <code>MPICXX_PRETTY_FUNC_NAME__</code> is defined as <code>__PRETTY_FUNC__</code> (<a href="https://gcc.gnu.org/"><em>GCC</em></a> and <a href="https://clang.llvm.org/"><em>clang</em></a>), <code>__FUNCSIG__</code> (<a href="https://visualstudio.microsoft.com/de/vs/features/cplusplus/"><em>MSVC</em></a>) or <code>__func__</code> (otherwise). This macro can be used as first parameter to the static <a class="el" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current()</a> function to get a better function name.</li>
+<li>The new macro <code>MPICXX_PRETTY_FUNC_NAME__</code> is defined as <code>__PRETTY_FUNC__</code> (<a href="https://gcc.gnu.org/">GCC</a> and <a href="https://clang.llvm.org/">clang</a>), <code>__FUNCSIG__</code> (<a href="https://visualstudio.microsoft.com/de/vs/features/cplusplus/">MSVC</a>) or <code>__func__</code> (otherwise). This macro can be used as first parameter to the static <a class="el" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current()</a> function to get a better function name.</li>
 <li>Includes a member-function <a class="el" href="classmpicxx_1_1detail_1_1source__location.html#aa461826a7ae1c7d081a6a7775c26473f">mpicxx::detail::source_location::rank()</a> which holds the current MPI rank (if a MPI environment is currently active).</li>
 <li>The <a class="el" href="classmpicxx_1_1detail_1_1source__location.html#a658dd59aa4fea1938d54201726b461a4">mpicxx::detail::source_location::stack_trace()</a> function can be used to print/get the current function call stack. </li>
 </ul>
@@ -154,7 +155,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The <a class="el" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a> macro is defined as <code>__PRETTY_FUNC__</code> (<a href="https://gcc.gnu.org/"><em>GCC</em></a> and <a href="https://clang.llvm.org/"><em>clang</em></a>), <code>__FUNCSIG__</code> (<a href="https://visualstudio.microsoft.com/de/vs/features/cplusplus/"><em>MSVC</em></a>) or <code>__func__</code> (otherwise). </p>
+<p>The <a class="el" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a> macro is defined as <code>__PRETTY_FUNC__</code> (<a href="https://gcc.gnu.org/">GCC</a> and <a href="https://clang.llvm.org/">clang</a>), <code>__FUNCSIG__</code> (<a href="https://visualstudio.microsoft.com/de/vs/features/cplusplus/">MSVC</a>) or <code>__func__</code> (otherwise). </p>
 <p>It can be used as compiler independent way to enable a better function name when used as first parameter to <a class="el" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current()</a>. </p>
 
 </div>

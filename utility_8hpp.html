@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
         <meta name="generator" content="Doxygen 1.8.11"/>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <title>mpicxx: include/mpicxx/detail/utility.hpp File Reference</title>
+        <title>mpicxx: /github/workspace/mpicxx/include/mpicxx/detail/utility.hpp File Reference</title>
         <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link type="image/x-icon" rel="shortcut icon" href="logo.ico">
         <script type="text/javascript" src="dynsections.js"></script>
@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_577beba3f1c5b4ba73c78e086d96629d.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_a9f1036782c0468974feeb8f108e6341.html">detail</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_aa394cd1d9abb8ffe941d9aaafca8d03.html">github</a></li><li class="navelem"><a class="el" href="dir_c52569aa89a7adbb6029022c2fa60a11.html">workspace</a></li><li class="navelem"><a class="el" href="dir_d946da1135403067f4297c50191b2e68.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_f994a43fc660a205a9236742d2191c64.html">include</a></li><li class="navelem"><a class="el" href="dir_6f3b6bfc911252f1bb43169d9217f018.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_cb792bac188806f7c5abbb8150626824.html">detail</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -120,31 +120,32 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">utility functions checking if all values in a parameter pack fulfill a predicate</div></td></tr>
-<tr class="memitem:a761fc31b192acf730274a0f3e3b7ef43"><td class="memTemplParams" colspan="2">template&lt;typename BinaryOp , typename T , typename U &gt; </td></tr>
-<tr class="memitem:a761fc31b192acf730274a0f3e3b7ef43"><td class="memTemplItemLeft" align="right" valign="top">requires std::is_same_v&lt; std::invoke_result_t&lt; BinaryOp, T, U &gt;, bool &gt;[[nodiscard]] bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a761fc31b192acf730274a0f3e3b7ef43">mpicxx::detail::all_same</a> (BinaryOp pred, const T &amp;t, const U &amp;u)</td></tr>
-<tr class="memdesc:a761fc31b192acf730274a0f3e3b7ef43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether invoking the predicate <code>pred</code> with <code>t</code> and <code>u</code> evaluates to <code>true</code>.  <a href="namespacempicxx_1_1detail.html#a761fc31b192acf730274a0f3e3b7ef43">More...</a><br /></td></tr>
-<tr class="separator:a761fc31b192acf730274a0f3e3b7ef43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56e909f887838b146a4f6345b4f1b78a"><td class="memTemplParams" colspan="2">template&lt;typename BinaryOp , typename T , typename U , typename... Args&gt; </td></tr>
-<tr class="memitem:a56e909f887838b146a4f6345b4f1b78a"><td class="memTemplItemLeft" align="right" valign="top">requires std::is_same_v&lt; std::invoke_result_t&lt; BinaryOp, T, U &gt;, bool &gt;[[nodiscard]] bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a56e909f887838b146a4f6345b4f1b78a">mpicxx::detail::all_same</a> (BinaryOp pred, const T &amp;t, const U &amp;u, const Args &amp;...args)</td></tr>
-<tr class="memdesc:a56e909f887838b146a4f6345b4f1b78a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the results of invoking the predicate <code>pred</code> with all parameters (<code>t</code>, <code>u</code> and <code>args</code>) compare equal.  <a href="namespacempicxx_1_1detail.html#a56e909f887838b146a4f6345b4f1b78a">More...</a><br /></td></tr>
-<tr class="separator:a56e909f887838b146a4f6345b4f1b78a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a921745732ae704cc17e47d79226997ef"><td class="memTemplParams" colspan="2">template&lt;typename UnaryOp , typename T , typename U &gt; </td></tr>
-<tr class="memitem:a921745732ae704cc17e47d79226997ef"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a921745732ae704cc17e47d79226997ef">mpicxx::detail::all_same</a> (UnaryOp pred, const T &amp;t, const U &amp;u)</td></tr>
-<tr class="memdesc:a921745732ae704cc17e47d79226997ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the results of invoking the predicate <code>pred</code> with <code>t</code> and <code>u</code> compare equal.  <a href="namespacempicxx_1_1detail.html#a921745732ae704cc17e47d79226997ef">More...</a><br /></td></tr>
-<tr class="separator:a921745732ae704cc17e47d79226997ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab70535c54034b59cae3455582530172d"><td class="memTemplParams" colspan="2">template&lt;typename UnaryOp , typename T , typename U , typename... Args&gt; </td></tr>
-<tr class="memitem:ab70535c54034b59cae3455582530172d"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#ab70535c54034b59cae3455582530172d">mpicxx::detail::all_same</a> (UnaryOp pred, const T &amp;t, const U &amp;u, const Args &amp;...args)</td></tr>
-<tr class="memdesc:ab70535c54034b59cae3455582530172d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the results of invoking the predicate <code>pred</code> with all parameters (<code>t</code>, <code>u</code> and <code>args</code>) compare equal.  <a href="namespacempicxx_1_1detail.html#ab70535c54034b59cae3455582530172d">More...</a><br /></td></tr>
-<tr class="separator:ab70535c54034b59cae3455582530172d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fe2a3609f43e0978a9612a378b01028"><td class="memTemplParams" colspan="2">template&lt;typename Op , typename T &gt; </td></tr>
-<tr class="memitem:a4fe2a3609f43e0978a9612a378b01028"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a4fe2a3609f43e0978a9612a378b01028">mpicxx::detail::all_same</a> (Op pred, const T &amp;t)</td></tr>
-<tr class="memdesc:a4fe2a3609f43e0978a9612a378b01028"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether all results of invoking <code>pred</code> compare equal. Since only one parameter is given, this function returns always <code>true</code>.  <a href="namespacempicxx_1_1detail.html#a4fe2a3609f43e0978a9612a378b01028">More...</a><br /></td></tr>
-<tr class="separator:a4fe2a3609f43e0978a9612a378b01028"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afca71dc39e8b9748b2cbacbf5b043548"><td class="memTemplParams" colspan="2">template&lt;typename BinaryOp , typename T , typename U &gt; </td></tr>
+<tr class="memitem:afca71dc39e8b9748b2cbacbf5b043548"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#afca71dc39e8b9748b2cbacbf5b043548">mpicxx::detail::all_same</a> (BinaryOp pred, const T &amp;t, const U &amp;u) noexcept(std::is_nothrow_invocable_r_v&lt; bool, BinaryOp, T, U &gt;) requires std</td></tr>
+<tr class="memdesc:afca71dc39e8b9748b2cbacbf5b043548"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether invoking the predicate <code>pred</code> with <code>t</code> and <code>u</code> evaluates to <code>true</code>.  <a href="namespacempicxx_1_1detail.html#afca71dc39e8b9748b2cbacbf5b043548">More...</a><br /></td></tr>
+<tr class="separator:afca71dc39e8b9748b2cbacbf5b043548"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a4db6df7e0b3e38d37ca0c159a884e1"><td class="memTemplParams" colspan="2">template&lt;typename BinaryOp , typename T , typename U , typename... Args&gt; </td></tr>
+<tr class="memitem:a3a4db6df7e0b3e38d37ca0c159a884e1"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a3a4db6df7e0b3e38d37ca0c159a884e1">mpicxx::detail::all_same</a> (BinaryOp pred, const T &amp;t, const U &amp;u, const Args &amp;...args) noexcept(std::is_nothrow_invocable_r_v&lt; bool, BinaryOp, T, U &gt;) requires std</td></tr>
+<tr class="memdesc:a3a4db6df7e0b3e38d37ca0c159a884e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the results of invoking the predicate <code>pred</code> with all parameters (<code>t</code>, <code>u</code> and <code>args</code>) compare equal.  <a href="namespacempicxx_1_1detail.html#a3a4db6df7e0b3e38d37ca0c159a884e1">More...</a><br /></td></tr>
+<tr class="separator:a3a4db6df7e0b3e38d37ca0c159a884e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac989572ba045414117b1c874a001cc2c"><td class="memTemplParams" colspan="2">template&lt;typename UnaryOp , typename T , typename U &gt; </td></tr>
+<tr class="memitem:ac989572ba045414117b1c874a001cc2c"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#ac989572ba045414117b1c874a001cc2c">mpicxx::detail::all_same</a> (UnaryOp pred, const T &amp;t, const U &amp;u) noexcept(std::is_nothrow_invocable_v&lt; UnaryOp, T &gt; &amp;&amp;std::is_nothrow_invocable_v&lt; UnaryOp, U &gt;)</td></tr>
+<tr class="memdesc:ac989572ba045414117b1c874a001cc2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the results of invoking the predicate <code>pred</code> with <code>t</code> and <code>u</code> compare equal.  <a href="namespacempicxx_1_1detail.html#ac989572ba045414117b1c874a001cc2c">More...</a><br /></td></tr>
+<tr class="separator:ac989572ba045414117b1c874a001cc2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b3717c4e5ed10cf4c73fa7457b2b418"><td class="memTemplParams" colspan="2">template&lt;typename UnaryOp , typename T , typename U , typename... Args&gt; </td></tr>
+<tr class="memitem:a0b3717c4e5ed10cf4c73fa7457b2b418"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a0b3717c4e5ed10cf4c73fa7457b2b418">mpicxx::detail::all_same</a> (UnaryOp pred, const T &amp;t, const U &amp;u, const Args &amp;...args) noexcept(std::is_nothrow_invocable_v&lt; UnaryOp, T &gt; &amp;&amp;std::is_nothrow_invocable_v&lt; UnaryOp, U &gt;)</td></tr>
+<tr class="memdesc:a0b3717c4e5ed10cf4c73fa7457b2b418"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the results of invoking the predicate <code>pred</code> with all parameters (<code>t</code>, <code>u</code> and <code>args</code>) compare equal.  <a href="namespacempicxx_1_1detail.html#a0b3717c4e5ed10cf4c73fa7457b2b418">More...</a><br /></td></tr>
+<tr class="separator:a0b3717c4e5ed10cf4c73fa7457b2b418"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab25011ab9fd5f3a6cb0113061e9c1a81"><td class="memTemplParams" colspan="2">template&lt;typename Op , typename T &gt; </td></tr>
+<tr class="memitem:ab25011ab9fd5f3a6cb0113061e9c1a81"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#ab25011ab9fd5f3a6cb0113061e9c1a81">mpicxx::detail::all_same</a> (Op pred, const T &amp;t) noexcept</td></tr>
+<tr class="memdesc:ab25011ab9fd5f3a6cb0113061e9c1a81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether all results of invoking <code>pred</code> compare equal. Since only one parameter is given, this function returns always <code>true</code>.  <a href="namespacempicxx_1_1detail.html#ab25011ab9fd5f3a6cb0113061e9c1a81">More...</a><br /></td></tr>
+<tr class="separator:ab25011ab9fd5f3a6cb0113061e9c1a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Defines utility functions used in the mpicxx library. </p>
 <dl class="section author"><dt>Author</dt><dd>Marcel Breyer </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2020-06-23 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2020-07-20 </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>This file is distributed under the MIT License. </dd></dl>
 </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
 <!-- start footer part -->

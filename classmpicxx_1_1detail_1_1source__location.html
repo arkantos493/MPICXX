@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -137,12 +137,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:af37ddd34d737ac48f15db3d41d2655e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classmpicxx_1_1detail_1_1source__location.html">mpicxx::detail::source_location</a> with the respective information about the current call side.  <a href="#af37ddd34d737ac48f15db3d41d2655e9">More...</a><br /></td></tr>
 <tr class="separator:af37ddd34d737ac48f15db3d41d2655e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a658dd59aa4fea1938d54201726b461a4"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1detail_1_1source__location.html#a658dd59aa4fea1938d54201726b461a4">stack_trace</a> ([[maybe_unused]] const int max_call_stack_size=64)</td></tr>
-<tr class="memdesc:a658dd59aa4fea1938d54201726b461a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the current stack trace to the given output stream <code>out</code>.  <a href="#a658dd59aa4fea1938d54201726b461a4">More...</a><br /></td></tr>
+<tr class="memdesc:a658dd59aa4fea1938d54201726b461a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current stack trace.  <a href="#a658dd59aa4fea1938d54201726b461a4">More...</a><br /></td></tr>
 <tr class="separator:a658dd59aa4fea1938d54201726b461a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Represents information of a specific source code location. </p>
-<p>Example usage: </p><div class="fragment"><div class="line"></div><div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;string_view&gt;</span></div><div class="line"></div><div class="line"><span class="preprocessor">#include &lt;mpicxx/detail/source_location&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">void</span> log(std::string_view message,</div><div class="line">        <span class="keyword">const</span> <a class="code" href="classmpicxx_1_1detail_1_1source__location.html">mpicxx::detail::source_location</a>&amp; loc = <a class="code" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current</a>())</div><div class="line">{</div><div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;info:\n&quot;</span></div><div class="line">              &lt;&lt; <span class="stringliteral">&quot;   &quot;</span> &lt;&lt; location.file_name() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div><div class="line">              &lt;&lt; <span class="stringliteral">&quot;   &quot;</span> &lt;&lt; loc.function_name() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div><div class="line">              &lt;&lt; <span class="stringliteral">&quot;   &quot;</span> &lt;&lt; loc.line() &lt;&lt; <span class="stringliteral">&quot;\n\n&quot;</span></div><div class="line">              &lt;&lt; message &lt;&lt; std::endl;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>() {</div><div class="line">    <span class="comment">// normal usage</span></div><div class="line">    log(<span class="stringliteral">&quot;Hello, world!&quot;</span>);</div><div class="line"></div><div class="line">    <span class="comment">// better function name</span></div><div class="line">    log(<span class="stringliteral">&quot;Hello, world!&quot;</span>, <a class="code" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current</a>(<a class="code" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a>));</div><div class="line"></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --> </div><h2 class="groupheader">Member Function Documentation</h2>
+<p>Example usage: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;string_view&gt;</span></div><div class="line"></div><div class="line"><span class="preprocessor">#include &lt;mpicxx/detail/source_location&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">void</span> log(std::string_view message,</div><div class="line">        <span class="keyword">const</span> <a class="code" href="classmpicxx_1_1detail_1_1source__location.html">mpicxx::detail::source_location</a>&amp; loc = <a class="code" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current</a>())</div><div class="line">{</div><div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;info:\n&quot;</span></div><div class="line">              &lt;&lt; <span class="stringliteral">&quot;   &quot;</span> &lt;&lt; location.file_name() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div><div class="line">              &lt;&lt; <span class="stringliteral">&quot;   &quot;</span> &lt;&lt; loc.function_name() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span></div><div class="line">              &lt;&lt; <span class="stringliteral">&quot;   &quot;</span> &lt;&lt; loc.line() &lt;&lt; <span class="stringliteral">&quot;\n\n&quot;</span></div><div class="line">              &lt;&lt; message &lt;&lt; std::endl;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>() {</div><div class="line">    <span class="comment">// normal usage</span></div><div class="line">    log(<span class="stringliteral">&quot;Hello, world!&quot;</span>);</div><div class="line"></div><div class="line">    <span class="comment">// better function name</span></div><div class="line">    log(<span class="stringliteral">&quot;Hello, world!&quot;</span>, <a class="code" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current</a>(<a class="code" href="source__location_8hpp.html#abfe6739c81e58c3d84b0fc4bd161917c">MPICXX_PRETTY_FUNC_NAME__</a>));</div><div class="line"></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --></div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="af37ddd34d737ac48f15db3d41d2655e9"></a>
 <div class="memitem">
 <div class="memproto">
@@ -188,7 +188,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Constructs a new <a class="el" href="classmpicxx_1_1detail_1_1source__location.html">mpicxx::detail::source_location</a> with the respective information about the current call side. </p>
-<p>The MPI rank is set to <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> if an error occurred during the call to <em>MPI_Comm_rank</em> (an exception is thrown or a return code different than <em>MPI_SUCCESS</em> is returned). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>The MPI rank is set to <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> if an error occurred during the call to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node155.htm"><em>MPI_Comm_rank</em></a> (an exception is thrown or a return code different than <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node222.htm"><em>MPI_SUCCESS</em></a> is returned). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>the function name (including its signature if supported via the macro <code>MPICXX_PRETTY_FUNC_NAME__</code>) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>the file name (absolute path) </td></tr>
@@ -197,11 +197,11 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the m<a class="el" href="classmpicxx_1_1detail_1_1source__location.html">mpicxx::detail::source_location</a> holding the call side location information (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="classmpicxx_1_1detail_1_1source__location.html">mpicxx::detail::source_location</a> holding the call side location information <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd><code>column</code> is always (independent of the call side position) default initialized to 0!</dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Initialized(<span class="keywordtype">int</span> *flag);                  <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Finalized(<span class="keywordtype">int</span> *flag);                    <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Comm_rank(MPI_Comm comm, <span class="keywordtype">int</span> *<a class="code" href="classmpicxx_1_1detail_1_1source__location.html#aa461826a7ae1c7d081a6a7775c26473f">rank</a>);     <span class="comment">// at most once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Initialized(<span class="keywordtype">int</span> *flag);                 <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Finalized(<span class="keywordtype">int</span> *flag);                   <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Comm_rank(MPI_Comm comm, <span class="keywordtype">int</span> *<a class="code" href="classmpicxx_1_1detail_1_1source__location.html#aa461826a7ae1c7d081a6a7775c26473f">rank</a>);    <span class="comment">// at most once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -228,16 +228,16 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Prints the current stack trace to the given output stream <code>out</code>. </p>
-<p>For a better stack trace (precise function names) the linker flag <code>-rdynamic</code> is set if and only if <b>any</b> MPICXX_ASSERTION has been activated during cmake's configuration step.</p>
-<p>A sample stack trace (while <code>-rdynamic</code> is set) could look like: </p><div class="fragment"><div class="line">stack trace:</div><div class="line"><span class="preprocessor"> #5    ./output.s: test(int) [+0x3]</span></div><div class="line"><span class="preprocessor"> #4    ./output.s: foo() [+0x1]</span></div><div class="line"><span class="preprocessor"> #3    ./output.s: main() [+0x1]</span></div><div class="line"><span class="preprocessor"> #2    /lib/x86_64-linux-gnu/libc.so.6: __libc_start_main() [+0xe]</span></div><div class="line"><span class="preprocessor"> #1    ./output.s: _start() [+0x2]</span></div></div><!-- fragment --> <dl class="params"><dt>Parameters</dt><dd>
+<p>Returns the current stack trace. </p>
+<p>For a better stack trace (precise function names) the linker flag <code>-rdynamic</code> is set if and only if <b>any</b> <code>MPICXX_ASSERTION_...</code> has been activated during <a href="https://cmake.org/"><code>Cmake</code></a>'s configuration step.</p>
+<p>A sample stack trace (while <code>-rdynamic</code> is set) could look like: </p><div class="fragment"><div class="line">stack trace:</div><div class="line"><span class="preprocessor">  #5    ./output.s: test(int) [+0x3]</span></div><div class="line"><span class="preprocessor">  #4    ./output.s: foo() [+0x1]</span></div><div class="line"><span class="preprocessor">  #3    ./output.s: main() [+0x1]</span></div><div class="line"><span class="preprocessor">  #2    /lib/x86_64-linux-gnu/libc.so.6: __libc_start_main() [+0xe]</span></div><div class="line"><span class="preprocessor">  #1    ./output.s: _start() [+0x2]</span></div></div><!-- fragment --> <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">max_call_stack_size</td><td>the maximum depth of the stack trace report </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the stack trace (<code>[[nodiscard]]</code>)</dd></dl>
-<dl class="section attention"><dt>Attention</dt><dd>The stack trace report is only available under <a href="https://gcc.gnu.org/"><em>GCC</em></a> and <a href="https://clang.llvm.org/"><em>clang</em></a> (to be precise: only if <code>__GNUG__</code> is defined). This function does nothing if <code>__GNUG__</code> isn't defined. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the stack trace <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>The stack trace report is only available under <a href="https://gcc.gnu.org/">GCC</a> and <a href="https://clang.llvm.org/">clang</a> (to be precise: only if <code>__GNUG__</code> is defined). This function does nothing if <code>__GNUG__</code> isn't defined. </dd></dl>
 
 </div>
 </div>
@@ -263,7 +263,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the absolute path name of the file. </p>
-<dl class="section return"><dt>Returns</dt><dd>the file name (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the file name <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -289,7 +289,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the function name without additional signature information (i.e. return type or parameters). </p>
-<dl class="section return"><dt>Returns</dt><dd>the function name (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the function name <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -315,7 +315,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the line number. </p>
-<dl class="section return"><dt>Returns</dt><dd>the line number (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the line number <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -341,7 +341,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the column number. </p>
-<dl class="section return"><dt>Returns</dt><dd>the column number (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the column number <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>Default value in <a class="el" href="classmpicxx_1_1detail_1_1source__location.html#af37ddd34d737ac48f15db3d41d2655e9">mpicxx::detail::source_location::current()</a> always 0! </dd></dl>
 
 </div>
@@ -368,7 +368,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the rank if a MPI environment is currently active. </p>
-<p>If no MPI environment is currently active, the returned <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> is empty. </p><dl class="section return"><dt>Returns</dt><dd>a <a href="https://en.cppreference.com/w/cpp/utility/optional"><code>std::optional&lt;int&gt;</code></a> containing the current MPI rank (<code>[[nodiscard]]</code>) </dd></dl>
+<p>If no MPI environment is currently active, the returned <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> is empty. </p><dl class="section return"><dt>Returns</dt><dd>a <a href="https://en.cppreference.com/w/cpp/utility/optional"><code>std::optional</code></a> containing the current MPI rank <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>

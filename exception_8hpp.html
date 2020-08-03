@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
         <meta name="generator" content="Doxygen 1.8.11"/>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <title>mpicxx: include/mpicxx/exception/exception.hpp File Reference</title>
+        <title>mpicxx: /github/workspace/mpicxx/include/mpicxx/exception/exception.hpp File Reference</title>
         <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link type="image/x-icon" rel="shortcut icon" href="logo.ico">
         <script type="text/javascript" src="dynsections.js"></script>
@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_577beba3f1c5b4ba73c78e086d96629d.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_5f0a94158d9760e9475282f0d3768217.html">exception</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_aa394cd1d9abb8ffe941d9aaafca8d03.html">github</a></li><li class="navelem"><a class="el" href="dir_c52569aa89a7adbb6029022c2fa60a11.html">workspace</a></li><li class="navelem"><a class="el" href="dir_d946da1135403067f4297c50191b2e68.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_f994a43fc660a205a9236742d2191c64.html">include</a></li><li class="navelem"><a class="el" href="dir_6f3b6bfc911252f1bb43169d9217f018.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_30077eab8a64338118d64edf6f738286.html">exception</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -108,12 +108,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>Contains the base class for all custom exception in the mpicxx namespace.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;memory&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="concepts_8hpp_source.html">mpicxx/detail/concepts.hpp</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="source__location_8hpp_source.html">mpicxx/detail/source_location.hpp</a>&gt;</code><br />
+<code>#include &lt;fmt/format.h&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
 <code>#include &lt;stdexcept&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
-<code>#include &lt;fmt/format.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="concepts_8hpp_source.html">mpicxx/detail/concepts.hpp</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="source__location_8hpp_source.html">mpicxx/detail/source_location.hpp</a>&gt;</code><br />
 </div>
 <p><a href="exception_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -138,8 +138,9 @@ Macros</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains the base class for all custom exception in the mpicxx namespace. </p>
 <dl class="section author"><dt>Author</dt><dd>Marcel Breyer </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2020-06-27</dd></dl>
-<p>This base class is fully standard conformant, i.e. it provides a public <b>noexcept</b> copy constructor and copy assignment operator. </p>
+<dl class="section date"><dt>Date</dt><dd>2020-07-21 </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>This file is distributed under the MIT License.</dd></dl>
+<p>This base class is standard conformant, i.e. it provides a public <a href="https://en.cppreference.com/w/cpp/language/noexcept_spec"><code>noexcept</code></a> copy constructor and copy assignment operator. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
 <a class="anchor" id="a21960387ab783299f9000a50c2b07cb1"></a>
 <div class="memitem">

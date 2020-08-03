@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -119,13 +119,13 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmpicxx_1_1clock.html">clock</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A clock wrapper for <em>MPI_Wtime</em> and <em>MPI_Wtick</em> which supports <a href="https://en.cppreference.com/w/cpp/chrono"><code>std::chrono</code></a>.  <a href="structmpicxx_1_1clock.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A clock wrapper for <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtime</em></a> and <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtick</em></a> which supports <a href="https://en.cppreference.com/w/cpp/chrono"><code>std::chrono</code></a>.  <a href="structmpicxx_1_1clock.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1exception.html">exception</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The base class of all exceptions in the mpicxx namespace.  <a href="classmpicxx_1_1exception.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info.html">info</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class is a wrapper to the <em>MPI_Info</em> object providing a interface inspired by <a href="https://en.cppreference.com/w/cpp/container/unordered_map"><code>std::unordered_map</code></a> and <a href="https://en.cppreference.com/w/cpp/container/map"><code>std::map</code></a>.  <a href="classmpicxx_1_1info.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class is a wrapper to the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_Info</em></a> object providing a interface inspired by <a href="https://en.cppreference.com/w/cpp/container/unordered_map"><code>std::unordered_map</code></a> and <a href="https://en.cppreference.com/w/cpp/container/map"><code>std::map</code></a>.  <a href="classmpicxx_1_1info.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spawner class which enables to spawn (multiple) <b>different</b> MPI processes at runtime.  <a href="classmpicxx_1_1multiple__spawner.html#details">More...</a><br /></td></tr>
@@ -134,10 +134,11 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spawner class which enables to spawn (multiple) MPI processes at runtime.  <a href="classmpicxx_1_1single__spawner.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result.html">spawn_result</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#a665db5834f62af806737247d05dd5210">mpicxx::single_spawner::spawn()</a> resp. <a class="el" href="classmpicxx_1_1multiple__spawner.html#a7fc5be2b9f642f4b4c02dcb8a8f7bbfe">mpicxx::multiple_spawner::spawn()</a>.  <a href="classmpicxx_1_1spawn__result.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#a665db5834f62af806737247d05dd5210">mpicxx::single_spawner::spawn()</a> respectively <a class="el" href="classmpicxx_1_1multiple__spawner.html#a7fc5be2b9f642f4b4c02dcb8a8f7bbfe">mpicxx::multiple_spawner::spawn()</a>.  <a href="classmpicxx_1_1spawn__result.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html">spawn_result_with_errcodes</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> resp. <a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>.  <a href="classmpicxx_1_1spawn__result__with__errcodes.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> respectively <br />
+<a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>.  <a href="classmpicxx_1_1spawn__result__with__errcodes.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1thread__support__not__satisfied.html">thread_support_not_satisfied</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An exception which is thrown if the required level of thread support can't be satisfied.  <a href="classmpicxx_1_1thread__support__not__satisfied.html#details">More...</a><br /></td></tr>
@@ -146,7 +147,7 @@ Classes</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a42348b41aa2985de36a0505e876da9f9"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a42348b41aa2985de36a0505e876da9f9">spawner</a> = <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a></td></tr>
-<tr class="memdesc:a42348b41aa2985de36a0505e876da9f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">default spawner is a <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a>  <a href="#a42348b41aa2985de36a0505e876da9f9">More...</a><br /></td></tr>
+<tr class="memdesc:a42348b41aa2985de36a0505e876da9f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The default spawner is a <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a>.  <a href="#a42348b41aa2985de36a0505e876da9f9">More...</a><br /></td></tr>
 <tr class="separator:a42348b41aa2985de36a0505e876da9f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -161,7 +162,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a7c3e78916536320a81ef7d853099f77c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of the processor this code is currently running on.  <a href="#a7c3e78916536320a81ef7d853099f77c">More...</a><br /></td></tr>
 <tr class="separator:a7c3e78916536320a81ef7d853099f77c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace00036524d8cf0362a3744b55e7d41f"><td class="memItemLeft" align="right" valign="top">std::optional&lt; MPI_Comm &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#ace00036524d8cf0362a3744b55e7d41f">parent_process</a> ()</td></tr>
-<tr class="memdesc:ace00036524d8cf0362a3744b55e7d41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the parent intracommunicator of the current process if the process was started with <em>MPI_COMM_SPAWN</em> or <em>MPI_COMM_SPAWN_MULTIPLE</em>.  <a href="#ace00036524d8cf0362a3744b55e7d41f">More...</a><br /></td></tr>
+<tr class="memdesc:ace00036524d8cf0362a3744b55e7d41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the parent intercommunicator of the current process if the process was started with <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm"><em>MPI_Comm_spawn</em></a> or <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm"><em>MPI_Comm_spawn_multiple</em></a>.  <a href="#ace00036524d8cf0362a3744b55e7d41f">More...</a><br /></td></tr>
 <tr class="separator:ace00036524d8cf0362a3744b55e7d41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">conversion functions to std::string</div></td></tr>
 <tr class="memitem:ad5059762ddb1053c96d5c6a6eae84ebb"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
@@ -179,7 +180,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a10ae5c9c6e4aeeb402f7c39832c0d1c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to abort all tasks in the communication group of <code>comm</code>.  <a href="#a10ae5c9c6e4aeeb402f7c39832c0d1c8">More...</a><br /></td></tr>
 <tr class="separator:a10ae5c9c6e4aeeb402f7c39832c0d1c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5248e613642eada46f062bd0ca69a0af"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a5248e613642eada46f062bd0ca69a0af">atfinalize</a> (detail::atfinalize_callback_t func)</td></tr>
-<tr class="memdesc:a5248e613642eada46f062bd0ca69a0af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the callback function <code>func</code> (of the type <code>void (*)void</code>) to be called directly before <em>MPI_Finalize</em>.  <a href="#a5248e613642eada46f062bd0ca69a0af">More...</a><br /></td></tr>
+<tr class="memdesc:a5248e613642eada46f062bd0ca69a0af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the callback function <code>func</code> (of the type <code>void (*)void</code>) to be called directly before <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm"><em>MPI_Finalize</em></a>.  <a href="#a5248e613642eada46f062bd0ca69a0af">More...</a><br /></td></tr>
 <tr class="separator:a5248e613642eada46f062bd0ca69a0af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">initialization of the MPI environment</div></td></tr>
 <tr class="memitem:a6cc2ebeee678d1478e910d1bc58c0181"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">initialized</a> ()</td></tr>
@@ -207,28 +208,30 @@ Functions</h2></td></tr>
 <tr class="memdesc:aa3cc96e47c8ea50ef686359ea1e59925"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>true</code> if this thread is the main thread, i.e. the thread that called <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a>.  <a href="#aa3cc96e47c8ea50ef686359ea1e59925">More...</a><br /></td></tr>
 <tr class="separator:aa3cc96e47c8ea50ef686359ea1e59925"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">automatic initialization and finalization of the MPI environment</div></td></tr>
-<tr class="memitem:aa2335721fe24326defb4742a76a6e268"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
-<tr class="memitem:aa2335721fe24326defb4742a76a6e268"><td class="memTemplItemLeft" align="right" valign="top">requires <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a>&lt; FuncPtr, Args... &gt; int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a> (FuncPtr func, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:aa2335721fe24326defb4742a76a6e268"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment while executing the code given by <code>func</code>.  <a href="#aa2335721fe24326defb4742a76a6e268">More...</a><br /></td></tr>
-<tr class="separator:aa2335721fe24326defb4742a76a6e268"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4d5d868d4ebe467a13a77dc68afe167"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
-<tr class="memitem:ac4d5d868d4ebe467a13a77dc68afe167"><td class="memTemplItemLeft" align="right" valign="top">requires <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">detail::is_main_args_pointer</a>&lt; FuncPtr, Args... &gt; int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#ac4d5d868d4ebe467a13a77dc68afe167">main</a> (FuncPtr func, int &amp;argc, char **argv, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:ac4d5d868d4ebe467a13a77dc68afe167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment while executing the code given by <code>func</code>.  <a href="#ac4d5d868d4ebe467a13a77dc68afe167">More...</a><br /></td></tr>
-<tr class="separator:ac4d5d868d4ebe467a13a77dc68afe167"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad714dfc6ed0eb9afde0e6d0d89c4dbbb"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
-<tr class="memitem:ad714dfc6ed0eb9afde0e6d0d89c4dbbb"><td class="memTemplItemLeft" align="right" valign="top">requires <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a>&lt; FuncPtr, Args... &gt; int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#ad714dfc6ed0eb9afde0e6d0d89c4dbbb">main</a> (FuncPtr func, const <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a> required, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:ad714dfc6ed0eb9afde0e6d0d89c4dbbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. If the required level of thread support couldn't be satisfied, the function returns immediately with return code <em>EXIT_FAILURE</em>.  <a href="#ad714dfc6ed0eb9afde0e6d0d89c4dbbb">More...</a><br /></td></tr>
-<tr class="separator:ad714dfc6ed0eb9afde0e6d0d89c4dbbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6bb33c10e0e7b3657a248ea0381a244"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
-<tr class="memitem:aa6bb33c10e0e7b3657a248ea0381a244"><td class="memTemplItemLeft" align="right" valign="top">requires <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">detail::is_main_args_pointer</a>&lt; FuncPtr, Args... &gt; int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#aa6bb33c10e0e7b3657a248ea0381a244">main</a> (FuncPtr func, int &amp;argc, char **argv, const <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a> required, Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:aa6bb33c10e0e7b3657a248ea0381a244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. If the required level of thread support couldn't be satisfied, the function returns immediately with return code <em>EXIT_FAILURE</em>.  <a href="#aa6bb33c10e0e7b3657a248ea0381a244">More...</a><br /></td></tr>
-<tr class="separator:aa6bb33c10e0e7b3657a248ea0381a244"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0f4474ecfbb1bd9434d56f216592dd1"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
+<tr class="memitem:ae0f4474ecfbb1bd9434d56f216592dd1"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a> (FuncPtr func, Args &amp;&amp;...args) requires detail</td></tr>
+<tr class="memdesc:ae0f4474ecfbb1bd9434d56f216592dd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment while executing the code given by <code>func</code>.  <a href="#ae0f4474ecfbb1bd9434d56f216592dd1">More...</a><br /></td></tr>
+<tr class="separator:ae0f4474ecfbb1bd9434d56f216592dd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af85020142c801c04ad6ad61b5b3c4ef3"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
+<tr class="memitem:af85020142c801c04ad6ad61b5b3c4ef3"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#af85020142c801c04ad6ad61b5b3c4ef3">main</a> (FuncPtr func, int &amp;argc, char **argv, Args &amp;&amp;...args) requires detail</td></tr>
+<tr class="memdesc:af85020142c801c04ad6ad61b5b3c4ef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment while executing the code given by <code>func</code>.  <a href="#af85020142c801c04ad6ad61b5b3c4ef3">More...</a><br /></td></tr>
+<tr class="separator:af85020142c801c04ad6ad61b5b3c4ef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20a2505fbb89d987198a7a76857645f1"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
+<tr class="memitem:a20a2505fbb89d987198a7a76857645f1"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a20a2505fbb89d987198a7a76857645f1">main</a> (FuncPtr func, const <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a> required, Args &amp;&amp;...args) requires detail</td></tr>
+<tr class="memdesc:a20a2505fbb89d987198a7a76857645f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. <br />
+ If the required level of thread support couldn't be satisfied, the function returns immediately with return code <a href="https://en.cppreference.com/w/cpp/utility/program/EXIT_status"><code>EXIT_FAILURE</code></a>.  <a href="#a20a2505fbb89d987198a7a76857645f1">More...</a><br /></td></tr>
+<tr class="separator:a20a2505fbb89d987198a7a76857645f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a671421e595a2563cc4c5eebe38d2cd"><td class="memTemplParams" colspan="2">template&lt;typename FuncPtr , typename... Args&gt; </td></tr>
+<tr class="memitem:a9a671421e595a2563cc4c5eebe38d2cd"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a9a671421e595a2563cc4c5eebe38d2cd">main</a> (FuncPtr func, int &amp;argc, char **argv, const <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a> required, Args &amp;&amp;...args) requires detail</td></tr>
+<tr class="memdesc:a9a671421e595a2563cc4c5eebe38d2cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. <br />
+ If the required level of thread support couldn't be satisfied, the function returns immediately with return code <a href="https://en.cppreference.com/w/cpp/utility/program/EXIT_status"><code>EXIT_FAILURE</code></a>.  <a href="#a9a671421e595a2563cc4c5eebe38d2cd">More...</a><br /></td></tr>
+<tr class="separator:a9a671421e595a2563cc4c5eebe38d2cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">mpicxx::thread_support conversion functions</div></td></tr>
 <tr class="memitem:a91098bb280b279ee9b5d187121b21716"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a91098bb280b279ee9b5d187121b21716">operator&lt;&lt;</a> (std::ostream &amp;out, const <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a> ts)</td></tr>
 <tr class="memdesc:a91098bb280b279ee9b5d187121b21716"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stream-insertion operator overload for the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> enum class.  <a href="#a91098bb280b279ee9b5d187121b21716">More...</a><br /></td></tr>
 <tr class="separator:a91098bb280b279ee9b5d187121b21716"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c8b9da037802eca89bd0278be5e7b7c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#a5c8b9da037802eca89bd0278be5e7b7c">to_string</a> (const <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a> ts)</td></tr>
-<tr class="memdesc:a5c8b9da037802eca89bd0278be5e7b7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload of the <a class="el" href="namespacempicxx.html#ad5059762ddb1053c96d5c6a6eae84ebb">mpicxx::to_string</a> function for the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85" title="Enum class for the different levels of thread support provided by MPI. ">mpicxx::thread_support</a> enum class.  <a href="#a5c8b9da037802eca89bd0278be5e7b7c">More...</a><br /></td></tr>
+<tr class="memdesc:a5c8b9da037802eca89bd0278be5e7b7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload of the <a class="el" href="namespacempicxx.html#ad5059762ddb1053c96d5c6a6eae84ebb">mpicxx::to_string(T&amp;&amp;)</a> function for the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> enum class.  <a href="#a5c8b9da037802eca89bd0278be5e7b7c">More...</a><br /></td></tr>
 <tr class="separator:a5c8b9da037802eca89bd0278be5e7b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab69c703bcf9df9417f074e5696e2853c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">thread_support</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#ab69c703bcf9df9417f074e5696e2853c">thread_support_from_string</a> (const std::string_view sv)</td></tr>
 <tr class="memdesc:ab69c703bcf9df9417f074e5696e2853c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the given string to the respective <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> value.  <a href="#ab69c703bcf9df9417f074e5696e2853c">More...</a><br /></td></tr>
@@ -250,7 +253,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>default spawner is a <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a> </p>
+<p>The default spawner is a <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a>. </p>
 
 </div>
 </div>
@@ -356,11 +359,11 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the maximum possible number of processes. </p>
-<dl class="section return"><dt>Returns</dt><dd>a <a href="https://en.cppreference.com/w/cpp/utility/optional"><code>std::optional</code></a> containing the maximum possible number of processes or <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> if no value could be retrieved (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a <a href="https://en.cppreference.com/w/cpp/utility/optional"><code>std::optional</code></a> containing the maximum possible number of processes or <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> if no value could be retrieved <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>It may be possible that less than <code>universe_size</code> processes can be spawned if processes are already running.</dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_get_attr(MPI_Comm comm, <span class="keywordtype">int</span> comm_keyval, <span class="keywordtype">void</span> *attribute_val, <span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_get_attr(MPI_Comm comm, <span class="keywordtype">int</span> comm_keyval, <span class="keywordtype">void</span> *attribute_val, <span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -387,10 +390,10 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the name of the processor this code is currently running on. </p>
-<dl class="section return"><dt>Returns</dt><dd>the name of the processor this code is running on (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the name of the processor this code is running on <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Get_processor_name(<span class="keywordtype">char</span> *<a class="code" href="namespacempicxx_1_1version.html#a61c87bed915a3f63b09f7374cb37e033">name</a>, <span class="keywordtype">int</span> *resultlen);      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Get_processor_name(<span class="keywordtype">char</span> *<a class="code" href="namespacempicxx_1_1version.html#a61c87bed915a3f63b09f7374cb37e033">name</a>, <span class="keywordtype">int</span> *resultlen);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -417,8 +420,8 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Checks whether <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a> has completed. </p>
-<p>It is valid to call <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a> before <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> and after <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a>. </p><pre class="fragment">     This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-</pre> <dl class="section return"><dt>Returns</dt><dd><code>true</code> if <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a> has completed, otherwise <code>false</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<p>It is valid to call <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a> before <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> and after <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a>.</p>
+<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a> has completed, otherwise <code>false</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
 <dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Finalized(<span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
@@ -449,13 +452,21 @@ template&lt;typename T &gt; </div>
 
 <p>Clean up the MPI state. </p>
 <p>If a MPI program terminates normally (i.e., not due to a call to <a class="el" href="namespacempicxx.html#a10ae5c9c6e4aeeb402f7c39832c0d1c8">mpicxx::abort()</a> or an unrecoverable error) then each process must call <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a> before it exits. Before an MPI process invokes <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a>, the process must perform all MPI calls needed to complete its involvement in MPI communications.</p>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be finalized. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment has been finalized, i.e. it's illegal to call any mpicxx function. The only exceptions are:<ul>
+<li><a class="el" href="namespacempicxx_1_1version.html#ad915eb6db5ef3a01ccf1c425df178f0b">mpicxx::version::mpi_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#a5d6a4bee135335d2c0e8d97d3166b051">mpicxx::version::mpi_version_major()</a>, <a class="el" href="namespacempicxx_1_1version.html#af6e42859aa8a1e90d10e275e297580fb">mpicxx::version::mpi_version_minor()</a></li>
+<li><a class="el" href="namespacempicxx_1_1version.html#abda411dca5f225a9be45a52db541d7ca">mpicxx::version::mpi_library_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#aa562055e1a62e8ba21cda9f6a3106ad4">mpicxx::version::mpi_library_name()</a></li>
+<li><a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a>, <a class="el" href="namespacempicxx.html#ae7adc49a22cb146f9e0febe3bff13203">mpicxx::active()</a>, <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a></li>
+<li>other mpicxx functions that don't wrap MPI calls</li>
+</ul>
+</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the MPI environment has already been finalized. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Finalize(<span class="keywordtype">void</span>);      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Finalize(<span class="keywordtype">void</span>);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -493,7 +504,7 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Attempts to abort all tasks in the communication group of <code>comm</code>. </p>
-<p>An MPI implementation is <b>not</b> required to be able to abort only a subset of processes of <em>MPI_COMM_WORLD</em>. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>An MPI implementation is <b>not</b> required to be able to abort only a subset of processes of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">error_code</td><td>the error code (not necessarily returned from the executable) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">comm</td><td>the communicator whom's tasks to abort</td></tr>
@@ -502,7 +513,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Abort(MPI_Comm comm, <span class="keywordtype">int</span> errorcode);      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Abort(MPI_Comm comm, <span class="keywordtype">int</span> errorcode);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -529,7 +540,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Registers the callback function <code>func</code> (of the type <code>void (*)void</code>) to be called directly before <em>MPI_Finalize</em>. </p>
+<p>Registers the callback function <code>func</code> (of the type <code>void (*)void</code>) to be called directly before <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm"><em>MPI_Finalize</em></a>. </p>
 <p>Calls all registered functions in reverse order in which they were set. This happens before any other parts of MPI are affected, i.e. <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a> will return <code>false</code> in any of these callback functions.</p>
 <p>The maximum number of registrable callback functions can be set via the <a href="https://cmake.org/"><code>CMake</code></a> configuration flag <em>MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS</em> (default: <code>32</code>). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -538,13 +549,17 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>0</code> if the registration succeeded, <code>1</code> otherwise</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The callback function pointer <code>func</code> <b>must not</b> be the <code>nullptr</code>. </dd>
+<dd>
+The total number of added callback functions <b>must not</b> be greater or equal than <em>MPICXX_MAX_NUMBER_OF_ATFINALIZE_CALLBACKS</em>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
-<dd>If <code>func</code> is the <code>nullptr</code>. </dd>
+<dd>If <code>func</code> is the <code>nullptr</code>. <br />
+ If adding <code>func</code> would exceed the size limit. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_create_keyval(MPI_Comm_copy_attr_function *comm_copy_attr_fn, MPI_Comm_delete_attr_function *comm_delete_attr_fn, <span class="keywordtype">int</span> *comm_keyval, <span class="keywordtype">void</span> *extra_state);     <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Comm_set_attr(MPI_Comm comm, <span class="keywordtype">int</span> comm_keyval, <span class="keywordtype">void</span> *attribute_val); </div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_create_keyval(MPI_Comm_copy_attr_function *comm_copy_attr_fn, MPI_Comm_delete_attr_function *comm_delete_attr_fn, <span class="keywordtype">int</span> *comm_keyval, <span class="keywordtype">void</span> *extra_state);    <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Comm_set_attr(MPI_Comm comm, <span class="keywordtype">int</span> comm_keyval, <span class="keywordtype">void</span> *attribute_val);    <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -571,8 +586,8 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Checks whether <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> has completed. </p>
-<p>It is valid to call <a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a> before <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> and after <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a>. </p><pre class="fragment">     This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-</pre> <dl class="section return"><dt>Returns</dt><dd><code>true</code> if <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> has completed, otherwise <code>false</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<p>It is valid to call <a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a> before <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> and after <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a>.</p>
+<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> has completed, otherwise <code>false</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
 <dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Initialized(<span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
@@ -602,11 +617,11 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Checks whether the MPI environment is currently active, i.e. <a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a> returns <code>true</code> and <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a> returns <code>false</code>. </p>
-<p>It is valid to call any mpicxx function (except the <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> functions) while this function returns <code>true</code>. </p><pre class="fragment">     This function is thread safe as required by the [MPI standard 3.1](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf).
-</pre> <dl class="section return"><dt>Returns</dt><dd><code>true</code> if currently the MPI environment is active, otherwise <code>false</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<p>It is valid to call any mpicxx function (except the <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a> functions) while this function returns <code>true</code>.</p>
+<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if currently the MPI environment is active, otherwise <code>false</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Initialized(<span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Finalized(<span class="keywordtype">int</span> *flag);      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Initialized(<span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Finalized(<span class="keywordtype">int</span> *flag);      <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -633,14 +648,16 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Initialize the MPI environment. </p>
-<p>All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization routines are erroneous.</p>
+<p>All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization routines are erroneous.</p>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment is initialized, i.e. <b>any</b> mpicxx function can be called, except other initialization functions.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the MPI environment has already been initialized. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);       <span class="comment">// exactly once  </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);    <span class="comment">// exactly once  </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -678,20 +695,22 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Initialize the MPI environment. </p>
-<p>All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization routines are erroneous. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization routines are erroneous. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argc</td><td>number of command line arguments </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argv</td><td>command line arguments</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment is initialized, i.e. <b>any</b> mpicxx function can be called, except other initialization functions.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the MPI environment has already been initialized. </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);       <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -719,14 +738,16 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Initialize the MPI environment with the required level of thread support (or higher). </p>
-<p>All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization routines are erroneous.</p>
-<p>A MPI implementation is not required to return the level of thread support requested by <code>required</code> if it can provide a higher level of thread support. For example if the requested level of thread support is <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a> (<em>MPI_THREAD_SINGLE</em>) an implementation could return <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a> (<em>MPI_THREAD_MULTIPLE</em>). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>All MPI programs must contain exactly one call to a mpicxx initialization routine. Subsequent calls to any initialization routines are erroneous.</p>
+<p>A MPI implementation is not required to return the level of thread support requested by <code>required</code> if it can provide a higher level of thread support. For example if the requested level of thread support is <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a> (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><em>MPI_THREAD_SINGLE</em></a>) an implementation could return <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a> (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><em>MPI_THREAD_MULTIPLE</em></a>). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">required</td><td>the required level of thread support </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the provided level of thread support</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment is initialized, i.e. <b>any</b> mpicxx function can be called, except other initialization functions.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the MPI environment has already been initialized. </dd>
@@ -739,7 +760,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);       <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -784,7 +805,7 @@ template&lt;typename T &gt; </div>
 
 <p>Initialize the MPI environment with the required level of thread support (or higher). </p>
 <p>All MPI programs must contain exactly one call to a MPI initialization routine. Subsequent calls to any initialization routines are erroneous.</p>
-<p>A MPI implementation is not required to return the level of thread support requested by <code>required</code> if it can provide a higher level of thread support. For example if the requested level of thread support is <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a> (<em>MPI_THREAD_SINGLE</em>) an implementation could return <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a> (<em>MPI_THREAD_MULTIPLE</em>). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>A MPI implementation is not required to return the level of thread support requested by <code>required</code> if it can provide a higher level of thread support. For example if the requested level of thread support is <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a> (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><em>MPI_THREAD_SINGLE</em></a>) an implementation could return <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a> (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><em>MPI_THREAD_MULTIPLE</em></a>). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argc</td><td>number of command line arguments </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argv</td><td>command line arguments </td></tr>
@@ -793,6 +814,7 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the provided level of thread support</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the MPI environment has already been initialized. </dd>
@@ -805,7 +827,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);       <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -832,11 +854,11 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Query the provided level of thread support. </p>
-<p>Note that the provided level of thread support must <b>not</b> be equal to the requested level of thread support but could be higher. For example if the requested level of thread support is <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a> (<em>MPI_THREAD_SINGLE</em>) an implementation could return <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a> (<em>MPI_THREAD_MULTIPLE</em>).</p>
-<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd>the provided level of thread support (<code>[[nodiscard]]</code>)</dd></dl>
+<p>Note that the provided level of thread support must <b>not</b> be equal to the requested level of thread support but could be higher. For example if the requested level of thread support is <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a> (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><em>MPI_THREAD_SINGLE</em></a>) an implementation could return <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a> (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><em>MPI_THREAD_MULTIPLE</em></a>).</p>
+<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd>the provided level of thread support <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Query_thread(<span class="keywordtype">int</span> *provided);     <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Query_thread(<span class="keywordtype">int</span> *provided);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -863,15 +885,15 @@ template&lt;typename T &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns <code>true</code> if this thread is the main thread, i.e. the thread that called <a class="el" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init()</a>. </p>
-<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if this is the main thread, otherwise <code>false</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<p>This function is thread safe as required by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a>. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if this is the main thread, otherwise <code>false</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Is_thread_main(<span class="keywordtype">int</span> *flag);       <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Is_thread_main(<span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="aa2335721fe24326defb4742a76a6e268"></a>
+<a class="anchor" id="ae0f4474ecfbb1bd9434d56f216592dd1"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -881,7 +903,7 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">requires <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a>&lt;FuncPtr, Args...&gt; int mpicxx::main </td>
+          <td class="memname">int mpicxx::main </td>
           <td>(</td>
           <td class="paramtype">FuncPtr&#160;</td>
           <td class="paramname"><em>func</em>, </td>
@@ -911,29 +933,45 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 <li>invoke the function represented by <code>func</code> (forwarding all additional parameters)</li>
 <li>call <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a></li>
 </ol>
-<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>() {</div><div class="line">    <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>();         <span class="comment">// don&#39;t forget the initialization call (exactly once)!</span></div><div class="line">    {                       <span class="comment">// brackets needed or mpicxx objects would get destroyed after the finalization call which is not permitted</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();     <span class="comment">// don&#39;t forget the finalization call (exactly once)!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is the same as: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main() {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>() {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">mpicxx::main</a>(&amp;mpicxx_main);   <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>() {</div><div class="line">    <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>();        <span class="comment">// don&#39;t forget the initialization call</span></div><div class="line">    {                      <span class="comment">// brackets needed or mpicxx objects would get destroyed after the finalization call</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();    <span class="comment">// don&#39;t forget the finalization call</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is the same as: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main() {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>() {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">mpicxx::main</a>(&amp;mpicxx_main);    <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a> requirements. </td></tr>
-    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters. </td></tr>
+    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">mpicxx::detail::is_main_pointer</a> requirements </td></tr>
+    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>any callable holding the main code of the application </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined function <code>func</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>a callable holding the main code of the application </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined callable <code>func</code> </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>FuncPtr</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>func</code> </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd>
+<dd>
+The MPI environment <b>must not</b> be finalized. </dd></dl>
+<dl class="section invariant"><dt>Invariant</dt><dd><b>Any</b> mpicxx function an be called inside the provided <code>func</code> callable (except initialization or finalization functions). </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment has been finalized, i.e. it's illegal to call any mpicxx function. The only exceptions are:<ul>
+<li><a class="el" href="namespacempicxx_1_1version.html#ad915eb6db5ef3a01ccf1c425df178f0b">mpicxx::version::mpi_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#a5d6a4bee135335d2c0e8d97d3166b051">mpicxx::version::mpi_version_major()</a>, <a class="el" href="namespacempicxx_1_1version.html#af6e42859aa8a1e90d10e275e297580fb">mpicxx::version::mpi_version_minor()</a></li>
+<li><a class="el" href="namespacempicxx_1_1version.html#abda411dca5f225a9be45a52db541d7ca">mpicxx::version::mpi_library_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#aa562055e1a62e8ba21cda9f6a3106ad4">mpicxx::version::mpi_library_name()</a></li>
+<li><a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a>, <a class="el" href="namespacempicxx.html#ae7adc49a22cb146f9e0febe3bff13203">mpicxx::active()</a>, <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a></li>
+<li>other mpicxx functions that don't wrap MPI calls</li>
+</ul>
+</dd></dl>
+<dl class="section assert_precondition">
+<dt>Precondition assertions</dt>
+<dd>If the MPI environment has already been initialized. <br />
+ If the MPI environment has already been finalized. </dd>
+</dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);       <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Finalize();                          <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);    <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Finalize();                       <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ac4d5d868d4ebe467a13a77dc68afe167"></a>
+<a class="anchor" id="af85020142c801c04ad6ad61b5b3c4ef3"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -943,7 +981,7 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">requires <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">detail::is_main_args_pointer</a>&lt;FuncPtr, Args...&gt; int mpicxx::main </td>
+          <td class="memname">int mpicxx::main </td>
           <td>(</td>
           <td class="paramtype">FuncPtr&#160;</td>
           <td class="paramname"><em>func</em>, </td>
@@ -985,31 +1023,47 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 <li>invoke the function represented by <code>func</code> (forwarding all additional parameters)</li>
 <li>call <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a></li>
 </ol>
-<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>(argc, argv);   <span class="comment">// don&#39;t forget the initialization call (exactly once)!</span></div><div class="line">    {                           <span class="comment">// brackets needed or mpicxx objects would get destroyed after the finalization call which is not permitted</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();         <span class="comment">// don&#39;t forget the finalization call (exactly once)!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is the same as: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">mpicxx::main</a>(&amp;mpicxx_main, argc, argv);   <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>(argc, argv);    <span class="comment">// don&#39;t forget the initialization call</span></div><div class="line">    {                            <span class="comment">// brackets needed or mpicxx objects would get destroyed after the finalization call</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();          <span class="comment">// don&#39;t forget the finalization call</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is the same as: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">mpicxx::main</a>(&amp;mpicxx_main, argc, argv);    <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">detail::is_main_args_pointer</a> requirements. </td></tr>
-    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters. </td></tr>
+    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">mpicxx::detail::is_main_args_pointer</a> requirements </td></tr>
+    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>any callable holding the main code of the application </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>a callable holding the main code of the application </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argc</td><td>the number of command line parameters </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argv</td><td>the command line parameters </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined function <code>func</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined callable <code>func</code> </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>FuncPtr</code> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>func</code> </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd>
+<dd>
+The MPI environment <b>must not</b> be finalized. </dd></dl>
+<dl class="section invariant"><dt>Invariant</dt><dd><b>Any</b> mpicxx function an be called inside the provided <code>func</code> callable (except initialization or finalization functions). </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment has been finalized, i.e. it's illegal to call any mpicxx function. The only exceptions are:<ul>
+<li><a class="el" href="namespacempicxx_1_1version.html#ad915eb6db5ef3a01ccf1c425df178f0b">mpicxx::version::mpi_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#a5d6a4bee135335d2c0e8d97d3166b051">mpicxx::version::mpi_version_major()</a>, <a class="el" href="namespacempicxx_1_1version.html#af6e42859aa8a1e90d10e275e297580fb">mpicxx::version::mpi_version_minor()</a></li>
+<li><a class="el" href="namespacempicxx_1_1version.html#abda411dca5f225a9be45a52db541d7ca">mpicxx::version::mpi_library_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#aa562055e1a62e8ba21cda9f6a3106ad4">mpicxx::version::mpi_library_name()</a></li>
+<li><a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a>, <a class="el" href="namespacempicxx.html#ae7adc49a22cb146f9e0febe3bff13203">mpicxx::active()</a>, <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a></li>
+<li>other mpicxx functions that don't wrap MPI calls</li>
+</ul>
+</dd></dl>
+<dl class="section assert_precondition">
+<dt>Precondition assertions</dt>
+<dd>If the MPI environment has already been initialized. <br />
+ If the MPI environment has already been finalized. </dd>
+</dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);       <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Finalize();                          <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv);    <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Finalize();                       <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ad714dfc6ed0eb9afde0e6d0d89c4dbbb"></a>
+<a class="anchor" id="a20a2505fbb89d987198a7a76857645f1"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -1019,7 +1073,7 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">requires <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a>&lt;FuncPtr, Args...&gt; int mpicxx::main </td>
+          <td class="memname">int mpicxx::main </td>
           <td>(</td>
           <td class="paramtype">FuncPtr&#160;</td>
           <td class="paramname"><em>func</em>, </td>
@@ -1049,36 +1103,53 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. If the required level of thread support couldn't be satisfied, the function returns immediately with return code <em>EXIT_FAILURE</em>. </p>
+<p>Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. <br />
+ If the required level of thread support couldn't be satisfied, the function returns immediately with return code <a href="https://en.cppreference.com/w/cpp/utility/program/EXIT_status"><code>EXIT_FAILURE</code></a>. </p>
 <p>This function performs the following tasks in the given order:</p><ol type="1">
 <li>call <a class="el" href="namespacempicxx.html#aaaf397ce3a9ac3f4edc55b2acd329670">mpicxx::init(const thread_support)</a></li>
 <li>invoke the function represented by <code>func</code> (forwarding all additional parameters)</li>
 <li>call <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a></li>
 </ol>
-<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>() {</div><div class="line">    <span class="keywordflow">try</span> {</div><div class="line">        <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>(mpicxx::thread_support::MULTIPLE);     <span class="comment">// don&#39;t forget the initialization call (exactly once)!</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    } <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classmpicxx_1_1thread__support__not__satisfied.html">mpicxx::thread_support_not_satisfied</a>&amp; e) {</div><div class="line">        std::cout &lt;&lt; e.<a class="code" href="classmpicxx_1_1exception.html#a77e5ea0e482b6025a37b844564198154">what</a>() &lt;&lt; std::endl;</div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();                                     <span class="comment">// don&#39;t forget the finalization call even in case of an exception (exactly once)!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is nearly the same as (except for the return value): </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main() {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line">    <span class="comment">// no need to catch an exception; if this function gets called, the required level of thread support could be satisfied</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>() {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">mpicxx::main</a>(&amp;mpicxx_main, mpicxx::thread_support::MULTIPLE);   <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>() {</div><div class="line">    <span class="keywordflow">try</span> {</div><div class="line">        <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>(<a class="code" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a>);    <span class="comment">// don&#39;t forget the initialization call</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    } <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classmpicxx_1_1thread__support__not__satisfied.html">mpicxx::thread_support_not_satisfied</a>&amp; e) {</div><div class="line">        std::cout &lt;&lt; e.<a class="code" href="classmpicxx_1_1exception.html#a77e5ea0e482b6025a37b844564198154">what</a>() &lt;&lt; std::endl;</div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();                                    <span class="comment">// don&#39;t forget the finalization call even in case of an exception</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is nearly the same as (except for the return value): </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main() {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line">    <span class="comment">// no need to catch an exception; if this function gets called, the required level of thread support could be satisfied</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>() {</div><div class="line">    <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">mpicxx::main</a>(&amp;mpicxx_main, <a class="code" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a>);</div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a> requirements. </td></tr>
-    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters. </td></tr>
+    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">mpicxx::detail::is_main_pointer</a> requirements </td></tr>
+    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>any callable holding the main code of the application </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>a callable holding the main code of the application </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">required</td><td>the required level of thread support </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined function <code>func</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined callable <code>func</code> </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>FuncPtr</code> or <em>EXIT_FAILURE</em> if the required level of thread support couldn't be satisfied</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>func</code> or <a href="https://en.cppreference.com/w/cpp/utility/program/EXIT_status"><code>EXIT_FAILURE</code></a> if the required level of thread support couldn't be satisfied</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd>
+<dd>
+The MPI environment <b>must not</b> be finalized. </dd></dl>
+<dl class="section invariant"><dt>Invariant</dt><dd><b>Any</b> mpicxx function an be called inside the provided <code>func</code> callable (except initialization or finalization functions). </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment has been finalized, i.e. it's illegal to call any mpicxx function. The only exceptions are:<ul>
+<li><a class="el" href="namespacempicxx_1_1version.html#ad915eb6db5ef3a01ccf1c425df178f0b">mpicxx::version::mpi_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#a5d6a4bee135335d2c0e8d97d3166b051">mpicxx::version::mpi_version_major()</a>, <a class="el" href="namespacempicxx_1_1version.html#af6e42859aa8a1e90d10e275e297580fb">mpicxx::version::mpi_version_minor()</a></li>
+<li><a class="el" href="namespacempicxx_1_1version.html#abda411dca5f225a9be45a52db541d7ca">mpicxx::version::mpi_library_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#aa562055e1a62e8ba21cda9f6a3106ad4">mpicxx::version::mpi_library_name()</a></li>
+<li><a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a>, <a class="el" href="namespacempicxx.html#ae7adc49a22cb146f9e0febe3bff13203">mpicxx::active()</a>, <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a></li>
+<li>other mpicxx functions that don't wrap MPI calls</li>
+</ul>
+</dd></dl>
+<dl class="section assert_precondition">
+<dt>Precondition assertions</dt>
+<dd>If the MPI environment has already been initialized. <br />
+ If the MPI environment has already been finalized. </dd>
+</dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);       <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Finalize();                                                              <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);    <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Finalize();                                                           <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="aa6bb33c10e0e7b3657a248ea0381a244"></a>
+<a class="anchor" id="a9a671421e595a2563cc4c5eebe38d2cd"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -1088,7 +1159,7 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">requires <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">detail::is_main_args_pointer</a>&lt;FuncPtr, Args...&gt; int mpicxx::main </td>
+          <td class="memname">int mpicxx::main </td>
           <td>(</td>
           <td class="paramtype">FuncPtr&#160;</td>
           <td class="paramname"><em>func</em>, </td>
@@ -1130,33 +1201,50 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. If the required level of thread support couldn't be satisfied, the function returns immediately with return code <em>EXIT_FAILURE</em>. </p>
+<p>Correctly setup and teardown the MPI environment with the required level of thread support while executing the code given by <code>func</code>. <br />
+ If the required level of thread support couldn't be satisfied, the function returns immediately with return code <a href="https://en.cppreference.com/w/cpp/utility/program/EXIT_status"><code>EXIT_FAILURE</code></a>. </p>
 <p>This function performs the following tasks in the given order:</p><ol type="1">
 <li>call <a class="el" href="namespacempicxx.html#a59b8533d9fb0ba26a55de760d5c85577">mpicxx::init(int&amp; argc, char** argv, const thread_support)</a></li>
 <li>invoke the function represented by <code>func</code> (forwarding all additional parameters)</li>
 <li>call <a class="el" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize()</a></li>
 </ol>
-<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="keywordflow">try</span> {</div><div class="line">        <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>(argc, argv, mpicxx::thread_support::MULTIPLE);     <span class="comment">// don&#39;t forget the initialization call (exactly once)!</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    } <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classmpicxx_1_1thread__support__not__satisfied.html">mpicxx::thread_support_not_satisfied</a>&amp; e) {</div><div class="line">        std::cout &lt;&lt; e.<a class="code" href="classmpicxx_1_1exception.html#a77e5ea0e482b6025a37b844564198154">what</a>() &lt;&lt; std::endl;</div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();                                                 <span class="comment">// don&#39;t forget the finalization call even in case of an exception (exactly once)!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is nearly the same as (except for the return value): </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line">    <span class="comment">// no need to catch an exception; if this function gets called, the required level of thread support could be satisfied</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">mpicxx::main</a>(&amp;mpicxx_main, argc, argv, mpicxx::thread_support::MULTIPLE);   <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Example: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="init_8hpp.html">mpicxx/startup/init.hpp</a>&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="finalize_8hpp.html">mpicxx/startup/finalize.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="keywordflow">try</span> {</div><div class="line">        <a class="code" href="namespacempicxx.html#a9359a0e055ccab58ea27f8c06ac136f1">mpicxx::init</a>(argc, argv, <a class="code" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a>);    <span class="comment">// don&#39;t forget the initialization call</span></div><div class="line"></div><div class="line">        <span class="comment">// user code</span></div><div class="line"></div><div class="line">    } <span class="keywordflow">catch</span>(<span class="keyword">const</span> <a class="code" href="classmpicxx_1_1thread__support__not__satisfied.html">mpicxx::thread_support_not_satisfied</a>&amp; e) {</div><div class="line">        std::cout &lt;&lt; e.<a class="code" href="classmpicxx_1_1exception.html#a77e5ea0e482b6025a37b844564198154">what</a>() &lt;&lt; std::endl;</div><div class="line">    }</div><div class="line">    <a class="code" href="namespacempicxx.html#a5919b223d37e891d56f92bda1fdcd494">mpicxx::finalize</a>();                                                <span class="comment">// don&#39;t forget the finalization call even in case of an exception</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --><p> is nearly the same as (except for the return value): </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="mpicxx__main_8hpp.html">mpicxx/startup/mpicxx_main.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> mpicxx_main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="comment">// no need to call a initialization function!</span></div><div class="line">    <span class="comment">// no need to catch an exception; if this function gets called, the required level of thread support could be satisfied</span></div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="comment">// no need to call a finalization function!</span></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div><div class="line">    <span class="comment">// can&#39;t make any mistake related to initialization or finalization!</span></div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">mpicxx::main</a>(&amp;mpicxx_main, argc, argv, <a class="code" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85ace495ab8d79db0d37413d8e95b54e606">mpicxx::thread_support::multiple</a>);</div><div class="line">}</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#afcce7194790ae4bb2055ec77ba9da602">detail::is_main_pointer</a> requirements. </td></tr>
-    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters. </td></tr>
+    <tr><td class="paramname">FuncPtr</td><td>must meet the <a class="el" href="namespacempicxx_1_1detail.html#aec3947fd432dae099daabded1bd4f3f0">mpicxx::detail::is_main_args_pointer</a> requirements </td></tr>
+    <tr><td class="paramname">Args</td><td>a parameter pack representing the additional (optional) parameters </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>any callable holding the main code of the application </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">func</td><td>a callable holding the main code of the application </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argc</td><td>the number of command line parameters </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">argv</td><td>the command line parameters </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">required</td><td>the required level of thread support </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined function <code>func</code> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the additional parameters forwarded to the user defined callable <code>func</code> </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>FuncPtr</code> or <em>EXIT_FAILURE</em> if the required level of thread support couldn't be satisfied</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of the invocation of <code>func</code> or <a href="https://en.cppreference.com/w/cpp/utility/program/EXIT_status"><code>EXIT_FAILURE</code></a> if the required level of thread support couldn't be satisfied</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The MPI environment <b>must not</b> be initialized. </dd>
+<dd>
+The MPI environment <b>must not</b> be finalized. </dd></dl>
+<dl class="section invariant"><dt>Invariant</dt><dd><b>Any</b> mpicxx function an be called inside the provided <code>func</code> callable (except initialization or finalization functions). </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>The MPI environment has been finalized, i.e. it's illegal to call any mpicxx function. The only exceptions are:<ul>
+<li><a class="el" href="namespacempicxx_1_1version.html#ad915eb6db5ef3a01ccf1c425df178f0b">mpicxx::version::mpi_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#a5d6a4bee135335d2c0e8d97d3166b051">mpicxx::version::mpi_version_major()</a>, <a class="el" href="namespacempicxx_1_1version.html#af6e42859aa8a1e90d10e275e297580fb">mpicxx::version::mpi_version_minor()</a></li>
+<li><a class="el" href="namespacempicxx_1_1version.html#abda411dca5f225a9be45a52db541d7ca">mpicxx::version::mpi_library_version()</a>, <a class="el" href="namespacempicxx_1_1version.html#aa562055e1a62e8ba21cda9f6a3106ad4">mpicxx::version::mpi_library_name()</a></li>
+<li><a class="el" href="namespacempicxx.html#a6cc2ebeee678d1478e910d1bc58c0181">mpicxx::initialized()</a>, <a class="el" href="namespacempicxx.html#ae7adc49a22cb146f9e0febe3bff13203">mpicxx::active()</a>, <a class="el" href="namespacempicxx.html#ab48ed9c9b4eb2dfe8b8d5b140799c2c0">mpicxx::finalized()</a></li>
+<li>other mpicxx functions that don't wrap MPI calls</li>
+</ul>
+</dd></dl>
+<dl class="section assert_precondition">
+<dt>Precondition assertions</dt>
+<dd>If the MPI environment has already been initialized. <br />
+ If the MPI environment has already been finalized. </dd>
+</dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);       <span class="comment">// exactly once</span></div><div class="line">       <span class="keywordtype">int</span> MPI_Finalize();                                                              <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Init_thread(<span class="keywordtype">int</span> *argc, <span class="keywordtype">char</span> ***argv, <span class="keywordtype">int</span> required, <span class="keywordtype">int</span> *provided);    <span class="comment">// exactly once</span></div><div class="line"><span class="keywordtype">int</span> MPI_Finalize();                                                           <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -1182,8 +1270,8 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the parent intracommunicator of the current process if the process was started with <em>MPI_COMM_SPAWN</em> or <em>MPI_COMM_SPAWN_MULTIPLE</em>. </p>
-<dl class="section return"><dt>Returns</dt><dd>a <a href="https://en.cppreference.com/w/cpp/utility/optional"><code>std::optional</code></a> containing the parent intracommunicator or <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> (<code>[[nodiscard]]</code>) </dd></dl>
+<p>Returns the parent intercommunicator of the current process if the process was started with <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm"><em>MPI_Comm_spawn</em></a> or <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm"><em>MPI_Comm_spawn_multiple</em></a>. </p>
+<dl class="section return"><dt>Returns</dt><dd>a <a href="https://en.cppreference.com/w/cpp/utility/optional"><code>std::optional</code></a> containing the parent intercommunicator or <a href="https://en.cppreference.com/w/cpp/utility/optional/nullopt"><code>std::nullopt</code></a> <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -1253,14 +1341,14 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Overload of the <a class="el" href="namespacempicxx.html#ad5059762ddb1053c96d5c6a6eae84ebb">mpicxx::to_string</a> function for the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85" title="Enum class for the different levels of thread support provided by MPI. ">mpicxx::thread_support</a> enum class. </p>
+<p>Overload of the <a class="el" href="namespacempicxx.html#ad5059762ddb1053c96d5c6a6eae84ebb">mpicxx::to_string(T&amp;&amp;)</a> function for the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> enum class. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ts</td><td>the enum class value </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> representation of the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> value (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> representation of the enum class value <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -1287,13 +1375,13 @@ template&lt;typename FuncPtr , typename... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Converts the given string to the respective <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> value. </p>
-<p>Expects the string value to be the MPI notation (e.g. <code>"MPI_THREAD_SINGLE"</code> gets converted to <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a>). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Expects the string value to be the MPI notation (e.g. <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node303.htm"><code>"MPI_THREAD_SINGLE"</code></a> gets converted to <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85add5c07036f2975ff4bce568b6511d3bc">mpicxx::thread_support::single</a>). </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sv</td><td>the enum value represented as a string </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> representation of <code>sv</code> (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> representation of <code>sv</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::invalid_argument</td><td>if the given value can't be converted to a <a class="el" href="namespacempicxx.html#a16006a6c89512b74793bedeaed0aaa85">mpicxx::thread_support</a> value </td></tr>

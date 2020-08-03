@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['getter_2ecpp',['getter.cpp',['../argvs_2getter_8cpp.html',1,'']]],
-  ['getter_2ecpp',['getter.cpp',['../spawn__info_2getter_8cpp.html',1,'']]],
-  ['getter_2ecpp',['getter.cpp',['../maxprocs_2getter_8cpp.html',1,'']]],
-  ['getter_2ecpp',['getter.cpp',['../command_2getter_8cpp.html',1,'']]]
+  ['mpicxx_5fmain_2ehpp',['mpicxx_main.hpp',['../mpicxx__main_8hpp.html',1,'']]],
+  ['multiple_5fspawner_2ehpp',['multiple_spawner.hpp',['../multiple__spawner_8hpp.html',1,'']]]
 ];

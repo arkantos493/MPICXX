@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
         <meta name="generator" content="Doxygen 1.8.11"/>
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <title>mpicxx: include/mpicxx/startup/spawn_result.hpp File Reference</title>
+        <title>mpicxx: /github/workspace/mpicxx/include/mpicxx/startup/spawn_result.hpp File Reference</title>
         <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link type="image/x-icon" rel="shortcut icon" href="logo.ico">
         <script type="text/javascript" src="dynsections.js"></script>
@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -93,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_577beba3f1c5b4ba73c78e086d96629d.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_3893e74461e93ad697f65ae30c224ebb.html">startup</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_aa394cd1d9abb8ffe941d9aaafca8d03.html">github</a></li><li class="navelem"><a class="el" href="dir_c52569aa89a7adbb6029022c2fa60a11.html">workspace</a></li><li class="navelem"><a class="el" href="dir_d946da1135403067f4297c50191b2e68.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_f994a43fc660a205a9236742d2191c64.html">include</a></li><li class="navelem"><a class="el" href="dir_6f3b6bfc911252f1bb43169d9217f018.html">mpicxx</a></li><li class="navelem"><a class="el" href="dir_3cda8e223f236ec69ad074b7e966f543.html">startup</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -108,24 +108,25 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>Implements the class which gets returned from the <a class="el" href="classmpicxx_1_1single__spawner.html#a665db5834f62af806737247d05dd5210">mpicxx::single_spawner::spawn()</a>, <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a>, <a class="el" href="classmpicxx_1_1multiple__spawner.html#a7fc5be2b9f642f4b4c02dcb8a8f7bbfe">mpicxx::multiple_spawner::spawn()</a> and <a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a> functions.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
+<div class="textblock"><code>#include &lt;fmt/format.h&gt;</code><br />
+<code>#include &lt;mpi.h&gt;</code><br />
+<code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
 <code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;string_view&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
-<code>#include &lt;fmt/format.h&gt;</code><br />
-<code>#include &lt;mpi.h&gt;</code><br />
 </div>
 <p><a href="spawn__result_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html">mpicxx::spawn_result_with_errcodes</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> resp. <a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>.  <a href="classmpicxx_1_1spawn__result__with__errcodes.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> respectively <br />
+<a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>.  <a href="classmpicxx_1_1spawn__result__with__errcodes.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result.html">mpicxx::spawn_result</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#a665db5834f62af806737247d05dd5210">mpicxx::single_spawner::spawn()</a> resp. <a class="el" href="classmpicxx_1_1multiple__spawner.html#a7fc5be2b9f642f4b4c02dcb8a8f7bbfe">mpicxx::multiple_spawner::spawn()</a>.  <a href="classmpicxx_1_1spawn__result.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#a665db5834f62af806737247d05dd5210">mpicxx::single_spawner::spawn()</a> respectively <a class="el" href="classmpicxx_1_1multiple__spawner.html#a7fc5be2b9f642f4b4c02dcb8a8f7bbfe">mpicxx::multiple_spawner::spawn()</a>.  <a href="classmpicxx_1_1spawn__result.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -137,13 +138,14 @@ Namespaces</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ace00036524d8cf0362a3744b55e7d41f"><td class="memItemLeft" align="right" valign="top">std::optional&lt; MPI_Comm &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacempicxx.html#ace00036524d8cf0362a3744b55e7d41f">mpicxx::parent_process</a> ()</td></tr>
-<tr class="memdesc:ace00036524d8cf0362a3744b55e7d41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the parent intracommunicator of the current process if the process was started with <em>MPI_COMM_SPAWN</em> or <em>MPI_COMM_SPAWN_MULTIPLE</em>.  <a href="namespacempicxx.html#ace00036524d8cf0362a3744b55e7d41f">More...</a><br /></td></tr>
+<tr class="memdesc:ace00036524d8cf0362a3744b55e7d41f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the parent intercommunicator of the current process if the process was started with <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm"><em>MPI_Comm_spawn</em></a> or <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm"><em>MPI_Comm_spawn_multiple</em></a>.  <a href="namespacempicxx.html#ace00036524d8cf0362a3744b55e7d41f">More...</a><br /></td></tr>
 <tr class="separator:ace00036524d8cf0362a3744b55e7d41f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements the class which gets returned from the <a class="el" href="classmpicxx_1_1single__spawner.html#a665db5834f62af806737247d05dd5210">mpicxx::single_spawner::spawn()</a>, <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a>, <a class="el" href="classmpicxx_1_1multiple__spawner.html#a7fc5be2b9f642f4b4c02dcb8a8f7bbfe">mpicxx::multiple_spawner::spawn()</a> and <a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a> functions. </p>
 <dl class="section author"><dt>Author</dt><dd>Marcel Breyer </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2020-06-16 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2020-08-02 </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>This file is distributed under the MIT License. </dd></dl>
 </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.8-->
 <!-- start footer part -->

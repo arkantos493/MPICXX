@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -108,7 +108,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> resp. <a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>.  
+<p>This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> respectively <br />
+<a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>.  
  <a href="classmpicxx_1_1spawn__result__with__errcodes.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="spawn__result_8hpp_source.html">spawn_result.hpp</a>&gt;</code></p>
@@ -118,31 +119,32 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae0efba35a8314e86fa7c88830ed28031"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#ae0efba35a8314e86fa7c88830ed28031">number_of_spawned_processes</a> () const </td></tr>
 <tr class="memdesc:ae0efba35a8314e86fa7c88830ed28031"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of spawned processes.  <a href="#ae0efba35a8314e86fa7c88830ed28031">More...</a><br /></td></tr>
 <tr class="separator:ae0efba35a8314e86fa7c88830ed28031"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96f64bfe13723554216971962ef576c0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#a96f64bfe13723554216971962ef576c0">maxprocs_processes_spawned</a> () const </td></tr>
-<tr class="memdesc:a96f64bfe13723554216971962ef576c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether it was possible to spawn the requested number of processes.  <a href="#a96f64bfe13723554216971962ef576c0">More...</a><br /></td></tr>
-<tr class="separator:a96f64bfe13723554216971962ef576c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f03ebb625d770ffc0391216232ef64f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#a7f03ebb625d770ffc0391216232ef64f">all_processes_spawned</a> () const </td></tr>
+<tr class="memdesc:a7f03ebb625d770ffc0391216232ef64f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether it was possible to spawn the requested number of processes.  <a href="#a7f03ebb625d770ffc0391216232ef64f">More...</a><br /></td></tr>
+<tr class="separator:a7f03ebb625d770ffc0391216232ef64f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a805627e0e916f0d4d295222dd6cc2863"><td class="memItemLeft" align="right" valign="top">MPI_Comm&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#a805627e0e916f0d4d295222dd6cc2863">intercommunicator</a> () const  noexcept</td></tr>
-<tr class="memdesc:a805627e0e916f0d4d295222dd6cc2863"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the intercommunicator between the original group and the newly spawned group.  <a href="#a805627e0e916f0d4d295222dd6cc2863">More...</a><br /></td></tr>
+<tr class="memdesc:a805627e0e916f0d4d295222dd6cc2863"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the intercommunicator between the original and the newly spawned group.  <a href="#a805627e0e916f0d4d295222dd6cc2863">More...</a><br /></td></tr>
 <tr class="separator:a805627e0e916f0d4d295222dd6cc2863"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a979a8e60679bc650d668d2ff88234603"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#a979a8e60679bc650d668d2ff88234603">errcodes</a> () const  noexcept</td></tr>
-<tr class="memdesc:a979a8e60679bc650d668d2ff88234603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the errcodes (one code per process) returned by the *MPI_COMM_SPAWN_** call.  <a href="#a979a8e60679bc650d668d2ff88234603">More...</a><br /></td></tr>
+<tr class="memdesc:a979a8e60679bc650d668d2ff88234603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the errcodes (one for each process) returned by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm"><em>MPI_Comm_spawn</em></a> respectively <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm"><em>MPI_Comm_spawn_multiple</em></a> call.  <a href="#a979a8e60679bc650d668d2ff88234603">More...</a><br /></td></tr>
 <tr class="separator:a979a8e60679bc650d668d2ff88234603"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac938f4f5970e392f6c94410b5fa089b0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#ac938f4f5970e392f6c94410b5fa089b0">error_list</a> () const </td></tr>
-<tr class="memdesc:ac938f4f5970e392f6c94410b5fa089b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of failed spawns and the respective errcode messages (including how often the errcode occurred).  <a href="#ac938f4f5970e392f6c94410b5fa089b0">More...</a><br /></td></tr>
+<tr class="memdesc:ac938f4f5970e392f6c94410b5fa089b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of failed spawns and the respective errcode messages (including how often an errcode occurred).  <a href="#ac938f4f5970e392f6c94410b5fa089b0">More...</a><br /></td></tr>
 <tr class="separator:ac938f4f5970e392f6c94410b5fa089b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a1dec38648de4347e1fab2fb421aac26f"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#a1dec38648de4347e1fab2fb421aac26f">mpicxx::single_spawner</a></td></tr>
-<tr class="memdesc:a1dec38648de4347e1fab2fb421aac26f"><td class="mdescLeft">&#160;</td><td class="mdescRight">befriend <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a>  <a href="#a1dec38648de4347e1fab2fb421aac26f">More...</a><br /></td></tr>
+<tr class="memitem:a1dec38648de4347e1fab2fb421aac26f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1dec38648de4347e1fab2fb421aac26f"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>mpicxx::single_spawner</b></td></tr>
 <tr class="separator:a1dec38648de4347e1fab2fb421aac26f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a973bae55c480556144a88b4dc6100aef"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html#a973bae55c480556144a88b4dc6100aef">mpicxx::multiple_spawner</a></td></tr>
-<tr class="memdesc:a973bae55c480556144a88b4dc6100aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">befriend <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>  <a href="#a973bae55c480556144a88b4dc6100aef">More...</a><br /></td></tr>
+<tr class="memitem:a973bae55c480556144a88b4dc6100aef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a973bae55c480556144a88b4dc6100aef"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>mpicxx::multiple_spawner</b></td></tr>
 <tr class="separator:a973bae55c480556144a88b4dc6100aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> resp. <a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>. </p>
-<p>Same as <a class="el" href="classmpicxx_1_1spawn__result.html">mpicxx::spawn_result</a> but also contains error codes. </p>
+<div class="textblock"><p>This class implements all functions that can be called on the result of <a class="el" href="classmpicxx_1_1single__spawner.html#abc2db3d2377e5c4dd38d6f756ef40f8e">mpicxx::single_spawner::spawn_with_errcodes()</a> respectively <br />
+<a class="el" href="classmpicxx_1_1multiple__spawner.html#a2d31072466c4556b1c12d672ced0bd5d">mpicxx::multiple_spawner::spawn_with_errcodes()</a>. </p>
+<p>Same as <a class="el" href="classmpicxx_1_1spawn__result.html">mpicxx::spawn_result</a> but also contains information about potentially error codes. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="ae0efba35a8314e86fa7c88830ed28031"></a>
 <div class="memitem">
@@ -166,19 +168,19 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the number of spawned processes. </p>
-<p>Two possible behaviours:</p><ol type="1">
+<p>Two possible behaviors:</p><ol type="1">
 <li><b>hard</b> spawn: Either <code>maxprocs</code> processes are spawned (returning <code>maxprocs</code>) or the call to spawn results in an error (returning <code>0</code>).</li>
-<li><b>soft</b> spawn: The info object may specify an arbitrary set <img class="formulaInl" alt="$\{m_i : 0 \leq m_i \leq maxprocs \}$" src="form_1.png"/> of allowed values for the number of spawned processes. If one of these allowed numbers of processes <img class="formulaInl" alt="$ m_i $" src="form_2.png"/> can be spawned, the call to spawn succeeds (returning <img class="formulaInl" alt="$ m_i $" src="form_2.png"/>). If it isn't possible to spawn one of the allowed number of processes, the call to spawn results in an error (returning <code>0</code>). <dl class="section return"><dt>Returns</dt><dd>the number of spawned processes (<code>[[nodiscard]]</code>)</dd></dl>
+<li><b>soft</b> spawn: The info object may specify an arbitrary set <img class="formulaInl" alt="$\{m_i : 0 \leq m_i \leq maxprocs \}$" src="form_1.png"/> of allowed values for the number of spawned processes. If one of these allowed numbers of processes <img class="formulaInl" alt="$ m_i $" src="form_2.png"/> can be spawned, the call to spawn succeeds (returning <img class="formulaInl" alt="$ m_i $" src="form_2.png"/>). If it isn't possible to spawn one of the allowed number of processes, the call to spawn results in an error (returning <code>0</code>).</li>
+</ol>
+<dl class="section return"><dt>Returns</dt><dd>the number of spawned processes <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_remote_size(MPI_Comm comm, <span class="keywordtype">int</span> *size);      <span class="comment">// at most once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_remote_size(MPI_Comm comm, <span class="keywordtype">int</span> *size);    <span class="comment">// at most once </span></div></div><!-- fragment --></dd>
 </dl>
-</li>
-</ol>
 
 </div>
 </div>
-<a class="anchor" id="a96f64bfe13723554216971962ef576c0"></a>
+<a class="anchor" id="a7f03ebb625d770ffc0391216232ef64f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -186,7 +188,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool mpicxx::spawn_result_with_errcodes::maxprocs_processes_spawned </td>
+          <td class="memname">bool mpicxx::spawn_result_with_errcodes::all_processes_spawned </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -200,10 +202,10 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Check whether it was possible to spawn the requested number of processes. </p>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the requested number of processes could be spawned, <code>false</code> otherwise (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the requested number of processes could be spawned, <code>false</code> otherwise <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_remote_size(MPI_Comm comm, <span class="keywordtype">int</span> *size);      <span class="comment">// at most once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_remote_size(MPI_Comm comm, <span class="keywordtype">int</span> *size);    <span class="comment">// at most once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -229,8 +231,8 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the intercommunicator between the original group and the newly spawned group. </p>
-<dl class="section return"><dt>Returns</dt><dd>the intercommunicator (<code>[[nodiscard]]</code>) </dd></dl>
+<p>Returns the intercommunicator between the original and the newly spawned group. </p>
+<dl class="section return"><dt>Returns</dt><dd>the intercommunicator <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -255,8 +257,8 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the errcodes (one code per process) returned by the *MPI_COMM_SPAWN_** call. </p>
-<dl class="section return"><dt>Returns</dt><dd>the errcodes (<code>[[nodiscard]]</code>) </dd></dl>
+<p>Returns the errcodes (one for each process) returned by the <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm"><em>MPI_Comm_spawn</em></a> respectively <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node238.htm"><em>MPI_Comm_spawn_multiple</em></a> call. </p>
+<dl class="section return"><dt>Returns</dt><dd>the errcodes <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -281,57 +283,12 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the number of failed spawns and the respective errcode messages (including how often the errcode occurred). </p>
-<dl class="section return"><dt>Returns</dt><dd>the error code message (<code>[[nodiscard]]</code>)</dd></dl>
+<p>Returns the number of failed spawns and the respective errcode messages (including how often an errcode occurred). </p>
+<dl class="section return"><dt>Returns</dt><dd>the errcode messages <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Error_string(<span class="keywordtype">int</span> errorcode, <span class="keywordtype">char</span> *<span class="keywordtype">string</span>, <span class="keywordtype">int</span> *resultlen);       <span class="comment">// at most &#39;maxprocs&#39; times </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Error_string(<span class="keywordtype">int</span> errorcode, <span class="keywordtype">char</span> *<span class="keywordtype">string</span>, <span class="keywordtype">int</span> *resultlen);    <span class="comment">// at most &#39;maxprocs&#39; times </span></div></div><!-- fragment --></dd>
 </dl>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a class="anchor" id="a1dec38648de4347e1fab2fb421aac26f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>befriend <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a> </p>
-
-</div>
-</div>
-<a class="anchor" id="a973bae55c480556144a88b4dc6100aef"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">friend class <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>befriend <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> </p>
 
 </div>
 </div>

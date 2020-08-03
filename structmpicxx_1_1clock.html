@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -109,7 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A clock wrapper for <em>MPI_Wtime</em> and <em>MPI_Wtick</em> which supports <a href="https://en.cppreference.com/w/cpp/chrono"><code>std::chrono</code></a>.  
+<p>A clock wrapper for <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtime</em></a> and <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtick</em></a> which supports <a href="https://en.cppreference.com/w/cpp/chrono"><code>std::chrono</code></a>.  
  <a href="structmpicxx_1_1clock.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="clock_8hpp_source.html">clock.hpp</a>&gt;</code></p>
@@ -138,18 +138,18 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a121a75e1d2772489190017d64f531670"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the resolution of <a class="el" href="structmpicxx_1_1clock.html#a721c87081be8b9392d14b6831c7dc58d">mpicxx::clock::now()</a> in seconds.  <a href="#a121a75e1d2772489190017d64f531670">More...</a><br /></td></tr>
 <tr class="separator:a121a75e1d2772489190017d64f531670"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65bd00002827607398e153af764b0df1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmpicxx_1_1clock.html#a65bd00002827607398e153af764b0df1">synchronized</a> (MPI_Comm comm=MPI_COMM_WORLD)</td></tr>
-<tr class="memdesc:a65bd00002827607398e153af764b0df1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the clock is synchronized in the given communicator group (default: <em>MPI_COMM_WORLD</em>).  <a href="#a65bd00002827607398e153af764b0df1">More...</a><br /></td></tr>
+<tr class="memdesc:a65bd00002827607398e153af764b0df1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the clock is synchronized in the given communicator group <code>comm</code> (default: <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>).  <a href="#a65bd00002827607398e153af764b0df1">More...</a><br /></td></tr>
 <tr class="separator:a65bd00002827607398e153af764b0df1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a0d7749cc57a73a34bda1585780ff4b1e"><td class="memItemLeft" align="right" valign="top">static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmpicxx_1_1clock.html#a0d7749cc57a73a34bda1585780ff4b1e">is_steady</a> = true</td></tr>
-<tr class="memdesc:a0d7749cc57a73a34bda1585780ff4b1e"><td class="mdescLeft">&#160;</td><td class="mdescRight"><em>MPI_Wtime</em> is steady.  <a href="#a0d7749cc57a73a34bda1585780ff4b1e">More...</a><br /></td></tr>
-<tr class="separator:a0d7749cc57a73a34bda1585780ff4b1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70872300206766b08bf3d5d00b2369ef"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmpicxx_1_1clock.html#a70872300206766b08bf3d5d00b2369ef">is_steady</a> = true</td></tr>
+<tr class="memdesc:a70872300206766b08bf3d5d00b2369ef"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtime</em></a> is steady.  <a href="#a70872300206766b08bf3d5d00b2369ef">More...</a><br /></td></tr>
+<tr class="separator:a70872300206766b08bf3d5d00b2369ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A clock wrapper for <em>MPI_Wtime</em> and <em>MPI_Wtick</em> which supports <a href="https://en.cppreference.com/w/cpp/chrono"><code>std::chrono</code></a>. </p>
-<p>Example usage: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;chrono&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div><div class="line"></div><div class="line"><span class="preprocessor">#include &lt;mpicxx/chrono/clock&gt;</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#aa2335721fe24326defb4742a76a6e268">main</a>() {</div><div class="line"></div><div class="line">    <span class="keyword">auto</span> start_time = <a class="code" href="structmpicxx_1_1clock.html#a721c87081be8b9392d14b6831c7dc58d">mpicxx::clock::now</a>();</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line"></div><div class="line">    <span class="keyword">auto</span> end_time = <a class="code" href="structmpicxx_1_1clock.html#a721c87081be8b9392d14b6831c7dc58d">mpicxx::clock::now</a>();</div><div class="line">    std::cout &lt;&lt; std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(end_time - start_time).count() &lt;&lt; <span class="stringliteral">&quot; ms&quot;</span> &lt;&lt; std::endl;</div><div class="line"></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --></div><h2 class="groupheader">Member Typedef Documentation</h2>
+<div class="textblock"><p>A clock wrapper for <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtime</em></a> and <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtick</em></a> which supports <a href="https://en.cppreference.com/w/cpp/chrono"><code>std::chrono</code></a>. </p>
+<p>Example usage: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;chrono&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div><div class="line"></div><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="clock_8hpp.html">mpicxx/chrono/clock.hpp</a>&gt;</span></div><div class="line"></div><div class="line"><span class="keywordtype">int</span> <a class="code" href="namespacempicxx.html#ae0f4474ecfbb1bd9434d56f216592dd1">main</a>() {</div><div class="line">    <span class="keyword">auto</span> start_time = <a class="code" href="structmpicxx_1_1clock.html#a721c87081be8b9392d14b6831c7dc58d">mpicxx::clock::now</a>();</div><div class="line"></div><div class="line">    <span class="comment">// user code</span></div><div class="line"></div><div class="line">    <span class="keyword">auto</span> end_time = <a class="code" href="structmpicxx_1_1clock.html#a721c87081be8b9392d14b6831c7dc58d">mpicxx::clock::now</a>();</div><div class="line">    std::cout &lt;&lt; std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(end_time - start_time).count() &lt;&lt; <span class="stringliteral">&quot; ms&quot;</span> &lt;&lt; std::endl;</div><div class="line"></div><div class="line">    <span class="keywordflow">return</span> 0;</div><div class="line">}</div></div><!-- fragment --></div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a class="anchor" id="a987f83fa47b61fe4139e091e0e8db94a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -229,10 +229,10 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns a floating-point number of seconds, representing elapsed wall-clock time since some time in the past. </p>
-<dl class="section return"><dt>Returns</dt><dd>the elapsed wall-clock time (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the elapsed wall-clock time <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line">MPI_Wtime();      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line">MPI_Wtime();    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -259,10 +259,10 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the resolution of <a class="el" href="structmpicxx_1_1clock.html#a721c87081be8b9392d14b6831c7dc58d">mpicxx::clock::now()</a> in seconds. </p>
-<p>Example: if the clock is incremented every millisecond, this function would return <img class="formulaInl" alt="$10^{-3}$" src="form_0.png"/>. </p><dl class="section return"><dt>Returns</dt><dd>the number of seconds between successive clock ticks (<code>[[nodiscard]]</code>)</dd></dl>
+<p>Example: if the clock is incremented every millisecond, this function would return <img class="formulaInl" alt="$10^{-3}$" src="form_0.png"/>. </p><dl class="section return"><dt>Returns</dt><dd>the number of seconds between successive clock ticks <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">double</span> MPI_Wtick();      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">double</span> MPI_Wtick();    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -289,23 +289,23 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns whether the clock is synchronized in the given communicator group (default: <em>MPI_COMM_WORLD</em>). </p>
-<p>The global variable <em>MPI_WTIME_IS_GLOBAL</em> is set to <code>1</code> if clocks at all processes in <em>MPI_COMM_WORLD</em> are synchronized, <code>0</code> otherwise. Because this variable need not be present when the clocks are not synchronized, the attribute key to <em>MPI_Comm_get_attr</em> is used, which is always valid. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Returns whether the clock is synchronized in the given communicator group <code>comm</code> (default: <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>). </p>
+<p>The global variable <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_WTIME_IS_GLOBAL</em></a> is set to <code>1</code> if clocks at all processes in <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a> are synchronized, <code>0</code> otherwise. Because this variable need not be present when the clocks are not synchronized, the attribute key to <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node174.htm"><em>MPI_Comm_get_attr</em></a> is used, which is always valid. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">comm</td><td>the communicator for which the synchronization should be checked </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the clocks are synchronized, otherwise <code>false</code></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the clocks are synchronized, otherwise <code>false</code> <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_get_attr(MPI_Comm comm, <span class="keywordtype">int</span> comm_keyval, <span class="keywordtype">void</span> *attribute_val, <span class="keywordtype">int</span> *flag);      <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_get_attr(MPI_Comm comm, <span class="keywordtype">int</span> comm_keyval, <span class="keywordtype">void</span> *attribute_val, <span class="keywordtype">int</span> *flag);    <span class="comment">// exactly once </span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a0d7749cc57a73a34bda1585780ff4b1e"></a>
+<a class="anchor" id="a70872300206766b08bf3d5d00b2369ef"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -313,7 +313,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const bool mpicxx::clock::is_steady = true</td>
+          <td class="memname">constexpr bool mpicxx::clock::is_steady = true</td>
         </tr>
       </table>
   </td>
@@ -323,7 +323,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p><em>MPI_Wtime</em> is steady. </p>
+<p><a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node224.htm"><em>MPI_Wtime</em></a> is steady. </p>
 
 </div>
 </div>

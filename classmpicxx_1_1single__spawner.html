@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -122,11 +122,11 @@ Public Types</h2></td></tr>
 constructor</h2></td></tr>
 <tr class="memitem:af7f168c928f84d3c8f73a20839c4517d"><td class="memTemplParams" colspan="2">template&lt;detail::is_string T&gt; </td></tr>
 <tr class="memitem:af7f168c928f84d3c8f73a20839c4517d"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1single__spawner.html#af7f168c928f84d3c8f73a20839c4517d">single_spawner</a> (T &amp;&amp;<a class="el" href="classmpicxx_1_1single__spawner.html#a3dececcdedc84f2a523b00e09cf6d8b8">command</a>, const int <a class="el" href="classmpicxx_1_1single__spawner.html#abf160a29b2e95e612edc7117edc7eb07">maxprocs</a>)</td></tr>
-<tr class="memdesc:af7f168c928f84d3c8f73a20839c4517d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a> object.  <a href="#af7f168c928f84d3c8f73a20839c4517d">More...</a><br /></td></tr>
+<tr class="memdesc:af7f168c928f84d3c8f73a20839c4517d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a> object.  <a href="#af7f168c928f84d3c8f73a20839c4517d">More...</a><br /></td></tr>
 <tr class="separator:af7f168c928f84d3c8f73a20839c4517d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac234631eacc28c720944ed09ad89059"><td class="memTemplParams" colspan="2">template&lt;detail::is_string T&gt; </td></tr>
 <tr class="memitem:aac234631eacc28c720944ed09ad89059"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1single__spawner.html#aac234631eacc28c720944ed09ad89059">single_spawner</a> (std::pair&lt; T, int &gt; pair)</td></tr>
-<tr class="memdesc:aac234631eacc28c720944ed09ad89059"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a> object.  <a href="#aac234631eacc28c720944ed09ad89059">More...</a><br /></td></tr>
+<tr class="memdesc:aac234631eacc28c720944ed09ad89059"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a> object.  <a href="#aac234631eacc28c720944ed09ad89059">More...</a><br /></td></tr>
 <tr class="separator:aac234631eacc28c720944ed09ad89059"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
@@ -248,10 +248,10 @@ template&lt;detail::is_string T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a> object. </p>
+<p>Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a> object. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">detail::is_string</a></code> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="concept is_string&lt;T&gt;  Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">mpicxx::detail::is_string</a></code> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -292,15 +292,15 @@ template&lt;detail::is_string T&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">single_spawner</a> object. </p>
+<p>Construct a new <a class="el" href="classmpicxx_1_1single__spawner.html">mpicxx::single_spawner</a> object. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">detail::is_string</a></code> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="concept is_string&lt;T&gt;  Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">mpicxx::detail::is_string</a></code> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -349,7 +349,7 @@ template&lt;detail::is_string T&gt; </div>
 <p>Replace the old executable name with the new executable name <code>command</code>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">detail::is_string</a></code> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="concept is_string&lt;T&gt;  Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">mpicxx::detail::is_string</a></code> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -405,7 +405,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 <p>Adds all command line arguments in the range [<code>first</code>, <code>last</code>) to the executable. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputIt</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>. </td></tr>
+    <tr><td class="paramname">InputIt</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -460,7 +460,7 @@ template&lt;typename T  = std::string&gt; </div>
 <p>Adds all command line arguments in the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> <code>ilist</code> to the executable. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">detail::convert_to_string</a>. </td></tr>
+    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">mpicxx::detail::convert_to_string</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -506,7 +506,7 @@ template&lt;typename... T&gt; </div>
 <p>Adds all command line arguments in the parameter pack <code>args</code> to the executable. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">detail::convert_to_string</a>. </td></tr>
+    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">mpicxx::detail::convert_to_string</a> and must not be empty </td></tr>
   </table>
   </dd>
 </dl>
@@ -586,8 +586,7 @@ template&lt;typename... T&gt; </div>
 </div><div class="memdoc">
 
 <p>Set the info object representing additional information for the runtime system where and how to spawn the processes. </p>
-<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are:</p>
-<table class="doxtable">
+<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are: </p><table class="doxtable">
 <tr>
 <th align="left">key </th><th align="left">description  </th></tr>
 <tr>
@@ -644,7 +643,7 @@ template&lt;typename... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>root</code> <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1single__spawner.html#a8addbafd1a5379228c975dff53fb38c9">set_communicator(MPI_Comm)</a> or default <em>MPI_COMM_WORLD</em>).</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>root</code> <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1single__spawner.html#a8addbafd1a5379228c975dff53fb38c9">set_communicator(MPI_Comm)</a> or default <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>).</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>root</code> isn't a legal root. </dd>
@@ -682,12 +681,12 @@ template&lt;typename... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>comm</code> <b>must not</b> be <em>MPI_COMM_NULL</em>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>comm</code> <b>must not</b> be <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>. </dd>
 <dd>
 The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1single__spawner.html#a257df3509fca0bab8d10e49c0f696f23">root()</a>) <b>must be</b> valid in <code>comm</code>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
-<dd>If <code>comm</code> is the null communicator (<em>MPI_COMM_NULL</em>). </dd>
+<dd>If <code>comm</code> is the null communicator (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>). </dd>
 </dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
@@ -718,7 +717,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the name of the executable which should get spawned. </p>
-<dl class="section return"><dt>Returns</dt><dd>the executable name (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the executable name <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -744,7 +743,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns all command line arguments. </p>
-<dl class="section return"><dt>Returns</dt><dd>the command line arguments (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the command line arguments <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -777,7 +776,8 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> command line argument (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> command line argument <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1single__spawner.html#a7b7fd8ff10bfe591309f4c4d6e6b2407" title="Returns the number of command line arguments. ">argv_size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -809,7 +809,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the number of command line arguments. </p>
-<dl class="section return"><dt>Returns</dt><dd>the number of command line arguments (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of command line arguments <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -835,7 +835,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the number of processes. </p>
-<dl class="section return"><dt>Returns</dt><dd>the number of processes (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of processes <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -861,7 +861,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the info object. </p>
-<dl class="section return"><dt>Returns</dt><dd>the info object (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the info object <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -887,7 +887,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the rank of the root process. </p>
-<dl class="section return"><dt>Returns</dt><dd>the root rank (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the root rank <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -913,7 +913,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the intracommunicator containing the group of spawning processes. </p>
-<dl class="section return"><dt>Returns</dt><dd>the intracommunicator (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the intracommunicator <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -947,20 +947,20 @@ All command line arguments <b>must not</b> be empty. </dd>
 <dd>
 maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
-root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1single__spawner.html#a8addbafd1a5379228c975dff53fb38c9">set_communicator(MPI_Comm)</a> or default <em>MPI_COMM_WORLD</em>). </dd>
+root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1single__spawner.html#a8addbafd1a5379228c975dff53fb38c9">set_communicator(MPI_Comm)</a> or default <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>). </dd>
 <dd>
-comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
+comm <b>must not</b> be <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the executable name is empty. <br />
  If any command line argument is empty. <br />
  If maxprocs is invalid. <br />
  If root isn't a legal root. <br />
- If comm is the null communicator (<em>MPI_COMM_NULL</em>). </dd>
+ If comm is the null communicator (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>). </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmpicxx_1_1single__spawner.html#a3dececcdedc84f2a523b00e09cf6d8b8">command</a>, <span class="keywordtype">char</span> *argv[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#abf160a29b2e95e612edc7117edc7eb07">maxprocs</a>, MPI_Info info, <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#a257df3509fca0bab8d10e49c0f696f23">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);       <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmpicxx_1_1single__spawner.html#a3dececcdedc84f2a523b00e09cf6d8b8">command</a>, <span class="keywordtype">char</span> *argv[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#abf160a29b2e95e612edc7117edc7eb07">maxprocs</a>, MPI_Info info, <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#a257df3509fca0bab8d10e49c0f696f23">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);    <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -995,20 +995,20 @@ All command line arguments <b>must not</b> be empty. </dd>
 <dd>
 maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
-root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1single__spawner.html#a8addbafd1a5379228c975dff53fb38c9">set_communicator(MPI_Comm)</a> or default <em>MPI_COMM_WORLD</em>). </dd>
+root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1single__spawner.html#a8addbafd1a5379228c975dff53fb38c9">set_communicator(MPI_Comm)</a> or default <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>). </dd>
 <dd>
-comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
+comm <b>must not</b> be <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If the executable name is empty. <br />
  If any command line argument is empty. <br />
  If maxprocs is invalid. <br />
  If root isn't a legal root. <br />
- If comm is the null communicator (<em>MPI_COMM_NULL</em>). </dd>
+ If comm is the null communicator (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>). </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmpicxx_1_1single__spawner.html#a3dececcdedc84f2a523b00e09cf6d8b8">command</a>, <span class="keywordtype">char</span> *argv[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#abf160a29b2e95e612edc7117edc7eb07">maxprocs</a>, MPI_Info info, <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#a257df3509fca0bab8d10e49c0f696f23">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);       <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmpicxx_1_1single__spawner.html#a3dececcdedc84f2a523b00e09cf6d8b8">command</a>, <span class="keywordtype">char</span> *argv[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#abf160a29b2e95e612edc7117edc7eb07">maxprocs</a>, MPI_Info info, <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1single__spawner.html#a257df3509fca0bab8d10e49c0f696f23">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);    <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>

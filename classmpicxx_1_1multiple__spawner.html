@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.3.1)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
                 </div>
             </div>
         </nav>
@@ -115,7 +115,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:aa5151b1573a8a58ede2808dae0dd12de"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#aa5151b1573a8a58ede2808dae0dd12de">argv_size_type</a> = std::size_t</td></tr>
-<tr class="memdesc:aa5151b1573a8a58ede2808dae0dd12de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type for argv.  <a href="#aa5151b1573a8a58ede2808dae0dd12de">More...</a><br /></td></tr>
+<tr class="memdesc:aa5151b1573a8a58ede2808dae0dd12de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type for argv size.  <a href="#aa5151b1573a8a58ede2808dae0dd12de">More...</a><br /></td></tr>
 <tr class="separator:aa5151b1573a8a58ede2808dae0dd12de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49acf1b4ffcd20cce74198db8e3949b8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#a49acf1b4ffcd20cce74198db8e3949b8">size_type</a> = std::size_t</td></tr>
 <tr class="memdesc:a49acf1b4ffcd20cce74198db8e3949b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type.  <a href="#a49acf1b4ffcd20cce74198db8e3949b8">More...</a><br /></td></tr>
@@ -125,25 +125,25 @@ Public Types</h2></td></tr>
 constructor</h2></td></tr>
 <tr class="memitem:a39f32c4f6eefdf51f86c74b338768f03"><td class="memTemplParams" colspan="2">template&lt;std::input_iterator InputItCommands, std::input_iterator InputItMaxprocs&gt; </td></tr>
 <tr class="memitem:a39f32c4f6eefdf51f86c74b338768f03"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#a39f32c4f6eefdf51f86c74b338768f03">multiple_spawner</a> (InputItCommands first_commands, InputItCommands last_commands, InputItMaxprocs first_maxprocs, InputItMaxprocs last_maxprocs)</td></tr>
-<tr class="memdesc:a39f32c4f6eefdf51f86c74b338768f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the two ranges [<code>first_commands</code>, <code>last_commands</code>) and [<code>first_maxprocs</code>, <code>last_maxprocs</code>).  <a href="#a39f32c4f6eefdf51f86c74b338768f03">More...</a><br /></td></tr>
+<tr class="memdesc:a39f32c4f6eefdf51f86c74b338768f03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the two ranges [<code>first_commands</code>, <code>last_commands</code>) and [<code>first_maxprocs</code>, <code>last_maxprocs</code>).  <a href="#a39f32c4f6eefdf51f86c74b338768f03">More...</a><br /></td></tr>
 <tr class="separator:a39f32c4f6eefdf51f86c74b338768f03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc1ddeeb60b5791ed6b3bde1495323fa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#afc1ddeeb60b5791ed6b3bde1495323fa">multiple_spawner</a> (std::initializer_list&lt; std::string &gt; ilist_commands, std::initializer_list&lt; int &gt; ilist_maxprocs)</td></tr>
-<tr class="memdesc:afc1ddeeb60b5791ed6b3bde1495323fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the two <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> lists <code>ilist_commands</code> and <code>ilist_maxprocs</code>.  <a href="#afc1ddeeb60b5791ed6b3bde1495323fa">More...</a><br /></td></tr>
+<tr class="memdesc:afc1ddeeb60b5791ed6b3bde1495323fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the two <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> lists <code>ilist_commands</code> and <code>ilist_maxprocs</code>.  <a href="#afc1ddeeb60b5791ed6b3bde1495323fa">More...</a><br /></td></tr>
 <tr class="separator:afc1ddeeb60b5791ed6b3bde1495323fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55de8c8b0bb9321e486d8bfe379222c1"><td class="memTemplParams" colspan="2">template&lt;std::input_iterator InputIt&gt; </td></tr>
 <tr class="memitem:a55de8c8b0bb9321e486d8bfe379222c1"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#a55de8c8b0bb9321e486d8bfe379222c1">multiple_spawner</a> (InputIt first, InputIt last)</td></tr>
-<tr class="memdesc:a55de8c8b0bb9321e486d8bfe379222c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the range [<code>first</code>, <code>last</code>).  <a href="#a55de8c8b0bb9321e486d8bfe379222c1">More...</a><br /></td></tr>
+<tr class="memdesc:a55de8c8b0bb9321e486d8bfe379222c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the range [<code>first</code>, <code>last</code>).  <a href="#a55de8c8b0bb9321e486d8bfe379222c1">More...</a><br /></td></tr>
 <tr class="separator:a55de8c8b0bb9321e486d8bfe379222c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91a83eff7c5ad2928f253acde8499fbe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#a91a83eff7c5ad2928f253acde8499fbe">multiple_spawner</a> (std::initializer_list&lt; std::pair&lt; std::string, int &gt;&gt; ilist)</td></tr>
-<tr class="memdesc:a91a83eff7c5ad2928f253acde8499fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> list <code>ilist</code>.  <a href="#a91a83eff7c5ad2928f253acde8499fbe">More...</a><br /></td></tr>
+<tr class="memdesc:a91a83eff7c5ad2928f253acde8499fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> list <code>ilist</code>.  <a href="#a91a83eff7c5ad2928f253acde8499fbe">More...</a><br /></td></tr>
 <tr class="separator:a91a83eff7c5ad2928f253acde8499fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memTemplParams" colspan="2">template&lt;detail::is_pair... T&gt; </td></tr>
 <tr class="memitem:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#af0e40b0b8ead284d4dc3d56d608de4ea">multiple_spawner</a> (T &amp;&amp;...args) requires(sizeof...(T) &gt; 0)</td></tr>
-<tr class="memdesc:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the parameter pack <code>args</code>.  <a href="#af0e40b0b8ead284d4dc3d56d608de4ea">More...</a><br /></td></tr>
+<tr class="memdesc:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the parameter pack <code>args</code>.  <a href="#af0e40b0b8ead284d4dc3d56d608de4ea">More...</a><br /></td></tr>
 <tr class="separator:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad798415f22d9aacad0cab5feed0d76ca"><td class="memTemplParams" colspan="2">template&lt;typename... T, std::enable_if_t&lt;(is_spawner_v&lt; T &gt; &amp;&amp;...), int &gt;  = 0&gt; </td></tr>
 <tr class="memitem:ad798415f22d9aacad0cab5feed0d76ca"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#ad798415f22d9aacad0cab5feed0d76ca">multiple_spawner</a> (T &amp;&amp;...args) requires(sizeof...(T) &gt; 0)</td></tr>
-<tr class="memdesc:ad798415f22d9aacad0cab5feed0d76ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the spawner object(s) of the parameter pack <code>args</code>.  <a href="#ad798415f22d9aacad0cab5feed0d76ca">More...</a><br /></td></tr>
+<tr class="memdesc:ad798415f22d9aacad0cab5feed0d76ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the spawner object(s) of the parameter pack <code>args</code>.  <a href="#ad798415f22d9aacad0cab5feed0d76ca">More...</a><br /></td></tr>
 <tr class="separator:ad798415f22d9aacad0cab5feed0d76ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
@@ -161,7 +161,7 @@ modify spawn information</h2></td></tr>
 <tr class="separator:a836587710baeae8fa27b4a1da8e9ef38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b1ae27c06aa8df7c6e147372b7b425e"><td class="memTemplParams" colspan="2">template&lt;detail::is_string T&gt; </td></tr>
 <tr class="memitem:a2b1ae27c06aa8df7c6e147372b7b425e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#a2b1ae27c06aa8df7c6e147372b7b425e">set_command_at</a> (const std::size_t i, T &amp;&amp;name)</td></tr>
-<tr class="memdesc:a2b1ae27c06aa8df7c6e147372b7b425e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the i-th executable name to <code>name</code>.  <a href="#a2b1ae27c06aa8df7c6e147372b7b425e">More...</a><br /></td></tr>
+<tr class="memdesc:a2b1ae27c06aa8df7c6e147372b7b425e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change the <code>i-th</code> executable name to <code>name</code>.  <a href="#a2b1ae27c06aa8df7c6e147372b7b425e">More...</a><br /></td></tr>
 <tr class="separator:a2b1ae27c06aa8df7c6e147372b7b425e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeec3c4da03872501ef015fa07a0cf71a"><td class="memTemplParams" colspan="2">template&lt;std::input_iterator InputIt&gt; </td></tr>
 <tr class="memitem:aeec3c4da03872501ef015fa07a0cf71a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#aeec3c4da03872501ef015fa07a0cf71a">add_argv</a> (InputIt first, InputIt last)</td></tr>
@@ -252,7 +252,7 @@ get spawn information</h2></td></tr>
 <tr class="memdesc:a535fb314ae35e094bdc3fa2529839ac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of added command line arguments per executable.  <a href="#a535fb314ae35e094bdc3fa2529839ac9">More...</a><br /></td></tr>
 <tr class="separator:a535fb314ae35e094bdc3fa2529839ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad35083bd04f5542b10b2616134e25e89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmpicxx_1_1multiple__spawner.html#aa5151b1573a8a58ede2808dae0dd12de">argv_size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#ad35083bd04f5542b10b2616134e25e89">argv_size_at</a> (const std::size_t i) const </td></tr>
-<tr class="memdesc:ad35083bd04f5542b10b2616134e25e89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of added command line arguments of the <code>i-th</code> exectuable.  <a href="#ad35083bd04f5542b10b2616134e25e89">More...</a><br /></td></tr>
+<tr class="memdesc:ad35083bd04f5542b10b2616134e25e89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of added command line arguments of the <code>i-th</code> executable.  <a href="#ad35083bd04f5542b10b2616134e25e89">More...</a><br /></td></tr>
 <tr class="separator:ad35083bd04f5542b10b2616134e25e89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4463fa0189f8b9ce6812917e107c4527"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#a4463fa0189f8b9ce6812917e107c4527">maxprocs</a> () const  noexcept</td></tr>
 <tr class="memdesc:a4463fa0189f8b9ce6812917e107c4527"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all numbers of processes.  <a href="#a4463fa0189f8b9ce6812917e107c4527">More...</a><br /></td></tr>
@@ -301,7 +301,7 @@ spawn new process(es)</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Unsigned integer type for argv. </p>
+<p>Unsigned integer type for argv size. </p>
 
 </div>
 </div>
@@ -366,11 +366,11 @@ template&lt;std::input_iterator InputItCommands, std::input_iterator InputItMaxp
 </table>
 </div><div class="memdoc">
 
-<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the two ranges [<code>first_commands</code>, <code>last_commands</code>) and [<code>first_maxprocs</code>, <code>last_maxprocs</code>). </p>
+<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the two ranges [<code>first_commands</code>, <code>last_commands</code>) and [<code>first_maxprocs</code>, <code>last_maxprocs</code>). </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputItCommands</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>. </td></tr>
-    <tr><td class="paramname">InputItMaxprocs</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>. </td></tr>
+    <tr><td class="paramname">InputItCommands</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> </td></tr>
+    <tr><td class="paramname">InputItMaxprocs</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -445,7 +445,7 @@ The total number of maxprocs <b>must not</b> be less or equal than <code>0</code
 </table>
 </div><div class="memdoc">
 
-<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the two <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> lists <code>ilist_commands</code> and <code>ilist_maxprocs</code>. </p>
+<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the two <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> lists <code>ilist_commands</code> and <code>ilist_maxprocs</code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ilist_commands</td><td>the list of executable names </td></tr>
@@ -510,10 +510,10 @@ template&lt;std::input_iterator InputIt&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the range [<code>first</code>, <code>last</code>). </p>
+<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the range [<code>first</code>, <code>last</code>). </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputIt</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a>. </td></tr>
+    <tr><td class="paramname">InputIt</td><td>must meet the requirements of <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -568,7 +568,7 @@ The total number of maxprocs <b>must not</b> be less or equal than <code>0</code
 </table>
 </div><div class="memdoc">
 
-<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> list <code>ilist</code>. </p>
+<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> list <code>ilist</code>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ilist</td><td>the list of executable names and maxprocs pairs</td></tr>
@@ -614,15 +614,15 @@ template&lt;detail::is_pair... T&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the contents of the parameter pack <code>args</code>. </p>
+<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the parameter pack <code>args</code>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>an arbitrary number of pairs meeting the <a class="el" href="namespacempicxx_1_1detail.html#aa6fa2de298220e8cb4c28699796c5563">detail::is_pair</a> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>an arbitrary number (but at least 1) of pairs meeting the <a class="el" href="namespacempicxx_1_1detail.html#aa6fa2de298220e8cb4c28699796c5563">mpicxx::detail::is_pair</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -665,21 +665,21 @@ template&lt;typename... T, std::enable_if_t&lt;(is_spawner_v&lt; T &gt; &amp;&am
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a> object with the spawner object(s) of the parameter pack <code>args</code>. </p>
+<p>Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the spawner object(s) of the parameter pack <code>args</code>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>an arbitrary number of spawners meeting the <a class="el" href="namespacempicxx_1_1detail.html#aea1a5321a2cd2191bface50a109c461d">detail::is_spawner</a> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>an arbitrary number (but at least 1) of spawners meeting the <a class="el" href="namespacempicxx_1_1detail.html#aea1a5321a2cd2191bface50a109c461d">mpicxx::detail::is_spawner</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the spawners which should get merged into this <a class="el" href="classmpicxx_1_1multiple__spawner.html" title="Spawner class which enables to spawn (multiple) different MPI processes at runtime. ">multiple_spawner</a></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>the spawners which should get merged into this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a></td></tr>
   </table>
   </dd>
 </dl>
@@ -738,7 +738,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 <p>Replaces the old executable names with the new names from the range [<code>first</code>, <code>last</code>). </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputIt</td><td>must meet <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements. </td></tr>
+    <tr><td class="paramname">InputIt</td><td>must meet <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -750,7 +750,9 @@ template&lt;std::input_iterator InputIt&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of the this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a> and thus must be legal. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>first</code> and <code>last</code> <b>must</b> refer to the same container. </dd>
+<dd>
+The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of the this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> and thus must be legal. </dd>
 <dd>
 All executable names in the range [<code>first</code>, <code>last</code>) <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_precondition">
@@ -795,7 +797,7 @@ All executable names in the range [<code>first</code>, <code>last</code>) <b>mus
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All executable names in <code>ilist</code> <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
@@ -833,7 +835,7 @@ template&lt;detail::is_string... T&gt; </div>
 <p>Replaces the old executable names with the new names from the parameter pack <code>args</code>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>an arbitrary number of string like objects meeting <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">detail::is_string</a></code> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>an arbitrary number (but at least 1) of string like objects meeting <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="concept is_string&lt;T&gt;  Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">mpicxx::detail::is_string</a></code> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -844,7 +846,7 @@ template&lt;detail::is_string... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All executable names in the parameter pack <code>args</code> <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
@@ -889,22 +891,24 @@ template&lt;detail::is_string T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Change the i-th executable name to <code>name</code>. </p>
+<p>Change the <code>i-th</code> executable name to <code>name</code>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">detail::is_string</a></code> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>must meet the <code><a class="el" href="namespacempicxx_1_1detail.html#ac868ceb9222d55ab6a6cdfd549811837" title="concept is_string&lt;T&gt;  Concept that describes every string like type, i.e. std::string, std::string_view, const char* and char[]. ">mpicxx::detail::is_string</a></code> requirements </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>the index of the executable name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>the new name of the i-th executable </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>the new name of the <code>i-th</code> executable </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>name</code> <b>must not</b> be empty.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+<code>name</code> <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>name</code> is empty. </dd>
@@ -956,7 +960,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 <p><code>std::begin(*first)</code> and <code>std::end(*first)</code> must be valid statements (which holds e.g. for a two-dimensional <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</code></a>).</p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// create a two dimensional vector holding all command line arguments</span></div><div class="line">std::vector&lt;std::vector&lt;std::string&gt;&gt; argvs(2);</div><div class="line">argvs[0] = { <span class="stringliteral">&quot;-foo&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>, <span class="stringliteral">&quot;--baz&quot;</span> };  <span class="comment">// command line arguments for the first executable</span></div><div class="line">argvs[1] = { <span class="stringliteral">&quot;-bar&quot;</span>, <span class="stringliteral">&quot;1&quot;</span>, <span class="stringliteral">&quot;-qux&quot;</span> };     <span class="comment">// command line arguments for the second executable</span></div><div class="line"></div><div class="line"><span class="comment">// add all command line arguments to the spawner</span></div><div class="line">ms.add_argv(argvs.begin(), argvs.end());</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputIt</td><td>must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements. </td></tr>
+    <tr><td class="paramname">InputIt</td><td>must meet the <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -970,7 +974,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
 <dl class="section pre"><dt>Precondition</dt><dd><code>first</code> and <code>last</code> <b>must</b> refer to the same container. </dd>
 <dd>
-The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a> and thus <b>must</b> be legal. </dd>
+The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> and thus <b>must</b> be legal. </dd>
 <dd>
 All command line arguments <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_precondition">
@@ -1012,7 +1016,7 @@ template&lt;typename T  = std::string&gt; </div>
 <p>Adds all command line arguments of the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> <code>ilist</code> to the respective executable. </p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// add all command line arguments to the spawner</span></div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#aeec3c4da03872501ef015fa07a0cf71a">add_argv</a>({ { <span class="stringliteral">&quot;-foo&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>, <span class="stringliteral">&quot;--baz&quot;</span> }, { <span class="stringliteral">&quot;-bar&quot;</span>, <span class="stringliteral">&quot;1&quot;</span>, <span class="stringliteral">&quot;-qux&quot;</span> } });</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">detail::convert_to_string</a>. </td></tr>
+    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">mpicxx::detail::convert_to_string</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -1023,7 +1027,7 @@ template&lt;typename T  = std::string&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All command line arguments <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
@@ -1061,7 +1065,7 @@ template&lt;typename... T&gt; </div>
 <p>Adds all command line arguments of the parameter pack <code>args</code> to the respective executable. </p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// create command line arguments</span></div><div class="line">std::string c_arr[] = { <span class="stringliteral">&quot;-foo&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>, <span class="stringliteral">&quot;--baz&quot;</span> };   <span class="comment">// command line arguments for the first executable</span></div><div class="line">std::array&lt;int, 3&gt; arr = { { 1, 2, 3 } };           <span class="comment">// command line arguments for the second executable</span></div><div class="line"></div><div class="line"><span class="comment">// add all command line arguments to the spawner</span></div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#aeec3c4da03872501ef015fa07a0cf71a">add_argv</a>(c_arr, arr);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must be a container type or C-style array type. </td></tr>
+    <tr><td class="paramname">T</td><td>must be a container type or C-style array type and must not be empty </td></tr>
   </table>
   </dd>
 </dl>
@@ -1072,7 +1076,7 @@ template&lt;typename... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All command line arguments <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
@@ -1139,7 +1143,9 @@ template&lt;std::input_iterator InputIt&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>first</code> and <code>last</code> <b>must</b> refer to the same container. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+<code>first</code> and <code>last</code> <b>must</b> refer to the same container. </dd>
 <dd>
 <code>first</code> and <code>last</code> <b>must</b> form a valid range, i.e. <code>first</code> must be less or equal than <code>last</code>. </dd>
 <dd>
@@ -1198,7 +1204,7 @@ template&lt;typename T  = std::string&gt; </div>
 <p>Adds all command line arguments in the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> <code>ilist</code> to the <code>i-th</code> executable. </p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// add all command line arguments to the spawner</span></div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(0, { <span class="stringliteral">&quot;-foo&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>, <span class="stringliteral">&quot;--baz&quot;</span> });</div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(1, { 1, 2, 3 });</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">detail::convert_to_string</a>. </td></tr>
+    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">mpicxx::detail::convert_to_string</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -1210,7 +1216,9 @@ template&lt;typename T  = std::string&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>All command line arguments <b>must not</b> be empty.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+All command line arguments <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If any command line argument is empty. </dd>
@@ -1261,7 +1269,7 @@ template&lt;typename... T&gt; </div>
 <p>Adds all command line arguments in the parameter pack <code>args</code> to the <code>i-th</code> executable. </p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// add all command line arguments to the spawner</span></div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(0, <span class="stringliteral">&quot;-foo&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>, <span class="stringliteral">&quot;--baz&quot;</span>);</div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(1, 1, 2, 3);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">detail::convert_to_string</a>. </td></tr>
+    <tr><td class="paramname">T</td><td>must be convertible to <a href="https://en.cppreference.com/w/cpp/string/basic_string"><code>std::string</code></a> via <a class="el" href="namespacempicxx_1_1detail.html#af8b88976e007657a2a5669f38de553e7">mpicxx::detail::convert_to_string</a> and must not be empty </td></tr>
   </table>
   </dd>
 </dl>
@@ -1273,7 +1281,9 @@ template&lt;typename... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>All command line arguments in <code>args</code> <b>must not</b> be empty.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+All command line arguments in <code>args</code> <b>must not</b> be empty.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If any command line argument is empty. </dd>
@@ -1343,6 +1353,7 @@ template&lt;typename... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -1393,6 +1404,9 @@ template&lt;typename... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+<code>j</code> <b>must not</b> be greater than <code>this-&gt;argv_size_at(i)</code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the indices <code>i</code> or <code>j</code> fall outside their valid range </td></tr>
@@ -1439,7 +1453,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 <p>Replaces the old number of processes with the new numbers from the range [<code>first</code>, <code>last</code>). </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputIt</td><td>must meet <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements. </td></tr>
+    <tr><td class="paramname">InputIt</td><td>must meet <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -1451,7 +1465,9 @@ template&lt;std::input_iterator InputIt&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a> and thus must be legal. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>first</code> and <code>last</code> <b>must</b> refer to the same container. </dd>
+<dd>
+The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> and thus must be legal. </dd>
 <dd>
 <b>Any</b> maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
@@ -1499,7 +1515,7 @@ The total number of maxprocs <b>must not</b> be less or equal than <code>0</code
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 <b>Any</b> maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
@@ -1540,7 +1556,7 @@ template&lt;std::integral... T&gt; </div>
 <p>Replaces the old number of processes with the new numbers from the parameter pack <code>args</code>. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>an arbitrary number of integral objects meeting the <a href="https://en.cppreference.com/w/cpp/concepts/integral"><code>std::integral</code></a> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>an arbitrary number (but at least 1) of integral objects meeting the <a href="https://en.cppreference.com/w/cpp/concepts/integral"><code>std::integral</code></a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -1551,7 +1567,7 @@ template&lt;std::integral... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 <b>Any</b> maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
@@ -1606,7 +1622,9 @@ The total number of maxprocs <b>must not</b> be less or equal than <code>0</code
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>maxprocs</code> <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+<code>maxprocs</code> <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
 The total number of maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>).</dd></dl>
 <dl class="section assert_sanity">
@@ -1658,8 +1676,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 </div><div class="memdoc">
 
 <p>Replaces the old spawn info with the new info from the range [<code>first</code>, <code>last</code>). </p>
-<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are:</p>
-<table class="doxtable">
+<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are: </p><table class="doxtable">
 <tr>
 <th align="left">key </th><th align="left">description  </th></tr>
 <tr>
@@ -1678,7 +1695,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the functionality described. </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">InputIt</td><td>must meet <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements. </td></tr>
+    <tr><td class="paramname">InputIt</td><td>must meet <a href="https://en.cppreference.com/w/cpp/named_req/InputIterator">LegacyInputIterator</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -1690,7 +1707,9 @@ template&lt;std::input_iterator InputIt&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a> and thus must be legal.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>first</code> and <code>last</code> <b>must</b> refer to the same container. </dd>
+<dd>
+The size of the range [<code>first</code>, <code>last</code>) <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> and thus must be legal.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If <code>first</code> and <code>last</code> don't denote a valid iterator range. </dd>
@@ -1725,8 +1744,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
 </div><div class="memdoc">
 
 <p>Replaces the old spawn info with the new info from the <a href="https://en.cppreference.com/w/cpp/utility/initializer_list"><code>std::initializer_list</code></a> <code>ilist</code>. </p>
-<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are:</p>
-<table class="doxtable">
+<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are: </p><table class="doxtable">
 <tr>
 <th align="left">key </th><th align="left">description  </th></tr>
 <tr>
@@ -1750,7 +1768,7 @@ template&lt;std::input_iterator InputIt&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of <code>ilist</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If the sizes mismatch. </dd>
@@ -1783,8 +1801,7 @@ template&lt;detail::is_info... T&gt; </div>
 </div><div class="memdoc">
 
 <p>Replaces the old spawn info with the new info from the parameter pack <code>args</code>. </p>
-<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are:</p>
-<table class="doxtable">
+<p>As of <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf">MPI standard 3.1</a> reserved keys are: </p><table class="doxtable">
 <tr>
 <th align="left">key </th><th align="left">description  </th></tr>
 <tr>
@@ -1803,7 +1820,7 @@ template&lt;detail::is_info... T&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>An implementation is not required to interpret these keys, but if it does interpret the key, it must provide the functionality described. </dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>an arbitrary number of <a class="el" href="classmpicxx_1_1info.html">mpicxx::info</a> objects meeting the æref <a class="el" href="namespacempicxx_1_1detail.html#ae43e87d642f256e6a024b0fbdc598779" title="Concept that describes the mpicxx::info class. ">detail::is_info</a> requirements. </td></tr>
+    <tr><td class="paramname">T</td><td>an arbitrary number (but at least 1) of <a class="el" href="classmpicxx_1_1info.html">mpicxx::info</a> objects meeting the <a class="el" href="namespacempicxx_1_1detail.html#ae43e87d642f256e6a024b0fbdc598779">mpicxx::detail::is_info</a> requirements </td></tr>
   </table>
   </dd>
 </dl>
@@ -1814,7 +1831,7 @@ template&lt;detail::is_info... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>.</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>The size of the parameter pack <code>args</code> <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>.</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If the sizes mismatch. </dd>
@@ -1863,6 +1880,7 @@ template&lt;detail::is_info... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -1902,7 +1920,7 @@ template&lt;detail::is_info... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>root</code> <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1multiple__spawner.html#ac35e6d24e4d65e33920d54d23fae1095">set_communicator(MPI_Comm)</a> or default <em>MPI_COMM_WORLD</em>).</dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>root</code> <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1multiple__spawner.html#ac35e6d24e4d65e33920d54d23fae1095">set_communicator(MPI_Comm)</a> or default <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>).</dd></dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
 <dd>If <code>root</code> isn't a legal root. </dd>
@@ -1940,12 +1958,12 @@ template&lt;detail::is_info... T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code></dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd><code>comm</code> <b>must not</b> be <em>MPI_COMM_NULL</em>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd><code>comm</code> <b>must not</b> be <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>. </dd>
 <dd>
 The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1multiple__spawner.html#a813e65785586e5f578134e09ed704acd">root()</a>) <b>must be</b> valid in <code>comm</code>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
-<dd>If <code>comm</code> is the null communicator (<em>MPI_COMM_NULL</em>). </dd>
+<dd>If <code>comm</code> is the null communicator (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>). </dd>
 </dl>
 <dl class="section assert_sanity">
 <dt>Sanity assertions</dt>
@@ -1976,7 +1994,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns all executable names. </p>
-<dl class="section return"><dt>Returns</dt><dd>the executable names (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the executable names <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2009,7 +2027,8 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> executable name (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> executable name <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -2041,7 +2060,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns all added command line arguments. </p>
-<dl class="section return"><dt>Returns</dt><dd>the command line arguments of all executables (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the command line arguments of all executables <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2074,7 +2093,8 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the command line arguments of the <code>i-th</code> executable (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the command line arguments of the <code>i-th</code> executable <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -2124,7 +2144,10 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <code>j-th</code> command line argument of the <code>i-th</code> executable (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <code>j-th</code> command line argument of the <code>i-th</code> executable <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>. </dd>
+<dd>
+<code>j</code> <b>must not</b> be greater than <code>this-&gt;argv_size_at(i)</code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the indices <code>i</code> or <code>j</code> fall outside their valid ranges </td></tr>
@@ -2156,7 +2179,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the number of added command line arguments per executable. </p>
-<dl class="section return"><dt>Returns</dt><dd>the number of command line arguments per executable (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of command line arguments per executable <span class="label label-info nodiscard">nodiscard</span></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Creates a new <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</code></a> on each invocation. </dd></dl>
 
 </div>
@@ -2183,14 +2206,15 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </table>
 </div><div class="memdoc">
 
-<p>Returns the number of added command line arguments of the <code>i-th</code> exectuable. </p>
+<p>Returns the number of added command line arguments of the <code>i-th</code> executable. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>the index of the executable </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the number of command line arguments of the <code>i-th</code> executable (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of command line arguments of the <code>i-th</code> executable <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -2222,7 +2246,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns all numbers of processes. </p>
-<dl class="section return"><dt>Returns</dt><dd>the number of processes (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of processes <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2255,7 +2279,8 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> number of processes (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> number of processes <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -2287,7 +2312,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns all spawn info. </p>
-<dl class="section return"><dt>Returns</dt><dd>the info objects used to spawn the executables (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the info objects used to spawn the executables <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2320,7 +2345,8 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> spawn info (<code>[[nodiscard]]</code>)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the <code>i-th</code> spawn info <span class="label label-info nodiscard">nodiscard</span></dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd><code>i</code> <b>must not</b> be greater than <code>this-&gt;<a class="el" href="classmpicxx_1_1multiple__spawner.html#a0aacb3728d5f06aa0758340dc0b54221" title="Returns the size of this mpicxx::multiple_spawner object, i.e. the number of spawned executables (not...">size()</a></code>.</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">std::out_of_range</td><td>if the index <code>i</code> falls outside the valid range </td></tr>
@@ -2352,7 +2378,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the rank of the root process. </p>
-<dl class="section return"><dt>Returns</dt><dd>the root rank (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the root rank <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2378,7 +2404,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the intracommunicator containing the group of spawning processes. </p>
-<dl class="section return"><dt>Returns</dt><dd>the intracommunicator (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the intracommunicator <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2404,7 +2430,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object, i.e. the number of spawned executables (<b>not</b> the total number of processes to spawn). </p>
-<dl class="section return"><dt>Returns</dt><dd>the size if this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the size if this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2430,7 +2456,7 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 </div><div class="memdoc">
 
 <p>Returns the total number of process that will get spawned. </p>
-<dl class="section return"><dt>Returns</dt><dd>the total number of processes (<code>[[nodiscard]]</code>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the total number of processes <span class="label label-info nodiscard">nodiscard</span> </dd></dl>
 
 </div>
 </div>
@@ -2458,25 +2484,25 @@ The currently specified rank (as returned by <a class="el" href="classmpicxx_1_1
 <p>Spawns a number of MPI processes associated with multiple executables according to the previously set options. </p>
 <p>The returned <a class="el" href="classmpicxx_1_1spawn__result.html">mpicxx::spawn_result</a> object <b>only</b> contains the intercommunicator.</p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// add command line arguments</span></div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(0, <span class="stringliteral">&quot;--file&quot;</span>, <span class="stringliteral">&quot;foo&quot;</span>, <span class="stringliteral">&quot;--size&quot;</span>, 42);</div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(1, <span class="stringliteral">&quot;--file&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>);</div><div class="line"></div><div class="line"><span class="comment">// add additional spawn information</span></div><div class="line"><a class="code" href="classmpicxx_1_1info.html">mpicxx::info</a> info;</div><div class="line">info[<span class="stringliteral">&quot;wdir&quot;</span>] = <span class="stringliteral">&quot;new/working/dir&quot;</span>;</div><div class="line">ms.set_spawn_info_at(1, info);</div><div class="line"></div><div class="line"><span class="comment">// spawn new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1spawn__result.html">mpicxx::spawn_result</a> res = ms.spawn();</div></div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd>the result of the spawn invocation</dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The number of executables <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The number of executables <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All executable name <b>must not</b> be empty. </dd>
 <dd>
-The number of command line argument lists <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+The number of command line argument lists <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All command line arguments <b>must not</b> be empty. </dd>
 <dd>
-The number of maxprocs <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+The number of maxprocs <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
 The total number of maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
-The number of spawn info <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+The number of spawn info <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
-root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1multiple__spawner.html#ac35e6d24e4d65e33920d54d23fae1095">set_communicator(MPI_Comm)</a> or default <em>MPI_COMM_WORLD</em>). </dd>
+root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1multiple__spawner.html#ac35e6d24e4d65e33920d54d23fae1095">set_communicator(MPI_Comm)</a> or default <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>). </dd>
 <dd>
-comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
+comm <b>must not</b> be <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If <b>any</b> size mismatches. <br />
@@ -2485,11 +2511,11 @@ comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
  If any number of maxprocs is invalid. <br />
  If the total number of maxprocs is invalid. <br />
  If root isn't a legal root. <br />
- If comm is the null communicator (<em>MPI_COMM_NULL</em>). </dd>
+ If comm is the null communicator (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>). </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn_multiple(<span class="keywordtype">int</span> count, <span class="keywordtype">char</span> *array_of_commands[], <span class="keywordtype">char</span> **array_of_argv[], <span class="keyword">const</span> <span class="keywordtype">int</span> array_of_maxprocs[], <span class="keyword">const</span> MPI_Info array_of_info[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1multiple__spawner.html#a813e65785586e5f578134e09ed704acd">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);       <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn_multiple(<span class="keywordtype">int</span> count, <span class="keywordtype">char</span> *array_of_commands[], <span class="keywordtype">char</span> **array_of_argv[], <span class="keyword">const</span> <span class="keywordtype">int</span> array_of_maxprocs[], <span class="keyword">const</span> MPI_Info array_of_info[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1multiple__spawner.html#a813e65785586e5f578134e09ed704acd">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);    <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
@@ -2518,25 +2544,25 @@ comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
 <p>Spawns a number of MPI processes associated with multiple executables according to the previously set options. </p>
 <p>The returned <a class="el" href="classmpicxx_1_1spawn__result__with__errcodes.html">mpicxx::spawn_result_with_errcodes</a> object contains the intercommunicator <b>and</b> information about the possibly occurring error codes.</p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// create multiple_spawner spawning exactly two new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> ms({ { <span class="stringliteral">&quot;a.out&quot;</span>, 4 }, { <span class="stringliteral">&quot;b.out&quot;</span>, 2 } });</div><div class="line"></div><div class="line"><span class="comment">// add command line arguments</span></div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(0, <span class="stringliteral">&quot;--file&quot;</span>, <span class="stringliteral">&quot;foo&quot;</span>, <span class="stringliteral">&quot;--size&quot;</span>, 42);</div><div class="line">ms.<a class="code" href="classmpicxx_1_1multiple__spawner.html#a60c661c8b6a096359dcf977cca152df1">add_argv_at</a>(1, <span class="stringliteral">&quot;--file&quot;</span>, <span class="stringliteral">&quot;bar&quot;</span>);</div><div class="line"></div><div class="line"><span class="comment">// add additional spawn information</span></div><div class="line"><a class="code" href="classmpicxx_1_1info.html">mpicxx::info</a> info;</div><div class="line">info[<span class="stringliteral">&quot;wdir&quot;</span>] = <span class="stringliteral">&quot;new/working/dir&quot;</span>;</div><div class="line">ms.set_spawn_info_at(1, info);</div><div class="line"></div><div class="line"><span class="comment">// spawn new executables</span></div><div class="line"><a class="code" href="classmpicxx_1_1spawn__result__with__errcodes.html">mpicxx::spawn_result_with_errcodes</a> res = ms.spawn_with_errcodes();</div></div><!-- fragment --><dl class="section return"><dt>Returns</dt><dd>the result of the spawn invocation</dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>The number of executables <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+<dl class="section pre"><dt>Precondition</dt><dd>The number of executables <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All executable name <b>must not</b> be empty. </dd>
 <dd>
-The number of command line argument lists <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+The number of command line argument lists <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All command line arguments <b>must not</b> be empty. </dd>
 <dd>
-The number of maxprocs <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+The number of maxprocs <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
 All maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
 The total number of maxprocs <b>must not</b> be less or equal than <code>0</code> or greater than the maximum possible number of processes (<a class="el" href="namespacempicxx.html#a3a057af49516f63a9e48c6bf5f439c0b">mpicxx::universe_size()</a>). </dd>
 <dd>
-The number of spawn info <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">multiple_spawner</a>. </dd>
+The number of spawn info <b>must</b> match the size of this <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a>. </dd>
 <dd>
-root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1multiple__spawner.html#ac35e6d24e4d65e33920d54d23fae1095">set_communicator(MPI_Comm)</a> or default <em>MPI_COMM_WORLD</em>). </dd>
+root <b>must not</b> be less than <code>0</code> and greater or equal than the size of the communicator (set via <a class="el" href="classmpicxx_1_1multiple__spawner.html#ac35e6d24e4d65e33920d54d23fae1095">set_communicator(MPI_Comm)</a> or default <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_WORLD</em></a>). </dd>
 <dd>
-comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
+comm <b>must not</b> be <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>.</dd></dl>
 <dl class="section assert_precondition">
 <dt>Precondition assertions</dt>
 <dd>If <b>any</b> size mismatches. <br />
@@ -2545,11 +2571,11 @@ comm <b>must not</b> be <em>MPI_COMM_NULL</em>.</dd></dl>
  If any number of maxprocs is invalid. <br />
  If the total number of maxprocs is invalid. <br />
  If root isn't a legal root. <br />
- If comm is the null communicator (<em>MPI_COMM_NULL</em>). </dd>
+ If comm is the null communicator (<a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node149.htm"><em>MPI_COMM_NULL</em></a>). </dd>
 </dl>
 <dl class="section calls">
 <dt>MPI functions internally called</dt>
-<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn_multiple(<span class="keywordtype">int</span> count, <span class="keywordtype">char</span> *array_of_commands[], <span class="keywordtype">char</span> **array_of_argv[], <span class="keyword">const</span> <span class="keywordtype">int</span> array_of_maxprocs[], <span class="keyword">const</span> MPI_Info array_of_info[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1multiple__spawner.html#a813e65785586e5f578134e09ed704acd">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);       <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
+<dd><div class="fragment"><div class="line"><span class="keywordtype">int</span> MPI_Comm_spawn_multiple(<span class="keywordtype">int</span> count, <span class="keywordtype">char</span> *array_of_commands[], <span class="keywordtype">char</span> **array_of_argv[], <span class="keyword">const</span> <span class="keywordtype">int</span> array_of_maxprocs[], <span class="keyword">const</span> MPI_Info array_of_info[], <span class="keywordtype">int</span> <a class="code" href="classmpicxx_1_1multiple__spawner.html#a813e65785586e5f578134e09ed704acd">root</a>, MPI_Comm comm, MPI_Comm *intercomm, <span class="keywordtype">int</span> array_of_errcodes[]);    <span class="comment">// exactly once</span></div></div><!-- fragment --></dd>
 </dl>
 
 </div>
