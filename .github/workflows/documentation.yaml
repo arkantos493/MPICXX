@@ -42,7 +42,9 @@ jobs:
         run: |
           cd mpicxx/doc
           ls
-          cp html/customdoxygen.css html/search/customdoxygen.css
+          ls html
+          ls html/search
+          sudo cp html/customdoxygen.css html/search/customdoxygen.css
           cat resources/customsearch.js >> html/search/search.js
       # deploy generated documentation using github.io
       - name: Deploy
