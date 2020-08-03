@@ -36,7 +36,7 @@ jobs:
         uses: arkantos493/doxygen-action@v2.1.0
         with:
           doxyfile-path: "doc/Doxyfile.in"
-          working-directory: "."
+          working-directory: "mpicxx"
       # fix errors after generation
       - name: After Generation
         run: |
