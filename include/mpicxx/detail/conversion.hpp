@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-02
+ * @date 2020-08-03
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines conversion functions used in the mpicxx library.
@@ -12,9 +12,9 @@
 
 #include <mpicxx/detail/concepts.hpp>
 
+#include <cstring>
 #include <sstream>
 #include <string>
-#include <string.h>
 #include <type_traits>
 #include <utility>
 
@@ -127,7 +127,7 @@ namespace mpicxx::detail {
      * @brief Returns a pointer to the string @p str.
      * @details If @p str is a pointer type, returns @p str, otherwise calls [`std::data`](https://en.cppreference.com/w/cpp/iterator/data).
      * @tparam T must meet the @ref mpicxx::detail::is_string requirements
-     * @param str the string to get the pointer to
+     * @param[in] str the string to get the pointer to
      * @return the pointer to @p str
      * @nodiscard
      */
@@ -143,15 +143,15 @@ namespace mpicxx::detail {
     /**
      * @brief Returns the size of the string @p str.
      * @tparam T must meet the @ref mpicxx::detail::is_string requirements
-     * @param str the string to get the size from
+     * @param[in] str the string to get the size from
      * @return the size of @p str
      * @nodiscard
      */
     template <is_string T>
     [[nodiscard]] 
-    constexpr std::size_t convert_to_string_size(const T& str, [[maybe_unused]] const std::size_t max_size) noexcept {
+    constexpr std::size_t convert_to_string_size(const T& str) noexcept {
         if constexpr (std::is_pointer_v<std::decay_t<T>>) {
-            return strnlen(str, max_size);
+            return std::strlen(str);
         } else {
             return std::size(str);
         }
