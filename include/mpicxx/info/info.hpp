@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-03
+ * @date 2020-08-04
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements a wrapper class around the [*MPI_Info*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) object.
@@ -2908,13 +2908,13 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]]
-        std::vector<std::string> keys() const {
+        std::vector<key_type> keys() const {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             // create vector which will hold all keys
             const size_type size = this->size();
-            std::vector<std::string> keys(size);
+            std::vector<key_type> keys(size);
             char key[MPI_MAX_INFO_KEY];
 
             for (size_type i = 0; i < size; ++i) {
@@ -2942,13 +2942,13 @@ namespace mpicxx {
          * }
          */
         [[nodiscard]]
-        std::vector<std::string> values() const {
+        std::vector<mapped_type> values() const {
             MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
                     "Attempt to call a function on an info object referring to 'MPI_INFO_NULL'!");
 
             // create vector which will hold all values
             const size_type size = this->size();
-            std::vector<std::string> values(size);
+            std::vector<mapped_type> values(size);
             char key[MPI_MAX_INFO_KEY];
 
             for (size_type i = 0; i < size; ++i) {
