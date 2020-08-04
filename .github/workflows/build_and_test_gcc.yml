@@ -6,12 +6,10 @@ on:
     branches:
       - master
       - develop
-      - init_and_finalize
   pull_request:
     branches:
       - master
       - develop
-
 
 jobs:
   build-gcc:
@@ -27,7 +25,7 @@ jobs:
         if: steps.cache-gcc.outputs.cache-hit != 'true'
         run: |
           sudo apt-get install flex
-          git clone -b releases/gcc-10.2.0 --depth 1  https://github.com/gcc-mirror/gcc.git
+          git clone -b releases/gcc-10.2.0 --depth 1 https://github.com/gcc-mirror/gcc.git
           cd gcc
           ./contrib/download_prerequisites
           cd ..
@@ -136,7 +134,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/fmt-gcc ..
-          make -j
+          make
           make install
       - name: Upload fmt with GCC artifact
         uses: actions/upload-artifact@v1.0.0
