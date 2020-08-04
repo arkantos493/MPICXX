@@ -6,6 +6,7 @@ on:
     branches:
       - master
       - develop
+      - init_and_finalize
   pull_request:
     branches:
       - master
@@ -22,9 +23,9 @@ jobs:
           path: ${{ github.workspace }}/clang-install
           key: cache-clang
       - name: Build clang
-        if: steps.cache-clang.outputs.cache-hit != 'true'
+        if: steps.cache-clang.outputs.cache-hit != 'false'
         run: |
-          git clone https://github.com/llvm/llvm-project.git
+          git clone -b llvmorg-10.0.1 ---depth 1 https://github.com/llvm/llvm-project.git
           cd llvm-project
           mkdir build
           cd build
@@ -53,7 +54,7 @@ jobs:
           path: ${{ github.workspace }}/openmpi-clang
           key: cache-openmpi-clang
       - name: Build OpenMPI with clang
-        if: steps.cache-openmpi-clang.outputs.cache-hit != 'true'
+        if: steps.cache-openmpi-clang.outputs.cache-hit != 'false'
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/clang
           export CC=${{ github.workspace }}/clang/bin/clang
@@ -61,7 +62,7 @@ jobs:
           wget https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2.tar.gz
           tar -xvf openmpi-4.0.2.tar.gz
           cd openmpi-4.0.2
-          ./configure --prefix=${{ github.workspace }}/openmpi-clang
+          ./configure --prefix=${{ github.workspace }}/openmpi-clang --disable-mpi-fortran
           make
           make install
       - name: Upload OpenMPI with clang artifact
@@ -131,7 +132,7 @@ jobs:
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/fmt-clang ..
-          make -j
+          make
           make install
       - name: Upload fmt with clang artifact
         uses: actions/upload-artifact@v1.0.0
@@ -178,7 +179,7 @@ jobs:
                 -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-clang \
                 -DMPICXX_ENABLE_TESTS=ON \
                 -DMPICXX_ASSERTION_LEVEL=2 ..
-          make -j
+          make
           ctest --output-on-failure
 
   test-mpich-clang:
@@ -220,7 +221,7 @@ jobs:
                 -DCMAKE_PREFIX_PATH=${{ github.workspace }}/fmt-clang \
                 -DMPICXX_ENABLE_TESTS=ON \
                 -DMPICXX_ASSERTION_LEVEL=2 ..
-          make -j
+          make
           ctest --output-on-failure
 
   delete-artifacts-clang:
