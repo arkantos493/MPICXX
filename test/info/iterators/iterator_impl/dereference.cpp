@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-29
+ * @date 2020-08-04
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the dereference operations of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
@@ -118,16 +118,17 @@ TEST(InfoIteratorImplDeathTest, DereferenceInvalid) {
     mpicxx::info::iterator sit;
 
     // dereference using operator[]
-    EXPECT_DEATH( sit[0] , "");
-    EXPECT_DEATH( info_null_it[0] , "");
-    EXPECT_DEATH( it[-1] , "");
-    EXPECT_DEATH( it[1] , "");
+    using res_t = mpicxx::info::iterator::reference;
+    EXPECT_DEATH( [[maybe_unused]] res_t res = sit[0] , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = info_null_it[0] , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = it[-1] , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = it[1] , "");
 
     // dereference using operator*
-    EXPECT_DEATH( *sit , "");
-    EXPECT_DEATH( *info_null_it , "");
-    EXPECT_DEATH( *(it - 1) , "");
-    EXPECT_DEATH( *(it + 1) , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = *sit , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = *info_null_it , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = *(it - 1) , "");
+    EXPECT_DEATH( [[maybe_unused]] res_t res = *(it + 1) , "");
 
     // dereference using operator->
     EXPECT_DEATH( sit->first , "");

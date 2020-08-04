@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-29
+ * @date 2020-08-04
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::extract(const_iterator) and @ref mpicxx::info::extract(const std::string_view) member
@@ -140,8 +140,8 @@ TEST(ModifierDeathTest, ExtractByIllegalKey) {
     std::string key(MPI_MAX_INFO_KEY, ' ');
 
     // try accessing illegal keys
-    ASSERT_DEATH( info.extract(key) , "");
-    ASSERT_DEATH( info.extract("") , "");
+    ASSERT_DEATH( [[maybe_unused]] std::optional<mpicxx::info::value_type> res = info.extract(key) , "");
+    ASSERT_DEATH( [[maybe_unused]] std::optional<mpicxx::info::value_type> res = info.extract("") , "");
 }
 
 TEST(ModifierDeathTest, NullExtractByKey) {
@@ -149,6 +149,5 @@ TEST(ModifierDeathTest, NullExtractByKey) {
     mpicxx::info info(MPI_INFO_NULL, false);
 
     // calling extract() on an info object referring to MPI_INFO_NULL is illegal
-    [[maybe_unused]] std::optional<std::pair<std::string, std::string>> key_value_pair;
-    ASSERT_DEATH( key_value_pair = info.extract("key") , "");
+    ASSERT_DEATH( [[maybe_unused]] std::optional<mpicxx::info::value_type> res = info.extract("key") , "");
 }

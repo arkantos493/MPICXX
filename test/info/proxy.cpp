@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-29
+ * @date 2020-08-04
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::proxy class that is used to distinguish between read and write access of a [key, value]-pair
@@ -93,7 +93,8 @@ TEST(InfoProxyDeathTest, ProxyReadAccessInvalid) {
 
     // attempt read access on a proxy that refers to an info object referring to MPI_INFO_NULL
     info = mpicxx::info(MPI_INFO_NULL, false);
-    EXPECT_DEATH( static_cast<std::string>(p) , "");
+    [[maybe_unused]] std::string str;
+    EXPECT_DEATH( str = static_cast<std::string>(p) , "");
 }
 
 

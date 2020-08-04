@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-29
+ * @date 2020-08-04
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::keys() const member function provided by the @ref mpicxx::info class.
@@ -61,5 +61,6 @@ TEST(NonMemberFunctionDeathTest, NullKeys) {
     mpicxx::info info(MPI_INFO_NULL, false);
 
     // calling key() on an info object referring to MPI_INFO_NULL is illegal
-    ASSERT_DEATH( info.keys() , "");
+    [[maybe_unused]] std::vector<mpicxx::info::key_type> res;
+    ASSERT_DEATH( res = info.keys() , "");
 }
