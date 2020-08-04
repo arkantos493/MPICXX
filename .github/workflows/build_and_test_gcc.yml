@@ -23,7 +23,7 @@ jobs:
           path: ${{ github.workspace }}/gcc-install
           key: cache-gcc
       - name: Build GCC
-        if: steps.cache-gcc.outputs.cache-hit != 'false'
+        if: steps.cache-gcc.outputs.cache-hit != 'true'
         run: |
           sudo apt-get install flex
           git clone -b releases/gcc-10.2.0 --depth 1  https://github.com/gcc-mirror/gcc.git
@@ -57,7 +57,7 @@ jobs:
           path: ${{ github.workspace }}/openmpi-gcc
           key: cache-openmpi-gcc
       - name: Build OpenMPI with GCC
-        if: steps.cache-openmpi-gcc.outputs.cache-hit != 'false'
+        if: steps.cache-openmpi-gcc.outputs.cache-hit != 'true'
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/gcc
           export CC=${{ github.workspace }}/gcc/bin/gcc
