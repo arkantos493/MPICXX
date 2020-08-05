@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.1)</div>
                 </div>
             </div>
         </nav>
@@ -141,10 +141,10 @@ constructor</h2></td></tr>
 <tr class="memitem:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#af0e40b0b8ead284d4dc3d56d608de4ea">multiple_spawner</a> (T &amp;&amp;...args) requires(sizeof...(T) &gt; 0)</td></tr>
 <tr class="memdesc:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the contents of the parameter pack <code>args</code>.  <a href="#af0e40b0b8ead284d4dc3d56d608de4ea">More...</a><br /></td></tr>
 <tr class="separator:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad798415f22d9aacad0cab5feed0d76ca"><td class="memTemplParams" colspan="2">template&lt;typename... T, std::enable_if_t&lt;(is_spawner_v&lt; T &gt; &amp;&amp;...), int &gt;  = 0&gt; </td></tr>
-<tr class="memitem:ad798415f22d9aacad0cab5feed0d76ca"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#ad798415f22d9aacad0cab5feed0d76ca">multiple_spawner</a> (T &amp;&amp;...args) requires(sizeof...(T) &gt; 0)</td></tr>
-<tr class="memdesc:ad798415f22d9aacad0cab5feed0d76ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the spawner object(s) of the parameter pack <code>args</code>.  <a href="#ad798415f22d9aacad0cab5feed0d76ca">More...</a><br /></td></tr>
-<tr class="separator:ad798415f22d9aacad0cab5feed0d76ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memTemplParams" colspan="2">template&lt;detail::is_spawner... T&gt; </td></tr>
+<tr class="memitem:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1multiple__spawner.html#af0e40b0b8ead284d4dc3d56d608de4ea">multiple_spawner</a> (T &amp;&amp;...args) requires(sizeof...(T) &gt; 0)</td></tr>
+<tr class="memdesc:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the <a class="el" href="classmpicxx_1_1multiple__spawner.html">mpicxx::multiple_spawner</a> object with the spawner object(s) of the parameter pack <code>args</code>.  <a href="#af0e40b0b8ead284d4dc3d56d608de4ea">More...</a><br /></td></tr>
+<tr class="separator:af0e40b0b8ead284d4dc3d56d608de4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 modify spawn information</h2></td></tr>
@@ -646,11 +646,11 @@ The total number of maxprocs <b>must not</b> be less or equal than <code>0</code
 
 </div>
 </div>
-<a class="anchor" id="ad798415f22d9aacad0cab5feed0d76ca"></a>
+<a class="anchor" id="af0e40b0b8ead284d4dc3d56d608de4ea"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename... T, std::enable_if_t&lt;(is_spawner_v&lt; T &gt; &amp;&amp;...), int &gt;  = 0&gt; </div>
+template&lt;detail::is_spawner... T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">

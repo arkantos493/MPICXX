@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.1)</div>
                 </div>
             </div>
         </nav>
@@ -371,12 +371,12 @@ non-member functions</h2></td></tr>
 additional member functions</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrp416126ac5b868f3a91117313b139137f"></a> (member functions which are not related to the <a href="https://en.cppreference.com/w/cpp/container/unordered_map"><code>std::unordered_map</code></a> or <a href="https://en.cppreference.com/w/cpp/container/map"><code>std::map</code></a> interface) </p>
 </td></tr>
-<tr class="memitem:a58ec10c6242f591b673974a9222af96b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info.html#a58ec10c6242f591b673974a9222af96b">keys</a> () const </td></tr>
-<tr class="memdesc:a58ec10c6242f591b673974a9222af96b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</code></a> containing all keys of the info object.  <a href="#a58ec10c6242f591b673974a9222af96b">More...</a><br /></td></tr>
-<tr class="separator:a58ec10c6242f591b673974a9222af96b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2df82c6a73c6314903e94e7381721f8a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info.html#a2df82c6a73c6314903e94e7381721f8a">values</a> () const </td></tr>
-<tr class="memdesc:a2df82c6a73c6314903e94e7381721f8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</code></a> containing all values of the info object.  <a href="#a2df82c6a73c6314903e94e7381721f8a">More...</a><br /></td></tr>
-<tr class="separator:a2df82c6a73c6314903e94e7381721f8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a329a23981fb8b3b65ab50db4f93ac9f4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classmpicxx_1_1info.html#a7f718f1397b8e80181a75d4a39baac25">key_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info.html#a329a23981fb8b3b65ab50db4f93ac9f4">keys</a> () const </td></tr>
+<tr class="memdesc:a329a23981fb8b3b65ab50db4f93ac9f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</code></a> containing all keys of the info object.  <a href="#a329a23981fb8b3b65ab50db4f93ac9f4">More...</a><br /></td></tr>
+<tr class="separator:a329a23981fb8b3b65ab50db4f93ac9f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec497f4b47fb1f40fb3a14068ce394f7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classmpicxx_1_1info.html#a22a86fb5242a07f81b96d50d5c7324c1">mapped_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info.html#aec497f4b47fb1f40fb3a14068ce394f7">values</a> () const </td></tr>
+<tr class="memdesc:aec497f4b47fb1f40fb3a14068ce394f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a <a href="https://en.cppreference.com/w/cpp/container/vector"><code>std::vector</code></a> containing all values of the info object.  <a href="#aec497f4b47fb1f40fb3a14068ce394f7">More...</a><br /></td></tr>
+<tr class="separator:aec497f4b47fb1f40fb3a14068ce394f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32dd0ffdd2fff80d77e323bb1eb62f0f"><td class="memItemLeft" align="right" valign="top">const MPI_Info &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmpicxx_1_1info.html#a32dd0ffdd2fff80d77e323bb1eb62f0f">get</a> () const  noexcept</td></tr>
 <tr class="memdesc:a32dd0ffdd2fff80d77e323bb1eb62f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a href="https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm"><em>MPI_Info</em></a> object.  <a href="#a32dd0ffdd2fff80d77e323bb1eb62f0f">More...</a><br /></td></tr>
 <tr class="separator:a32dd0ffdd2fff80d77e323bb1eb62f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2991,7 +2991,7 @@ The <code>key's</code> length <b>must</b> be greater than 0 and less than <a hre
 
 </div>
 </div>
-<a class="anchor" id="a58ec10c6242f591b673974a9222af96b"></a>
+<a class="anchor" id="a329a23981fb8b3b65ab50db4f93ac9f4"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -2999,7 +2999,7 @@ The <code>key's</code> length <b>must</b> be greater than 0 and less than <a hre
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;std::string&gt; mpicxx::info::keys </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classmpicxx_1_1info.html#a7f718f1397b8e80181a75d4a39baac25">key_type</a>&gt; mpicxx::info::keys </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -3026,7 +3026,7 @@ The <code>key's</code> length <b>must</b> be greater than 0 and less than <a hre
 
 </div>
 </div>
-<a class="anchor" id="a2df82c6a73c6314903e94e7381721f8a"></a>
+<a class="anchor" id="aec497f4b47fb1f40fb3a14068ce394f7"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -3034,7 +3034,7 @@ The <code>key's</code> length <b>must</b> be greater than 0 and less than <a hre
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;std::string&gt; mpicxx::info::values </td>
+          <td class="memname">std::vector&lt;<a class="el" href="classmpicxx_1_1info.html#a22a86fb5242a07f81b96d50d5c7324c1">mapped_type</a>&gt; mpicxx::info::values </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>

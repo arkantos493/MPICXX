@@ -32,7 +32,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <img class="navbar-logo" src=logo.png>
-                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.0)</div>
+                    <div class="navbar-brand" style="color: #ddd; display: inline-block; vertical-align: middle;">mpicxx - A header only C++ wrapper library for MPI (v0.4.1)</div>
                 </div>
             </div>
         </nav>
@@ -147,10 +147,10 @@ Functions</h2></td></tr>
 <tr class="memitem:aa7f5c89381eab2ddb8306ffdae43f078"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#aa7f5c89381eab2ddb8306ffdae43f078">convert_to_char_pointer</a> (const T &amp;str) noexcept</td></tr>
 <tr class="memdesc:aa7f5c89381eab2ddb8306ffdae43f078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pointer to the string <code>str</code>.  <a href="#aa7f5c89381eab2ddb8306ffdae43f078">More...</a><br /></td></tr>
 <tr class="separator:aa7f5c89381eab2ddb8306ffdae43f078"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ef2fb8a4279c2dfa3f1689df9817f14"><td class="memTemplParams" colspan="2">template&lt;is_string T&gt; </td></tr>
-<tr class="memitem:a3ef2fb8a4279c2dfa3f1689df9817f14"><td class="memTemplItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a3ef2fb8a4279c2dfa3f1689df9817f14">convert_to_string_size</a> (const T &amp;str, [[maybe_unused]] const std::size_t max_size) noexcept</td></tr>
-<tr class="memdesc:a3ef2fb8a4279c2dfa3f1689df9817f14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the string <code>str</code>.  <a href="#a3ef2fb8a4279c2dfa3f1689df9817f14">More...</a><br /></td></tr>
-<tr class="separator:a3ef2fb8a4279c2dfa3f1689df9817f14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ee393da7f7d54652dc9563e493a80e7"><td class="memTemplParams" colspan="2">template&lt;is_string T&gt; </td></tr>
+<tr class="memitem:a3ee393da7f7d54652dc9563e493a80e7"><td class="memTemplItemLeft" align="right" valign="top">constexpr std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#a3ee393da7f7d54652dc9563e493a80e7">convert_to_string_size</a> (const T &amp;str) noexcept</td></tr>
+<tr class="memdesc:a3ee393da7f7d54652dc9563e493a80e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the string <code>str</code>.  <a href="#a3ee393da7f7d54652dc9563e493a80e7">More...</a><br /></td></tr>
+<tr class="separator:a3ee393da7f7d54652dc9563e493a80e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">utility functions checking if all values in a parameter pack fulfill a predicate</div></td></tr>
 <tr class="memitem:afca71dc39e8b9748b2cbacbf5b043548"><td class="memTemplParams" colspan="2">template&lt;typename BinaryOp , typename T , typename U &gt; </td></tr>
 <tr class="memitem:afca71dc39e8b9748b2cbacbf5b043548"><td class="memTemplItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacempicxx_1_1detail.html#afca71dc39e8b9748b2cbacbf5b043548">all_same</a> (BinaryOp pred, const T &amp;t, const U &amp;u) noexcept(std::is_nothrow_invocable_r_v&lt; bool, BinaryOp, T, U &gt;) requires std</td></tr>
@@ -488,7 +488,7 @@ template&lt;is_string T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>the string to get the pointer to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">str</td><td>the string to get the pointer to </td></tr>
   </table>
   </dd>
 </dl>
@@ -496,7 +496,7 @@ template&lt;is_string T&gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a3ef2fb8a4279c2dfa3f1689df9817f14"></a>
+<a class="anchor" id="a3ee393da7f7d54652dc9563e493a80e7"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -509,18 +509,8 @@ template&lt;is_string T&gt; </div>
           <td class="memname">constexpr std::size_t mpicxx::detail::convert_to_string_size </td>
           <td>(</td>
           <td class="paramtype">const T &amp;&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>str</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">[[maybe_unused] ] const std::size_t&#160;</td>
-          <td class="paramname"><em>max_size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -539,7 +529,7 @@ template&lt;is_string T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>the string to get the size from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">str</td><td>the string to get the size from </td></tr>
   </table>
   </dd>
 </dl>
