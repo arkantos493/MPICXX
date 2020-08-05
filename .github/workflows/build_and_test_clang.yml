@@ -23,7 +23,7 @@ jobs:
           path: ${{ github.workspace }}/clang-install
           key: cache-clang
       - name: Build clang
-        if: steps.cache-clang.outputs.cache-hit != 'false'
+        if: steps.cache-clang.outputs.cache-hit != 'true'
         run: |
           git clone -b llvmorg-10.0.1 --depth 1 https://github.com/llvm/llvm-project.git
           cd llvm-project
@@ -54,7 +54,7 @@ jobs:
           path: ${{ github.workspace }}/openmpi-clang
           key: cache-openmpi-clang
       - name: Build OpenMPI with clang
-        if: steps.cache-openmpi-clang.outputs.cache-hit != 'false'
+        if: steps.cache-openmpi-clang.outputs.cache-hit != 'true'
         run: |
           sudo chmod -R 777 ${{ github.workspace }}/clang
           export CC=${{ github.workspace }}/clang/bin/clang
