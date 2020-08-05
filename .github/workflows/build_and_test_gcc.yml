@@ -228,10 +228,10 @@ jobs:
 
   delete-artifacts-gcc:
     needs: [test-openmpi-gcc, test-mpich-gcc]
+    if: "always()"
     runs-on: [ubuntu-latest]
     steps:
       - name: Delete all artifacts
-        if: always()
         uses: geekyeggo/delete-artifact@v1
         with:
           failOnError: false

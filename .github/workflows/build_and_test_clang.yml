@@ -226,10 +226,10 @@ jobs:
 
   delete-artifacts-clang:
     needs: [test-openmpi-clang, test-mpich-clang]
+    if: "always()"
     runs-on: [ubuntu-latest]
     steps:
       - name: Delete all artifacts
-        if: always()
         uses: geekyeggo/delete-artifact@v1
         with:
           failOnError: false
