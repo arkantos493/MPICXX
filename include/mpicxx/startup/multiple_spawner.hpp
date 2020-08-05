@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-02
+ * @date 2020-08-05
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the
@@ -40,11 +40,6 @@ namespace mpicxx {
      * @brief Spawner class which enables to spawn (multiple) **different** MPI processes at runtime.
      */
     class multiple_spawner {
-        // TODO 2020-05-13 00:21 breyerml: remove as soon as GCC bug has been fixed
-        template <typename SpawnerType>
-        static constexpr bool is_spawner_v = std::is_same_v<std::remove_cvref_t<SpawnerType>, single_spawner>
-                || std::is_same_v<std::remove_cvref_t<SpawnerType>, multiple_spawner>;
-
     public:
         /// Unsigned integer type for argv size.
         using argv_size_type = std::size_t;
@@ -271,7 +266,6 @@ namespace mpicxx {
             // set command line arguments to default values
             argvs_.assign(size_, std::vector<std::string>());
         }
-        // TODO 2020-05-11 22:58 breyerml: change to c++20 concepts syntax as soon as GCC bug has been fixed
         /**
          * @brief Constructs the @ref mpicxx::multiple_spawner object with the spawner object(s) of the parameter pack @p args.
          * @tparam T an arbitrary number (but at least 1) of spawners meeting the @ref mpicxx::detail::is_spawner requirements
@@ -286,7 +280,7 @@ namespace mpicxx {
          *                       If not all communicators are equivalent. }
          * @assert_sanity{ If the total number of maxprocs is invalid. }
          */
-        template <typename... T, std::enable_if_t<(is_spawner_v<T> && ...), int> = 0>
+        template <detail::is_spawner... T>
         explicit multiple_spawner(T&&... args) requires (sizeof...(T) > 0) {
             MPICXX_ASSERT_PRECONDITION(detail::all_same([](const auto& arg) { return arg.root(); }, args...),
                     "Attempt to use different root processes!");
