@@ -147,7 +147,7 @@ namespace GTestMPIListener {
 
                 if (rank_ != 0) {
                     // Nonzero ranks send constituent parts of each result to rank 0
-                    for (const ::testing::TestPartResult test_part_result : result_vector_) {
+                    for (const ::testing::TestPartResult& test_part_result : result_vector_) {
                         int resultStatus = test_part_result.failed();
                         std::string resultFileName(test_part_result.file_name());
                         int resultLineNumber = test_part_result.line_number();
