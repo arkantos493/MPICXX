@@ -32,7 +32,7 @@ namespace mpicxx::version {
      *
      *    It's in the form of `"version_major.version_minor.version_patch"`.
      */
-    inline constexpr std::string_view version = "0.4.0";
+    inline constexpr std::string_view version = "0.4.1";
     /**
      * @brief The current major version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
@@ -47,7 +47,7 @@ namespace mpicxx::version {
      * @brief The current patch version of the mpicxx library.
      * @details The value gets automatically set during the [`CMake`](https://cmake.org/) configuration step.
      */
-    inline constexpr int version_patch = 0;
+    inline constexpr int version_patch = 1;
     ///@}
 
     /// @name version details specific to the used MPI standard
