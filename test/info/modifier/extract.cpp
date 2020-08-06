@@ -1,30 +1,30 @@
 /**
- * @file test/info/modifier/extract.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-08-04
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::extract(const_iterator) and @ref mpicxx::info::extract(const std::string_view) member
- * functions provided by the @ref mpicxx::info class.
+ *        functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name                      | test case description                                      |
- * |:------------------------------------|:-----------------------------------------------------------|
- * | ExtractByIterator                   | extract [key, value]-pair at the given iterator position   |
- * | ExtractByIllegalIterator            | iterator doesn't refer to `*this` info object (death test) |
- * | ExtractByIteratorNotDereferenceable | iterator not dereferenceable (death test)                  |
- * | NullExtractByIterator               | info object referring to MPI_INFO_NULL (death test)        |
- * | ExtractByKey                        | extract [key, value]-pair with the given key               |
- * | ExtractByIllegalKey                 | try to extract with an illegal key (death test)            |
- * | NullExtractByKey                    | info object referring to MPI_INFO_NULL (death test)        |
+ * | test case name                      | test case description                                                                                                    |
+ * |:------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | ExtractByIterator                   | extract [key, value]-pair at the given iterator position                                                                 |
+ * | ExtractByIllegalIterator            | iterator doesn't refer to `*this` info object (death test)                                                               |
+ * | ExtractByIteratorNotDereferenceable | iterator not dereferenceable (death test)                                                                                |
+ * | NullExtractByIterator               | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | ExtractByKey                        | extract [key, value]-pair with the given key                                                                             |
+ * | ExtractByIllegalKey                 | try to extract with an illegal key (death test)                                                                          |
+ * | NullExtractByKey                    | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
 
-#include <optional>
-#include <string>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <optional>
+#include <string>
 
 TEST(ModifierTest, ExtractByIterator) {
     // create info object
@@ -140,8 +140,8 @@ TEST(ModifierDeathTest, ExtractByIllegalKey) {
     std::string key(MPI_MAX_INFO_KEY, ' ');
 
     // try accessing illegal keys
-    ASSERT_DEATH( info.extract(key) , "");
-    ASSERT_DEATH( info.extract("") , "");
+    ASSERT_DEATH( [[maybe_unused]] std::optional<mpicxx::info::value_type> res = info.extract(key) , "");
+    ASSERT_DEATH( [[maybe_unused]] std::optional<mpicxx::info::value_type> res = info.extract("") , "");
 }
 
 TEST(ModifierDeathTest, NullExtractByKey) {
@@ -149,6 +149,5 @@ TEST(ModifierDeathTest, NullExtractByKey) {
     mpicxx::info info(MPI_INFO_NULL, false);
 
     // calling extract() on an info object referring to MPI_INFO_NULL is illegal
-    [[maybe_unused]] std::optional<std::pair<std::string, std::string>> key_value_pair;
-    ASSERT_DEATH( key_value_pair = info.extract("key") , "");
+    ASSERT_DEATH( [[maybe_unused]] std::optional<mpicxx::info::value_type> res = info.extract("key") , "");
 }

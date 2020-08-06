@@ -1,0 +1,7 @@
+/**
+ * @dir test/exception
+ * @author Marcel Breyer
+ * @date 2020-03-01
+ *
+ * @brief This directory contains all test cases for the exception classes.
+ */

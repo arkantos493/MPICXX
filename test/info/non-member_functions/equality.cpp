@@ -1,24 +1,24 @@
 /**
- * @file test/info/non-member_functions/equality.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-02-14
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::operator==(const info&, const info&) function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name      | test case description                               |
- * |:--------------------|:----------------------------------------------------|
- * | Equality            | check various `==` cases                            |
- * | EqualityIdempotence | `info1 == info1; // true`                           |
- * | EqualitySymmetry    | `info1 == info2` <-> `info2 == info1`               |
- * | EqualityNonFreeable | freeable state should't have any impact on equality |
- * | NullEquality        | info objects referring to *MPI_INFO_NULL*           |
+ * | test case name      | test case description                                                                                        |
+ * |:--------------------|:-------------------------------------------------------------------------------------------------------------|
+ * | Equality            | check various `==` cases                                                                                     |
+ * | EqualityIdempotence | `info1 == info1; // true`                                                                                    |
+ * | EqualitySymmetry    | `info1 == info2` <-> `info2 == info1`                                                                        |
+ * | EqualityNonFreeable | freeable state should't have any impact on equality                                                          |
+ * | NullEquality        | info objects referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(NonMemberFunctionTest, Equality) {
     // create two empty info objects

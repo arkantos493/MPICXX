@@ -1,76 +1,82 @@
 /**
- * @file include/mpicxx/detail/source_location.hpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-05-17
+ * @date 2020-07-21
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Provides a `source_location` class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
+ * @brief Provides a class similar to [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location).
  * @details Differences are:
- * - The new macro `PRETTY_FUNC_NAME__` is defined as `__PRETTY_FUNC__` ([*GCC*](https://gcc.gnu.org/) and
- * [*clang*](https://clang.llvm.org/)), `__FUNCSIG__` ([*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
- * `__func__` (otherwise). This macro can be used as first parameter to the static @ref mpicxx::detail::source_location::current()
- * function to get a better function name.
- * - Includes a member named `rank` which holds the current MPI rank (if a MPI environment is currently active).
- * - The @ref mpicxx::detail::source_location::stack_trace() function can be used to print/get the current function call stack.
+ *          - The new macro `MPICXX_PRETTY_FUNC_NAME__` is defined as `__PRETTY_FUNC__` ([GCC](https://gcc.gnu.org/) and
+ *            [clang](https://clang.llvm.org/)), `__FUNCSIG__` ([MSVC](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
+ *            `__func__` (otherwise). This macro can be used as first parameter to the static
+ *            @ref mpicxx::detail::source_location::current() function to get a better function name.
+ *          - Includes a member-function @ref mpicxx::detail::source_location::rank() which holds the current MPI rank (if a MPI environment
+ *            is currently active).
+ *          - The @ref mpicxx::detail::source_location::stack_trace() function can be used to print/get the current function call stack.
  */
 
 #ifndef MPICXX_SOURCE_LOCATION_HPP
 #define MPICXX_SOURCE_LOCATION_HPP
 
-#include <iostream>
+#include <fmt/format.h>
+#include <mpi.h>
+
 #include <optional>
-#include <ostream>
 #include <string>
-#include <string_view>
 #include <vector>
 
-#include <mpi.h>
-#include <fmt/format.h>
-
 /**
- * @def PRETTY_FUNC_NAME__
- * @brief The @ref PRETTY_FUNC_NAME__ macro is defined as `__PRETTY_FUNC__` ([*GCC*](https://gcc.gnu.org/) and
- * [*clang*](https://clang.llvm.org/)), `__FUNCSIG__` ([*MSVC*](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
- * `__func__` (otherwise).
+ * @def MPICXX_PRETTY_FUNC_NAME__
+ * @brief The @ref MPICXX_PRETTY_FUNC_NAME__ macro is defined as `__PRETTY_FUNC__` ([GCC](https://gcc.gnu.org/) and
+ *        [clang](https://clang.llvm.org/)), `__FUNCSIG__` ([MSVC](https://visualstudio.microsoft.com/de/vs/features/cplusplus/)) or
+ *        `__func__` (otherwise).
  * @details It can be used as compiler independent way to enable a better function name when used as first parameter to
- * @ref mpicxx::detail::source_location::current().
+ *          @ref mpicxx::detail::source_location::current().
  */
 #ifdef __GNUG__
 #include <execinfo.h>
 #include <cxxabi.h>
-#define PRETTY_FUNC_NAME__ __PRETTY_FUNCTION__
+#define MPICXX_PRETTY_FUNC_NAME__ __PRETTY_FUNCTION__
 #elif _MSC_VER
-#define PRETTY_FUNC_NAME__ __FUNCSIG__
+#define MPICXX_PRETTY_FUNC_NAME__ __FUNCSIG__
 #else
-#define PRETTY_FUNC_NAME__ __func__
+#define MPICXX_PRETTY_FUNC_NAME__ __func__
 #endif
 
 namespace mpicxx::detail {
+    
     /**
      * @brief Represents information of a specific source code location.
      * @details Example usage:
-     * @include examples/detail/source_location.cpp
+     *          @snippet examples/detail/source_location.cpp mwe
      */
     class source_location {
     public:
         /**
-         * @brief Constructs a new source_location with the respective information about the current call side.
-         * @param[in] func the function name (including its signature if supported via the macro `PRETTY_FUNC_NAME__`)
+         * @brief Constructs a new @ref mpicxx::detail::source_location with the respective information about the current call side.
+         * @details The MPI rank is set to [`std::nullopt`](https://en.cppreference.com/w/cpp/utility/optional/nullopt) if an error occurred
+         *          during the call to [*MPI_Comm_rank*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node155.htm)
+         *          (an exception is thrown or a return code different than
+         *          [*MPI_SUCCESS*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node222.htm) is returned).
+         * @param[in] func the function name (including its signature if supported via the macro `MPICXX_PRETTY_FUNC_NAME__`)
          * @param[in] file the file name (absolute path)
          * @param[in] line the line number
          * @param[in] column the column number
-         * @return the source_location holding the call side location information
+         * @return the @ref mpicxx::detail::source_location holding the call side location information
+         * @nodiscard
          *
          * @attention @p column is always (independent of the call side position) default initialized to 0!
          *
          * @calls{
-         * int MPI_Initialized(int *flag);                  // exactly once
-         * int MPI_Finalized(int *flag);                    // exactly once
-         * int MPI_Comm_rank(MPI_Comm comm, int *rank);     // at most once
+         * int MPI_Initialized(int *flag);                 // exactly once
+         * int MPI_Finalized(int *flag);                   // exactly once
+         * int MPI_Comm_rank(MPI_Comm comm, int *rank);    // at most once
          * }
          */
+        [[nodiscard]]
         static source_location current(
-                const std::string_view func = __builtin_FUNCTION(),
-                const std::string_view file = __builtin_FILE(),
+                const char* func = __builtin_FUNCTION(),
+                const char* file = __builtin_FILE(),
                 const int line = __builtin_LINE(),
                 const int column = 0
                 ) noexcept {
@@ -79,7 +85,6 @@ namespace mpicxx::detail {
             loc.func_ = func;
             loc.line_ = line;
             loc.column_ = column;
-            // TODO 2020-05-17 15:49 marcel: change to mpicxx::running()?
             try {
                 // get the current MPI rank iff the MPI environment is active
                 int is_initialized, is_finalized;
@@ -87,8 +92,10 @@ namespace mpicxx::detail {
                 MPI_Finalized(&is_finalized);
                 if (static_cast<bool>(is_initialized) && !static_cast<bool>(is_finalized)) {
                     int rank;
-                    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-                    loc.rank_ = std::optional<int>(rank);
+                    int err = MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+                    if (err == MPI_SUCCESS) {
+                        loc.rank_ = std::make_optional(rank);
+                    }
                 }
             } catch (...) {
                 // something went wrong during the MPI calls -> no information could be retrieved
@@ -98,13 +105,13 @@ namespace mpicxx::detail {
         }
 
         /**
-         * @brief Prints the current stack trace to the given output stream @p out.
+         * @brief Returns the current stack trace.
          * @details For a better stack trace (precise function names) the linker flag `-rdynamic` is set if and only if **any**
-         * MPICXX_ASSERTION has been activated during cmake's configuration step.
+         *          `MPICXX_ASSERTION_...` has been activated during [`Cmake`](https://cmake.org/)'s configuration step.
          *
-         * A sample output (while `-rdynamic` set) could look like:
+         *          A sample stack trace (while `-rdynamic` is set) could look like:
          * @code
-         *  stack trace:
+         * stack trace:
          *   #5    ./output.s: test(int) [+0x3]
          *   #4    ./output.s: foo() [+0x1]
          *   #3    ./output.s: main() [+0x1]
@@ -112,12 +119,15 @@ namespace mpicxx::detail {
          *   #1    ./output.s: _start() [+0x2]
          * @endcode
          * @param[in] max_call_stack_size the maximum depth of the stack trace report
+         * @return the stack trace
+         * @nodiscard
          *
-         * @attention The stack trace report is only available under [*GCC*](https://gcc.gnu.org/) and [*clang*](https://clang.llvm.org/)
-         * (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
+         * @attention The stack trace report is only available under [GCC](https://gcc.gnu.org/) and [clang](https://clang.llvm.org/)
+         *            (to be precise: only if `__GNUG__` is defined). This function does nothing if `__GNUG__` isn't defined.
          */
+        [[nodiscard]]
         static inline std::string stack_trace([[maybe_unused]] const int max_call_stack_size = 64) {
-#if defined(ENABLE_STACK_TRACE) && defined(__GNUG__)
+#if defined(MPICXX_ENABLE_STACK_TRACE) && defined(__GNUG__)
             using std::to_string;
             fmt::memory_buffer buf;
             fmt::format_to(buf, "stack trace:\n");
@@ -178,7 +188,7 @@ namespace mpicxx::detail {
                 }
             }
             return fmt::format("{}\n", to_string(buf));
-#elif defined(ENABLED_STACK_TRACE) && !defined(__GNUG__)
+#elif defined(MPICXX_ENABLED_STACK_TRACE) && !defined(__GNUG__)
 // stack traces enabled but not supported
             return std::string("No stack trace supported!");
 #else
@@ -187,40 +197,49 @@ namespace mpicxx::detail {
 #endif
         }
 
-
         /**
          * @brief Returns the absolute path name of the file.
          * @return the file name
+         * @nodiscard
          */
-        constexpr const std::string& file_name() const noexcept { return file_; }
+        [[nodiscard]]
+        constexpr const char* file_name() const noexcept { return file_; }
         /**
          * @brief Returns the function name without additional signature information (i.e. return type or parameters).
          * @return the function name
+         * @nodiscard
          */
-        constexpr const std::string& function_name() const noexcept { return func_; }
+        [[nodiscard]]
+        constexpr const char* function_name() const noexcept { return func_; }
         /**
          * @brief Returns the line number.
          * @return the line number
+         * @nodiscard
          */
+        [[nodiscard]]
         constexpr int line() const noexcept { return line_; }
         /**
          * @brief Returns the column number.
          * @return the column number
+         * @nodiscard
          *
          * @attention Default value in @ref mpicxx::detail::source_location::current() always 0!
          */
+        [[nodiscard]]
         constexpr int column() const noexcept { return column_; }
         /**
          * @brief Returns the rank if a MPI environment is currently active.
          * @details If no MPI environment is currently active, the returned
-         * [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) is empty.
-         * @return a `std::optional<int>` containing the current rank
+         *          [`std::nullopt`](https://en.cppreference.com/w/cpp/utility/optional/nullopt) is empty.
+         * @return a [`std::optional`](https://en.cppreference.com/w/cpp/utility/optional) containing the current MPI rank
+         * @nodiscard
          */
+        [[nodiscard]]
         constexpr std::optional<int> rank() const noexcept { return rank_; }
 
     private:
-        std::string file_ = "unknown";
-        std::string func_ = "unknown";
+        const char* file_ = "unknown";
+        const char* func_ = "unknown";
         int line_ = 0;
         int column_ = 0;
         std::optional<int> rank_ = std::nullopt;

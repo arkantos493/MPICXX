@@ -1,7 +1,8 @@
 /**
- * @file test/info/constructor_and_destructor/default_constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::info() member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *ConstructionTest*
@@ -10,11 +11,10 @@
  * | DefaultConstruction | default construct info object |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(ConstructionTest, DefaultConstruction) {
     // default construct an info object

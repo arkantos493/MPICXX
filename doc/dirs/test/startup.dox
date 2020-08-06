@@ -1,0 +1,66 @@
+/**
+ * @dir test/startup
+ * @author Marcel Breyer
+ * @date 2020-03-18
+ *
+ * @brief This directory contains all test cases for the functions related to the initialization or finalization of
+ * the MPI runtime system.
+ */
+
+/**
+ * @dir test/startup/single_spawner
+ * @author Marcel Breyer
+ * @date 2020-04-13
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::single_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner
+ * @author Marcel Breyer
+ * @date 2020-05-12
+ *
+ * @brief This directory contains all test cases for the @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/constructor
+ * @author Marcel Breyer
+ * @date 2020-05-12
+ *
+ * @brief This directory contains all test cases for the constructors of the @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/command
+ * @author Marcel Breyer
+ * @date 2020-05-15
+ *
+ * @brief This directory contains all test cases for the command functions of the @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/maxprocs
+ * @author Marcel Breyer
+ * @date 2020-05-15
+ *
+ * @brief This directory contains all test cases for the maxprocs functions of the @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/argvs
+ * @author Marcel Breyer
+ * @date 2020-06-02
+ *
+ * @brief This directory contains all test cases for the command line argument manipulating functions of the
+ * @ref mpicxx::multiple_spawner class.
+ */
+
+/**
+ * @dir test/startup/multiple_spawner/spawn_info
+ * @author Marcel Breyer
+ * @date 2020-05-17
+ *
+ * @brief This directory contains all test cases for the spawn_info functions of the
+ * @ref mpicxx::multiple_spawner class.
+ */

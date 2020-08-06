@@ -1,7 +1,8 @@
 /**
- * @file test/info/iterators/iterator_impl/assignment.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the assignment operator of the @ref mpicxx::info::iterator and @ref mpicxx::info::const_iterator class.
  * @details Testsuite: *InfoIteratorImplTest*
@@ -11,11 +12,10 @@
  * | AssignmentInvalid | assign an invalid iterator to another one (death test) |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(InfoIteratorImplTest, AssignmentValid) {
     // create info objects and add [key, value]-pairs

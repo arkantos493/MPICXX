@@ -1,27 +1,28 @@
 /**
- * @file test/info/proxy.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-02-13
+ * @date 2020-08-04
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::proxy class that is used to distinguish between read and write access of a [key, value]-pair
- * of a @ref mpicxx::info object.
+ *        of a @ref mpicxx::info object.
  * @details Testsuite: *InfoProxyTest*
- * | test case name             | test case description                         |
- * |:---------------------------|:----------------------------------------------|
- * | ProxyWriteAccessValid      | write access the proxy                        |
- * | ProxyWriteAccessInvalid    | invalid write access the proxy (death test)   |
- * | ProxyReadAccessValid       | read access the proxy                         |
- * | ProxyReadAccessInvalid     | invalid read access the proxy (death test)    |
- * | ProxyOutputOperatorValid   | output operator overload                      |
- * | ProxyOutputOperatorInvalid | invalid output operator overload (death test) |
+ * | test case name             | test case description                                   |
+ * |:---------------------------|:--------------------------------------------------------|
+ * | ProxyWriteAccessValid      | write access the proxy                                  |
+ * | ProxyWriteAccessInvalid    | invalid write access the proxy (death test)             |
+ * | ProxyReadAccessValid       | read access the proxy                                   |
+ * | ProxyReadAccessInvalid     | invalid read access the proxy (death test)              |
+ * | ProxyOutputOperatorValid   | stream-insertion operator overload                      |
+ * | ProxyOutputOperatorInvalid | invalid stream-insertion operator overload (death test) |
  */
 
-#include <sstream>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
+#include <sstream>
 
 TEST(InfoProxyTest, ProxyWriteAccessValid) {
     // create info object
@@ -92,7 +93,8 @@ TEST(InfoProxyDeathTest, ProxyReadAccessInvalid) {
 
     // attempt read access on a proxy that refers to an info object referring to MPI_INFO_NULL
     info = mpicxx::info(MPI_INFO_NULL, false);
-    EXPECT_DEATH( static_cast<std::string>(p) , "");
+    [[maybe_unused]] std::string str;
+    EXPECT_DEATH( str = static_cast<std::string>(p) , "");
 }
 
 

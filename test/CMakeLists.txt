@@ -5,13 +5,15 @@ function(add_mpi_test name test_files num_mpi_procs)
     # add new test executable with the static main and the provided source test files
     add_executable(${name} ${CMAKE_SOURCE_DIR}/test/main.cpp ${test_files})
     # add enable death test cmake flag
-    if(ENABLE_DEATH_TESTS)
-        target_compile_definitions(${name} PRIVATE ENABLE_DEATH_TESTING=1)
+    if(MPICXX_ENABLE_DEATH_TESTS)
+        target_compile_definitions(${name} PRIVATE MPICXX_ENABLE_DEATH_TESTING=1)
     else()
-        target_compile_definitions(${name} PRIVATE ENABLE_DEATH_TESTING=0)
+        target_compile_definitions(${name} PRIVATE MPICXX_ENABLE_DEATH_TESTING=0)
     endif()
     # link test against own library and gtest
     target_link_libraries(${name} ${PROJECT_NAME} gtest)
+    # set include directory
+    target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/test/)
     # add MPI parameter for the number of used processors
     set(test_parameters ${MPIEXEC_NUMPROC_FLAG} ${num_mpi_procs} "./${name}")
     # add test to run with MPI    

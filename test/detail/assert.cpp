@@ -1,9 +1,10 @@
 /**
- * @file test/detail/assert.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-02-08
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Test cases for the MPICXX_ASSERTION macros.
+ * @brief Test cases for the `MPICXX_ASSERTION` macros.
  * @details Testsuite: *DetailTest*
  * | test case name               | test case description                   |
  * |:-----------------------------|:----------------------------------------|
@@ -13,9 +14,9 @@
  * | AssertSanityDoesntHold       | assert sanity checks (death test)       |
  */
 
-#include <gtest/gtest.h>
-
 #include <mpicxx/detail/assert.hpp>
+
+#include <gtest/gtest.h>
 
 namespace {
     int precondition_check(const int i) {

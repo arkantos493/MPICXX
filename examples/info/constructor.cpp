@@ -1,7 +1,8 @@
 /**
- * @file examples/info/constructor.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-02-16
+ * @date 2020-07-24
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Code snippets for the @ref mpicxx::info constructor implementations.
  */
@@ -22,6 +23,16 @@ mpicxx::info obj = { {"key1", "value1"},
                      {"key1", "value1_override"},
                      {"key3", "value3"} };
 //! [constructor initializer list]
+
+//! [constructor parameter pack]
+MPI_Info mpi_info;
+auto p1 = std::make_pair("key1", "value1");
+std::pair<const std::string, std::string> p2("key2", "value2");
+
+mpicxx::info info (p1, p2, std::make_pair("key1", "value1_override"), std::make_pair("key3", "value3"));
+
+mpi_info = MPI_INFO_NULL;    // <- does not change the value of 'info'!
+//! [constructor parameter pack]
 
 //! [constructor MPI_Info]
 MPI_Info mpi_info;

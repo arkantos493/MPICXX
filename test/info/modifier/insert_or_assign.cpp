@@ -1,35 +1,38 @@
 /**
- * @file test/info/modifier/insert_or_assign.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-11
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::insert_or_assign(const std::string_view, const std::string_view),
- * @ref mpicxx::info::insert_or_assign(InputIt, InputIt) and @ref mpicxx::info::insert_or_assign(std::initializer_list<value_type>) member
- * functions provided by the @ref mpicxx::info class.
+ *        @ref mpicxx::info::insert_or_assign(InputIt, InputIt) and @ref mpicxx::info::insert_or_assign(std::initializer_list<value_type>)
+ *        member functions provided by the @ref mpicxx::info class.
  * @details Testsuite: *ModifierTest*
- * | test case name                                 | test case description                                                                         |
- * |:-----------------------------------------------|:----------------------------------------------------------------------------------------------|
- * | InsertOrAssignByKeyValuePair                   | insert or assign single [key, value]-pair                                                     |
- * | InsertOrAssignByIllegalKeyOrValue              | try to insert or assign [key, value]-pair with illegal key or value (death test)              |
- * | NullInsertOrAssignByKeyValuePair               | info object referring to MPI_INFO_NULL (death test)                                           |
- * | InsertOrAssignByIteratorRange                  | insert or assign all [key, value]-pairs from the iterator range                               |
- * | InsertOrAssignByIteratorRangeFromInfo          | insert or assign all [key, value]-pairs from the iterator range retrieved from an info object |
- * | InsertOrAssignByIllegalIteratorRange           | iterator range is not valid (death test)                                                      |
- * | InsertOrAssignByIllegalIteratorRangeKeyOrValue | key or value in the iterator range illegal (death test)                                       |
- * | NullInsertOrAssignByIteratorRange              | info object referring to MPI_INFO_NULL (death test)                                           |
- * | InsertOrAssignByInitializerList                | insert or assign all [key, value]-pairs from the initializer list                             |
- * | InsertOrAssignByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                                     |
- * | NullInsertOrAssignByInitializerList            | info object referring to MPI_INFO_NULL (death test)                                           |
+ * | test case name                                 | test case description                                                                                                    |
+ * |:-----------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | InsertOrAssignByKeyValuePair                   | insert or assign single [key, value]-pair                                                                                |
+ * | InsertOrAssignByIllegalKeyOrValue              | try to insert or assign [key, value]-pair with illegal key or value (death test)                                         |
+ * | NullInsertOrAssignByKeyValuePair               | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | InsertOrAssignByIteratorRange                  | insert or assign all [key, value]-pairs from the iterator range                                                          |
+ * | InsertOrAssignByIteratorRangeFromInfo          | insert or assign all [key, value]-pairs from the iterator range retrieved from an info object                            |
+ * | InsertOrAssignByIllegalIteratorRange           | iterator range is not valid (death test)                                                                                 |
+ * | InsertOrAssignByIllegalIteratorRangeKeyOrValue | key or value in the iterator range illegal (death test)                                                                  |
+ * | NullInsertOrAssignByIteratorRange              | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | InsertOrAssignByInitializerList                | insert or assign all [key, value]-pairs from the initializer list                                                        |
+ * | InsertOrAssignByInitializerListKeyOrValue      | key or value in the initializer list illegal (death test)                                                                |
+ * | NullInsertOrAssignByInitializerList            | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
+ * | InsertOrAssignByParameterPack                  | insert or assign all [key, value]-pairs from the parameter pack                                                          |
+ * | InsertOrAssignByParameterPackIllegalKeyOrValue | key or value in the parameter pack illegal (death test)                                                                  |
+ * | NullInsertOrAssignByParameterPack              | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
 
-#include <string>
-#include <vector>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <string>
+#include <vector>
 
 TEST(ModifierTest, InsertOrAssignByKeyValuePair) {
     // create empty info object
@@ -246,4 +249,58 @@ TEST(ModifierDeathTest, NullInsertOrAssignByInitializerList) {
 
     // calling insert_or_assign() on an info object referring to MPI_INFO_NULL is illegal
     ASSERT_DEATH( info.insert_or_assign({ { "key", "value" } }) , "");
+}
+
+
+TEST(ModifierTest, InsertOrAssignByParameterPack) {
+    // create empty info object
+    mpicxx::info info;
+
+    // create [key, value]-pairs
+    std::pair<const std::string, std::string> p1("key1", "value1");
+    std::pair<const std::string, std::string> p2("key2", "value2");
+
+    // insert or assign [key, value]-pairs
+    info.insert_or_assign(p1, p2, std::make_pair("key1", "value1_override"));
+    info.insert_or_assign(std::make_pair("key3", "value3"));
+
+    // the info object should contain three [key, value]-pairs
+    int nkeys;
+    MPI_Info_get_nkeys(info.get(), &nkeys);
+    ASSERT_EQ(nkeys, 3);
+
+    int flag;
+    char value[MPI_MAX_INFO_VAL];
+    MPI_Info_get(info.get(), "key1", 15, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value1_override");
+    MPI_Info_get(info.get(), "key2", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value2");
+    MPI_Info_get(info.get(), "key3", 6, value, &flag);
+    EXPECT_TRUE(static_cast<bool>(flag));
+    EXPECT_STREQ(value, "value3");
+}
+
+TEST(ModifierDeathTest, InsertOrAssignByParameterPackIllegalKeyOrValue) {
+    // create info object
+    mpicxx::info info;
+    std::string key(MPI_MAX_INFO_KEY, ' ');
+    std::string value(MPI_MAX_INFO_VAL, ' ');
+
+    // try using illegal keys
+    ASSERT_DEATH( info.insert_or_assign(std::make_pair(key, "value")) , "");
+    ASSERT_DEATH( info.insert_or_assign(std::make_pair("", "value")) , "");
+
+    // try using illegal value
+    ASSERT_DEATH( info.insert_or_assign(std::make_pair("key", value)) , "");
+    ASSERT_DEATH( info.insert_or_assign(std::make_pair("key", "")) , "");
+}
+
+TEST(ModifierDeathTest, NullInsertOrAssignByParameterPack) {
+    // create null info object
+    mpicxx::info info(MPI_INFO_NULL, false);
+
+    // calling insert_or_assign() on an info object referring to MPI_INFO_NULL is illegal
+    ASSERT_DEATH( info.insert_or_assign(std::make_pair("key", "value")) , "");
 }

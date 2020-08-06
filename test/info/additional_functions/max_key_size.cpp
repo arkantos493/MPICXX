@@ -1,7 +1,8 @@
 /**
- * @file test/info/additional_functions/max_key_size.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::max_key_size() static member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
@@ -10,11 +11,10 @@
  * | MaxKeySize     | check received value  |
  */
 
-#include <gtest/gtest.h>
-#include <mpi.h>
-
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(NonMemberFunctionTest, MaxKeySize) {
     // static access

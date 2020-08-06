@@ -1,24 +1,25 @@
 /**
- * @file test/info/non-member_functions/inequality.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
- * @brief Test cases for the @ref mpicxx::info::operator!=(const info&, const info&) function provided by the @ref mpicxx::info class.
+ * @brief Test cases for the mpicxx::info::operator!=(const info&, const info&) function automatically generated from
+ *        @ref mpicxx::info::operator==(const info&, const info&) provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name        | test case description                               |
- * |:----------------------|:----------------------------------------------------|
- * | Inequality            | check various `!=` cases                            |
- * | InequalityIdempotence | `info1 != info1; // false`                          |
- * | InequalitySymmetry    | `info1 != info2` <-> `info2 != info1`               |
- * | InequalityNonFreeable | freeable state should't have any impact on equality |
- * | NullInequality        | info objects referring to *MPI_INFO_NULL*           |
+ * | test case name        | test case description                                                                                        |
+ * |:----------------------|:-------------------------------------------------------------------------------------------------------------|
+ * | Inequality            | check various `!=` cases                                                                                     |
+ * | InequalityIdempotence | `info1 != info1; // false`                                                                                   |
+ * | InequalitySymmetry    | `info1 != info2` <-> `info2 != info1`                                                                        |
+ * | InequalityNonFreeable | freeable state should't have any impact on equality                                                          |
+ * | NullInequality        | info objects referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) |
  */
-
-#include <gtest/gtest.h>
-#include <mpi.h>
 
 #include <mpicxx/info/info.hpp>
 
+#include <gtest/gtest.h>
+#include <mpi.h>
 
 TEST(NonMemberFunctionTest, Inequality) {
     // create two empty info objects

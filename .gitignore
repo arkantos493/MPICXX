@@ -7,7 +7,9 @@ third_party/googletest/*
 !third_party/googletest/CMakeLists.txt.in
 
 ### documentation ###
+doc/resources/main_page.md
 html/
+mpi31-report.pdf
 
 ### CLion ###
 .idea/

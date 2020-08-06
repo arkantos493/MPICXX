@@ -1,24 +1,24 @@
 /**
- * @file test/chrono/clock.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-02-18
+ * @date 2020-07-29
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::clock class.
  * @details Testsuite: *ClockTest*
- * | test case name | test case description                      |
- * |:---------------|:-------------------------------------------|
- * | Now            | check the static `now()` function          |
- * | Resolution     | check the static `resolution()` function   |
- * | Synchronized   | check the static `synchronized()` function |
+ * | test case name | test case description                                        |
+ * |:---------------|:-------------------------------------------------------------|
+ * | Now            | check the static @ref mpicxx::clock::now() function          |
+ * | Resolution     | check the static @ref mpicxx::clock::resolution() function   |
+ * | Synchronized   | check the static @ref mpicxx::clock::synchronized() function |
  */
-
-#include <chrono>
-#include <thread>
-
-#include <gtest/gtest.h>
 
 #include <mpicxx/chrono/clock.hpp>
 
+#include <gtest/gtest.h>
+
+#include <chrono>
+#include <thread>
 
 TEST(ClockTest, Now) {
     // get current wall-clock time

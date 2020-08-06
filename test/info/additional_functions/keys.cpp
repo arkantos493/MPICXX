@@ -1,24 +1,24 @@
 /**
- * @file test/info/additional_functions/keys.cpp
+ * @file
  * @author Marcel Breyer
- * @date 2020-04-10
+ * @date 2020-08-04
+ * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::info::keys() const member function provided by the @ref mpicxx::info class.
  * @details Testsuite: *NonMemberFunctionTest*
- * | test case name | test case description                                 |
- * |:---------------|:------------------------------------------------------|
- * | NoKeys         | empty info object                                     |
- * | Keys           | info object with [key, value]-pairs                   |
- * | NullKeys       | info object referring to *MPI_INFO_NULL* (death test) |
+ * | test case name | test case description                                                                                                    |
+ * |:---------------|:-------------------------------------------------------------------------------------------------------------------------|
+ * | NoKeys         | empty info object                                                                                                        |
+ * | Keys           | info object with [key, value]-pairs                                                                                      |
+ * | NullKeys       | info object referring to [*MPI_INFO_NULL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) (death test) |
  */
 
-#include <vector>
+#include <mpicxx/info/info.hpp>
 
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#include <mpicxx/info/info.hpp>
-
+#include <vector>
 
 TEST(NonMemberFunctionTest, NoKeys) {
     // create empty info object
@@ -61,5 +61,6 @@ TEST(NonMemberFunctionDeathTest, NullKeys) {
     mpicxx::info info(MPI_INFO_NULL, false);
 
     // calling key() on an info object referring to MPI_INFO_NULL is illegal
-    ASSERT_DEATH( info.keys() , "");
+    [[maybe_unused]] std::vector<mpicxx::info::key_type> res;
+    ASSERT_DEATH( res = info.keys() , "");
 }

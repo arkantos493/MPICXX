@@ -10,6 +10,7 @@ set(TEST_SOURCES
         constructor_and_destructor/iterator_range_constructor.cpp
         constructor_and_destructor/initializer_list_constructor.cpp
         constructor_and_destructor/mpi_info_constructor.cpp
+        constructor_and_destructor/parameter_pack_constructor.cpp
 
         assignment/copy_assignment.cpp
         assignment/move_assignment.cpp
