@@ -1,6 +1,6 @@
 # specify all source files for this test suite
 set(TEST_SOURCES
-        error.cpp
+        error_code.cpp
 )
 
 # create google test with MPI support
