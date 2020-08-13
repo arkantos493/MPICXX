@@ -246,6 +246,14 @@ html::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-color);
 }
 
+td {
+    white-space: normal;
+    vertical-align: middle;
+}
+th {
+    text-align: center;
+}
+
 
 span.btn.btn-default.btn-xs {
     vertical-align: baseline;
