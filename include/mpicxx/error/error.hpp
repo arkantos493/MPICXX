@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-12
+ * @date 2020-08-13
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines error codes and error classes including standard once.
@@ -248,6 +248,14 @@ namespace mpicxx {
             MPI_Error_string(code_, error_string, &resultlen);
             return std::string(error_string, resultlen);
         }
+        /**
+         * @brief Returns the maximum possible error string size.
+         * @return the maximum error string size
+         *         (= [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm))
+         * @nodiscard
+         */
+        [[nodiscard]] 
+        static constexpr std::size_t max_message_size() { return static_cast<std::size_t>(MPI_MAX_ERROR_STRING); }
         /**
          * @brief Check if the error code value is valid, i.e. non-zero.
          * @return `false` if `value() == 0`, `true` otherwise
