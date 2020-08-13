@@ -10,6 +10,7 @@
 #ifndef MPICXX_ERROR_HPP
 #define MPICXX_ERROR_HPP
 
+#include <mpicxx/detail/assert.hpp>
 #include <mpicxx/detail/concepts.hpp>
 
 #include <fmt/format.h>
@@ -167,11 +168,12 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Constructs a new error code with the value given by @p code.
-         * @param[in] code the error code value
+         * @param[in] code the error code value (default: [`MPI_SUCCESS`](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node222.htm))
          */
-        constexpr error_code(const int code) noexcept : code_(code) {
-//            MPICXX_ASSERT_SANITY(this->valid_error_code(code), "");
-            // TODO 2020-08-11 20:42 breyerml: check bounds
+        error_code(const int code = MPI_SUCCESS) noexcept : code_(code) {
+            MPICXX_ASSERT_SANITY(this->valid_error_code(code),
+                    "Attempt to create an error code with invalid value ({})! Valid error code values must be in the interval [{}, {}].",
+                    code, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
         }
         ///@}
         
@@ -185,7 +187,13 @@ namespace mpicxx {
          * @brief Assign the new error code value @p code to the current one.
          * @param[in] code the new error code value
          */
-        constexpr void assign(const int code) noexcept { code_ = code; }
+        void assign(const int code) noexcept {
+            MPICXX_ASSERT_SANITY(this->valid_error_code(code),
+                    "Attempt to assign an error code with invalid value ({})! Valid error code values must be in the interval [{}, {}].",
+                     code, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
+
+            code_ = code;
+        }
         /**
          * @brief Replaces the error code with the default value
          *        [*MPI_SUCCESS*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node222.htm).
@@ -232,6 +240,11 @@ namespace mpicxx {
          */
         [[nodiscard]]
         error_category category() const {
+            MPICXX_ASSERT_PRECONDITION(this->valid_error_code(code_),
+                    "Attempt to retrieve the error strong of an error code with invalid value ({})! "
+                    "Valid error code values must be in the interval [{}, {}].",
+                    code_, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
+
             int category;
             MPI_Error_class(code_, &category);
             return error_category(category);
@@ -243,6 +256,11 @@ namespace mpicxx {
          */
         [[nodiscard]]
         std::string message() const {
+            MPICXX_ASSERT_PRECONDITION(this->valid_error_code(code_),
+                    "Attempt to retrieve the error strong of an error code with invalid value ({})! "
+                    "Valid error code values must be in the interval [{}, {}].",
+                    code_, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
+
             char error_string[MPI_MAX_ERROR_STRING];
             int resultlen;
             MPI_Error_string(code_, error_string, &resultlen);
@@ -298,9 +316,9 @@ namespace mpicxx {
 
     private:
 #if MPICXX_ASSERTION_LEVEL > 0
-//        bool valid_error_code(const int code) const {
-//            return 0 <= code && code <
-//        }
+        bool valid_error_code(const int code) const {
+            return 0 <= code && code <= error_code::last_used_value().value_or(std::numeric_limits<int>::max());
+        }
 #endif
 
         int code_;
