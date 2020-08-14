@@ -228,6 +228,7 @@ namespace mpicxx {
     };
 
 
+    
     /**
      * @nosubgrouping
      * @brief This class represents an error category containing possibly multiple @ref error_code.
@@ -256,10 +257,12 @@ namespace mpicxx {
         ///@{
         /**
          * @brief Constructs a new error category.
+         *
+         * @calls{ int MPI_Add_error_class(int *errorclass);    // exactly once }
          */
-//        error_category() noexcept { // TODO 2020-08-13 23:24 breyerml:
-//            MPI_Add_error_class(&category_);
-//        }
+        error_category() noexcept {
+            MPI_Add_error_class(&category_);
+        }
         ///@}
 
 
@@ -273,8 +276,29 @@ namespace mpicxx {
          *        @ref mpicxx::error_category.
          * @param[in] error_string the description of the new error code
          * @return the newly created @ref mpicxx::error_code
+         *
+         * @pre The current error category value **must** not be less than 0.
+         * @pre @p error_string **must** include the null-terminator.
+         * @pre The length of @p error_string **must** be less than
+         *      [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm)
+         *
+         * @assert_precondition{ If the current error category value isn't a valid value..\n
+         *                       If @p error_string exceeds its size limit. }
+         *
+         * @calls{
+         * int MPI_Add_error_code(int errorclass, int *errorcode);         // exactly once
+         * int MPI_Add_error_string(int errorcode, const char *string);    // exactly once
+         * }
          */
         error_code add_error_code(const std::string_view error_string) const {
+            MPICXX_ASSERT_PRECONDITION(this->valid_error_category(category_),
+                    "Attempt to use an error category with invalid value ({})! "
+                    "Valid error category values must be greater or equal than {}.",
+                    category_, MPI_SUCCESS);
+            MPICXX_ASSERT_PRECONDITION(this->legal_error_string(error_string),
+                    "Illegal error string: {} < {} (MPI_MAX_ERROR_STRING)",
+                    error_string.size(), MPI_MAX_ERROR_STRING);
+
             int new_error_code;
             MPI_Add_error_code(category_, &new_error_code);
             MPI_Add_error_string(new_error_code, error_string.data());
@@ -283,12 +307,36 @@ namespace mpicxx {
         /**
          * @brief Constructs [`std::distance(first, last)`](https://en.cppreference.com/w/cpp/iterator/distance) new @ref mpicxx::error_code
          *        with the respective error description in the range [@p first, @p last) associated with this @ref mpicxx::error_category.
+         * @tparam InputIt must meet the [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) requirements
          * @param[in] first iterator to the first error description in the range
          * @param[in] last iterator one-past the last error description in the range
          * @return all newly created @ref mpicxx::error_code
+         *
+         * @pre The current error category value **must** not be less than 0.
+         * @pre @p first and @p last **must** refer to the same container.
+         * @pre @p first and @p last **must** form a valid range, i.e. @p first must be less or equal than @p last.
+         * @pre All error strings **must** include the null-terminator.
+         * @pre The length of all error strings **must** be less than
+         *      [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm)
+         *
+         * @assert_precondition{ If the current error category value isn't a valid value. \n
+         *                       If @p first and @p last don't denote a valid range. \n
+         *                       If any error string exceeds its size limit. }
+         *
+         * @calls{
+         * int MPI_Add_error_code(int errorclass, int *errorcode);         // exactly 'last - first' times
+         * int MPI_Add_error_string(int errorcode, const char *string);    // exactly 'last - first' times
+         * }
          */
         template <std::input_iterator InputIt>
         std::vector<error_code> add_error_code(InputIt first, InputIt last) const requires (!detail::is_c_string<InputIt>) {
+            MPICXX_ASSERT_PRECONDITION(this->valid_error_category(category_),
+                    "Attempt to use an error category with invalid value ({})! "
+                    "Valid error category values must be greater or equal than {}.",
+                    category_, MPI_SUCCESS);
+            MPICXX_ASSERT_PRECONDITION(this->legal_iterator_range(first, last),
+                    "Attempt to pass an illegal iterator range ('first' must be less or equal than 'last')!");
+            
             std::vector<error_code> new_error_codes;
             new_error_codes.reserve(std::distance(first, last));
             for (; first != last; ++first) {
@@ -303,9 +351,27 @@ namespace mpicxx {
          * @param ilist [`std::initializer_list`](https://en.cppreference.com/w/cpp/utility/initializer_list) containing the error
          *              descriptions
          * @return all newly created @ref mpicxx::error_code
+         *
+         * @pre The current error category value **must** not be less than 0.
+         * @pre All error strings **must** include the null-terminator.
+         * @pre The length of all error strings **must** be less than
+         *      [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm)
+         *
+         * @assert_precondition{ If the current error category value isn't a valid value..\n
+         *                       If any error string exceeds its size limit. }
+         *
+         * @calls{
+         * int MPI_Add_error_code(int errorclass, int *errorcode);         // exactly 'ilist.size()' times
+         * int MPI_Add_error_string(int errorcode, const char *string);    // exactly 'ilist.size()' times
+         * }
          */
         template <detail::is_string T>
         std::vector<error_code> add_error_code(std::initializer_list<T> ilist) const {
+            MPICXX_ASSERT_PRECONDITION(this->valid_error_category(category_),
+                    "Attempt to use an error category with invalid value ({})! "
+                    "Valid error category values must be greater or equal than {}.",
+                    category_, MPI_SUCCESS);
+
             return this->add_error_code(ilist.begin(), ilist.end());
         }
         /**
@@ -314,9 +380,27 @@ namespace mpicxx {
          * @tparam T must meed the @ref mpicxx::detail::is_string requirements and must not greater than 1
          * @param args an arbitrary number (but at least 2) of error descriptions
          * @return all newly created @ref mpicxx::error_code
+         *
+         * @pre The current error category value **must** not be less than 0.
+         * @pre All error strings **must** include the null-terminator.
+         * @pre The length of all error strings **must** be less than
+         *      [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm)
+         *
+         * @assert_precondition{ If the current error category value isn't a valid value..\n
+         *                       If any error string exceeds its size limit. }
+         *
+         * @calls{
+         * int MPI_Add_error_code(int errorclass, int *errorcode);         // exactly 'sizeof...(T)' times
+         * int MPI_Add_error_string(int errorcode, const char *string);    // exactly 'sizeof...(T)' times
+         * }
          */
         template <detail::is_string... T>
         std::vector<error_code> add_error_code(T&&... args) const requires (sizeof...(T) > 1) {
+            MPICXX_ASSERT_PRECONDITION(this->valid_error_category(category_),
+                    "Attempt to use an error category with invalid value ({})! "
+                    "Valid error category values must be greater or equal than {}.",
+                    category_, MPI_SUCCESS);
+
             std::vector<error_code> new_error_codes;
             new_error_codes.reserve(sizeof...(T));
             ([&](auto&& arg) {
@@ -350,8 +434,8 @@ namespace mpicxx {
         /**
          * @brief [Three-way comparison operator](https://en.cppreference.com/w/cpp/language/default_comparisons) for two
          *        @ref mpicxx::error_category @p lhs and @p rhs.
-         * @details Automatically generates mpicxx::error_category::operator<, mpicxx::error_category::operator<=,
-         *          mpicxx::error_category::operator> and mpicxx::error_category::operator>=.
+         * @details Automatically generates `%mpicxx::error_category::operator<`, `%mpicxx::error_category::operator<=`,
+         *          `%mpicxx::error_category::operator>` and `%mpicxx::error_category::operator>=`.
          * @param[in] lhs an @ref mpicxx::error_category
          * @param[in] rhs an @ref mpicxx::error_category
          * @return the [`std::strong_ordering`](https://en.cppreference.com/w/cpp/utility/compare/strong_ordering) result
@@ -366,12 +450,44 @@ namespace mpicxx {
          * @return the output stream
          */
         friend std::ostream& operator<<(std::ostream& out, const error_category ec) {
-            return out << ec.category_;
+            return out << ec.value();
         }
         ///@}
 
 
     private:
+#if MPICXX_ASSERTION_LEVEL > 0
+        /*
+         * @brief Checks whether @p category is a valid error category value, i.e. @p category is not less than 0.
+         * @param[in] category the error category value to check
+         * @return `true` if @p code is a valid error code value, otherwise `false`
+         */
+        bool valid_error_category(const int category) const {
+            return MPI_SUCCESS <= category;
+        }
+        /*
+         * @brief Checks whether the error string @p str is legal, i.e. its size is less than
+         *        [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm).
+         * @param[in] str the error string to check the size
+         * @return `true` if the size of @p str less than
+         *         [*MPI_MAX_ERROR_STRING*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node221.htm), otherwise `false`
+         */
+        bool legal_error_string(const std::string_view str) const {
+            return str.size() < MPI_MAX_ERROR_STRING;
+        }
+        /*
+         * @brief Check whether @p first and @p last denote a valid range, i.e. @p first is less or equal than @p last.
+         * @details Checks whether the distance bewteen @p first and @p last is not negative.
+         * @param[in] first iterator to the first element
+         * @param[in] last past-the-end iterator
+         * @return `true` if @p first and @p last denote a valid iterator range, otherwise `false`
+         */
+        template <std::input_iterator InputIt>
+        bool legal_iterator_range(InputIt first, InputIt last) const {
+            return std::distance(first, last) >= 0;
+        }
+#endif
+
         int category_;
     };
 
