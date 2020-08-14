@@ -25,7 +25,7 @@
 
 namespace mpicxx {
 
-    // Forward declaration of the error_code class.
+    // forward declaration of the error_category class
     class error_category;
 
     /**
