@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-04
+ * @date 2020-08-14
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements a wrapper class around the [*MPI_Info*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) object.
@@ -3089,7 +3089,7 @@ namespace mpicxx {
          * @return `true` if @p first and @p last denote a valid iterator range, otherwise `false`
          */
         template <std::input_iterator InputIt>
-        bool legal_iterator_range(InputIt first, InputIt last) {
+        bool legal_iterator_range(InputIt first, InputIt last) const {
             return std::distance(first, last) >= 0;
         }
         /*
