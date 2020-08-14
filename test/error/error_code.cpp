@@ -23,6 +23,7 @@
  * | ErrorCodeThreeWayComparison             | check if the comparison operators `==`, `!=`, `<`, `<=`, `>` and `>=` work                                                                                      |
  * | ErrorCodeStreamInsertionOperator        | check if outputting an error code works as intended: `err_code_value: error_code_string`                                                                        |
  * | InvalidErrorCodeStreamInsertionOperator | try to output an error code with illegal value (death test)                                                                                                     |
+ * | HashErrorCode                           | check if the hash of an @ref mpicxx::error_code is the same as the hash of the corresponding int                                                                |
  */
 
 #include <mpicxx/error/error.hpp>
@@ -30,6 +31,7 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
+#include <functional>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -243,4 +245,15 @@ TEST(ErrorCodeDeathTest, InvalidErrorCodeStreamInsertionOperator) {
     // try to serialize error code
     std::stringstream ss1;
     ASSERT_DEATH( ss1 << ec , "");
+}
+
+
+TEST(ErrorCodeTest, HashErrorCode) {
+    // create error code
+    mpicxx::error_code ec0(0);
+    mpicxx::error_code ec1(2);
+
+    // check if hashes are equal
+    EXPECT_EQ(std::hash<mpicxx::error_code>{}(ec0), std::hash<int>{}(0));
+    EXPECT_EQ(std::hash<mpicxx::error_code>{}(ec1), std::hash<int>{}(2));
 }
