@@ -147,7 +147,7 @@ namespace mpicxx {
         [[nodiscard]]
         std::string message() const {
             MPICXX_ASSERT_PRECONDITION(this->valid_error_code(code_),
-                    "Attempt to retrieve the error strong of an error code with invalid value ({})! "
+                    "Attempt to retrieve the error string of an error code with invalid value ({})! "
                     "Valid error code values must be in the interval [{}, {}].",
                     code_, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
 
@@ -220,7 +220,7 @@ namespace mpicxx {
          * @return `true` if @p code is a valid error code value, otherwise `false`
          */
         bool valid_error_code(const int code) const {
-            return 0 <= code && code <= error_code::last_used_value().value_or(std::numeric_limits<int>::max());
+            return MPI_SUCCESS <= code && code <= error_code::last_used_value().value_or(std::numeric_limits<int>::max());
         }
 #endif
 
