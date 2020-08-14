@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-02
+ * @date 2020-08-14
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements the class which gets returned from the @ref mpicxx::single_spawner::spawn(),
@@ -11,6 +11,8 @@
 
 #ifndef MPICXX_SPAWNER_RESULT_HPP
 #define MPICXX_SPAWNER_RESULT_HPP
+
+#include <mpicxx/error/error.hpp>
 
 #include <fmt/format.h>
 #include <mpi.h>
@@ -25,7 +27,6 @@
 namespace mpicxx {
 
     // TODO 2020-04-14 21:55 breyerml: change from MPI_Comm to mpicxx equivalent
-    // TODO 2020-04-14 21:55 breyerml: change from int to mpicxx errcode equivalent
 
     // forward declare all spawner classes
     class single_spawner;
@@ -52,7 +53,7 @@ namespace mpicxx {
          * @brief Construct a new spawn_result_with_errcodes object.
          * @param[in] maxprocs the total number of spawned processes
          */
-        explicit spawn_result_with_errcodes(const int maxprocs) : errcodes_(maxprocs, -1) { }
+        explicit spawn_result_with_errcodes(const int maxprocs) : errcodes_(maxprocs) { }
 
 
     public:
@@ -112,7 +113,7 @@ namespace mpicxx {
          * @nodiscard
          */
         [[nodiscard]]
-        const std::vector<int>& errcodes() const noexcept {
+        const std::vector<mpicxx::error_code>& errcodes() const noexcept {
             return errcodes_;
         }
         /**
@@ -126,7 +127,7 @@ namespace mpicxx {
         std::string error_list() const {
             // count the number of errors
             const auto failed_spawns = std::count_if(errcodes_.cbegin(), errcodes_.cend(),
-                    [](const int err) { return err != MPI_SUCCESS; });
+                    [](const mpicxx::error_code err) { return static_cast<bool>(err); });
 
             // no errors occurred
             if (failed_spawns == 0) {
@@ -137,23 +138,16 @@ namespace mpicxx {
             fmt::format_to(buf, "{} {} occurred!:\n", failed_spawns, failed_spawns == 1 ? "error" : "errors");
 
             // count how often each error occurred
-            std::map<int, int> counts;
-            for (const int err : errcodes_) {
-                if (err != MPI_SUCCESS) {
+            std::map<mpicxx::error_code, int> counts;
+            for (const mpicxx::error_code err : errcodes_) {
+                if (err) {
                     ++counts[err];
                 }
             }
 
             // retrieve the error string and print it
             for (const auto [err, count] : counts) {
-                if (err == -1) {
-                    fmt::format_to(buf, "{:>5}x Failed to retrieve error string\n", count);
-                } else {
-                    char error_string[MPI_MAX_ERROR_STRING];
-                    int resultlen;
-                    MPI_Error_string(err, error_string, &resultlen);
-                    fmt::format_to(buf, "{:>5}x {}\n", count, std::string_view(error_string, resultlen));
-                }
+                fmt::format_to(buf, "{:>5}x {}\n", count, err.message());
             }
 
             using std::to_string;
@@ -161,7 +155,7 @@ namespace mpicxx {
         }
         
     private:
-        std::vector<int> errcodes_;
+        std::vector<mpicxx::error_code> errcodes_;
         MPI_Comm intercomm_ = MPI_COMM_NULL;
     };
 

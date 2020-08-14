@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-24
+ * @date 2020-08-14
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the [*MPI_Comm_spawn*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node237.htm) function.
@@ -453,7 +453,7 @@ namespace mpicxx {
             // determine whether the placeholder MPI_ERRCODES_IGNORE shall be used or a "real" std::vector
             auto errcode = [&res]() {
                 if constexpr (std::is_same_v<return_type, spawn_result_with_errcodes>) {
-                    return res.errcodes_.data();
+                    return reinterpret_cast<int*>(res.errcodes_.data());
                 } else {
                     return MPI_ERRCODES_IGNORE;
                 }
