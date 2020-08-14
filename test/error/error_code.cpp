@@ -4,7 +4,7 @@
  * @date 2020-08-14
  * @copyright This file is distributed under the MIT License.
  *
- * @brief Test cases for the error code class.
+ * @brief Test cases for the @ref mpicxx::error_code class.
  * @details Testsuite: *ErrorCodeTest*
  * | test case name                          | test case description                                                                                                                                           |
  * |:----------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------|
