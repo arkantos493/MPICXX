@@ -42,6 +42,10 @@ namespace mpicxx {
         /**
          * @brief Constructs a new error code with the value given by @p code.
          * @param[in] code the error code value (default: [*MPI_SUCCESS*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node222.htm))
+         *
+         * @pre @p code **must** not be less than 0 or greater than the last used error code (@ref mpicxx::error_code::last_used_value()).
+         *
+         * @assert_sanity{ If @p code isn't a valid error code value. }
          */
         error_code(const int code = MPI_SUCCESS) noexcept : code_(code) {
             MPICXX_ASSERT_SANITY(this->valid_error_code(code),
@@ -60,6 +64,10 @@ namespace mpicxx {
         /**
          * @brief Assign the new error code value @p code to the current one.
          * @param[in] code the new error code value
+         *
+         * @pre @p code **must** not be less than 0 or greater than the last used error code (@ref mpicxx::error_code::last_used_value()).
+         *
+         * @assert_sanity{ If @p code isn't a valid error code value. }
          */
         void assign(const int code) noexcept {
             MPICXX_ASSERT_SANITY(this->valid_error_code(code),
@@ -96,6 +104,8 @@ namespace mpicxx {
          * @nodiscard
          *
          * @note One can **not** assume that **all** values below the returned value are valid.
+         *
+         * @calls{ int MPI_Comm_get_attr(MPI_Comm comm, int comm_keyval, void *attribute_val, int *flag);    // exactly once }
          */
         [[nodiscard]]
         static const std::optional<int> last_used_value() {
@@ -112,6 +122,13 @@ namespace mpicxx {
          * @brief Returns the @ref mpicxx::error_category of the error code value.
          * @return the @ref mpicxx::error_category
          * @nodiscard
+         *
+         * @pre The current error code value **must** not be less than 0 or greater than the last used error code
+         *      (@ref mpicxx::error_code::last_used_value()).
+         *
+         * @assert_precondition{ If the current error code value isn't a valid value. }
+         *
+         * @calls{ int MPI_Error_class(int errorcode, int *errorclass);    // exactly once }
          */
         [[nodiscard]]
         error_category category() const;
@@ -119,6 +136,13 @@ namespace mpicxx {
          * @brief Returns the error string associated with the error code value.
          * @return the error string
          * @nodiscard
+         * 
+         * @pre The current error code value **must** not be less than 0 or greater than the last used error code
+         *      (@ref mpicxx::error_code::last_used_value()).
+         *
+         * @assert_precondition{ If the current error code value isn't a valid value. }
+         *
+         * @calls{ int MPI_Error_string(int errorcode, char *string, int *resultlen);    // exactly once }
          */
         [[nodiscard]]
         std::string message() const {
@@ -158,8 +182,8 @@ namespace mpicxx {
         /**
          * @brief [Three-way comparison operator](https://en.cppreference.com/w/cpp/language/default_comparisons) for two
          *        @ref mpicxx::error_code @p lhs and @p rhs.
-         * @details Automatically generates mpicxx::error_code::operator<, mpicxx::error_code::operator<=,
-         *          mpicxx::error_code::operator> and mpicxx::error_code::operator>=.
+         * @details Automatically generates `%mpicxx::error_code::operator<`, `%mpicxx::error_code::operator<=`,
+         *          `%mpicxx::error_code::operator>` and `%mpicxx::error_code::operator>=`.
          * @param[in] lhs an @ref mpicxx::error_code
          * @param[in] rhs an @ref mpicxx::error_code
          * @return the [`std::strong_ordering`](https://en.cppreference.com/w/cpp/utility/compare/strong_ordering) result
@@ -173,6 +197,13 @@ namespace mpicxx {
          * @param[inout] out an output stream
          * @param[in] ec the @ref mpicxx::error_code
          * @return the output stream
+         *
+         * @pre The current error code value **must** not be less than 0 or greater than the last used error code
+         *      (@ref mpicxx::error_code::last_used_value()).
+         *
+         * @assert_precondition{ If the current error code value isn't a valid value. }
+         *
+         * @calls{ int MPI_Error_string(int errorcode, char *string, int *resultlen);    // exactly once }
          */
         friend std::ostream& operator<<(std::ostream& out, const error_code ec) {
             return out << ec.value() << ": " << ec.message();
@@ -182,6 +213,12 @@ namespace mpicxx {
 
     private:
 #if MPICXX_ASSERTION_LEVEL > 0
+        /*
+         * @brief Checks whether @p code is a valid error code value, i.e. @p code is not less than 0 and not greater than the last used
+         *        error code value (mpicxx::error_code::last_used_value()).
+         * @param[in] code the error code value to check
+         * @return `true` if @p code is a valid error code value, otherwise `false`
+         */
         bool valid_error_code(const int code) const {
             return 0 <= code && code <= error_code::last_used_value().value_or(std::numeric_limits<int>::max());
         }
@@ -340,9 +377,9 @@ namespace mpicxx {
 
 
     [[nodiscard]]
-    error_category error_code::category() const {
+    inline error_category error_code::category() const {
         MPICXX_ASSERT_PRECONDITION(this->valid_error_code(code_),
-                "Attempt to retrieve the error strong of an error code with invalid value ({})! "
+                "Attempt to retrieve the error string of an error code with invalid value ({})! "
                 "Valid error code values must be in the interval [{}, {}].",
                 code_, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
 
