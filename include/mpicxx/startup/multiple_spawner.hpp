@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-05
+ * @date 2020-08-14
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the
@@ -1377,7 +1377,7 @@ namespace mpicxx {
                 const std::size_t total_size = std::accumulate(argvs_.cbegin(), argvs_.cend(), 0,
                         [](std::size_t sum, const std::vector<std::string>& vec) { return sum + vec.size(); });
                 // convert vector of vectors of strings to flat vector of char*
-                std::vector<char*> ptr(total_size);
+                std::vector<char*> ptr(total_size + argvs_.size());
                 std::size_t idx = 0;
                 for (std::vector<std::string>& vec : argvs_) {
                     for (std::string& str : vec) {
