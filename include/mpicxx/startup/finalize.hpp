@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-19
+ * @date 2020-08-16
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements wrapper around the [MPI finalization functions](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node225.htm).
@@ -11,6 +11,7 @@
 #define MPICXX_FINALIZATION_HPP
 
 #include <mpicxx/detail/assert.hpp>
+#include <mpicxx/error/error.hpp>
 
 #include <mpi.h>
 
@@ -69,8 +70,8 @@ namespace mpicxx {
      *
      * @calls{ int MPI_Abort(MPI_Comm comm, int errorcode);    // exactly once }
      */
-    inline void abort(int error_code = -1, MPI_Comm comm = MPI_COMM_WORLD) {
-        MPI_Abort(comm, error_code);
+    inline void abort(const error_code error_code = error_code::success, MPI_Comm comm = MPI_COMM_WORLD) {
+        MPI_Abort(comm, error_code.value());
     }
 
     namespace detail {
