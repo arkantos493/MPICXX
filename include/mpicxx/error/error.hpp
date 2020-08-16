@@ -235,6 +235,16 @@ namespace mpicxx {
         bool valid_error_code(const int code) const {
             return MPI_SUCCESS <= code && code <= error_code::last_used_value().value_or(std::numeric_limits<int>::max());
         }
+        /*
+         * @brief Checks whether @p code is a valid error code value, i.e. @p code is not less than 0 and not greater than the last used
+         *        error code value @p last_code.
+         * @param[in] code the error code value to check
+         * @param[in] last_code the last used error code value
+         * @return `true` if @p code is a valid error code value, otherwise `false`
+         */
+        bool valid_error_code(const int code, const int last_code) const {
+            return MPI_SUCCESS <= code && code <= last_code;
+        }
 #endif
 
         int code_;
