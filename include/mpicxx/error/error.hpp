@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-14
+ * @date 2020-08-16
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines error codes and error classes including standard once.
@@ -48,10 +48,23 @@ namespace mpicxx {
          * @assert_sanity{ If @p code isn't a valid error code value. }
          */
         error_code(const int code = MPI_SUCCESS) noexcept : code_(code) {
-            MPICXX_ASSERT_SANITY(this->valid_error_code(code),
-                    "Attempt to create an error code with invalid value ({})! "
-                    "Valid error code values must be in the interval [{}, {}].",
-                    code, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
+#if MPICXX_ASSERTION_LEVEL > 0
+            int initialized;
+            MPI_Initialized(&initialized);
+            if (static_cast<bool>(initialized)) {
+                // if the MPI environment has been initialized use the (dynamic) MPI_LASTUSEDCODE attribute
+                MPICXX_ASSERT_SANITY(this->valid_error_code(code),
+                        "Attempt to create an error code with invalid value ({})! "
+                        "Valid error code values must be in the interval [{}, {}].",
+                        code, MPI_SUCCESS, error_code::last_used_value().value_or(std::numeric_limits<int>::max()));
+            } else {
+                // if the MPI environment hasn't been initialized use the (stat) MPI_ERR_LASTCODE
+                MPICXX_ASSERT_SANITY(this->valid_error_code(code, MPI_ERR_LASTCODE),
+                        "Attempt to create an error code with invalid value ({})! "
+                        "Valid error code values must be in the interval [{}, {}].",
+                        code, MPI_SUCCESS, MPI_ERR_LASTCODE);
+            }
+#endif
         }
         ///@}
 
