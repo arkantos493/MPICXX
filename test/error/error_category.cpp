@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-14
+ * @date 2020-08-16
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Test cases for the @ref mpicxx::error_category class.
@@ -25,6 +25,7 @@
  * | ErrorCategoryGetValue                        | get the current error category value                                                                                                                                         |
  * | ErrorCategoryThreeWayComparison              | check if the comparison operators `==`, `!=`, `<`, `<=`, `>` and `>=` work                                                                                                   |
  * | ErrorCategoryStreamInsertionOperator         | check if outputting an error code works as intended: `err_category_value`                                                                                                    |
+ * | PredefinedErrorCategories                    | check the predefined MPI error categories                                                                                                                                    |
  */
 
 #include <mpicxx/error/error.hpp>
@@ -274,4 +275,68 @@ TEST(ErrorCategoryTest, ErrorCategoryStreamInsertionOperator) {
 
     // compare strings
     EXPECT_STREQ(ss.str().c_str(), "1");
+}
+
+
+TEST(ErrorCategoryTest, PredefinedErrorCategories) {
+    // check predefined MPI error categories
+    EXPECT_EQ(mpicxx::error_category::success.value(), MPI_SUCCESS);
+    EXPECT_EQ(mpicxx::error_category::buffer.value(), MPI_ERR_BUFFER);
+    EXPECT_EQ(mpicxx::error_category::count.value(), MPI_ERR_COUNT);
+    EXPECT_EQ(mpicxx::error_category::type.value(), MPI_ERR_TYPE);
+    EXPECT_EQ(mpicxx::error_category::tag.value(), MPI_ERR_TAG);
+    EXPECT_EQ(mpicxx::error_category::comm.value(), MPI_ERR_COMM);
+    EXPECT_EQ(mpicxx::error_category::rank.value(), MPI_ERR_RANK);
+    EXPECT_EQ(mpicxx::error_category::request.value(), MPI_ERR_REQUEST);
+    EXPECT_EQ(mpicxx::error_category::root.value(), MPI_ERR_ROOT);
+    EXPECT_EQ(mpicxx::error_category::group.value(), MPI_ERR_GROUP);
+    EXPECT_EQ(mpicxx::error_category::op.value(), MPI_ERR_OP);
+    EXPECT_EQ(mpicxx::error_category::topology.value(), MPI_ERR_TOPOLOGY);
+    EXPECT_EQ(mpicxx::error_category::dims.value(), MPI_ERR_DIMS);
+    EXPECT_EQ(mpicxx::error_category::arg.value(), MPI_ERR_ARG);
+    EXPECT_EQ(mpicxx::error_category::unknown.value(), MPI_ERR_UNKNOWN);
+    EXPECT_EQ(mpicxx::error_category::truncate.value(), MPI_ERR_TRUNCATE);
+    EXPECT_EQ(mpicxx::error_category::other.value(), MPI_ERR_OTHER);
+    EXPECT_EQ(mpicxx::error_category::intern.value(), MPI_ERR_INTERN);
+    EXPECT_EQ(mpicxx::error_category::in_status.value(), MPI_ERR_IN_STATUS);
+    EXPECT_EQ(mpicxx::error_category::pending.value(), MPI_ERR_PENDING);
+    EXPECT_EQ(mpicxx::error_category::keyval.value(), MPI_ERR_KEYVAL);
+    EXPECT_EQ(mpicxx::error_category::no_mem.value(), MPI_ERR_NO_MEM);
+    EXPECT_EQ(mpicxx::error_category::base.value(), MPI_ERR_BASE);
+    EXPECT_EQ(mpicxx::error_category::info_key.value(), MPI_ERR_INFO_KEY);
+    EXPECT_EQ(mpicxx::error_category::info_value.value(), MPI_ERR_INFO_VALUE);
+    EXPECT_EQ(mpicxx::error_category::info_nokey.value(), MPI_ERR_INFO_NOKEY);
+    EXPECT_EQ(mpicxx::error_category::spawn.value(), MPI_ERR_SPAWN);
+    EXPECT_EQ(mpicxx::error_category::port.value(), MPI_ERR_PORT);
+    EXPECT_EQ(mpicxx::error_category::service.value(), MPI_ERR_SERVICE);
+    EXPECT_EQ(mpicxx::error_category::name.value(), MPI_ERR_NAME);
+    EXPECT_EQ(mpicxx::error_category::win.value(), MPI_ERR_WIN);
+    EXPECT_EQ(mpicxx::error_category::size.value(), MPI_ERR_SIZE);
+    EXPECT_EQ(mpicxx::error_category::disp.value(), MPI_ERR_DISP);
+    EXPECT_EQ(mpicxx::error_category::info.value(), MPI_ERR_INFO);
+    EXPECT_EQ(mpicxx::error_category::locktype.value(), MPI_ERR_LOCKTYPE);
+    EXPECT_EQ(mpicxx::error_category::assert.value(), MPI_ERR_ASSERT);
+    EXPECT_EQ(mpicxx::error_category::rma_conflict.value(), MPI_ERR_RMA_CONFLICT);
+    EXPECT_EQ(mpicxx::error_category::rma_sync.value(), MPI_ERR_RMA_CONFLICT);
+    EXPECT_EQ(mpicxx::error_category::rma_range.value(), MPI_ERR_RMA_RANGE);
+    EXPECT_EQ(mpicxx::error_category::rma_attach.value(), MPI_ERR_RMA_ATTACH);
+    EXPECT_EQ(mpicxx::error_category::rma_shared.value(), MPI_ERR_RMA_SHARED);
+    EXPECT_EQ(mpicxx::error_category::rma_flavor.value(), MPI_ERR_RMA_FLAVOR);
+    EXPECT_EQ(mpicxx::error_category::file.value(), MPI_ERR_FILE);
+    EXPECT_EQ(mpicxx::error_category::not_same.value(), MPI_ERR_NOT_SAME);
+    EXPECT_EQ(mpicxx::error_category::amode.value(), MPI_ERR_AMODE);
+    EXPECT_EQ(mpicxx::error_category::unsupported_datarep.value(), MPI_ERR_UNSUPPORTED_DATAREP);
+    EXPECT_EQ(mpicxx::error_category::unsupported_operation.value(), MPI_ERR_UNSUPPORTED_OPERATION);
+    EXPECT_EQ(mpicxx::error_category::no_such_file.value(), MPI_ERR_NO_SUCH_FILE);
+    EXPECT_EQ(mpicxx::error_category::file_exits.value(), MPI_ERR_FILE_EXISTS);
+    EXPECT_EQ(mpicxx::error_category::bad_file.value(), MPI_ERR_BAD_FILE);
+    EXPECT_EQ(mpicxx::error_category::access.value(), MPI_ERR_ACCESS);
+    EXPECT_EQ(mpicxx::error_category::no_space.value(), MPI_ERR_NO_SPACE);
+    EXPECT_EQ(mpicxx::error_category::quota.value(), MPI_ERR_QUOTA);
+    EXPECT_EQ(mpicxx::error_category::read_only.value(), MPI_ERR_READ_ONLY);
+    EXPECT_EQ(mpicxx::error_category::file_in_use.value(), MPI_ERR_FILE_IN_USE);
+    EXPECT_EQ(mpicxx::error_category::dup_datarep.value(), MPI_ERR_DUP_DATAREP);
+    EXPECT_EQ(mpicxx::error_category::conversion.value(), MPI_ERR_CONVERSION);
+    EXPECT_EQ(mpicxx::error_category::io.value(), MPI_ERR_IO);
+    EXPECT_EQ(mpicxx::error_category::lastcode.value(), MPI_ERR_LASTCODE);
 }

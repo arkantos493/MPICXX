@@ -35,6 +35,134 @@ namespace mpicxx {
     class error_code {
     public:
         // ---------------------------------------------------------------------------------------------------------- //
+        //                                             static data member                                             //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name predefined MPI error codes
+        ///@{
+        /// No Error.
+        static const error_code success;
+        /// Invalid buffer pointer.
+        static const error_code buffer;
+        /// Invalid count argument.
+        static const error_code count;
+        /// Invalid datatype argument.
+        static const error_code type;
+        /// Invalid tag argument.
+        static const error_code tag;
+        /// Invalid communicator.
+        static const error_code comm;
+        /// Invalid rank.
+        static const error_code rank;
+        /// Invalid request (handle).
+        static const error_code request;
+        /// Invalid root.
+        static const error_code root;
+        /// Invalid group.
+        static const error_code group;
+        /// Invalid operation.
+        static const error_code op;
+        /// Invalid topology.
+        static const error_code topology;
+        /// Invalid dimension argument.
+        static const error_code dims;
+        /// Invalid argument of some other kind.
+        static const error_code arg;
+        /// Unknown error.
+        static const error_code unknown;
+        /// Message truncated on receive.
+        static const error_code truncate;
+        /// Known error not in this list.
+        static const error_code other;
+        /// Internal MPI (implementation) error.
+        static const error_code intern;
+        /// Error code is in status.
+        static const error_code in_status;
+        /// Pending request.
+        static const error_code pending;
+        /// Invalid keyval has been passed.
+        static const error_code keyval;
+        /// [*MPI_ALLOC_MEM*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node216.htm) failed because memory is exhausted.
+        static const error_code no_mem;
+        /// Invalid base passed to [*MPI_FREE_MEM*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node216.htm).
+        static const error_code base;
+        /// Key longer than [*MPI_MAX_INFO_KEY*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm).
+        static const error_code info_key;
+        /// Value longer than [*MPI_MAX_INFO_VAL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm).
+        static const error_code info_value;
+        /// Invalid key passed to [*MPI_INFO_DELETE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm).
+        static const error_code info_nokey;
+        /// Error in spawning processes.
+        static const error_code spawn;
+        /// Invalid port name passed to [*MPI_COMM_CONNECT*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node245.htm).
+        static const error_code port;
+        /// Invalid service name passed to [*MPI_UNPUBLISH_NAME*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node246.htm).
+        static const error_code service;
+        /// Invalid service name passed to [*MPI_LOOKUP_NAME*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node246.htm).
+        static const error_code name;
+        /// Invalid `win` argument.
+        static const error_code win;
+        /// Invalid `size` argument.
+        static const error_code size;
+        /// Invalid `disp` argument.
+        static const error_code disp;
+        /// Invalid `info` argument.
+        static const error_code info;
+        /// Invalid `locktype` argument.
+        static const error_code locktype;
+        /// Invalid `assert` argument.
+        static const error_code assert;
+        /// Conflicting accesses to window.
+        static const error_code rma_conflict;
+        /// Wrong synchronization of RMA (Remote Memory Access) calls.
+        static const error_code rma_sync;
+        /// Target memory is not part of the window (in the case of a window created with
+        /// [*MPI_WIN_CREATE_DYNAMIC*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node264.htm), target memory is not attached).
+        static const error_code rma_range;
+        /// Memory cannot be attached (e.g., because of resource exhaustion).
+        static const error_code rma_attach;
+        /// Memory cannot be shared (e.g., some process in the group of the specified communicator cannot expose shared memory).
+        static const error_code rma_shared;
+        /// Passed window has the wrong flavor for the called function
+        static const error_code rma_flavor;
+        /// Invalid file handle.
+        static const error_code file;
+        /// Collective argument not identical on all processes, or collective routines called in a different order by different processes.
+        static const error_code not_same;
+        /// Error related to the amode passed to [*MPI_FILE_OPEN*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node308.htm).
+        static const error_code amode;
+        /// Unsupported datarep passed to [*MPI_FILE_SET_VIEW*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node317.htm).
+        static const error_code unsupported_datarep;
+        /// Unsupported operation, such as seeking on a file which supports sequential access only.
+        static const error_code unsupported_operation;
+        /// File does not exist.
+        static const error_code no_such_file;
+        /// File exists.
+        static const error_code file_exits;
+        /// Invalid file name (e.g., path name too long).
+        static const error_code bad_file;
+        /// Permission denied.
+        static const error_code access;
+        /// Not enough space.
+        static const error_code no_space;
+        /// Quota exceeded.
+        static const error_code quota;
+        /// Read-only file or file system.
+        static const error_code read_only;
+        /// File operation could not be completed, as the file is currently open by some process.
+        static const error_code file_in_use;
+        /// Conversion functions could not be registered because a data representation identifier that was already defined was passed
+        /// to [*MPI_REGISTER_DATAREP*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node334.htm).
+        static const error_code dup_datarep;
+        /// An error occurred in a user supplied data conversion function.
+        static const error_code conversion;
+        /// Other I/O error.
+        static const error_code io;
+        /// Last error code.
+        static const error_code lastcode;
+        ///@}
+
+
+        // ---------------------------------------------------------------------------------------------------------- //
         //                                                constructor                                                 //
         // ---------------------------------------------------------------------------------------------------------- //
         /// @name constructor
@@ -250,6 +378,66 @@ namespace mpicxx {
         int code_;
     };
 
+    // initialize predefined MPI error codes
+    inline const error_code error_code::success = error_code(MPI_SUCCESS);
+    inline const error_code error_code::buffer = error_code(MPI_ERR_BUFFER);
+    inline const error_code error_code::count = error_code(MPI_ERR_COUNT);
+    inline const error_code error_code::type = error_code(MPI_ERR_TYPE);
+    inline const error_code error_code::tag = error_code(MPI_ERR_TAG);
+    inline const error_code error_code::comm = error_code(MPI_ERR_COMM);
+    inline const error_code error_code::rank = error_code(MPI_ERR_RANK);
+    inline const error_code error_code::request = error_code(MPI_ERR_REQUEST);
+    inline const error_code error_code::root = error_code(MPI_ERR_ROOT);
+    inline const error_code error_code::group = error_code(MPI_ERR_GROUP);
+    inline const error_code error_code::op = error_code(MPI_ERR_OP);
+    inline const error_code error_code::topology = error_code(MPI_ERR_TOPOLOGY);
+    inline const error_code error_code::dims = error_code(MPI_ERR_DIMS);
+    inline const error_code error_code::arg = error_code(MPI_ERR_ARG);
+    inline const error_code error_code::unknown = error_code(MPI_ERR_UNKNOWN);
+    inline const error_code error_code::truncate = error_code(MPI_ERR_TRUNCATE);
+    inline const error_code error_code::other = error_code(MPI_ERR_OTHER);
+    inline const error_code error_code::intern = error_code(MPI_ERR_INTERN);
+    inline const error_code error_code::in_status = error_code(MPI_ERR_IN_STATUS);
+    inline const error_code error_code::pending = error_code(MPI_ERR_PENDING);
+    inline const error_code error_code::keyval = error_code(MPI_ERR_KEYVAL);
+    inline const error_code error_code::no_mem = error_code(MPI_ERR_NO_MEM);
+    inline const error_code error_code::base = error_code(MPI_ERR_BASE);
+    inline const error_code error_code::info_key = error_code(MPI_ERR_INFO_KEY);
+    inline const error_code error_code::info_value = error_code(MPI_ERR_INFO_VALUE);
+    inline const error_code error_code::info_nokey = error_code(MPI_ERR_INFO_NOKEY);
+    inline const error_code error_code::spawn = error_code(MPI_ERR_SPAWN);
+    inline const error_code error_code::port = error_code(MPI_ERR_PORT);
+    inline const error_code error_code::service = error_code(MPI_ERR_SERVICE);
+    inline const error_code error_code::name = error_code(MPI_ERR_NAME);
+    inline const error_code error_code::win = error_code(MPI_ERR_WIN);
+    inline const error_code error_code::size = error_code(MPI_ERR_SIZE);
+    inline const error_code error_code::disp = error_code(MPI_ERR_DISP);
+    inline const error_code error_code::info = error_code(MPI_ERR_INFO);
+    inline const error_code error_code::locktype = error_code(MPI_ERR_LOCKTYPE);
+    inline const error_code error_code::assert = error_code(MPI_ERR_ASSERT);
+    inline const error_code error_code::rma_conflict = error_code(MPI_ERR_RMA_CONFLICT);
+    inline const error_code error_code::rma_sync = error_code(MPI_ERR_RMA_CONFLICT);
+    inline const error_code error_code::rma_range = error_code(MPI_ERR_RMA_RANGE);
+    inline const error_code error_code::rma_attach = error_code(MPI_ERR_RMA_ATTACH);
+    inline const error_code error_code::rma_shared = error_code(MPI_ERR_RMA_SHARED);
+    inline const error_code error_code::rma_flavor = error_code(MPI_ERR_RMA_FLAVOR);
+    inline const error_code error_code::file = error_code(MPI_ERR_FILE);
+    inline const error_code error_code::not_same = error_code(MPI_ERR_NOT_SAME);
+    inline const error_code error_code::amode = error_code(MPI_ERR_AMODE);
+    inline const error_code error_code::unsupported_datarep = error_code(MPI_ERR_UNSUPPORTED_DATAREP);
+    inline const error_code error_code::unsupported_operation = error_code(MPI_ERR_UNSUPPORTED_OPERATION);
+    inline const error_code error_code::no_such_file = error_code(MPI_ERR_NO_SUCH_FILE);
+    inline const error_code error_code::file_exits = error_code(MPI_ERR_FILE_EXISTS);
+    inline const error_code error_code::bad_file = error_code(MPI_ERR_BAD_FILE);
+    inline const error_code error_code::access = error_code(MPI_ERR_ACCESS);
+    inline const error_code error_code::no_space = error_code(MPI_ERR_NO_SPACE);
+    inline const error_code error_code::quota = error_code(MPI_ERR_QUOTA);
+    inline const error_code error_code::read_only = error_code(MPI_ERR_READ_ONLY);
+    inline const error_code error_code::file_in_use = error_code(MPI_ERR_FILE_IN_USE);
+    inline const error_code error_code::dup_datarep = error_code(MPI_ERR_DUP_DATAREP);
+    inline const error_code error_code::conversion = error_code(MPI_ERR_CONVERSION);
+    inline const error_code error_code::io = error_code(MPI_ERR_IO);
+    inline const error_code error_code::lastcode = error_code(MPI_ERR_LASTCODE);
 
     
     /**
@@ -273,6 +461,132 @@ namespace mpicxx {
         explicit constexpr error_category(const int category) noexcept : category_(category) { }
 
     public:
+        // ---------------------------------------------------------------------------------------------------------- //
+        //                                             static data member                                             //
+        // ---------------------------------------------------------------------------------------------------------- //
+        /// @name predefined MPI error categories
+        ///@{
+        /// No Error.
+        static const error_category success;
+        /// Invalid buffer pointer.
+        static const error_category buffer;
+        /// Invalid count argument.
+        static const error_category count;
+        /// Invalid datatype argument.
+        static const error_category type;
+        /// Invalid tag argument.
+        static const error_category tag;
+        /// Invalid communicator.
+        static const error_category comm;
+        /// Invalid rank.
+        static const error_category rank;
+        /// Invalid request (handle).
+        static const error_category request;
+        /// Invalid root.
+        static const error_category root;
+        /// Invalid group.
+        static const error_category group;
+        /// Invalid operation.
+        static const error_category op;
+        /// Invalid topology.
+        static const error_category topology;
+        /// Invalid dimension argument.
+        static const error_category dims;
+        /// Invalid argument of some other kind.
+        static const error_category arg;
+        /// Unknown error.
+        static const error_category unknown;
+        /// Message truncated on receive.
+        static const error_category truncate;
+        /// Known error not in this list.
+        static const error_category other;
+        /// Internal MPI (implementation) error.
+        static const error_category intern;
+        /// Error code is in status.
+        static const error_category in_status;
+        /// Pending request.
+        static const error_category pending;
+        /// Invalid keyval has been passed.
+        static const error_category keyval;
+        /// [*MPI_ALLOC_MEM*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node216.htm) failed because memory is exhausted.
+        static const error_category no_mem;
+        /// Invalid base passed to [*MPI_FREE_MEM*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node216.htm).
+        static const error_category base;
+        /// Key longer than [*MPI_MAX_INFO_KEY*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm).
+        static const error_category info_key;
+        /// Value longer than [*MPI_MAX_INFO_VAL*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm).
+        static const error_category info_value;
+        /// Invalid key passed to [*MPI_INFO_DELETE*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm).
+        static const error_category info_nokey;
+        /// Error in spawning processes.
+        static const error_category spawn;
+        /// Invalid port name passed to [*MPI_COMM_CONNECT*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node245.htm).
+        static const error_category port;
+        /// Invalid service name passed to [*MPI_UNPUBLISH_NAME*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node246.htm).
+        static const error_category service;
+        /// Invalid service name passed to [*MPI_LOOKUP_NAME*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node246.htm).
+        static const error_category name;
+        /// Invalid `win` argument.
+        static const error_category win;
+        /// Invalid `size` argument.
+        static const error_category size;
+        /// Invalid `disp` argument.
+        static const error_category disp;
+        /// Invalid `info` argument.
+        static const error_category info;
+        /// Invalid `locktype` argument.
+        static const error_category locktype;
+        /// Invalid `assert` argument.
+        static const error_category assert;
+        /// Conflicting accesses to window.
+        static const error_category rma_conflict;
+        /// Wrong synchronization of RMA (Remote Memory Access) calls.
+        static const error_category rma_sync;
+        /// Target memory is not part of the window (in the case of a window created with
+        /// [*MPI_WIN_CREATE_DYNAMIC*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node264.htm), target memory is not attached).
+        static const error_category rma_range;
+        /// Memory cannot be attached (e.g., because of resource exhaustion).
+        static const error_category rma_attach;
+        /// Memory cannot be shared (e.g., some process in the group of the specified communicator cannot expose shared memory).
+        static const error_category rma_shared;
+        /// Passed window has the wrong flavor for the called function
+        static const error_category rma_flavor;
+        /// Invalid file handle.
+        static const error_category file;
+        /// Collective argument not identical on all processes, or collective routines called in a different order by different processes.
+        static const error_category not_same;
+        /// Error related to the amode passed to [*MPI_FILE_OPEN*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node308.htm).
+        static const error_category amode;
+        /// Unsupported datarep passed to [*MPI_FILE_SET_VIEW*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node317.htm).
+        static const error_category unsupported_datarep;
+        /// Unsupported operation, such as seeking on a file which supports sequential access only.
+        static const error_category unsupported_operation;
+        /// File does not exist.
+        static const error_category no_such_file;
+        /// File exists.
+        static const error_category file_exits;
+        /// Invalid file name (e.g., path name too long).
+        static const error_category bad_file;
+        /// Permission denied.
+        static const error_category access;
+        /// Not enough space.
+        static const error_category no_space;
+        /// Quota exceeded.
+        static const error_category quota;
+        /// Read-only file or file system.
+        static const error_category read_only;
+        /// File operation could not be completed, as the file is currently open by some process.
+        static const error_category file_in_use;
+        /// Conversion functions could not be registered because a data representation identifier that was already defined was passed
+        /// to [*MPI_REGISTER_DATAREP*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node334.htm).
+        static const error_category dup_datarep;
+        /// An error occurred in a user supplied data conversion function.
+        static const error_category conversion;
+        /// Other I/O error.
+        static const error_category io;
+        /// Last error code.
+        static const error_category lastcode;
+        ///@}
         // ---------------------------------------------------------------------------------------------------------- //
         //                                                 constructor                                                //
         // ---------------------------------------------------------------------------------------------------------- //
@@ -514,7 +828,69 @@ namespace mpicxx {
         int category_;
     };
 
+    // initialize predefined MPI error codes
+    inline const error_category error_category::success = error_category(MPI_SUCCESS);
+    inline const error_category error_category::buffer = error_category(MPI_ERR_BUFFER);
+    inline const error_category error_category::count = error_category(MPI_ERR_COUNT);
+    inline const error_category error_category::type = error_category(MPI_ERR_TYPE);
+    inline const error_category error_category::tag = error_category(MPI_ERR_TAG);
+    inline const error_category error_category::comm = error_category(MPI_ERR_COMM);
+    inline const error_category error_category::rank = error_category(MPI_ERR_RANK);
+    inline const error_category error_category::request = error_category(MPI_ERR_REQUEST);
+    inline const error_category error_category::root = error_category(MPI_ERR_ROOT);
+    inline const error_category error_category::group = error_category(MPI_ERR_GROUP);
+    inline const error_category error_category::op = error_category(MPI_ERR_OP);
+    inline const error_category error_category::topology = error_category(MPI_ERR_TOPOLOGY);
+    inline const error_category error_category::dims = error_category(MPI_ERR_DIMS);
+    inline const error_category error_category::arg = error_category(MPI_ERR_ARG);
+    inline const error_category error_category::unknown = error_category(MPI_ERR_UNKNOWN);
+    inline const error_category error_category::truncate = error_category(MPI_ERR_TRUNCATE);
+    inline const error_category error_category::other = error_category(MPI_ERR_OTHER);
+    inline const error_category error_category::intern = error_category(MPI_ERR_INTERN);
+    inline const error_category error_category::in_status = error_category(MPI_ERR_IN_STATUS);
+    inline const error_category error_category::pending = error_category(MPI_ERR_PENDING);
+    inline const error_category error_category::keyval = error_category(MPI_ERR_KEYVAL);
+    inline const error_category error_category::no_mem = error_category(MPI_ERR_NO_MEM);
+    inline const error_category error_category::base = error_category(MPI_ERR_BASE);
+    inline const error_category error_category::info_key = error_category(MPI_ERR_INFO_KEY);
+    inline const error_category error_category::info_value = error_category(MPI_ERR_INFO_VALUE);
+    inline const error_category error_category::info_nokey = error_category(MPI_ERR_INFO_NOKEY);
+    inline const error_category error_category::spawn = error_category(MPI_ERR_SPAWN);
+    inline const error_category error_category::port = error_category(MPI_ERR_PORT);
+    inline const error_category error_category::service = error_category(MPI_ERR_SERVICE);
+    inline const error_category error_category::name = error_category(MPI_ERR_NAME);
+    inline const error_category error_category::win = error_category(MPI_ERR_WIN);
+    inline const error_category error_category::size = error_category(MPI_ERR_SIZE);
+    inline const error_category error_category::disp = error_category(MPI_ERR_DISP);
+    inline const error_category error_category::info = error_category(MPI_ERR_INFO);
+    inline const error_category error_category::locktype = error_category(MPI_ERR_LOCKTYPE);
+    inline const error_category error_category::assert = error_category(MPI_ERR_ASSERT);
+    inline const error_category error_category::rma_conflict = error_category(MPI_ERR_RMA_CONFLICT);
+    inline const error_category error_category::rma_sync = error_category(MPI_ERR_RMA_CONFLICT);
+    inline const error_category error_category::rma_range = error_category(MPI_ERR_RMA_RANGE);
+    inline const error_category error_category::rma_attach = error_category(MPI_ERR_RMA_ATTACH);
+    inline const error_category error_category::rma_shared = error_category(MPI_ERR_RMA_SHARED);
+    inline const error_category error_category::rma_flavor = error_category(MPI_ERR_RMA_FLAVOR);
+    inline const error_category error_category::file = error_category(MPI_ERR_FILE);
+    inline const error_category error_category::not_same = error_category(MPI_ERR_NOT_SAME);
+    inline const error_category error_category::amode = error_category(MPI_ERR_AMODE);
+    inline const error_category error_category::unsupported_datarep = error_category(MPI_ERR_UNSUPPORTED_DATAREP);
+    inline const error_category error_category::unsupported_operation = error_category(MPI_ERR_UNSUPPORTED_OPERATION);
+    inline const error_category error_category::no_such_file = error_category(MPI_ERR_NO_SUCH_FILE);
+    inline const error_category error_category::file_exits = error_category(MPI_ERR_FILE_EXISTS);
+    inline const error_category error_category::bad_file = error_category(MPI_ERR_BAD_FILE);
+    inline const error_category error_category::access = error_category(MPI_ERR_ACCESS);
+    inline const error_category error_category::no_space = error_category(MPI_ERR_NO_SPACE);
+    inline const error_category error_category::quota = error_category(MPI_ERR_QUOTA);
+    inline const error_category error_category::read_only = error_category(MPI_ERR_READ_ONLY);
+    inline const error_category error_category::file_in_use = error_category(MPI_ERR_FILE_IN_USE);
+    inline const error_category error_category::dup_datarep = error_category(MPI_ERR_DUP_DATAREP);
+    inline const error_category error_category::conversion = error_category(MPI_ERR_CONVERSION);
+    inline const error_category error_category::io = error_category(MPI_ERR_IO);
+    inline const error_category error_category::lastcode = error_category(MPI_ERR_LASTCODE);
 
+
+    // Implement mpicxx::error_code::category() function.
     [[nodiscard]]
     inline error_category error_code::category() const {
         MPICXX_ASSERT_PRECONDITION(this->valid_error_code(code_),
