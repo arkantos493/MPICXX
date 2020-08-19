@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-17
+ * @date 2020-08-19
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Contains the level of thread support enum.
@@ -109,7 +109,7 @@ namespace mpicxx {
      * @param[out] ts the enum class
      * @return the input stream
      */
-    inline std::istream& operator>>(std::istream& in, mpicxx::thread_support& ts) {
+    inline std::istream& operator>>(std::istream& in, thread_support& ts) {
         try {
             std::string str;
             in >> str;
