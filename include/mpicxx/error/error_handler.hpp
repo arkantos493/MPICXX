@@ -80,6 +80,38 @@ namespace mpicxx {
             this->delete_mpi_errhandlers();
         }
 
+        [[nodiscard]]
+        const MPI_Errhandler& get(const error_handler_type type) const {
+            switch (type) {
+                case error_handler_type::comm:
+                    if (!detail::is_type_set(type_, error_handler_type::comm)) {
+                        MPICXX_THROW_EXCEPTION(unset_error_handler_type, type, type_);
+                    }
+                    return handler_[0];
+                case error_handler_type::file:
+                    if (!detail::is_type_set(type_, error_handler_type::file)) {
+                        MPICXX_THROW_EXCEPTION(unset_error_handler_type, type, type_);
+                    }
+                    return handler_[1];
+                case error_handler_type::win:
+                    if (!detail::is_type_set(type_, error_handler_type::win)) {
+                        MPICXX_THROW_EXCEPTION(unset_error_handler_type, type, type_);
+                    }
+                    return handler_[2];
+                default:
+                    throw std::invalid_argument(fmt::format("Illegal error handler type ({})!", type));
+            }
+        }
+        [[nodiscard]]
+        MPI_Errhandler& get(const error_handler_type type) {
+            return const_cast<MPI_Errhandler&>(static_cast<const error_handler*>(this)->get(type));
+        }
+        [[nodiscard]]
+        const std::array<MPI_Errhandler, 3>& get() const noexcept { return handler_; }
+        [[nodiscard]]
+        std::array<MPI_Errhandler, 3>& get() noexcept { return handler_; }
+        [[nodiscard]]
+        error_handler_type type() const noexcept { return type_; }
 
 
     private:
