@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-07-20
+ * @date 2020-08-22
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines utility functions used in the mpicxx library.
@@ -11,6 +11,7 @@
 #define MPICXX_UTILITY_HPP
 
 #include <functional>
+#include <string_view>
 #include <type_traits>
 
 namespace mpicxx::detail {
@@ -113,6 +114,13 @@ namespace mpicxx::detail {
     [[nodiscard]]
     constexpr bool all_same(Op pred, const T& t) noexcept { return true; }
     ///@}
+
+    [[nodiscard]] 
+    std::string_view trim(std::string_view sv) {
+        sv.remove_prefix(sv.find_first_not_of(" "));
+        sv.remove_suffix(sv.size() - sv.find_last_not_of(" ") - 1);
+        return sv;
+    }
 
 }
 
