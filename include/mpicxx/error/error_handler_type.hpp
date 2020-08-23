@@ -10,7 +10,7 @@
 #ifndef MPICXX_ERROR_HANDLER_TYPE_HPP
 #define MPICXX_ERROR_HANDLER_TYPE_HPP
 
-#include <mpicxx/detail/bitset.hpp>
+#include <mpicxx/detail/bitmask.hpp>
 
 #include <array>
 #include <istream>
@@ -136,13 +136,13 @@ namespace mpicxx {
     inline std::ostream& operator<<(std::ostream& out, const error_handler_type eht) {
         std::array<const char*, 3> strs;
         std::size_t idx = 0;
-        if (detail::bitset::test(eht, error_handler_type::comm)) {
+        if (detail::bitmask::test(eht, error_handler_type::comm)) {
             strs[idx++] = "COMM";
         }
-        if (detail::bitset::test(eht, error_handler_type::file)) {
+        if (detail::bitmask::test(eht, error_handler_type::file)) {
             strs[idx++] = "FILE";
         }
-        if (detail::bitset::test(eht, error_handler_type::win)) {
+        if (detail::bitmask::test(eht, error_handler_type::win)) {
             strs[idx++] = "WIN";
         }
         return out << fmt::format("{}", fmt::join(strs.begin(), strs.begin() + idx, " | "));
@@ -177,11 +177,11 @@ namespace mpicxx {
             const std::string_view substr = detail::trim(sv.substr(pos, next));
 
             if (substr.compare("COMM") == 0) {
-                eht = detail::bitset::set(eht, error_handler_type::comm);
+                eht = detail::bitmask::set(eht, error_handler_type::comm);
             } else if (substr.compare("FILE") == 0) {
-                eht = detail::bitset::set(eht, error_handler_type::file);
+                eht = detail::bitmask::set(eht, error_handler_type::file);
             } else if (substr.compare("WIN") == 0) {
-                eht = detail::bitset::set(eht, error_handler_type::win);
+                eht = detail::bitmask::set(eht, error_handler_type::win);
             }
 
             pos = next + 1;
