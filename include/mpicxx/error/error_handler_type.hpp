@@ -113,17 +113,6 @@ namespace mpicxx {
     ///@}
 
 
-    namespace detail {
-
-        [[nodiscard]]
-        bool is_type_set(const error_handler_type bitmask, const error_handler_type bit) noexcept {
-            return (bitmask & bit) == bit;
-            // TODO 2020-08-22 19:34 breyerml: maybe utility?
-        }
-        
-    }
-
-
     /// @name @ref mpicxx::error_handler_type conversion functions
     ///@{
     /**

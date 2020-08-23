@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-22
+ * @date 2020-08-23
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines the error handler class which can be attached to MPI communicators, files or windows.
@@ -10,6 +10,7 @@
 #ifndef MPICXX_ERROR_HANDLER_HPP
 #define MPICXX_ERROR_HANDLER_HPP
 
+#include <mpicxx/detail/bitmask.hpp>
 #include <mpicxx/detail/utility.hpp>
 #include <mpicxx/error/error.hpp>
 #include <mpicxx/error/error_handler_type.hpp>
@@ -84,17 +85,17 @@ namespace mpicxx {
         const MPI_Errhandler& get(const error_handler_type type) const {
             switch (type) {
                 case error_handler_type::comm:
-                    if (!detail::is_type_set(type_, error_handler_type::comm)) {
+                    if (!detail::bitmask::test(type_, error_handler_type::comm)) {
                         MPICXX_THROW_EXCEPTION(unset_error_handler_type, type, type_);
                     }
                     return handler_[0];
                 case error_handler_type::file:
-                    if (!detail::is_type_set(type_, error_handler_type::file)) {
+                    if (!detail::bitmask::test(type_, error_handler_type::file)) {
                         MPICXX_THROW_EXCEPTION(unset_error_handler_type, type, type_);
                     }
                     return handler_[1];
                 case error_handler_type::win:
-                    if (!detail::is_type_set(type_, error_handler_type::win)) {
+                    if (!detail::bitmask::test(type_, error_handler_type::win)) {
                         MPICXX_THROW_EXCEPTION(unset_error_handler_type, type, type_);
                     }
                     return handler_[2];
@@ -118,28 +119,28 @@ namespace mpicxx {
         error_handler() : type_(static_cast<error_handler_type>(0)) { }
 
         void delete_mpi_errhandlers() {
-            if (detail::is_type_set(type_, error_handler_type::comm)) {
+            if (detail::bitmask::test(type_, error_handler_type::comm)) {
                 MPI_Errhandler_free(&handler_[0]);
             }
-            if (detail::is_type_set(type_, error_handler_type::file)) {
+            if (detail::bitmask::test(type_, error_handler_type::file)) {
                 MPI_Errhandler_free(&handler_[1]);
             }
-            if (detail::is_type_set(type_, error_handler_type::win)) {
+            if (detail::bitmask::test(type_, error_handler_type::win)) {
                 MPI_Errhandler_free(&handler_[2]);
             }
         }
 
 
         void add_comm_error_handler(MPI_Comm_errhandler_function func) {
-            type_ |= error_handler_type::comm;
+            type_ = detail::bitmask::set(type_, error_handler_type::comm);
             MPI_Comm_create_errhandler(func, &handler_[0]);
         }
         void add_file_error_handler(MPI_File_errhandler_function func) {
-            type_ |= error_handler_type::file;
+            type_ = detail::bitmask::set(type_, error_handler_type::file);
             MPI_File_create_errhandler(func, &handler_[1]);
         }
         void add_win_error_handler(MPI_Win_errhandler_function func) {
-            type_ |= error_handler_type::win;
+            type_ = detail::bitmask::set(type_, error_handler_type::win);
             MPI_Win_create_errhandler(func, &handler_[2]);
         }
 
@@ -155,13 +156,13 @@ namespace mpicxx {
     [[nodiscard]]
     error_handler make_error_handler(const error_handler_type type) {
         error_handler handler;
-        if (detail::is_type_set(type, error_handler_type::comm)) {
+        if (detail::bitmask::test(type, error_handler_type::comm)) {
             handler.add_comm_error_handler(detail::wrap_comm_error_handler_function<Func>);
         }
-        if (detail::is_type_set(type, error_handler_type::file)) {
+        if (detail::bitmask::test(type, error_handler_type::file)) {
             handler.add_file_error_handler(detail::wrap_file_error_handler_function<Func>);
         }
-        if (detail::is_type_set(type, error_handler_type::win)) {
+        if (detail::bitmask::test(type, error_handler_type::win)) {
             handler.add_win_error_handler(detail::wrap_win_error_handler_function<Func>);
         }
         return handler;
