@@ -1,7 +1,7 @@
 /**
  * @file include/mpicxx/core.hpp
  * @author Marcel Breyer
- * @date 2020-07-19
+ * @date 2020-08-23
  *
  * @brief Core header which includes every other necessary header file, i.e. \c \#include` <mpicxx/core.hpp>` is sufficient to use every
  *        function or class of the mpicxx library.
@@ -32,6 +32,9 @@ namespace mpicxx::version {}
 
 /// This namespace is for implementation details and **should not** be used directly be users.
 namespace mpicxx::detail {}
+
+/// This namespace is for implementation details used to treat enums or enum classes as bitmasks.
+namespace mpicxx::detail::bitmask {}
 
 /// This namespace contains ADL (argument dependent lookup) helpers.
 namespace mpicxx::detail::adl_helper {}
