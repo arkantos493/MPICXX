@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-22
+ * @date 2020-08-23
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines utility functions used in the mpicxx library.
@@ -116,7 +116,7 @@ namespace mpicxx::detail {
     ///@}
 
     [[nodiscard]] 
-    std::string_view trim(std::string_view sv) {
+    inline std::string_view trim(std::string_view sv) {
         sv.remove_prefix(sv.find_first_not_of(" "));
         sv.remove_suffix(sv.size() - sv.find_last_not_of(" ") - 1);
         return sv;
