@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-22
+ * @date 2020-08-23
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines the error handler type for which the @ref mpicxx::error_handler can be used.
@@ -31,39 +31,81 @@ namespace mpicxx {
     };
 
 
-    /// @name mpicxx::error_handler_type bitwise operations
+    /// @name mpicxx::error_handler_type bitwise arithmetic operators
+    /**
+     * @brief Bitwise NOT operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param eht the enum class value
+     * @return the bitwise NOT value of @p eht
+     * @nodiscard
+     */
     [[nodiscard]]
-    error_handler_type operator~(const error_handler_type eht) {
+    inline error_handler_type operator~(const error_handler_type eht) {
         return static_cast<error_handler_type>( ~static_cast<std::underlying_type_t<error_handler_type>>(eht) );
     }
+    /**
+     * @brief Bitwise OR operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param lhs an enum class value
+     * @param rhs an enum class value
+     * @return the bitwise OR value of @p lhs and @p rhs
+     * @nodiscard
+     */
     [[nodiscard]]
-    error_handler_type operator|(const error_handler_type lhs, const error_handler_type rhs) {
+    inline error_handler_type operator|(const error_handler_type lhs, const error_handler_type rhs) {
         using type = std::underlying_type_t<error_handler_type>;
         return static_cast<error_handler_type>( static_cast<type>(lhs) | static_cast<type>(rhs) );
     }
+    /**
+     * @brief Bitwise AND operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param lhs an enum class value
+     * @param rhs an enum class value
+     * @return the bitwise AND value of @p lhs and @p rhs
+     * @nodiscard
+     */
     [[nodiscard]]
-    error_handler_type operator&(const error_handler_type lhs, const error_handler_type rhs) {
+    inline error_handler_type operator&(const error_handler_type lhs, const error_handler_type rhs) {
         using type = std::underlying_type_t<error_handler_type>;
         return static_cast<error_handler_type>( static_cast<type>(lhs) & static_cast<type>(rhs) );
     }
+    /**
+     * @brief Bitwise XOR operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param lhs an enum class value
+     * @param rhs an enum class value
+     * @return the bitwise XOR value of @p lhs and @p rhs
+     * @nodiscard
+     */
     [[nodiscard]]
-    error_handler_type operator^(const error_handler_type lhs, const error_handler_type rhs) {
+    inline error_handler_type operator^(const error_handler_type lhs, const error_handler_type rhs) {
         using type = std::underlying_type_t<error_handler_type>;
         return static_cast<error_handler_type>( static_cast<type>(lhs) ^ static_cast<type>(rhs) );
     }
-    error_handler_type& operator|=(error_handler_type& lhs, const error_handler_type rhs) {
-        using type = std::underlying_type_t<error_handler_type>;
-        lhs = static_cast<error_handler_type>( static_cast<type>(lhs) | static_cast<type>(rhs) );
+    /**
+     * @brief Compound bitwise OR operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param lhs an enum class value
+     * @param rhs an enum class value
+     * @return @p lhs containing the bitwise OR value of @p lhs and @p rhs
+     */
+    inline error_handler_type& operator|=(error_handler_type& lhs, const error_handler_type rhs) {
+        lhs = lhs | rhs;
         return lhs;
     }
-    error_handler_type& operator&=(error_handler_type& lhs, const error_handler_type rhs) {
-        using type = std::underlying_type_t<error_handler_type>;
-        lhs = static_cast<error_handler_type>( static_cast<type>(lhs) & static_cast<type>(rhs) );
+    /**
+     * @brief Compound bitwise AND operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param lhs an enum class value
+     * @param rhs an enum class value
+     * @return @p lhs containing the bitwise AND value of @p lhs and @p rhs
+     */
+    inline error_handler_type& operator&=(error_handler_type& lhs, const error_handler_type rhs) {
+        lhs = lhs & rhs;
         return lhs;
     }
-    error_handler_type& operator^=(error_handler_type& lhs, const error_handler_type rhs) {
-        using type = std::underlying_type_t<error_handler_type>;
-        lhs = static_cast<error_handler_type>( static_cast<type>(lhs) ^ static_cast<type>(rhs) );
+    /**
+     * @brief Compound bitwise XOR operator overload for the @ref mpicxx::error_handler_type enum class.
+     * @param lhs an enum class value
+     * @param rhs an enum class value
+     * @return @p lhs containing the bitwise XOR value of @p lhs and @p rhs
+     */
+    inline error_handler_type& operator^=(error_handler_type& lhs, const error_handler_type rhs) {
+        lhs = lhs ^ rhs;
         return lhs;
     }
     ///@}
