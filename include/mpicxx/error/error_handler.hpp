@@ -132,15 +132,15 @@ namespace mpicxx {
 
 
         void add_comm_error_handler(MPI_Comm_errhandler_function func) {
-            type_ = detail::bitmask::set(type_, error_handler_type::comm);
+            detail::bitmask::set(type_, error_handler_type::comm);
             MPI_Comm_create_errhandler(func, &handler_[0]);
         }
         void add_file_error_handler(MPI_File_errhandler_function func) {
-            type_ = detail::bitmask::set(type_, error_handler_type::file);
+            detail::bitmask::set(type_, error_handler_type::file);
             MPI_File_create_errhandler(func, &handler_[1]);
         }
         void add_win_error_handler(MPI_Win_errhandler_function func) {
-            type_ = detail::bitmask::set(type_, error_handler_type::win);
+            detail::bitmask::set(type_, error_handler_type::win);
             MPI_Win_create_errhandler(func, &handler_[2]);
         }
 

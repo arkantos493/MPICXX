@@ -166,11 +166,11 @@ namespace mpicxx {
             const std::string_view substr = detail::trim(sv.substr(pos, next));
 
             if (substr.compare("COMM") == 0) {
-                eht = detail::bitmask::set(eht, error_handler_type::comm);
+                detail::bitmask::set(eht, error_handler_type::comm);
             } else if (substr.compare("FILE") == 0) {
-                eht = detail::bitmask::set(eht, error_handler_type::file);
+                detail::bitmask::set(eht, error_handler_type::file);
             } else if (substr.compare("WIN") == 0) {
-                eht = detail::bitmask::set(eht, error_handler_type::win);
+                detail::bitmask::set(eht, error_handler_type::win);
             }
 
             pos = next + 1;
