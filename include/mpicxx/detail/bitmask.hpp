@@ -14,6 +14,30 @@
 #include <concepts>
 #include <type_traits>
 
+#define MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, Op) \
+[[nodiscard]]                                                \
+inline Enum operator Op (const Enum lhs) noexcept {          \
+    using utype = std::underlying_type_t<Enum>;              \
+    return static_cast<Enum>( Op static_cast<utype>(lhs) );  \
+}                                                            \
+
+#define MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, Op)                       \
+[[nodiscard]]                                                                       \
+inline Enum operator Op (const Enum lhs, const Enum rhs) noexcept {                 \
+    using utype = std::underlying_type_t<Enum>;                                     \
+    return static_cast<Enum>( static_cast<utype>(lhs) Op static_cast<utype>(rhs) ); \
+}                                                                                   \
+inline Enum& operator Op##=(Enum& lhs, const Enum rhs) noexcept {                   \
+    lhs = lhs Op rhs;                                                               \
+    return lhs;                                                                     \
+}                                                                                   \
+
+#define MPICXX_DEFINE_ENUM_BITWISE_OPERATORS(Enum)   \
+MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, ~)  \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, |) \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, &) \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, ^) \
+
 namespace mpicxx::detail::bitmask {
 
     /**

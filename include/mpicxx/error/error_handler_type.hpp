@@ -17,11 +17,13 @@
 #include <ostream>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 namespace mpicxx {
 
     /**
      * @brief Enum class for the different types of error handlers provided by MPI.
+     * @details Bitwise operators are enabled for the enum class using the @ref MPICXX_DEFINE_ENUM_BITWISE_OPERATORS macro.
      */
     enum class error_handler_type {
         /** error handler type for communicators */
@@ -32,86 +34,7 @@ namespace mpicxx {
         win  = 1 << 2
     };
 
-
-    /// @name mpicxx::error_handler_type bitwise arithmetic operators
-    /**
-     * @brief Bitwise NOT operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param eht the enum class value
-     * @return the bitwise NOT value of @p eht
-     * @nodiscard
-     */
-    [[nodiscard]]
-    inline error_handler_type operator~(const error_handler_type eht) {
-        return static_cast<error_handler_type>( ~static_cast<std::underlying_type_t<error_handler_type>>(eht) );
-    }
-    /**
-     * @brief Bitwise OR operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param lhs an enum class value
-     * @param rhs an enum class value
-     * @return the bitwise OR value of @p lhs and @p rhs
-     * @nodiscard
-     */
-    [[nodiscard]]
-    inline error_handler_type operator|(const error_handler_type lhs, const error_handler_type rhs) {
-        using type = std::underlying_type_t<error_handler_type>;
-        return static_cast<error_handler_type>( static_cast<type>(lhs) | static_cast<type>(rhs) );
-    }
-    /**
-     * @brief Bitwise AND operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param lhs an enum class value
-     * @param rhs an enum class value
-     * @return the bitwise AND value of @p lhs and @p rhs
-     * @nodiscard
-     */
-    [[nodiscard]]
-    inline error_handler_type operator&(const error_handler_type lhs, const error_handler_type rhs) {
-        using type = std::underlying_type_t<error_handler_type>;
-        return static_cast<error_handler_type>( static_cast<type>(lhs) & static_cast<type>(rhs) );
-    }
-    /**
-     * @brief Bitwise XOR operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param lhs an enum class value
-     * @param rhs an enum class value
-     * @return the bitwise XOR value of @p lhs and @p rhs
-     * @nodiscard
-     */
-    [[nodiscard]]
-    inline error_handler_type operator^(const error_handler_type lhs, const error_handler_type rhs) {
-        using type = std::underlying_type_t<error_handler_type>;
-        return static_cast<error_handler_type>( static_cast<type>(lhs) ^ static_cast<type>(rhs) );
-    }
-    /**
-     * @brief Compound bitwise OR operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param lhs an enum class value
-     * @param rhs an enum class value
-     * @return @p lhs containing the bitwise OR value of @p lhs and @p rhs
-     */
-    inline error_handler_type& operator|=(error_handler_type& lhs, const error_handler_type rhs) {
-        lhs = lhs | rhs;
-        return lhs;
-    }
-    /**
-     * @brief Compound bitwise AND operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param lhs an enum class value
-     * @param rhs an enum class value
-     * @return @p lhs containing the bitwise AND value of @p lhs and @p rhs
-     */
-    inline error_handler_type& operator&=(error_handler_type& lhs, const error_handler_type rhs) {
-        lhs = lhs & rhs;
-        return lhs;
-    }
-    /**
-     * @brief Compound bitwise XOR operator overload for the @ref mpicxx::error_handler_type enum class.
-     * @param lhs an enum class value
-     * @param rhs an enum class value
-     * @return @p lhs containing the bitwise XOR value of @p lhs and @p rhs
-     */
-    inline error_handler_type& operator^=(error_handler_type& lhs, const error_handler_type rhs) {
-        lhs = lhs ^ rhs;
-        return lhs;
-    }
-    ///@}
-
+    MPICXX_DEFINE_ENUM_BITWISE_OPERATORS(error_handler_type)
 
     /// @name @ref mpicxx::error_handler_type conversion functions
     ///@{
