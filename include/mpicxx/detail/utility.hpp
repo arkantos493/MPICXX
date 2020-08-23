@@ -115,6 +115,13 @@ namespace mpicxx::detail {
     constexpr bool all_same(Op pred, const T& t) noexcept { return true; }
     ///@}
 
+    
+    /**
+     * @brief Removes all leading and trailing whitespaces from the string @p sv.
+     * @param sv the string to trim
+     * @return the trimmed string
+     * @nodiscard
+     */
     [[nodiscard]] 
     inline std::string_view trim(std::string_view sv) {
         sv.remove_prefix(sv.find_first_not_of(" "));
