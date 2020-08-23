@@ -11,6 +11,7 @@
 #define MPICXX_BITMASK_HPP
 
 #include <bit>
+#include <concepts>
 #include <type_traits>
 
 namespace mpicxx::detail::bitmask {
