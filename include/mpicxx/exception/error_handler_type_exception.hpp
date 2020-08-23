@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-22
+ * @date 2020-08-23
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Implements the exception which gets thrown if the provided @ref mpicxx::error_handler_type isn't legal.
@@ -28,7 +28,8 @@ namespace mpicxx {
          * @brief Construct a new exception, i.e. tries to create a detailed exception message about the @ref mpicxx::error_handler_type
          *        and tries to add this message to the base class's @ref mpicxx::detail::source_location message.
          * @details If an exception is thrown during construction, no additional message will be prepended.
-         * @param[in] type the provided @ref mpicxx::error_handler_type
+         * @param[in] requested the requested @ref mpicxx::error_handler_type
+         * @param[in] set the set @ref mpicxx::error_handler_type
          * @param[in] loc the exception's source location
          */
         unset_error_handler_type(const error_handler_type requested, const error_handler_type set,
