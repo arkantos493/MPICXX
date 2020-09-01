@@ -14,6 +14,11 @@
 #include <concepts>
 #include <type_traits>
 
+/**
+ * @brief Defines the unary bitwise logic operator @p Op for the enum class @p Enum.
+ * @param[in] Enum the enum class name
+ * @param[in] Op the operation to define
+ */
 #define MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, Op) \
 [[nodiscard]]                                                \
 inline Enum operator Op (const Enum lhs) noexcept {          \
@@ -21,6 +26,11 @@ inline Enum operator Op (const Enum lhs) noexcept {          \
     return static_cast<Enum>( Op static_cast<utype>(lhs) );  \
 }                                                            \
 
+/**
+ * @brief Defines the binary (compound) bitwise logic operator @p Op for the enum class @p Enum.
+ * @param[in] Enum the enum class name
+ * @param[in] Op the operation to define
+ */
 #define MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, Op)                       \
 [[nodiscard]]                                                                       \
 inline Enum operator Op (const Enum lhs, const Enum rhs) noexcept {                 \
@@ -32,11 +42,23 @@ inline Enum& operator Op##=(Enum& lhs, const Enum rhs) noexcept {               
     return lhs;                                                                     \
 }                                                                                   \
 
-#define MPICXX_DEFINE_ENUM_BITWISE_OPERATORS(Enum)   \
-MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, ~)  \
-MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, |) \
-MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, &) \
-MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, ^) \
+/**
+ * @brief Defines all bitwise logic operators for the enum class @p Enum.
+ * @details These operations are:
+ *          [`operator~`](https://en.cppreference.com/w/cpp/language/operator_arithmetic),
+ *          [`operator|`](https://en.cppreference.com/w/cpp/language/operator_arithmetic),
+ *          [`operator|=`](https://en.cppreference.com/w/cpp/language/operator_arithmetic),
+ *          [`operator&`](https://en.cppreference.com/w/cpp/language/operator_arithmetic),
+ *          [`operator&=`](https://en.cppreference.com/w/cpp/language/operator_arithmetic),
+ *          [`operator^`](https://en.cppreference.com/w/cpp/language/operator_arithmetic) and
+ *          [`operator^=`](https://en.cppreference.com/w/cpp/language/operator_arithmetic).
+ * @param[in] Enum the enum class name
+ */
+#define MPICXX_DEFINE_ENUM_BITWISE_OPERATORS(Enum)    \
+MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, ~)   \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, |)  \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, &)  \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, ^)  \
 
 namespace mpicxx::detail::bitmask {
 
