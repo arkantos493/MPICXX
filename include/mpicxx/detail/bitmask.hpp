@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-08-23
+ * @date 2020-09-01
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines utility functions to treat enums or enum classes as bitmasks.
@@ -52,9 +52,9 @@ namespace mpicxx::detail::bitmask {
         { lhs | rhs }  -> std::convertible_to<typename std::remove_cvref_t<T>>;
         { lhs & rhs }  -> std::convertible_to<typename std::remove_cvref_t<T>>;
         { lhs ^ rhs }  -> std::convertible_to<typename std::remove_cvref_t<T>>;
-        { lhs |= rhs } -> std::convertible_to<typename std::remove_cvref_t<T>&>;
-        { lhs &= rhs } -> std::convertible_to<typename std::remove_cvref_t<T>&>;
-        { lhs ^= rhs } -> std::convertible_to<typename std::remove_cvref_t<T>&>;
+        { lhs |= rhs } -> std::convertible_to<typename std::add_lvalue_reference_t<typename std::remove_cvref_t<T>>>;
+        { lhs &= rhs } -> std::convertible_to<typename std::add_lvalue_reference_t<typename std::remove_cvref_t<T>>>;
+        { lhs ^= rhs } -> std::convertible_to<typename std::add_lvalue_reference_t<typename std::remove_cvref_t<T>>>;
     };
     /**
      * @brief @concept{ @ref is_bitwise_enum<T> }
