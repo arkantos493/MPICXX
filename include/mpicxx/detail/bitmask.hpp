@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Marcel Breyer
- * @date 2020-09-01
+ * @date 2020-09-02
  * @copyright This file is distributed under the MIT License.
  *
  * @brief Defines utility functions to treat enums or enum classes as bitmasks.
@@ -54,11 +54,11 @@ inline Enum& operator Op##=(Enum& lhs, const Enum rhs) noexcept {               
  *          [`operator^=`](https://en.cppreference.com/w/cpp/language/operator_arithmetic).
  * @param[in] Enum the enum class name
  */
-#define MPICXX_DEFINE_ENUM_BITWISE_OPERATORS(Enum)    \
-MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, ~)   \
-MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, |)  \
-MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, &)  \
-MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, ^)  \
+#define MPICXX_DEFINE_ENUM_BITWISE_OPERATORS(Enum)   \
+MPICXX_DEFINE_ENUM_UNARY_BITWISE_OPERATORS(Enum, ~)  \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, |) \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, &) \
+MPICXX_DEFINE_ENUM_BINARY_BITWISE_OPERATORS(Enum, ^) \
 
 namespace mpicxx::detail::bitmask {
 
@@ -84,7 +84,7 @@ namespace mpicxx::detail::bitmask {
      * @tparam T the compared to type
      */
     template <typename T>
-    concept is_bitwise_enum = std::is_enum_v<T> && has_bitwise_operators<T>;
+    concept is_bitwise_enum = std::is_enum_v<T> && std::is_unsigned_v<typename std::underlying_type_t<T>> && has_bitwise_operators<T>;
     
 
     /**
