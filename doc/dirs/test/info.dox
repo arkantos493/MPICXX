@@ -80,7 +80,7 @@
 
 
 /**
- * @dir test/info/iterators/iterator_impl
+ * @dir test/info/iterators/info_iterator_impl
  * @author
  * @date 2020-02-04
  *
