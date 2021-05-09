@@ -218,4 +218,12 @@ namespace mpicxx::detail {
 #define MPICXX_ASSERT_SANITY(cond, msg, ...)
 #endif
 
+#if MPICXX_ASSERTION_LEVEL > 0
+#define MPICXX_ENABLE_ASSERTIONS
+#define MPICXX_ASSERT(cond, msg, ...)                                                                       \
+        mpicxx::detail::check(cond, #cond, mpicxx::detail::assertion_category::precondition,                \
+        mpicxx::detail::source_location::current(MPICXX_PRETTY_FUNC_NAME__), msg __VA_OPT__(,) __VA_ARGS__)
+// TODO: remove assertion category
+#endif
+
 #endif // MPICXX_ASSERT_HPP
