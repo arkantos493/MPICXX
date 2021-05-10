@@ -12,9 +12,11 @@
 
 #include <mpi.h>
 
-#include <memory>
-#include <string>
-#include <string_view>
+#include <memory>       // std::addressof
+#include <ostream>      // std::ostream
+#include <string>       // std::string
+#include <string_view>  // std::string_view
+#include <utility>      // std::move
 
 namespace mpicxx::impl {
 
@@ -22,13 +24,16 @@ namespace mpicxx::impl {
  * @brief A proxy class for the mpicxx::info class to distinguish between read and write accesses for the element access functions.
  */
 class info_proxy {
+  // pointer type to the referred to info object
   using MPI_Info_ptr = MPI_Info*;
+  // reference type to the referred to info object
   using MPI_Info_ref = MPI_Info&;
+
  public:
   /**
    * @brief Construct a new proxy object referring to a specific MPI_Info object and key.
-   * @param info the referred to MPI_Info object
-   * @param key the provided key
+   * @param[inout] info the referred to MPI_Info object
+   * @param[in] key the provided key
    */
   info_proxy(MPI_Info_ref info, std::string key) : info_{ std::addressof(info) }, key_{ std::move(key) } {
     MPICXX_ASSERT(!this->info_refers_to_mpi_info_null(),
