@@ -155,7 +155,7 @@ class info_iterator {
   /**
    * @brief Special copy assignment operator. Assign a non-const iterator to a const_iterator.
    * @tparam is_const_
-   * @param rhs  iterator to use as data source
+   * @param[in] rhs  iterator to use as data source
    * @return *this
    */
   template <bool is_const_ = is_const>
@@ -177,7 +177,7 @@ class info_iterator {
   /**
    * @brief Compares *this and rhs for equality.
    * @tparam rhs_const
-   * @param rhs the other iterator
+   * @param[in] rhs the other iterator
    * @return true if both iterators are equal, otherwise false
    */
   template <bool rhs_const>
@@ -194,7 +194,7 @@ class info_iterator {
   /**
    * @brief Three-way comparison operator for *this and rhs.
    * @tparam rhs_const
-   * @param rhs the other iterator
+   * @param[in] rhs the other iterator
    * @return the std::partial_ordering result
    */
   template <bool rhs_const>
