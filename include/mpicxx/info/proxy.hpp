@@ -92,7 +92,7 @@ class info_proxy {
     MPICXX_ASSERT(!rhs.info_refers_to_mpi_info_null(),
                   "Attempt to access a [key, value]-pair of an info object referring to 'MPI_INFO_NULL'!");
 
-    return out << static_cast<std::string>(rhs);;
+    return out << static_cast<std::string>(rhs);
   }
 
  private:
