@@ -1,17 +1,13 @@
 /**
- * @file
- * @author Marcel Breyer
- * @date 2020-08-04
- * @copyright This file is distributed under the MIT License.
+ * Copyright (C) 2021-05-10 - Marcel Breyer - All Rights Reserved
+ * Licensed under the MIT License. See LICENSE.md file in the project root for full license information.
  *
- * @brief Implements a wrapper class around the [*MPI_Info*](https://www.mpi-forum.org/docs/mpi-3.1/mpi31-report/node229.htm) object.
- * @details The @ref mpicxx::info class interface is inspired by the
- *          [`std::unordered_map`](https://en.cppreference.com/w/cpp/container/unordered_map) and
- *          [`std::map`](https://en.cppreference.com/w/cpp/container/map) interface.
+ * Implements a wrapper class around the MPI_Info object. The mpicxx::info class interface is inspired by the std::unordered_map and
+ * std::map interface.
  */
 
-#ifndef MPICXX_INFO_HPP
-#define MPICXX_INFO_HPP
+#ifndef MPICXX_INFO_HPP_
+#define MPICXX_INFO_HPP_
 
 #include <mpicxx/detail/assert.hpp>
 #include <mpicxx/detail/concepts.hpp>
@@ -37,48 +33,71 @@
 #include <utility>
 #include <vector>
 
-
 namespace mpicxx {
 
-/// This class is a wrapper to the MPI_Info object providing a interface inspired by std::unordered_map and std::map.
+/**
+ * @brief This class is a wrapper to the MPI_Info object providing a interface inspired by std::unordered_map and std::map.
+ */
 class info {
 
  public:
   /**************************************************************************************************************/
-  /**                                                member types                                               **/
+  /**                                                member types                                              **/
   /**************************************************************************************************************/
+  /// The type of the key.
   using key_type = std::string;
+  /// The type of a value associated with a key.
   using mapped_type = std::string;
+  /// The type of a (key, value)-pair.
   using value_type = std::pair<const key_type, mapped_type>;
+  /// Unsigned integer type.
   using size_type = std::size_t;
+  /// Signed integer type.
   using difference_type = std::ptrdiff_t;
+  /// The type of value_type used as a reference.
   using reference = value_type&;
+  /// The type of value_type used as a const reference.
   using const_reference = const value_type&;
+  /// The type of value_type used as a pointer.
   using pointer = value_type*;
+  /// The type of value_type used as a const pointer.
   using const_pointer = const value_type*;
+  /// The type of an iterator.
   using iterator = impl::info_iterator<false>;
+  /// The type of a const_iterator.
   using const_iterator = impl::info_iterator<true>;
+  /// The type of a reverse_iterator using std::reverse_iterator.
   using reverse_iterator = std::reverse_iterator<iterator>;
+  /// The type of a const_reverse_iterator using std::reverse_iterator.
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+  /// The type of the proxy used to distinguish between read and write accesses for the element access functions.
   using proxy = impl::info_proxy;
 
 
   /**************************************************************************************************************/
   /**                                            static data member                                            **/
   /**************************************************************************************************************/
+  /// Static member that holds all execution environment information defined in MPI_INFO_ENV.
   static const info env;
+  /// Static null object which is mainly used to explicitly indicate that no info is provided.
   static const info null;
 
 
   /**************************************************************************************************************/
   /**                                       constructors and destructor                                        **/
   /**************************************************************************************************************/
+  /**
+   * @brief Construct an empty info object.
+   */
   info() : is_freeable_{ true } {
     // initialize an empty info object
     MPI_Info_create(&info_);
   }
-
+  /**
+   * @brief Copy constructor. Retains other's (key, value)-pair ordering.
+   * @param[in] other another info object to be used as source to initialize the (key, value)-pairs of this info object with
+   */
   info(const info& other) {
     if (other.info_ == MPI_INFO_NULL) {
       // copy an info object which refers to MPI_INFO_NULL
@@ -90,33 +109,53 @@ class info {
       is_freeable_ = true;
     }
   }
-
+  /**
+   * @brief Move constructor. Retains other's (key, value)-pair ordering.
+   * @param[inout] other another info object to be used as source to initialize the (key, value)-pairs of this info object with
+   */
   info(info&& other) noexcept: info_{ std::exchange(other.info_, MPI_INFO_NULL) },
                                is_freeable_{ std::exchange(other.is_freeable_, false) } { }
-
+  /**
+   * @brief Constructs the info object with the contents of the range [first, last).
+   * @details If multiple (key, value)-pairs in the range share the same key, the last occurrence determines the final value.
+   * @param[in] first iterator to the first (key, value)-pair in the range
+   * @param[in] last iterator one-past the last (key, value)-pair in the range
+   */
   template <std::input_iterator InputIter>
-  info(InputIter first, InputIter last) : info{ } {
+  info(InputIter first, InputIter last) : info{} {
     // default construct the info object via the default constructor
     // add all (key, value)-pairs
     this->insert_or_assign(first, last);
   }
-
-  info(std::initializer_list<value_type> init) : info{ } {
+  /**
+   * @brief Constructs the info object with the contents of the std::initializer_list init.
+   * @details If multiple (key, value)-pairs in the list share the same key, the last occurrence determines the final value.
+   * @param[in] init std::initializer_list to initialize the (key, value)-pairs of the info object with
+   */
+  info(std::initializer_list<value_type> init) : info{} {
     // default construct the info object via the default constructor
     // add all (key, value)-pairs
     this->insert_or_assign(init);
   }
-
+  /**
+   * @brief Wrap a MPI_Info object in an mpicxx::info object.
+   * @details Changing the underlying MPI_Info object does not change the value of *this!
+   * @param[in] other the raw MPI_Info object
+   * @param[in] is_freeable mark whether the MPI_Info object wrapped in this info object should be automatically freed at the end of its
+   *                        lifetime
+   */
   constexpr info(MPI_Info other, const bool is_freeable) noexcept: info_{ other }, is_freeable_{ is_freeable } {
-    MPICXX_ASSERT_SANITY(!(other == MPI_INFO_NULL && is_freeable == true), "'MPI_INFO_NULL' shouldn't be marked as freeable!");
-    MPICXX_ASSERT_SANITY(!(other == MPI_INFO_ENV && is_freeable == true), "'MPI_INFO_ENV' shouldn't be marked as freeable!");
+    MPICXX_ASSERT(!(other == MPI_INFO_NULL && is_freeable == true), "'MPI_INFO_NULL' shouldn't be marked as freeable!");
+    MPICXX_ASSERT(!(other == MPI_INFO_ENV && is_freeable == true), "'MPI_INFO_ENV' shouldn't be marked as freeable!");
   }
-
+  /**
+   * @brief Destructs the info object.
+   */
   ~info() {
     // destroy info object if marked as freeable
     if (is_freeable_) {
-      MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
-      MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
+      MPICXX_ASSERT(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
+      MPICXX_ASSERT(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
 
       MPI_Info_free(&info_);
     }
@@ -125,29 +164,31 @@ class info {
   /**************************************************************************************************************/
   /**                                           assignment operators                                           **/
   /**************************************************************************************************************/
+  /**
+   * @brief Copy assignment operator. Retains rhs's (key, value)-pair ordering.
+   * @param[in] rhs another info object to use as data source
+   * @return *this
+   */
   info& operator=(const info& rhs) {
     info tmp{ rhs };
     this->swap(tmp);
     return *this;
   }
-
+  /**
+   * @brief Move assignment operator. Retains rhs's (key, value)-pair ordering.
+   * @param[inout] rhs another info object to use as data source
+   * @return *this
+   */
   info& operator=(info&& rhs) {
-    MPICXX_ASSERT_SANITY(!this->identical(rhs), "Attempt to perform a \"self move assignment\"!");
-
-    // delete current MPI_Info object if and only if it is marked as freeable
-    if (is_freeable_) {
-      MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_NULL, "Attempt to free a 'MPI_INFO_NULL' object!");
-      MPICXX_ASSERT_PRECONDITION(info_ != MPI_INFO_ENV, "Attempt to free a 'MPI_INFO_ENV' object!");
-
-      MPI_Info_free(&info_);
-    }
-    // transfer ownership
-    info_ = std::exchange(rhs.info_, MPI_INFO_NULL);
-    is_freeable_ = std::exchange(rhs.is_freeable_, false);
-
+    info tmp{ std::move(rhs) };
+    this->swap(tmp);
     return *this;
   }
-
+  /**
+   * @brief Replaces the contents with those of the std::initializer_list of ilist.
+   * @param[in] ilist std::initializer_list to use as data source
+   * @return *this
+   */
   info& operator=(std::initializer_list<value_type> ilist) {
     info tmp{ ilist };
     this->swap(tmp);
@@ -157,19 +198,20 @@ class info {
   /**************************************************************************************************************/
   /**                                                 iterators                                                **/
   /**************************************************************************************************************/
-  [[nodiscard]]
-  iterator begin() noexcept {
-    MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
-                               "Attempt to create an iterator from an info object referring to 'MPI_INFO_NULL'!");
-
+  /**
+   * @brief Returns an iterator to the first (key, value)-pair of the info object.
+   * @return iterator to the first (key, value)-pair
+   */
+  [[nodiscard]] iterator begin() noexcept {
+    MPICXX_ASSERT(!this->refers_to_mpi_info_null(), "Attempt to create an iterator from an info object referring to 'MPI_INFO_NULL'!");
     return iterator{ info_, 0 };
   }
-
-  [[nodiscard]]
-  iterator end() noexcept {
-    MPICXX_ASSERT_PRECONDITION(!this->refers_to_mpi_info_null(),
-                               "Attempt to create an iterator from an info object referring to 'MPI_INFO_NULL'!");
-
+  /**
+   * @brief Returns an iterator to the element following the last (key, value)-pair of the info object.
+   * @return iterator to the element following the last (key, value)-pair
+   */
+  [[nodiscard]] iterator end() noexcept {
+    MPICXX_ASSERT(!this->refers_to_mpi_info_null(), "Attempt to create an iterator from an info object referring to 'MPI_INFO_NULL'!");
     return iterator{ info_, static_cast<difference_type>(this->size()) };
   }
 
@@ -549,7 +591,7 @@ class info {
     MPICXX_ASSERT_SANITY(!this->identical(source), "Attempt to perform a \"self merge\"!");
 
     // do nothing if a "self merge" is attempted
-    if (this == std::addressof(source)) return;
+    if (this == std::addressof(source)) { return; }
 
     size_type size = source.size();
     char source_key[MPI_MAX_INFO_KEY];
@@ -670,13 +712,13 @@ class info {
   [[nodiscard]]
   friend bool operator==(const info& lhs, const info& rhs) {
     // if both info object refer to MPI_INFO_NULL they compare equal
-    if (lhs.info_ == MPI_INFO_NULL && rhs.info_ == MPI_INFO_NULL) return true;
+    if (lhs.info_ == MPI_INFO_NULL && rhs.info_ == MPI_INFO_NULL) { return true; }
     // if only one info object refers to MPI_INFO_NULL they don't compare equal
-    if (lhs.info_ == MPI_INFO_NULL || rhs.info_ == MPI_INFO_NULL) return false;
+    if (lhs.info_ == MPI_INFO_NULL || rhs.info_ == MPI_INFO_NULL) { return false; }
 
     // not the same number of [key, value]-pairs therefore can't compare equal
     const size_type size = lhs.size();
-    if (size != rhs.size()) return false;
+    if (size != rhs.size()) { return false; }
 
     // check all [key, value]-pairs for equality
     char key[MPI_MAX_INFO_KEY];
@@ -864,6 +906,7 @@ class info {
   template <std::input_iterator InputIt>
   [[nodiscard]]
   bool legal_iterator_range(InputIt first, InputIt last) {
+    // TODO: not possible with input_iterator!
     return std::distance(first, last) >= 0;
   }
 
@@ -891,4 +934,4 @@ inline const info info::null = info(MPI_INFO_NULL, false);
 
 }
 
-#endif // MPICXX_INFO_HPP
+#endif // MPICXX_INFO_HPP_
