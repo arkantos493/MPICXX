@@ -11,6 +11,8 @@
 #include <mpicxx/detail/assert.hpp>
 #include <mpicxx/info/proxy.hpp>
 
+#include <mpi.h>
+
 #include <compare>      // std::partial_ordering
 #include <cstddef>      // std::ptrdiff_t
 #include <iterator>     // std::random_access_iterator_tag
