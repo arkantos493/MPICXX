@@ -189,15 +189,3 @@ if (MPICXX_GENERATE_DOCUMENTATION)
     endif ()
     add_subdirectory(doc)
 endif ()
-
-
-# only used to enable CLion code completion
-if ($ENV{CLION_IDE})
-    file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-
-    add_executable(prog ${SOURCES})
-
-    target_include_directories(prog PRIVATE ${PROJECT_SOURCE_DIR}/include)
-    target_include_directories(prog PRIVATE ${PROJECT_SOURCE_DIR}/third_party/googletest-src/googletest/include)
-    target_compile_features(prog PRIVATE cxx_std_20)
-endif ()
