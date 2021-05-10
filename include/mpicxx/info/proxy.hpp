@@ -1,6 +1,6 @@
 /**
- * 2021-05-09: Marcel Breyer
- * This file is distributed under the MIT License.
+ * Copyright (C) 2021-05-10 - Marcel Breyer - All Rights Reserved
+ * Licensed under the MIT License. See LICENSE.md file in the project root for full license information.
  *
  * Implements a proxy class for the mpicxx::info class.
  */
@@ -15,7 +15,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-
 
 namespace mpicxx::impl {
 
@@ -45,7 +44,7 @@ class info_proxy {
    */
   void operator=(const std::string_view value) {
     MPICXX_ASSERT(!this->info_refers_to_mpi_info_null(),
-                  "Attempt to access a [key, value]-pair of an info object referring to 'MPI_INFO_NULL'!");
+                  "Attempt to access a (key, value)-pair of an info object referring to 'MPI_INFO_NULL'!");
     MPICXX_ASSERT(this->legal_string_size(value, MPI_MAX_INFO_VAL),
                   "Illegal info value: 0 < {} < {} (MPI_MAX_INFO_VAL)", value.size(), MPI_MAX_INFO_VAL);
 
@@ -60,7 +59,7 @@ class info_proxy {
    */
   [[nodiscard]] operator std::string() const {
     MPICXX_ASSERT(!this->info_refers_to_mpi_info_null(),
-                  "Attempt to access a [key, value]-pair of an info object referring to 'MPI_INFO_NULL'!");
+                  "Attempt to access a (key, value)-pair of an info object referring to 'MPI_INFO_NULL'!");
 
     // get the length of the value
     int valuelen, flag;
@@ -68,7 +67,7 @@ class info_proxy {
 
     if (!static_cast<bool>(flag)) {
       // the key doesn't exist yet
-      // -> add a new [key, value]-pair and return a std::string consisting of only one whitespace
+      // -> add a new (key, value)-pair and return a std::string consisting of only one whitespace
       std::string value{ " " };
       MPI_Info_set(*info_, key_.data(), value.data());
       return value;
@@ -90,7 +89,7 @@ class info_proxy {
    */
   friend std::ostream& operator<<(std::ostream& out, const info_proxy& rhs) {
     MPICXX_ASSERT(!rhs.info_refers_to_mpi_info_null(),
-                  "Attempt to access a [key, value]-pair of an info object referring to 'MPI_INFO_NULL'!");
+                  "Attempt to access a (key, value)-pair of an info object referring to 'MPI_INFO_NULL'!");
 
     return out << static_cast<std::string>(rhs);
   }
